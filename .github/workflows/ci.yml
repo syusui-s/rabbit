@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branch:
+      - "*"
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint / Format
+        run: npm run lint
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build -- --base="/rezi/" # https://syusui-s.github.io/rezi/
+      - name: Check license
+        run: npm run checkLicense
+      - name: Copy index.html for GitHub Pages
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: cp dist/index.html dist/404.html
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
