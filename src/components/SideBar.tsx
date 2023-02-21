@@ -8,7 +8,7 @@ type SideBarProps = {
 };
 
 const SideBar: Component<SideBarProps> = (props) => {
-  const [formOpened, setFormOpened] = createSignal(true);
+  const [formOpened, setFormOpened] = createSignal(false);
 
   return (
     <div class="flex shrink-0 flex-row border-r bg-sidebar-bg">
@@ -22,8 +22,8 @@ const SideBar: Component<SideBarProps> = (props) => {
         <button class="h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary">
           <MagnifyingGlass />
         </button>
-        <div>column 1</div>
-        <div>column 2</div>
+        {/* <div>column 1</div> */}
+        {/* <div>column 2</div> */}
       </div>
       <Show when={formOpened()}>{() => props.postForm()}</Show>
     </div>

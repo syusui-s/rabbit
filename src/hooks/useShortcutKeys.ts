@@ -1,7 +1,7 @@
 // const commands = ['openPostForm'] as const;
 // type Commands = (typeof commands)[number];
 
-import { createMemo, createEffect } from 'solid-js';
+import { onMount, type JSX } from 'solid-js';
 
 type Shortcut = { key: string; command: string };
 
@@ -39,7 +39,7 @@ const createShortcutsMap = (shortcuts: Shortcut[]) => {
 const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcutKeysProps) => {
   const shortcutsMap = createShortcutsMap(shortcuts);
 
-  createEffect(() => {
+  onMount(() => {
     const handleKeydown: JSX.EventHandler<Window, KeyboardEvent> = (ev) => {
       console.log(ev);
       if (ev.type !== 'keydown') return;
