@@ -1,12 +1,15 @@
-import { createSignal } from 'solid-js';
-import type { Component } from 'solid-js';
+import { createSignal, type Component, type JSX } from 'solid-js';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 
-const NotePostForm: Component = (props) => {
-  const [text, setText] = createSignal('');
+type NotePostFormProps = {
+  onPost: (textNote: { content: string }) => void;
+};
+
+const NotePostForm: Component<NotePostFormProps> = (props) => {
+  const [text, setText] = createSignal<string>('');
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
-    ev.preventDefault(true);
+    ev.preventDefault();
     props.onPost({ content: text() });
   };
 

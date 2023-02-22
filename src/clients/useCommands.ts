@@ -4,7 +4,11 @@ import type { Event as NostrEvent } from 'nostr-tools/event';
 import usePool from '@/clients/usePool';
 
 type UseCommands = {
-  publishTextNote: ({ content }: { content: string }) => Promise<void>;
+  publishTextNote: (props: {
+    relayUrls: string[];
+    pubkey: string;
+    content: string;
+  }) => Promise<void>;
 };
 
 const useCommands = (): UseCommands => {

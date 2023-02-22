@@ -16,7 +16,7 @@ const GeneralUserMentionDisplay = (props: GeneralUserMentionDisplayProps) => {
 
   return (
     <Show when={profile() != null} fallback={`@${props.pubkey}`}>
-      @{profile()?.display_name ?? props.pubkey}
+      @{profile()?.name ?? props.pubkey}
     </Show>
   );
 };

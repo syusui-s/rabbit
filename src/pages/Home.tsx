@@ -1,10 +1,10 @@
-import { createSignal, createEffect, Show, For } from 'solid-js';
+import { createSignal, Show, For } from 'solid-js';
 import type { Component } from 'solid-js';
 
 import Column from '@/components/Column';
 import NotePostForm from '@/components/NotePostForm';
 import SideBar from '@/components/SideBar';
-import TextNote from '@/components/TextNote';
+import Timeline from '@/components/Timeline';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
 import useSubscription from '@/clients/useSubscription';
@@ -38,31 +38,54 @@ const Home: Component = () => {
     pubkey: pubkeyHex,
   }));
 
-  const { events: myPosts } = useSubscription(() => ({
-    relayUrls: config().relayUrls,
-    filters: [
-      {
-        kinds: [1],
-        authors: [pubkeyHex],
-        limit: 100,
-      },
-    ],
-  }));
-
   const { events: followingsPosts } = useSubscription(() => ({
     relayUrls: config().relayUrls,
     filters: [
       {
-        kinds: [1],
+        kinds: [1, 6],
         authors: followings()?.map((f) => f.pubkey) ?? [pubkeyHex],
-        limit: 100,
+        limit: 25,
         since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
     ],
   }));
 
-  const handlePost = ({ content }) => {
-    commands.publishTextNote({ relayUrls: config().relayUrls, pubkey: pubkeyHex, content });
+  const { events: myPosts } = useSubscription(() => ({
+    relayUrls: config().relayUrls,
+    filters: [
+      {
+        kinds: [1, 6],
+        authors: [pubkeyHex],
+        limit: 25,
+      },
+    ],
+  }));
+
+  const { events: searchPosts } = useSubscription(() => ({
+    relayUrls: ['wss://relay.nostr.band/'],
+    filters: [
+      {
+        kinds: [1],
+        search: '#nostrstudy',
+        limit: 25,
+        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+      },
+    ],
+  }));
+
+  const handlePost = ({ content }: { content: string }) => {
+    commands
+      .publishTextNote({
+        relayUrls: config().relayUrls,
+        pubkey: pubkeyHex,
+        content,
+      })
+      .then(() => {
+        console.log('ok');
+      })
+      .catch((err) => {
+        console.error('error', err);
+      });
   };
 
   return (
@@ -70,10 +93,13 @@ const Home: Component = () => {
       <SideBar postForm={() => <NotePostForm onPost={handlePost} />} />
       <div class="flex flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" width="widest">
-          <For each={followingsPosts()}>{(ev) => <TextNote event={ev} />}</For>
+          <Timeline events={followingsPosts()} />
         </Column>
         <Column name="自分の投稿" width="medium">
-          <For each={myPosts()}>{(ev) => <TextNote event={ev} />}</For>
+          <Timeline events={myPosts()} />
+        </Column>
+        <Column name="#nostrstudy" width="medium">
+          <Timeline events={searchPosts()} />
         </Column>
       </div>
     </div>

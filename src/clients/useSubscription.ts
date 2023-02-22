@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from 'solid-js';
+import { createSignal, createEffect, onCleanup } from 'solid-js';
 import type { Event as NostrEvent } from 'nostr-tools/event';
 import type { Filter } from 'nostr-tools/filter';
 import type { SubscriptionOptions } from 'nostr-tools/relay';
@@ -10,7 +10,8 @@ export type UseSubscriptionProps = {
   options?: SubscriptionOptions;
 };
 
-const sortEvents = (events: NostrEvent[]) => events.sort((a, b) => b.created_at - a.created_at);
+const sortEvents = (events: NostrEvent[]) =>
+  Array.from(events).sort((a, b) => b.created_at - a.created_at);
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps) => {
   const pool = usePool();
@@ -36,6 +37,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps) => {
       setEvents(sortEvents(storedEvents));
     });
 
+    // avoid updating an array too rapidly while this is fetching stored events
     const intervalId = setInterval(() => {
       if (eose) {
         clearInterval(intervalId);
@@ -44,10 +46,14 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps) => {
       setEvents(sortEvents(storedEvents));
     }, 100);
 
-    return () => {
+    onCleanup(() => {
       sub.unsub();
       clearInterval(intervalId);
-    };
+    });
+  });
+
+  createEffect(() => {
+    console.log(events());
   });
 
   return { events };
