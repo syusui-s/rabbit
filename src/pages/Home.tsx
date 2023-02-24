@@ -5,6 +5,7 @@ import Column from '@/components/Column';
 import NotePostForm from '@/components/NotePostForm';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
+import TextNote from '@/components/TextNote';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
 import useSubscription from '@/clients/useSubscription';
@@ -93,6 +94,18 @@ const Home: Component = () => {
       <SideBar postForm={() => <NotePostForm onPost={handlePost} />} />
       <div class="flex flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" width="widest">
+          <TextNote
+            event={
+              {
+                id: 12345,
+                kind: 1,
+                pubkey: pubkeyHex,
+                created_at: Math.floor(Date.now() / 1000),
+                tags: [],
+                content: 'hello',
+              } as NostrEvent
+            }
+          />
           <Timeline events={followingsPosts()} />
         </Column>
         <Column name="自分の投稿" width="medium">

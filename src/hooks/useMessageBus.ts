@@ -8,8 +8,16 @@ export type UseMessageChannelProps = {
   id: typeof CommandChannel;
 };
 
-const useMessageChannel = (propsProvider: () => UseMessageChannelProps) => {
-  const channel = () => channels()[id];
+export type MessageChannelRequest<T> = {
+  requestId: string;
+  message: T;
+};
+
+type Primitives = number | string | null;
+type Serializable = Record<string, Primitives | Array<Primitives>>;
+
+const useMessageChannel = <T extends Serializable>(propsProvider: () => UseMessageChannelProps) => {
+  const channel = () => channels()[propsProvider().id];
 
   onMount(() => {
     const { id } = propsProvider();
@@ -21,17 +29,18 @@ const useMessageChannel = (propsProvider: () => UseMessageChannelProps) => {
     }
   });
 
-  const listen = async (requestId: string, timeout = 1000) => {
+  const listen = async (requestId: string, timeout = 1000): Promise<T> => {
     return new Promise((resolve, reject) => {
       const listener = (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
+        if (typeof event.data !== 'string') return;
 
-        const data = JSON.parse(event.data);
+        const data = JSON.parse(event.data) as MessageChannelRequest<T>;
 
         if (data.requestId !== requestId) return;
 
         channel().port2.removeEventListener('message', listener);
-        resolve(data);
+        resolve(data.message);
       };
 
       setTimeout(() => {
@@ -44,14 +53,15 @@ const useMessageChannel = (propsProvider: () => UseMessageChannelProps) => {
   };
 
   return {
-    async requst(message) {
-      const requestId = Math.random();
-      const messageStr = JSON.stringify({ ...message, requestId });
+    async requst(message: T) {
+      const requestId = Math.random().toString();
+      const messageStr = JSON.stringify({ message, requestId });
       const response = listen(requestId, timeout);
       channel().postMessage(messageStr);
-
       return response;
     },
     handle(handler) {},
   };
 };
+
+export default useMessageChannel;

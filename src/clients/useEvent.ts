@@ -1,11 +1,18 @@
+import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type Accessor } from 'solid-js';
+
 import useCachedEvents from '@/clients/useCachedEvents';
 
-type UseEventProps = {
+export type UseEventProps = {
   relayUrls: string[];
   eventId: string;
 };
 
-const useEvent = (propsProvider: () => UseEventProps) => {
+export type UseEvent = {
+  event: Accessor<NostrEvent>;
+};
+
+const useEvent = (propsProvider: () => UseEventProps): UseEvent => {
   const query = useCachedEvents(() => {
     const { relayUrls, eventId } = propsProvider();
     return {
@@ -20,7 +27,7 @@ const useEvent = (propsProvider: () => UseEventProps) => {
     };
   });
 
-  const event = () => query.data?.[0];
+  const event = () => query.data?.[0] as NostrEvent;
 
   return { event };
 };

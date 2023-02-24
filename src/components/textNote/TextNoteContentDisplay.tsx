@@ -9,7 +9,7 @@ export type TextNoteContentDisplayProps = {
   event: NostrEvent;
 };
 
-export const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
+const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
   return (
     <For each={parseTextNote(props.event)}>
       {(item: ParsedTextNoteNode) => {

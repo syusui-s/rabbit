@@ -44,7 +44,8 @@ const getEvents = async ({
 /**
  * This aims to fetch stored data, and doesn't support fetching streaming data continuously.
  *
- * This will be useful when you want to fetch profile or following list, reactions, and something like that.
+ * This is useful when you want to fetch some data which change occasionally:
+ * profile or following list, reactions, and something like that.
  */
 const useCachedEvents = (propsProvider: () => UseSubscriptionProps) => {
   const pool = usePool();
@@ -52,7 +53,7 @@ const useCachedEvents = (propsProvider: () => UseSubscriptionProps) => {
   return createQuery(
     () => {
       const { relayUrls, filters, options } = propsProvider();
-      return ['useCachedEvents', relayUrls, filters, options];
+      return ['useCachedEvents', relayUrls, filters, options] as const;
     },
     ({ queryKey, signal }) => {
       const [, relayUrls, filters, options] = queryKey;
