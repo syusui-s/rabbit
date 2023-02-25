@@ -5,7 +5,7 @@ export type MentionedEventDisplayProps = {
 };
 
 const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
-  return <span class="text-blue-500 underline">@{props.mentionedEvent.eventId}</span>;
+  return <span class="text-blue-500 underline">#{props.mentionedEvent.eventId}</span>;
 };
 
 export default MentionedEventDisplay;

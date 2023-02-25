@@ -1,4 +1,4 @@
-import { createSignal, type Component, type JSX } from 'solid-js';
+import { createSignal, createMemo, type Component, type JSX } from 'solid-js';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 
 type NotePostFormProps = {
@@ -8,10 +8,17 @@ type NotePostFormProps = {
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [text, setText] = createSignal<string>('');
 
+  const handleChangeText: JSX.EventHandler<HTMLTextAreaElement, Event> = (ev) => {
+    setText(ev.currentTarget.value);
+  };
+
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
     props.onPost({ content: text() });
+    // TODO 投稿完了したらなんかする
   };
+
+  const submitDisabled = createMemo(() => text().trim().length === 0);
 
   return (
     <div class="p-1">
@@ -21,13 +28,16 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           class="rounded border-none"
           rows={4}
           placeholder="いまどうしてる？"
-          onChange={(ev) => {
-            setText(ev.target.value);
-          }}
+          onInput={handleChangeText}
           value={text()}
         />
         <div class="grid justify-end">
-          <button class="h-8 w-8 rounded bg-primary p-2 font-bold text-white" type="submit">
+          <button
+            class="h-8 w-8 rounded bg-primary p-2 font-bold text-white"
+            classList={{ 'bg-primary-disabled': submitDisabled(), 'bg-primary': !submitDisabled() }}
+            type="submit"
+            disabled={submitDisabled()}
+          >
             <PaperAirplane />
           </button>
         </div>

@@ -18,10 +18,6 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
   const pubkey = () => props.event.pubkey;
   const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
 
-  if (eventId() == null) {
-    return 'event not found';
-  }
-
   const { profile } = useProfile(() => ({ relayUrls: config().relayUrls, pubkey: pubkey() }));
   const { event } = useEvent(() => ({ relayUrls: config().relayUrls, eventId: eventId() }));
 
@@ -33,7 +29,7 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
         </div>
         <div>{profile()?.display_name} Reposted</div>
       </div>
-      <Show when={event() != null}>
+      <Show when={event() != null} fallback={'loading'}>
         <TextNote event={event()} />
       </Show>
     </div>

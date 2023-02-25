@@ -60,7 +60,8 @@ const useCachedEvents = (propsProvider: () => UseSubscriptionProps) => {
       return getEvents({ pool: pool(), relayUrls, filters, options, signal });
     },
     {
-      staleTime: 5 * 60 * 1000, // 5 minutes in ms
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 24 * 60 * 60 * 1000, // 24 hours
     },
   );
 };

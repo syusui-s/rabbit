@@ -2,7 +2,7 @@ import { For, Switch, Match, type Component } from 'solid-js';
 import { Kind, type Event as NostrEvent } from 'nostr-tools/event';
 
 import TextNote from '@/components/TextNote';
-import DeprecatedRepost from '@/components/DeprecatedRepost';
+import Reaction from '@/components/notification/Reaction';
 
 export type TimelineProps = {
   events: NostrEvent[];
@@ -16,8 +16,8 @@ const Timeline: Component<TimelineProps> = (props) => {
           <Match when={event.kind === Kind.Text}>
             <TextNote event={event} />
           </Match>
-          <Match when={(event.kind as number) === 6}>
-            <DeprecatedRepost event={event} />
+          <Match when={event.kind === Kind.Reaction}>
+            <Reaction event={event} />
           </Match>
         </Switch>
       )}

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { SimplePool } from 'nostr-tools/pool';
+import { SimplePool } from 'nostr-tools';
 
 const [pool] = createSignal<SimplePool>(new SimplePool());
 

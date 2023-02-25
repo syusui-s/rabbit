@@ -13,10 +13,18 @@ export type MessageChannelRequest<T> = {
   message: T;
 };
 
-type Primitives = number | string | null;
-type Serializable = Record<string, Primitives | Array<Primitives>>;
+// https://developer.mozilla.org/ja/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+type Clonable =
+  | number
+  | string
+  | boolean
+  | null
+  | bigint
+  | Date
+  | Array<Clonable>
+  | Record<string, Clonable>;
 
-const useMessageChannel = <T extends Serializable>(propsProvider: () => UseMessageChannelProps) => {
+const useMessageChannel = <T extends Clonable>(propsProvider: () => UseMessageChannelProps) => {
   const channel = () => channels()[propsProvider().id];
 
   onMount(() => {
@@ -29,7 +37,7 @@ const useMessageChannel = <T extends Serializable>(propsProvider: () => UseMessa
     }
   });
 
-  const listen = async (requestId: string, timeout = 1000): Promise<T> => {
+  const listen = async (requestId: string, timeoutMs = 1000): Promise<T> => {
     return new Promise((resolve, reject) => {
       const listener = (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
@@ -44,11 +52,12 @@ const useMessageChannel = <T extends Serializable>(propsProvider: () => UseMessa
       };
 
       setTimeout(() => {
-        reject(new Error('Timeout'));
         channel().port2.removeEventListener('message', listener);
-      }, timeout);
+        reject(new Error('TimeoutError'));
+      }, timeoutMs);
 
-      window.addEventListener('message', listener, false);
+      channel().port2.addEventListener('message', listener, false);
+      channel().port2.start();
     });
   };
 
@@ -56,7 +65,7 @@ const useMessageChannel = <T extends Serializable>(propsProvider: () => UseMessa
     async requst(message: T) {
       const requestId = Math.random().toString();
       const messageStr = JSON.stringify({ message, requestId });
-      const response = listen(requestId, timeout);
+      const response = listen(requestId, timeoutMs);
       channel().postMessage(messageStr);
       return response;
     },

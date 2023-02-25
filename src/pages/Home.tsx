@@ -5,6 +5,7 @@ import Column from '@/components/Column';
 import NotePostForm from '@/components/NotePostForm';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
+import Notification from '@/components/Notification';
 import TextNote from '@/components/TextNote';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
@@ -62,6 +63,29 @@ const Home: Component = () => {
     ],
   }));
 
+  const { events: notifications } = useSubscription(() => ({
+    relayUrls: config().relayUrls,
+    filters: [
+      {
+        kinds: [1, 6, 7],
+        '#p': [pubkeyHex],
+        limit: 25,
+        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+      },
+    ],
+  }));
+
+  const { events: localTimeline } = useSubscription(() => ({
+    relayUrls: ['wss://relay-jp.nostr.wirednet.jp', 'wss://nostr.h3z.jp/'],
+    filters: [
+      {
+        kinds: [1, 6],
+        limit: 25,
+        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+      },
+    ],
+  }));
+
   const { events: searchPosts } = useSubscription(() => ({
     relayUrls: ['wss://relay.nostr.band/'],
     filters: [
@@ -107,6 +131,12 @@ const Home: Component = () => {
             }
           />
           <Timeline events={followingsPosts()} />
+        </Column>
+        <Column name="通知" width="medium">
+          <Notification events={notifications()} />
+        </Column>
+        <Column name="ローカル" width="medium">
+          <Timeline events={localTimeline()} />
         </Column>
         <Column name="自分の投稿" width="medium">
           <Timeline events={myPosts()} />

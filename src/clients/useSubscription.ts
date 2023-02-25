@@ -13,19 +13,24 @@ export type UseSubscriptionProps = {
 const sortEvents = (events: NostrEvent[]) =>
   Array.from(events).sort((a, b) => b.created_at - a.created_at);
 
-const useSubscription = (propsProvider: () => UseSubscriptionProps) => {
+const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) => {
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
 
   createEffect(() => {
-    const { relayUrls, filters, options } = propsProvider();
+    const props = propsProvider();
+    if (props == null) return;
+
+    const { relayUrls, filters, options } = props;
 
     const sub = pool().sub(relayUrls, filters, options);
+    let pushed = false;
     let eose = false;
     const storedEvents: NostrEvent[] = [];
 
     sub.on('event', (event: NostrEvent) => {
       if (!eose) {
+        pushed = true;
         storedEvents.push(event);
       } else {
         setEvents((prevEvents) => sortEvents([event, ...prevEvents]));
@@ -43,7 +48,10 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps) => {
         clearInterval(intervalId);
         return;
       }
-      setEvents(sortEvents(storedEvents));
+      if (pushed) {
+        pushed = false;
+        setEvents(sortEvents(storedEvents));
+      }
     }, 100);
 
     onCleanup(() => {

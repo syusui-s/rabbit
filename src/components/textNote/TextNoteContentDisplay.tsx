@@ -7,6 +7,7 @@ import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;
+  embedding: boolean;
 };
 
 const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
@@ -19,7 +20,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'MentionedUser') {
           return <MentionedUserDisplay mentionedUser={item} />;
         }
-        if (item.type === 'MentionedEvent') {
+        if (item.type === 'MentionedEvent' && props.embedding) {
           return <MentionedEventDisplay mentionedEvent={item} />;
         }
         if (item.type === 'HashTag') {
