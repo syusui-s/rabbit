@@ -1,7 +1,7 @@
 import type { Event as NostrEvent } from 'nostr-tools/event';
 
-type EventMarker = 'reply' | 'root' | 'mention';
-type TaggedEvent = {
+export type EventMarker = 'reply' | 'root' | 'mention';
+export type TaggedEvent = {
   id: string;
   relayUrl?: string;
   marker: EventMarker;
@@ -9,9 +9,9 @@ type TaggedEvent = {
 
 const eventWrapper = (event: NostrEvent) => {
   return {
-    /**
-     * "replyingTo"
-     */
+    event(): NostrEvent {
+      return event;
+    },
     taggedUsers(): string[] {
       const pubkeys = new Set<string>();
       event.tags.forEach(([tagName, pubkey]) => {
@@ -24,6 +24,7 @@ const eventWrapper = (event: NostrEvent) => {
     taggedEvents(): TaggedEvent[] {
       const events = event.tags.filter(([tagName]) => tagName === 'e');
 
+      // NIP-10: Positional "e" tags (DEPRECATED)
       const positionToMarker = (index: number): EventMarker => {
         // One "e" tag
         if (events.length === 1) return 'reply';
@@ -32,9 +33,9 @@ const eventWrapper = (event: NostrEvent) => {
         // Two "e" tags
         if (events.length === 2) return 'reply';
         // Many "e" tags
-        // Last one is reply.
+        // The last one is reply.
         if (index === events.length - 1) return 'reply';
-        // other ones are mentions.
+        // The rest are mentions.
         return 'mention';
       };
 
@@ -55,3 +56,5 @@ const eventWrapper = (event: NostrEvent) => {
     },
   };
 };
+
+export default eventWrapper;

@@ -47,7 +47,6 @@ const Home: Component = () => {
         kinds: [1, 6],
         authors: followings()?.map((f) => f.pubkey) ?? [pubkeyHex],
         limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
     ],
   }));
@@ -135,7 +134,7 @@ const Home: Component = () => {
         <Column name="通知" width="medium">
           <Notification events={notifications()} />
         </Column>
-        <Column name="ローカル" width="medium">
+        <Column name="日本サーバ" width="medium">
           <Timeline events={localTimeline()} />
         </Column>
         <Column name="自分の投稿" width="medium">

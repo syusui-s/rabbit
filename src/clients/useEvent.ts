@@ -1,5 +1,6 @@
-import { type Event as NostrEvent } from 'nostr-tools/event';
 import { type Accessor } from 'solid-js';
+import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type CreateQueryResult } from '@tanstack/solid-query';
 
 import useCachedEvents from '@/clients/useCachedEvents';
 
@@ -9,7 +10,8 @@ export type UseEventProps = {
 };
 
 export type UseEvent = {
-  event: Accessor<NostrEvent>;
+  event: Accessor<NostrEvent | undefined>;
+  query: CreateQueryResult<NostrEvent[]>;
 };
 
 const useEvent = (propsProvider: () => UseEventProps): UseEvent => {
@@ -27,9 +29,9 @@ const useEvent = (propsProvider: () => UseEventProps): UseEvent => {
     };
   });
 
-  const event = () => query.data?.[0] as NostrEvent;
+  const event = () => query.data?.[0];
 
-  return { event };
+  return { event, query };
 };
 
 export default useEvent;

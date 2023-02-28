@@ -10,7 +10,12 @@ export type UseMessageChannelProps = {
 
 export type MessageChannelRequest<T> = {
   requestId: string;
-  message: T;
+  request: T;
+};
+
+export type MessageChannelResponse<T> = {
+  requestId: string;
+  response: T;
 };
 
 // https://developer.mozilla.org/ja/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
@@ -24,9 +29,9 @@ type Clonable =
   | Array<Clonable>
   | Record<string, Clonable>;
 
-const useMessageChannel = <T extends Clonable>(propsProvider: () => UseMessageChannelProps) => {
-  const channel = () => channels()[propsProvider().id];
-
+const useMessageBus = <Req extends Clonable, Res extends Clonable>(
+  propsProvider: () => UseMessageChannelProps,
+) => {
   onMount(() => {
     const { id } = propsProvider();
     if (channel() == null) {
@@ -37,40 +42,50 @@ const useMessageChannel = <T extends Clonable>(propsProvider: () => UseMessageCh
     }
   });
 
-  const listen = async (requestId: string, timeoutMs = 1000): Promise<T> => {
-    return new Promise((resolve, reject) => {
-      const listener = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
-        if (typeof event.data !== 'string') return;
+  const channel = () => channels()[propsProvider().id];
 
-        const data = JSON.parse(event.data) as MessageChannelRequest<T>;
+  const sendRequest = (requestId: string, message: Req) => {
+    const request: MessageChannelRequest<Req> = { requestId, request: message };
+    const messageStr = JSON.stringify(request);
+    channel().port1.postMessage(messageStr);
+  };
+
+  const waitResponse = (requestId: string, timeoutMs = 1000): Promise<Res> =>
+    new Promise((resolve, reject) => {
+      const listener = (event: MessageEvent) => {
+        const data = event.data as MessageChannelResponse<Res>;
 
         if (data.requestId !== requestId) return;
 
-        channel().port2.removeEventListener('message', listener);
-        resolve(data.message);
+        channel().port1.removeEventListener('message', listener);
+        resolve(data.response);
       };
 
       setTimeout(() => {
-        channel().port2.removeEventListener('message', listener);
+        channel().port1.removeEventListener('message', listener);
         reject(new Error('TimeoutError'));
       }, timeoutMs);
 
-      channel().port2.addEventListener('message', listener, false);
-      channel().port2.start();
+      channel().port1.addEventListener('message', listener, false);
+      channel().port1.start();
     });
-  };
+
+  const sendResponse = (res: Res) => {};
 
   return {
-    async requst(message: T) {
+    async requst(message: Req): Promise<Res> {
       const requestId = Math.random().toString();
-      const messageStr = JSON.stringify({ message, requestId });
-      const response = listen(requestId, timeoutMs);
-      channel().postMessage(messageStr);
+      const response = waitResponse(requestId);
+      sendRequest(requestId, message);
       return response;
     },
-    handle(handler) {},
+    handle(handler: (message: Req) => Res | Promise<Res>) {
+      channel().port2.addEventListener('message', (ev) => {
+        const request = event.data as MessageChannelRequest<Req>;
+        const res = handler(request.request).then((res) => {});
+      });
+    },
   };
 };
 
-export default useMessageChannel;
+export default useMessageBus;

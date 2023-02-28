@@ -25,7 +25,14 @@ module.exports = {
   },
   plugins: ['import', 'solid', 'jsx-a11y', 'prettier', '@typescript-eslint', 'tailwindcss'],
   rules: {
-    'import/extensions': ['error', 'ignorePackages', { ts: 'never', tsx: 'never' }],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        ts: 'never',
+        tsx: 'never',
+      },
+    ],
     'prettier/prettier': 'error',
   },
   settings: {

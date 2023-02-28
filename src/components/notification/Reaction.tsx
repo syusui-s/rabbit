@@ -19,31 +19,54 @@ const Reaction: Component<ReactionProps> = (props) => {
     relayUrls: config().relayUrls,
     pubkey: props.event.pubkey,
   }));
-  const { event } = useEvent(() => ({ relayUrls: config().relayUrls, eventId: eventId() }));
+  const { event: reactedEvent, query: reactedEventQuery } = useEvent(() => ({
+    relayUrls: config().relayUrls,
+    eventId: eventId(),
+  }));
+  const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;
 
   return (
-    <div>
-      <div class="flex gap-1 text-sm">
-        <div>
-          <Switch fallback={props.event.content}>
-            <Match when={props.event.content === '+'}>
-              <span class="inline-block h-4 w-4 text-rose-400">
-                <HeartSolid />
-              </span>
-            </Match>
-          </Switch>
-        </div>
-        <div>
-          <span class="font-bold">{profile()?.display_name}</span>
-          {' reacted'}
-        </div>
-      </div>
+    // if the reacted event is not found, it should be a removed event
+    <Show when={!isRemoved()}>
       <div>
-        <Show when={event() != null} fallback={'loading'}>
-          <TextNote event={event()} />
-        </Show>
+        <div class="notification-icon flex gap-1 px-1 text-sm">
+          <div class="flex place-items-center">
+            <Switch fallback={props.event.content}>
+              <Match when={props.event.content === '+'}>
+                <span class="h-4 w-4 pt-[1px] text-rose-400">
+                  <HeartSolid />
+                </span>
+              </Match>
+            </Switch>
+          </div>
+          <div class="notification-user flex gap-1 pt-1">
+            <div class="author-icon h-5 w-5 shrink-0">
+              <Show when={profile()?.picture != null}>
+                <img
+                  src={profile()?.picture}
+                  alt="icon"
+                  // TODO autofit
+                  class="rounded"
+                />
+              </Show>
+            </div>
+            <div>
+              <span class="truncate whitespace-pre-wrap break-all font-bold">
+                <Show when={profile() != null} fallback={props.event.pubkey}>
+                  {profile()?.display_name}
+                </Show>
+              </span>
+              {' reacted'}
+            </div>
+          </div>
+        </div>
+        <div class="notification-event">
+          <Show when={reactedEvent() != null} fallback="loading">
+            <TextNote event={reactedEvent()} />
+          </Show>
+        </div>
       </div>
-    </div>
+    </Show>
   );
 };
 

@@ -2,6 +2,7 @@ import { getEventHash } from 'nostr-tools/event';
 import type { Event as NostrEvent } from 'nostr-tools/event';
 import type { Pub } from 'nostr-tools/relay';
 
+import '@/types/nostr.d';
 import usePool from '@/clients/usePool';
 
 const currentDate = (): number => Math.floor(Date.now() / 1000);
@@ -26,8 +27,11 @@ const useCommands = () => {
   const publishEvent = async (relayUrls: string[], event: NostrEvent): Promise<Promise<void>[]> => {
     const preSignedEvent: NostrEvent = { ...event };
     preSignedEvent.id = getEventHash(preSignedEvent);
-    // TODO define window.nostr
-    const signedEvent = (await window.nostr.signEvent(preSignedEvent)) as NostrEvent;
+
+    if (window.nostr == null) {
+      throw new Error('NIP-07 implementation not found');
+    }
+    const signedEvent = await window.nostr.signEvent(preSignedEvent);
 
     return relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
@@ -60,14 +64,14 @@ const useCommands = () => {
     publishReaction({
       relayUrls,
       pubkey,
-      content,
       eventId,
+      content,
       notifyPubkey,
     }: {
       relayUrls: string[];
       pubkey: string;
-      content: string;
       eventId: string;
+      content: string;
       notifyPubkey: string;
     }): Promise<Promise<void>[]> {
       // TODO ensure that content is + or - or emoji.
@@ -76,11 +80,12 @@ const useCommands = () => {
         pubkey,
         created_at: currentDate(),
         tags: [
-          ['e', eventId],
+          ['e', eventId, ''],
           ['p', notifyPubkey],
         ],
         content,
       };
+      console.log(preSignedEvent);
       return publishEvent(relayUrls, preSignedEvent);
     },
     // NIP-18
@@ -100,12 +105,9 @@ const useCommands = () => {
         pubkey,
         created_at: currentDate(),
         tags: [
-          ['e', eventId],
+          ['e', eventId, ''],
           ['p', notifyPubkey],
         ],
-        // Some clients includes some contents here.
-        // Damus includes an original event. Iris includes #[0] as a mention.
-        // We just follow the specification.
         content: '',
       };
       return publishEvent(relayUrls, preSignedEvent);

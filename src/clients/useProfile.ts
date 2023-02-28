@@ -1,3 +1,7 @@
+import { type Accessor } from 'solid-js';
+import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type CreateQueryResult } from '@tanstack/solid-query';
+
 import useCachedEvents from '@/clients/useCachedEvents';
 
 type UseProfileProps = {
@@ -23,7 +27,12 @@ type NonStandardProfile = {
 
 type Profile = StandardProfile & NonStandardProfile;
 
-const useProfile = (propsProvider: () => UseProfileProps) => {
+type UseProfile = {
+  profile: Accessor<Profile | undefined>;
+  query: CreateQueryResult<NostrEvent[]>;
+};
+
+const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
   const query = useCachedEvents(() => {
     const { relayUrls, pubkey } = propsProvider();
     return {
@@ -40,13 +49,13 @@ const useProfile = (propsProvider: () => UseProfileProps) => {
 
   const profile = () => {
     const maybeProfile = query.data?.[0];
-    if (maybeProfile == null) return null;
+    if (maybeProfile == null) return undefined;
 
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
     return JSON.parse(maybeProfile.content) as Profile;
   };
 
-  return { profile };
+  return { profile, query };
 };
 
 export default useProfile;

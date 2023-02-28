@@ -33,7 +33,8 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
         pushed = true;
         storedEvents.push(event);
       } else {
-        setEvents((prevEvents) => sortEvents([event, ...prevEvents]));
+        // いったん1000件だけ保持
+        setEvents((prevEvents) => sortEvents([event, ...prevEvents].slice(0, 1000)));
       }
     });
 
@@ -58,10 +59,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
       sub.unsub();
       clearInterval(intervalId);
     });
-  });
-
-  createEffect(() => {
-    console.log(events());
   });
 
   return { events };

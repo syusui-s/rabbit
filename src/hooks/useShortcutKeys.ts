@@ -1,7 +1,7 @@
 // const commands = ['openPostForm'] as const;
 // type Commands = (typeof commands)[number];
 
-import { onMount, type JSX } from 'solid-js';
+import { onMount, onCleanup, type JSX } from 'solid-js';
 
 type Shortcut = { key: string; command: string };
 
@@ -54,7 +54,9 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
 
     window.addEventListener('keydown', handleKeydown);
 
-    return () => window.removeEventListener('keydown', handleKeydown);
+    onCleanup(() => {
+      window.removeEventListener('keydown', handleKeydown);
+    });
   });
 };
 

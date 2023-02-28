@@ -8,14 +8,17 @@ type NotePostFormProps = {
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [text, setText] = createSignal<string>('');
 
+  const clearText = () => setText('');
+
   const handleChangeText: JSX.EventHandler<HTMLTextAreaElement, Event> = (ev) => {
     setText(ev.currentTarget.value);
   };
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
+    // TODO 投稿完了したかどうかの検知をしたい
     props.onPost({ content: text() });
-    // TODO 投稿完了したらなんかする
+    clearText();
   };
 
   const submitDisabled = createMemo(() => text().trim().length === 0);

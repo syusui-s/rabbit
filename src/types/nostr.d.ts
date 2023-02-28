@@ -6,7 +6,7 @@ type NostrAPI = {
   /** returns a public key as hex */
   getPublicKey(): Promise<string>;
   /** takes an event object, adds `id`, `pubkey` and `sig` and returns it */
-  signEvent(event: Event): Promise<NostrEvent>;
+  signEvent(event: NostrEvent): Promise<NostrEvent>;
 
   // Optional
 
@@ -22,6 +22,8 @@ type NostrAPI = {
   };
 };
 
-interface Window {
-  nostr?: NostrAPI;
+declare global {
+  interface Window {
+    nostr?: NostrAPI;
+  }
 }
