@@ -1,5 +1,5 @@
 // NIP-18 (DEPRECATED)
-import { Show, type Component } from 'solid-js';
+import { Show, Switch, Match, type Component } from 'solid-js';
 import { Event as NostrEvent } from 'nostr-tools/event';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 
@@ -7,6 +7,7 @@ import useConfig from '@/clients/useConfig';
 import useEvent from '@/clients/useEvent';
 import useProfile from '@/clients/useProfile';
 
+import UserNameDisplay from '@/components/UserNameDisplay';
 import TextNote from '@/components/TextNote';
 
 export type DeprecatedRepostProps = {
@@ -30,19 +31,22 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
         <div class="h-5 w-5 shrink-0 pr-1 text-green-500" aria-hidden="true">
           <ArrowPathRoundedSquare />
         </div>
-        <div class="truncate">
-          <Show when={(profile()?.display_name?.length ?? 0) > 0} fallback={props.event.pubkey}>
-            {profile()?.display_name}
-          </Show>
+        <div class="truncate break-all">
+          <UserNameDisplay pubkey={props.event.pubkey} />
           {' Reposted'}
         </div>
       </div>
-      <Show
-        when={event() != null}
-        fallback={<Show when={eventQuery.isLoading}>loading {eventId()}</Show>}
-      >
-        <TextNote event={event()} />
-      </Show>
+      <Switch fallback="failed to load">
+        <Match when={event() != null}>
+          <TextNote event={event()} />
+        </Match>
+        <Match when={eventQuery.isLoading}>
+          <div class="truncate">
+            {'loading '}
+            <span>{eventId()}</span>
+          </div>
+        </Match>
+      </Switch>
     </div>
   );
 };

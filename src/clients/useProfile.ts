@@ -1,14 +1,14 @@
 import { createMemo, type Accessor } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type Filter } from 'nostr-tools/filter';
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 
-import useConfig from '@/clients/useConfig';
-import useBatch, { type Task } from '@/clients/useBatch';
-import useSubscription from '@/clients/useSubscription';
+import useBatchedEvent from '@/clients/useBatchedEvent';
+import { Task } from './useBatch';
 
 // TODO zodにする
 // deleted等の特殊なもの
-type StandardProfile = {
+export type StandardProfile = {
   name?: string;
   about?: string;
   picture?: string;
@@ -17,14 +17,14 @@ type StandardProfile = {
   lud16?: string; // NIP-57
 };
 
-type NonStandardProfile = {
+export type NonStandardProfile = {
   display_name?: string;
   website?: string;
 };
 
-type Profile = StandardProfile & NonStandardProfile;
+export type Profile = StandardProfile & NonStandardProfile;
 
-type UseProfileProps = {
+export type UseProfileProps = {
   relayUrls: string[];
   pubkey: string;
 };
@@ -34,40 +34,17 @@ type UseProfile = {
   query: CreateQueryResult<NostrEvent>;
 };
 
-const { exec } = useBatch<UseProfileProps, NostrEvent>(() => {
-  return {
-    executor: (tasks) => {
-      // TODO relayUrlsを考慮する
-      const [config] = useConfig();
-      const pubkeyTaskMap = new Map<string, Task<UseProfileProps, NostrEvent>>(
-        tasks.map((task) => [task.args.pubkey, task]),
-      );
-      const pubkeys = Array.from(pubkeyTaskMap.keys());
-
-      useSubscription(() => ({
-        relayUrls: config().relayUrls,
-        filters: [
-          {
-            kinds: [0],
-            authors: pubkeys,
-          },
-        ],
-        continuous: false,
-        onEvent: (event: NostrEvent) => {
-          if (event.id == null) return;
-          const task = pubkeyTaskMap.get(event.pubkey);
-          // possibly, the new event received
-          if (task == null) return;
-          task.resolve(event);
-        },
-      }));
-    },
-  };
-});
+const { exec } = useBatchedEvent<UseProfileProps>(() => ({
+  generateKey: ({ pubkey }: UseProfileProps): string => pubkey,
+  mergeFilters: (args: UseProfileProps[]): Filter[] => {
+    const pubkeys = args.map((arg) => arg.pubkey);
+    return [{ kinds: [0], authors: pubkeys }];
+  },
+  extractKey: (event: NostrEvent): string => event.pubkey,
+}));
 
 const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
   const props = createMemo(propsProvider);
-
   const query = createQuery(
     () => ['useProfile', props()] as const,
     ({ queryKey, signal }) => {
@@ -82,11 +59,9 @@ const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
   );
 
   const profile = () => {
-    const maybeProfile = query.data;
-    if (maybeProfile == null) return undefined;
-
+    if (query.data == null) return undefined;
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
-    return JSON.parse(maybeProfile.content) as Profile;
+    return JSON.parse(query.data.content) as Profile;
   };
 
   return { profile, query };

@@ -10,49 +10,21 @@ import TextNote from '@/components/TextNote';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
 import useSubscription from '@/clients/useSubscription';
-import useShortcutKeys from '@/hooks/useShortcutKeys';
 import useFollowings from '@/clients/useFollowings';
-
-/*
-type UseRelayProps = { pubkey: string };
-
-
-const publish = async (pool, event) => {
-  const pub = pool.publish(writeRelays, event);
-
-  return new Promise((resolve, reject) => {});
-};
-*/
-// const relays = ['ws://localhost:8008'];
-//
-const pubkey = 'npub1jcsr6e38dcepf65nkmrc54mu8jd8y70eael9rv308wxpwep6sxwqgsscyc';
-const pubkeyHex = '96203d66276e3214ea93b6c78a577c3c9a7279f9ee7e51b22f3b8c17643a819c';
+import usePubkey from '@/clients/usePubkey';
+import useShortcutKeys from '@/hooks/useShortcutKeys';
 
 useShortcutKeys({
   onShortcut: (s) => console.log(s),
 });
 
-const dummyTextNote = (
-  <TextNote
-    event={
-      {
-        id: 12345,
-        kind: 1,
-        pubkey: pubkeyHex,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [],
-        content: 'hello',
-      } as NostrEvent
-    }
-  />
-);
-
 const Home: Component = () => {
   const [config] = useConfig();
+  const pubkey = usePubkey();
   const commands = useCommands();
   const { followings } = useFollowings(() => ({
     relayUrls: config().relayUrls,
-    pubkey: pubkeyHex,
+    pubkey: pubkey(),
   }));
 
   const { events: followingsPosts } = useSubscription(() => ({
@@ -60,7 +32,7 @@ const Home: Component = () => {
     filters: [
       {
         kinds: [1, 6],
-        authors: followings()?.map((f) => f.pubkey) ?? [pubkeyHex],
+        authors: [...followings()?.map((f) => f.pubkey), pubkey()] ?? [pubkey()],
         limit: 25,
         since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
@@ -72,7 +44,7 @@ const Home: Component = () => {
     filters: [
       {
         kinds: [1, 6],
-        authors: [pubkeyHex],
+        authors: [pubkey()],
         limit: 25,
       },
     ],
@@ -83,7 +55,7 @@ const Home: Component = () => {
     filters: [
       {
         kinds: [1, 6, 7],
-        '#p': [pubkeyHex],
+        '#p': [pubkey()],
         limit: 25,
         since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
@@ -101,6 +73,7 @@ const Home: Component = () => {
     ],
   }));
 
+  /*
   const { events: searchPosts } = useSubscription(() => ({
     relayUrls: ['wss://relay.nostr.band/'],
     filters: [
@@ -112,12 +85,13 @@ const Home: Component = () => {
       },
     ],
   }));
+   */
 
   const handlePost = ({ content }: { content: string }) => {
     commands
       .publishTextNote({
         relayUrls: config().relayUrls,
-        pubkey: pubkeyHex,
+        pubkey: pubkey(),
         content,
       })
       .then(() => {
@@ -143,9 +117,6 @@ const Home: Component = () => {
         </Column>
         <Column name="自分の投稿" width="medium">
           <Timeline events={myPosts()} />
-        </Column>
-        <Column name="#nostrstudy" width="medium">
-          <Timeline events={searchPosts()} />
         </Column>
       </div>
     </div>

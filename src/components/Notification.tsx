@@ -3,6 +3,7 @@ import { Kind, type Event as NostrEvent } from 'nostr-tools/event';
 
 import TextNote from '@/components/TextNote';
 import Reaction from '@/components/notification/Reaction';
+import DeprecatedRepost from '@/components/DeprecatedRepost';
 
 export type TimelineProps = {
   events: NostrEvent[];
@@ -18,6 +19,10 @@ const Timeline: Component<TimelineProps> = (props) => {
           </Match>
           <Match when={event.kind === Kind.Reaction}>
             <Reaction event={event} />
+          </Match>
+          {/* TODO ちゃんとnotification用のコンポーネント使う */}
+          <Match when={event.kind === 1}>
+            <DeprecatedRepost event={event} />
           </Match>
         </Switch>
       )}

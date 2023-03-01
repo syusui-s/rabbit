@@ -2,10 +2,12 @@ import { Switch, Match, type Component, Show } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 
+import UserNameDisplay from '@/components/UserNameDisplay';
+import TextNote from '@/components/TextNote';
+
 import useConfig from '@/clients/useConfig';
 import useProfile from '@/clients/useProfile';
 import useEvent from '@/clients/useEvent';
-import TextNote from '../TextNote';
 
 type ReactionProps = {
   event: NostrEvent;
@@ -52,9 +54,7 @@ const Reaction: Component<ReactionProps> = (props) => {
             </div>
             <div>
               <span class="truncate whitespace-pre-wrap break-all font-bold">
-                <Show when={profile() != null} fallback={props.event.pubkey}>
-                  {profile()?.display_name}
-                </Show>
+                <UserNameDisplay pubkey={props.event.pubkey} />
               </span>
               {' reacted'}
             </div>
