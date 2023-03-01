@@ -1,13 +1,10 @@
-import { type Accessor } from 'solid-js';
+import { createMemo, type Accessor } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
-import { type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 
-import useCachedEvents from '@/clients/useCachedEvents';
-
-type UseProfileProps = {
-  relayUrls: string[];
-  pubkey: string;
-};
+import useConfig from '@/clients/useConfig';
+import useBatch, { type Task } from '@/clients/useBatch';
+import useSubscription from '@/clients/useSubscription';
 
 // TODO zodにする
 // deleted等の特殊なもの
@@ -27,28 +24,65 @@ type NonStandardProfile = {
 
 type Profile = StandardProfile & NonStandardProfile;
 
-type UseProfile = {
-  profile: Accessor<Profile | undefined>;
-  query: CreateQueryResult<NostrEvent[]>;
+type UseProfileProps = {
+  relayUrls: string[];
+  pubkey: string;
 };
 
-const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
-  const query = useCachedEvents(() => {
-    const { relayUrls, pubkey } = propsProvider();
-    return {
-      relayUrls,
-      filters: [
-        {
-          kinds: [0],
-          authors: [pubkey],
-          limit: 1,
+type UseProfile = {
+  profile: Accessor<Profile | undefined>;
+  query: CreateQueryResult<NostrEvent>;
+};
+
+const { exec } = useBatch<UseProfileProps, NostrEvent>(() => {
+  return {
+    executor: (tasks) => {
+      // TODO relayUrlsを考慮する
+      const [config] = useConfig();
+      const pubkeyTaskMap = new Map<string, Task<UseProfileProps, NostrEvent>>(
+        tasks.map((task) => [task.args.pubkey, task]),
+      );
+      const pubkeys = Array.from(pubkeyTaskMap.keys());
+
+      useSubscription(() => ({
+        relayUrls: config().relayUrls,
+        filters: [
+          {
+            kinds: [0],
+            authors: pubkeys,
+          },
+        ],
+        continuous: false,
+        onEvent: (event: NostrEvent) => {
+          if (event.id == null) return;
+          const task = pubkeyTaskMap.get(event.pubkey);
+          // possibly, the new event received
+          if (task == null) return;
+          task.resolve(event);
         },
-      ],
-    };
-  });
+      }));
+    },
+  };
+});
+
+const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
+  const props = createMemo(propsProvider);
+
+  const query = createQuery(
+    () => ['useProfile', props()] as const,
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      return exec(currentProps, signal);
+    },
+    {
+      // 5 minutes
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 15 * 60 * 1000,
+    },
+  );
 
   const profile = () => {
-    const maybeProfile = query.data?.[0];
+    const maybeProfile = query.data;
     if (maybeProfile == null) return undefined;
 
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック

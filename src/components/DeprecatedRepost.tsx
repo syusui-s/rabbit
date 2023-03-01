@@ -37,7 +37,10 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
           {' Reposted'}
         </div>
       </div>
-      <Show when={event() != null} fallback={<Show when={eventQuery.isLoading}>loading</Show>}>
+      <Show
+        when={event() != null}
+        fallback={<Show when={eventQuery.isLoading}>loading {eventId()}</Show>}
+      >
         <TextNote event={event()} />
       </Show>
     </div>

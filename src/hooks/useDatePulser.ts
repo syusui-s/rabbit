@@ -4,7 +4,7 @@ const [currentDate, setCurrentDate] = createSignal(new Date());
 
 setInterval(() => {
   setCurrentDate(new Date());
-}, 10000);
+}, 7000);
 
 const useDatePulser = (): Accessor<Date> => {
   return currentDate;

@@ -61,7 +61,7 @@ const Reaction: Component<ReactionProps> = (props) => {
           </div>
         </div>
         <div class="notification-event">
-          <Show when={reactedEvent() != null} fallback="loading">
+          <Show when={reactedEvent() != null} fallback={<>loading {eventId()}</>}>
             <TextNote event={reactedEvent()} />
           </Show>
         </div>

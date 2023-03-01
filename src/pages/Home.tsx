@@ -32,6 +32,21 @@ useShortcutKeys({
   onShortcut: (s) => console.log(s),
 });
 
+const dummyTextNote = (
+  <TextNote
+    event={
+      {
+        id: 12345,
+        kind: 1,
+        pubkey: pubkeyHex,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [],
+        content: 'hello',
+      } as NostrEvent
+    }
+  />
+);
+
 const Home: Component = () => {
   const [config] = useConfig();
   const commands = useCommands();
@@ -47,6 +62,7 @@ const Home: Component = () => {
         kinds: [1, 6],
         authors: followings()?.map((f) => f.pubkey) ?? [pubkeyHex],
         limit: 25,
+        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
     ],
   }));
@@ -117,18 +133,6 @@ const Home: Component = () => {
       <SideBar postForm={() => <NotePostForm onPost={handlePost} />} />
       <div class="flex flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" width="widest">
-          <TextNote
-            event={
-              {
-                id: 12345,
-                kind: 1,
-                pubkey: pubkeyHex,
-                created_at: Math.floor(Date.now() / 1000),
-                tags: [],
-                content: 'hello',
-              } as NostrEvent
-            }
-          />
           <Timeline events={followingsPosts()} />
         </Column>
         <Column name="通知" width="medium">

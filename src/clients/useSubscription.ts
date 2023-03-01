@@ -8,6 +8,11 @@ export type UseSubscriptionProps = {
   relayUrls: string[];
   filters: Filter[];
   options?: SubscriptionOptions;
+  // subscribe not only stored events but also new events published after the subscription
+  // default is true
+  continuous?: boolean;
+  onEvent?: (event: NostrEvent) => void;
+  signal?: AbortSignal;
 };
 
 const sortEvents = (events: NostrEvent[]) =>
@@ -21,7 +26,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
     const props = propsProvider();
     if (props == null) return;
 
-    const { relayUrls, filters, options } = props;
+    const { relayUrls, filters, options, onEvent, continuous = true } = props;
 
     const sub = pool().sub(relayUrls, filters, options);
     let pushed = false;
@@ -29,6 +34,9 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
     const storedEvents: NostrEvent[] = [];
 
     sub.on('event', (event: NostrEvent) => {
+      if (onEvent != null) {
+        onEvent(event);
+      }
       if (!eose) {
         pushed = true;
         storedEvents.push(event);
@@ -41,6 +49,10 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
     sub.on('eose', () => {
       eose = true;
       setEvents(sortEvents(storedEvents));
+
+      if (!continuous) {
+        sub.unsub();
+      }
     });
 
     // avoid updating an array too rapidly while this is fetching stored events

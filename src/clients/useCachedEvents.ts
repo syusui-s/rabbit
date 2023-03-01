@@ -1,5 +1,5 @@
 import { createQuery } from '@tanstack/solid-query';
-import { UseSubscriptionProps } from '@/clients/useSubscription';
+import { type UseSubscriptionProps } from '@/clients/useSubscription';
 import type { Event as NostrEvent } from 'nostr-tools/event';
 import type { Filter } from 'nostr-tools/filter';
 import type { SimplePool } from 'nostr-tools/pool';
@@ -10,6 +10,8 @@ type GetEventsArgs = {
   pool: SimplePool;
   relayUrls: string[];
   filters: Filter[];
+  // TODO 継続的に取得する場合、Promiseでは無理なので、無理やりキャッシュにストアする仕組みを使う
+  continuous?: boolean;
   options?: SubscriptionOptions;
   signal?: AbortSignal;
 };
@@ -52,12 +54,12 @@ const useCachedEvents = (propsProvider: () => UseSubscriptionProps) => {
 
   return createQuery(
     () => {
-      const { relayUrls, filters, options } = propsProvider();
-      return ['useCachedEvents', relayUrls, filters, options] as const;
+      const { relayUrls, filters, continuous, options } = propsProvider();
+      return ['useCachedEvents', relayUrls, filters, continuous, options] as const;
     },
     ({ queryKey, signal }) => {
-      const [, relayUrls, filters, options] = queryKey;
-      return getEvents({ pool: pool(), relayUrls, filters, options, signal });
+      const [, relayUrls, filters, continuous, options] = queryKey;
+      return getEvents({ pool: pool(), relayUrls, filters, options, continuous, signal });
     },
     {
       // 5 minutes
