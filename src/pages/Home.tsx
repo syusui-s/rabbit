@@ -63,7 +63,11 @@ const Home: Component = () => {
   }));
 
   const { events: localTimeline } = useSubscription(() => ({
-    relayUrls: ['wss://relay-jp.nostr.wirednet.jp', 'wss://nostr.h3z.jp/'],
+    relayUrls: [
+      'wss://relay-jp.nostr.wirednet.jp',
+      'wss://nostr.h3z.jp/',
+      'wss://nostr.holybea.com',
+    ],
     filters: [
       {
         kinds: [1, 6],

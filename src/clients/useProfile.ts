@@ -4,7 +4,7 @@ import { type Filter } from 'nostr-tools/filter';
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 
 import useBatchedEvent from '@/clients/useBatchedEvent';
-import { Task } from './useBatch';
+import timeout from '@/utils/timeout';
 
 // TODO zodにする
 // deleted等の特殊なもの
@@ -49,7 +49,8 @@ const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
     () => ['useProfile', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
-      return exec(currentProps, signal);
+      // TODO timeoutと同時にsignalでキャンセルするようにしたい
+      return timeout(15000, `useProfile: ${currentProps.pubkey}`)(exec(currentProps, signal));
     },
     {
       // 5 minutes
@@ -61,7 +62,12 @@ const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
   const profile = () => {
     if (query.data == null) return undefined;
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
-    return JSON.parse(query.data.content) as Profile;
+    try {
+      return JSON.parse(query.data.content) as Profile;
+    } catch (e) {
+      console.error(e);
+      return undefined;
+    }
   };
 
   return { profile, query };

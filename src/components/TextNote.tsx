@@ -11,7 +11,7 @@ import useProfile from '@/clients/useProfile';
 import useConfig from '@/clients/useConfig';
 import usePubkey from '@/clients/usePubkey';
 import useCommands from '@/clients/useCommands';
-// import useReactions from '@/clients/useReactions';
+import useReactions from '@/clients/useReactions';
 import useDatePulser from '@/hooks/useDatePulser';
 import { formatRelative } from '@/utils/formatDate';
 import ColumnItem from '@/components/ColumnItem';
@@ -33,19 +33,12 @@ const TextNote: Component<TextNoteProps> = (props) => {
     pubkey: props.event.pubkey,
   }));
 
-  /*
-  const {
-    reactions,
-    isReactedBy,
-    query: reactionsQuery,
-  } = useReactions(() => ({
+  const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
     relayUrls: config().relayUrls,
     eventId: props.event.id,
   }));
 
   const isReactedByMe = createMemo(() => isReactedBy(pubkey()));
- */
-  const isReactedByMe = () => false;
 
   const replyingToPubKeys = createMemo(() =>
     props.event.tags.filter((tag) => tag[0] === 'p').map((e) => e[1]),
@@ -64,13 +57,12 @@ const TextNote: Component<TextNoteProps> = (props) => {
   };
 
   const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
-    /*
     if (isReactedByMe()) {
       // TODO remove reaction
       return;
     }
-     */
     ev.preventDefault();
+
     commands
       .publishReaction({
         relayUrls: config().relayUrls,
@@ -79,9 +71,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
         eventId: props.event.id,
         notifyPubkey: props.event.pubkey,
       })
-      .then(() => {
-        // reactionsQuery.refetch();
-      });
+      .then(() => invalidateReactions());
   };
 
   return (
@@ -146,7 +136,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
                   <HeartSolid />
                 </Show>
               </button>
-              {/* <div class="text-sm text-zinc-400">{reactions().length}</div> */}
+              <div class="text-sm text-zinc-400">{reactions().length}</div>
             </div>
             <button class="h-4 w-4 text-zinc-400">
               <EllipsisHorizontal />

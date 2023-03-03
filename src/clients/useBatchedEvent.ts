@@ -1,3 +1,4 @@
+import { createMemo } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
 import { type Filter } from 'nostr-tools/filter';
 
@@ -6,16 +7,20 @@ import useBatch, { type Task } from '@/clients/useBatch';
 import useSubscription from '@/clients/useSubscription';
 
 export type UseBatchedEventProps<TaskArgs> = {
+  interval?: number;
   generateKey: (args: TaskArgs) => string | number;
   mergeFilters: (args: TaskArgs[]) => Filter[];
   extractKey: (event: NostrEvent) => string | number | undefined;
 };
 
 const useBatchedEvent = <TaskArgs>(propsProvider: () => UseBatchedEventProps<TaskArgs>) => {
+  const props = createMemo(propsProvider);
+
   return useBatch<TaskArgs, NostrEvent>(() => {
     return {
+      interval: props().interval,
       executor: (tasks) => {
-        const { generateKey, mergeFilters, extractKey } = propsProvider();
+        const { generateKey, mergeFilters, extractKey } = props();
         // TODO relayUrlsを考慮する
         const [config] = useConfig();
 
@@ -35,6 +40,11 @@ const useBatchedEvent = <TaskArgs>(propsProvider: () => UseBatchedEventProps<Tas
             // possibly, the new event received
             if (task == null) return;
             task.resolve(event);
+          },
+          onEOSE: () => {
+            tasks.forEach((task) => {
+              task.reject(new Error('NotFound'));
+            });
           },
         }));
       },

@@ -1,6 +1,7 @@
 import { createMemo, type Accessor } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
+import timeout from '@/utils/timeout';
 
 import useBatchedEvent from '@/clients/useBatchedEvent';
 
@@ -26,12 +27,11 @@ const { exec } = useBatchedEvent<UseEventProps>(() => ({
 
 const useEvent = (propsProvider: () => UseEventProps): UseEvent => {
   const props = createMemo(propsProvider);
-
   const query = createQuery(
     () => ['useEvent', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
-      return exec(currentProps, signal);
+      return timeout(15000, `useEvent: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {
       // 5 minutes

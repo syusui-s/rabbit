@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onCleanup } from 'solid-js';
+import { createSignal, createMemo } from 'solid-js';
 
 export type Task<TaskArgs, TaskResult> = {
   id: number;
@@ -10,7 +10,7 @@ export type Task<TaskArgs, TaskResult> = {
 export type UseBatchProps<TaskArgs, TaskResult> = {
   executor: (task: Task<TaskArgs, TaskResult>[]) => void;
   interval?: number;
-  // batchSize: number;
+  batchSize?: number;
 };
 
 export type PromiseWithCallbacks<T> = {
@@ -38,29 +38,52 @@ const promiseWithCallbacks = <T>(): PromiseWithCallbacks<T> => {
 const useBatch = <TaskArgs, TaskResult>(
   propsProvider: () => UseBatchProps<TaskArgs, TaskResult>,
 ) => {
+  const props = createMemo(propsProvider);
+  const batchSize = createMemo(() => props().batchSize ?? 100);
+  const interval = createMemo(() => props().interval ?? 1000);
+
   const [seqId, setSeqId] = createSignal<number>(0);
   const [taskQueue, setTaskQueue] = createSignal<Task<TaskArgs, TaskResult>[]>([]);
 
-  createEffect(() => {
-    const { executor, interval = 1000 } = propsProvider();
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    if (timeoutId == null && taskQueue().length > 0) {
-      timeoutId = setTimeout(() => {
-        const currentTaskQueue = taskQueue();
-        if (currentTaskQueue.length > 0) {
-          setTaskQueue([]);
-          executor(currentTaskQueue);
-        }
-        timeoutId = undefined;
-      }, interval);
+  const executeTasks = () => {
+    const { executor } = props();
+    const currentTaskQueue = taskQueue();
+
+    if (currentTaskQueue.length > 0) {
+      setTaskQueue([]);
+      executor(currentTaskQueue);
     }
-  });
+    if (timeoutId != null) clearTimeout(timeoutId);
+    timeoutId = undefined;
+  };
 
   const nextId = (): number => {
     const id = seqId();
     setSeqId((currentId) => currentId + 1);
     return id;
+  };
+
+  const launchTimer = () => {
+    if (timeoutId == null) {
+      timeoutId = setTimeout(() => {
+        executeTasks();
+      }, interval());
+    }
+  };
+
+  const addTask = (task: Task<TaskArgs, TaskResult>) => {
+    if (taskQueue().length < batchSize()) {
+      setTaskQueue((currentTaskQueue) => [...currentTaskQueue, task]);
+    } else {
+      executeTasks();
+      setTaskQueue([task]);
+    }
+  };
+
+  const removeTask = (id: number) => {
+    setTaskQueue((currentTaskQueue) => currentTaskQueue.filter((task) => task.id !== id));
   };
 
   // enqueue task and wait response
@@ -69,12 +92,13 @@ const useBatch = <TaskArgs, TaskResult>(
     const id = nextId();
     const newTask: Task<TaskArgs, TaskResult> = { id, args, resolve, reject };
 
-    signal?.addEventListener('abort', () => {
-      reject(new Error('AbortError'));
-      setTaskQueue((currentTaskQueue) => currentTaskQueue.filter((task) => task.id !== newTask.id));
-    });
+    addTask(newTask);
+    launchTimer();
 
-    setTaskQueue((currentTaskQueue) => [...currentTaskQueue, newTask]);
+    signal?.addEventListener('abort', () => {
+      removeTask(id);
+      reject(new Error('AbortError'));
+    });
 
     return promise;
   };

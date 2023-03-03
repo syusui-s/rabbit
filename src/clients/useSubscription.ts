@@ -12,6 +12,7 @@ export type UseSubscriptionProps = {
   // default is true
   continuous?: boolean;
   onEvent?: (event: NostrEvent) => void;
+  onEOSE?: () => void;
   signal?: AbortSignal;
 };
 
@@ -26,7 +27,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
     const props = propsProvider();
     if (props == null) return;
 
-    const { relayUrls, filters, options, onEvent, continuous = true } = props;
+    const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
 
     const sub = pool().sub(relayUrls, filters, options);
     let pushed = false;
@@ -47,6 +48,10 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
     });
 
     sub.on('eose', () => {
+      if (onEOSE != null) {
+        onEOSE();
+      }
+
       eose = true;
       setEvents(sortEvents(storedEvents));
 

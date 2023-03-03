@@ -17,7 +17,8 @@ const InitialConfig: Config = {
     'wss://relay.snort.social',
     'wss://relay.current.fyi',
     'wss://relay.nostr.wirednet.jp',
-    'wss://relay.mostr.pub',
+    'wss://nostr-relay.nokotaro.com',
+    'wss://nostr.holybea.com',
   ],
 };
 
