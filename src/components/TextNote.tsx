@@ -39,7 +39,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
     eventId: props.event.id,
   }));
 
-  const { reposts, isRepostedBy } = useDeprecatedReposts(() => ({
+  const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
     relayUrls: config().relayUrls,
     eventId: props.event.id,
   }));
@@ -55,12 +55,15 @@ const TextNote: Component<TextNoteProps> = (props) => {
 
   const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     ev.preventDefault();
-    commands.publishDeprecatedRepost({
-      relayUrls: config().relayUrls,
-      pubkey: pubkey(),
-      eventId: props.event.id,
-      notifyPubkey: props.event.pubkey,
-    });
+
+    commands
+      .publishDeprecatedRepost({
+        relayUrls: config().relayUrls,
+        pubkey: pubkey(),
+        eventId: props.event.id,
+        notifyPubkey: props.event.pubkey,
+      })
+      .then(() => invalidateDeprecatedReposts());
   };
 
   const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
