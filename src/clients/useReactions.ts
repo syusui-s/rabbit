@@ -1,10 +1,8 @@
-import { createSignal, createMemo, type Signal, type Accessor } from 'solid-js';
+import { createMemo, type Accessor } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools/event';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 
-import useConfig from '@/clients/useConfig';
-import useBatch, { type Task } from '@/clients/useBatch';
-import useSubscription from '@/clients/useSubscription';
+import useBatchedEvents, { type BatchedEvents } from '@/clients/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseReactionsProps = {
@@ -17,53 +15,19 @@ export type UseReactions = {
   reactionsGroupedByContent: Accessor<Map<string, NostrEvent[]>>;
   isReactedBy: (pubkey: string) => boolean;
   invalidateReactions: () => Promise<void>;
-  query: CreateQueryResult<Accessor<NostrEvent[]>>;
+  query: CreateQueryResult<Accessor<BatchedEvents>>;
 };
 
-const { exec } = useBatch<UseReactionsProps, Accessor<NostrEvent[]>>(() => {
-  return {
-    interval: 2500,
-    executor: (tasks) => {
-      // TODO relayUrlsを考慮する
-      const [config] = useConfig();
-
-      const eventIdTaskMap = new Map<string, Task<UseReactionsProps, Accessor<NostrEvent[]>>>(
-        tasks.map((task) => [task.args.eventId, task]),
-      );
-      const eventIds = Array.from(eventIdTaskMap.keys());
-      const eventIdReactionsMap = new Map<string, Signal<NostrEvent[]>>();
-
-      useSubscription(() => ({
-        relayUrls: config().relayUrls,
-        filters: [{ kinds: [7], '#e': eventIds }],
-        continuous: false,
-        onEvent(event: NostrEvent) {
-          const reactTo = event.tags.find((e) => e[0] === 'e')?.[1];
-          if (reactTo == null) return;
-          const task = eventIdTaskMap.get(reactTo);
-          // possibly, the new event received
-          if (task == null) return;
-
-          const reactionsSignal =
-            eventIdReactionsMap.get(reactTo) ?? createSignal<NostrEvent[]>([]);
-          eventIdReactionsMap.set(reactTo, reactionsSignal);
-
-          const [reactions, setReactions] = reactionsSignal;
-
-          setReactions((currentReactions) => [...currentReactions, event]);
-
-          // 初回のresolveのみが有効
-          task.resolve(reactions);
-        },
-        onEOSE() {
-          tasks.forEach((task) => {
-            task.resolve(() => []);
-          });
-        },
-      }));
-    },
-  };
-});
+const { exec } = useBatchedEvents<UseReactionsProps>(() => ({
+  generateKey: ({ eventId }) => eventId,
+  mergeFilters: (args) => {
+    const eventIds = args.map((arg) => arg.eventId);
+    return [{ kinds: [7], '#e': eventIds }];
+  },
+  extractKey: (event: NostrEvent) => {
+    return event.tags.find((e) => e[0] === 'e')?.[1];
+  },
+}));
 
 const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
   const props = createMemo(propsProvider);
@@ -71,8 +35,8 @@ const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
 
   const query = createQuery(
     () => queryKey(),
-    ({ queryKey, signal }) => {
-      const [, currentProps] = queryKey;
+    ({ queryKey: currentQueryKey, signal }) => {
+      const [, currentProps] = currentQueryKey;
       return timeout(15000, `useReactions: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {
@@ -82,7 +46,7 @@ const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
     },
   );
 
-  const reactions = () => query.data?.() ?? [];
+  const reactions = () => query.data?.()?.events ?? [];
 
   const reactionsGroupedByContent = () => {
     const result = new Map<string, NostrEvent[]>();

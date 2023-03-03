@@ -5,11 +5,11 @@ import TextNote from '@/components/TextNote';
 import Reaction from '@/components/notification/Reaction';
 import DeprecatedRepost from '@/components/DeprecatedRepost';
 
-export type TimelineProps = {
+export type NotificationProps = {
   events: NostrEvent[];
 };
 
-const Timeline: Component<TimelineProps> = (props) => {
+const Notification: Component<NotificationProps> = (props) => {
   return (
     <For each={props.events}>
       {(event) => (
@@ -21,7 +21,7 @@ const Timeline: Component<TimelineProps> = (props) => {
             <Reaction event={event} />
           </Match>
           {/* TODO ちゃんとnotification用のコンポーネント使う */}
-          <Match when={event.kind === 1}>
+          <Match when={event.kind === 6}>
             <DeprecatedRepost event={event} />
           </Match>
         </Switch>
@@ -30,4 +30,4 @@ const Timeline: Component<TimelineProps> = (props) => {
   );
 };
 
-export default Timeline;
+export default Notification;

@@ -12,6 +12,7 @@ import useConfig from '@/clients/useConfig';
 import usePubkey from '@/clients/usePubkey';
 import useCommands from '@/clients/useCommands';
 import useReactions from '@/clients/useReactions';
+import useDeprecatedReposts from '@/clients/useDeprecatedReposts';
 import useDatePulser from '@/hooks/useDatePulser';
 import { formatRelative } from '@/utils/formatDate';
 import ColumnItem from '@/components/ColumnItem';
@@ -38,7 +39,13 @@ const TextNote: Component<TextNoteProps> = (props) => {
     eventId: props.event.id,
   }));
 
+  const { reposts, isRepostedBy } = useDeprecatedReposts(() => ({
+    relayUrls: config().relayUrls,
+    eventId: props.event.id,
+  }));
+
   const isReactedByMe = createMemo(() => isReactedBy(pubkey()));
+  const isRepostedByMe = createMemo(() => isRepostedBy(pubkey()));
 
   const replyingToPubKeys = createMemo(() =>
     props.event.tags.filter((tag) => tag[0] === 'p').map((e) => e[1]),
@@ -79,6 +86,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
       <ColumnItem>
         <div class="author-icon h-10 w-10 shrink-0">
           <Show when={author()?.picture}>
+            {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
             <img
               src={author()?.picture}
               alt="icon"
@@ -121,9 +129,20 @@ const TextNote: Component<TextNoteProps> = (props) => {
             <button class="h-4 w-4 text-zinc-400">
               <ChatBubbleLeft />
             </button>
-            <button class="h-4 w-4 text-zinc-400" onClick={handleRepost}>
-              <ArrowPathRoundedSquare />
-            </button>
+            <div
+              class="flex items-center gap-1"
+              classList={{
+                'text-zinc-400': !isRepostedByMe(),
+                'text-green-400': isRepostedByMe(),
+              }}
+            >
+              <button class="h-4 w-4" onClick={handleReaction}>
+                <ArrowPathRoundedSquare />
+              </button>
+              <Show when={reposts().length > 0}>
+                <div class="text-sm text-zinc-400">{reposts().length}</div>
+              </Show>
+            </div>
             <div
               class="flex items-center gap-1"
               classList={{
@@ -136,7 +155,9 @@ const TextNote: Component<TextNoteProps> = (props) => {
                   <HeartSolid />
                 </Show>
               </button>
-              <div class="text-sm text-zinc-400">{reactions().length}</div>
+              <Show when={reactions().length > 0}>
+                <div class="text-sm text-zinc-400">{reactions().length}</div>
+              </Show>
             </div>
             <button class="h-4 w-4 text-zinc-400">
               <EllipsisHorizontal />
