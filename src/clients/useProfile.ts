@@ -65,7 +65,7 @@ const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
     try {
       return JSON.parse(query.data.content) as Profile;
     } catch (e) {
-      console.error(e);
+      console.error(e, query.data.content);
       return undefined;
     }
   };

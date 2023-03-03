@@ -18,6 +18,20 @@ export type BatchedEvents = {
   completed: boolean;
 };
 
+const emptyBatchedEvents = () => ({ completed: true, events: [] });
+
+const completeBatchedEvents = (current: BatchedEvents): BatchedEvents => ({
+  ...current,
+  completed: true,
+});
+
+const addEvent =
+  (event: NostrEvent) =>
+  (current: BatchedEvents): BatchedEvents => ({
+    ...current,
+    events: [...current.events, event],
+  });
+
 const useBatchedEvents = <TaskArgs>(propsProvider: () => UseBatchedEventsProps<TaskArgs>) => {
   const props = createMemo(propsProvider);
 
@@ -60,10 +74,7 @@ const useBatchedEvents = <TaskArgs>(propsProvider: () => UseBatchedEventsProps<T
 
             const [events, setEvents] = getSignalForKey(key);
 
-            setEvents((currentEvents) => ({
-              ...currentEvents,
-              events: [...currentEvents.events, event],
-            }));
+            setEvents(addEvent(event));
 
             task.resolve(events);
           },
@@ -72,12 +83,9 @@ const useBatchedEvents = <TaskArgs>(propsProvider: () => UseBatchedEventsProps<T
               const key = generateKey(task.args);
               if (didReceivedEventsForKey(key)) {
                 const [, setEvents] = getSignalForKey(key);
-                setEvents((currentEvents) => ({
-                  ...currentEvents,
-                  completed: true,
-                }));
+                setEvents(completeBatchedEvents);
               } else {
-                task.reject(new Error(`NotFound: ${key}`));
+                task.resolve(emptyBatchedEvents);
               }
             });
           },
