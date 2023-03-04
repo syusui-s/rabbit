@@ -12,7 +12,7 @@ const SideBar: Component<SideBarProps> = (props) => {
 
   return (
     <div class="flex shrink-0 flex-row border-r bg-sidebar-bg">
-      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r py-5">
+      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-rose-200 py-5">
         <button
           class={`h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl font-bold text-white`}
           onClick={() => setFormOpened((current) => !current)}

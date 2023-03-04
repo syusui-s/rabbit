@@ -31,6 +31,7 @@ const { exec } = useBatchedEvents<UseDeprecatedRepostsProps>(() => ({
 const useDeprecatedReposts = (
   propsProvider: () => UseDeprecatedRepostsProps,
 ): UseDeprecatedReposts => {
+  const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const queryKey = createMemo(() => ['useDeprecatedReposts', props()] as const);
 
@@ -55,10 +56,8 @@ const useDeprecatedReposts = (
   const isRepostedBy = (pubkey: string): boolean =>
     reposts().findIndex((event) => event.pubkey === pubkey) !== -1;
 
-  const invalidateDeprecatedReposts = (): Promise<void> => {
-    const queryClient = useQueryClient();
-    return queryClient.invalidateQueries(queryKey());
-  };
+  const invalidateDeprecatedReposts = (): Promise<void> =>
+    queryClient.invalidateQueries(queryKey());
 
   return { reposts, isRepostedBy, invalidateDeprecatedReposts, query };
 };

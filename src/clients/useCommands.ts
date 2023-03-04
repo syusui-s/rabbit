@@ -46,16 +46,33 @@ const useCommands = () => {
       relayUrls,
       pubkey,
       content,
+      notifyPubkeys,
+      rootEventId,
+      mentionEventIds,
+      replyEventId,
     }: {
       relayUrls: string[];
       pubkey: string;
       content: string;
+      notifyPubkeys?: string[];
+      rootEventId?: string;
+      mentionEventIds?: string[];
+      replyEventId?: string;
     }): Promise<Promise<void>[]> {
+      const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
+      const eTags = [];
+      if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
+      if (mentionEventIds != null)
+        mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
+      if (replyEventId != null) eTags.push(['e', replyEventId, '', 'reply']);
+
+      const tags = [...pTags, ...eTags];
+
       const preSignedEvent: NostrEvent = {
         kind: 1,
         pubkey,
         created_at: currentDate(),
-        tags: [],
+        tags,
         content,
       };
       return publishEvent(relayUrls, preSignedEvent);

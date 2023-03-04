@@ -5,9 +5,7 @@ type ColumnItemProps = {
 };
 
 const ColumnItem: Component<ColumnItemProps> = (props) => {
-  return (
-    <div class="flex w-full flex-row gap-1 overflow-hidden border-b p-1">{props.children}</div>
-  );
+  return <div class="overflow-hidden border-b p-1">{props.children}</div>;
 };
 
 export default ColumnItem;

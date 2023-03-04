@@ -30,6 +30,7 @@ const { exec } = useBatchedEvents<UseReactionsProps>(() => ({
 }));
 
 const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
+  const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const queryKey = createMemo(() => ['useReactions', props()] as const);
 
@@ -61,10 +62,7 @@ const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
   const isReactedBy = (pubkey: string): boolean =>
     reactions().findIndex((event) => event.pubkey === pubkey) !== -1;
 
-  const invalidateReactions = (): Promise<void> => {
-    const queryClient = useQueryClient();
-    return queryClient.invalidateQueries(queryKey());
-  };
+  const invalidateReactions = (): Promise<void> => queryClient.invalidateQueries(queryKey());
 
   return { reactions, reactionsGroupedByContent, isReactedBy, invalidateReactions, query };
 };

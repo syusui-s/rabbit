@@ -7,7 +7,7 @@ import useConfig from '@/clients/useConfig';
 import useEvent from '@/clients/useEvent';
 import useProfile from '@/clients/useProfile';
 
-import UserNameDisplay from '@/components/UserNameDisplay';
+import UserDisplayName from '@/components/UserDisplayName';
 import TextNote from '@/components/TextNote';
 
 export type DeprecatedRepostProps = {
@@ -32,7 +32,7 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
           <ArrowPathRoundedSquare />
         </div>
         <div class="truncate break-all">
-          <UserNameDisplay pubkey={props.event.pubkey} />
+          <UserDisplayName pubkey={props.event.pubkey} />
           {' Reposted'}
         </div>
       </div>

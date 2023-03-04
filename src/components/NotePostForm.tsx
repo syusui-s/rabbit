@@ -25,7 +25,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   return (
     <div class="p-1">
-      <form class="grid w-64 gap-1" onSubmit={handleSubmit}>
+      <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
         <textarea
           name="text"
           class="rounded border-none"
