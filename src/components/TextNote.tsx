@@ -160,7 +160,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
                     'text-green-400': isRepostedByMe(),
                   }}
                 >
-                  <button class="h-4 w-4" onClick={handleReaction}>
+                  <button class="h-4 w-4" onClick={handleRepost}>
                     <ArrowPathRoundedSquare />
                   </button>
                   <Show when={reposts().length > 0}>
