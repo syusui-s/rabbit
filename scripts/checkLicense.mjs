@@ -28,12 +28,16 @@ export default async function() {
 
   let ok = true;
 
-  const ignorePackageName = packageInfo.name;
+  const ignorePackageNames = [
+    packageInfo.name,
+    'nostr-tools', // nostr-tools is licensed under public domain
+  ];
 
   for (const [name, info] of Object.entries(packages)) {
     const acceptable = acceptableLicenses.includes(info.licenses);
     if (acceptable) continue;
-    if (name.startsWith(`${ignorePackageName}@`)) continue;
+    if (ignorePackageNames.some((ignorePackageName) => name.startsWith(`${ignorePackageName}@`)))
+      continue;
 
     console.error(name);
     ok = false;
