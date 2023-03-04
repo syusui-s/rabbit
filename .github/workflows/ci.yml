@@ -29,7 +29,7 @@ jobs:
       #   run: npm run lint
       # - name: Test
       #   run: npm run test
-      # - name: Build
+      - name: Build
         run: npm run build -- --base="/rabbit/" # https://syusui-s.github.io/rabbit/
       - name: Check license
         run: npm run checkLicense
