@@ -14,11 +14,21 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     setText(ev.currentTarget.value);
   };
 
-  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
-    ev.preventDefault();
-    // TODO 投稿完了したかどうかの検知をしたい
+  // TODO 投稿完了したかどうかの検知をしたい
+  const submit = () => {
     props.onPost({ content: text() });
     clearText();
+  };
+
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
+    ev.preventDefault();
+    submit();
+  };
+
+  const handleKeyDown: JSX.EventHandler<HTMLFormElement, KeyboardEvent> = (ev) => {
+    if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+      submit();
+    }
   };
 
   const submitDisabled = createMemo(() => text().trim().length === 0);
@@ -32,6 +42,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           rows={4}
           placeholder="いまどうしてる？"
           onInput={handleChangeText}
+          onKeyDown={handleKeyDown}
           value={text()}
         />
         <div class="grid justify-end">
