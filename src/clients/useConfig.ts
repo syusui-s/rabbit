@@ -14,7 +14,7 @@ const InitialConfig: Config = {
     'wss://nostr.h3z.jp/',
     'wss://relay.damus.io',
     'wss://nos.lol',
-    'wss://relay.snort.social',
+    // 'wss://relay.snort.social',
     'wss://relay.current.fyi',
     'wss://relay.nostr.wirednet.jp',
     'wss://nostr-relay.nokotaro.com',
