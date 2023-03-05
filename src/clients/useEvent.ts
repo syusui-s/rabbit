@@ -13,7 +13,7 @@ export type UseEventProps = {
 
 export type UseEvent = {
   event: Accessor<NostrEvent | undefined>;
-  query: CreateQueryResult<NostrEvent>;
+  query: CreateQueryResult<NostrEvent | undefined>;
 };
 
 const { exec } = useBatchedEvent<UseEventProps>(() => ({
@@ -25,12 +25,13 @@ const { exec } = useBatchedEvent<UseEventProps>(() => ({
   extractKey: (event: NostrEvent) => event.id,
 }));
 
-const useEvent = (propsProvider: () => UseEventProps): UseEvent => {
+const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
   const props = createMemo(propsProvider);
   const query = createQuery(
     () => ['useEvent', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
+      if (currentProps == null) return undefined;
       return timeout(15000, `useEvent: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {

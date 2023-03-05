@@ -1,3 +1,4 @@
+import { createMemo } from 'solid-js';
 import useCachedEvents from '@/clients/useCachedEvents';
 
 type UseFollowingsProps = {
@@ -12,8 +13,11 @@ type Following = {
 };
 
 const useFollowings = (propsProvider: () => UseFollowingsProps) => {
+  const props = createMemo(propsProvider);
   const query = useCachedEvents(() => {
-    const { relayUrls, pubkey } = propsProvider();
+    const currentProps = props();
+    if (currentProps == null) return null;
+    const { relayUrls, pubkey } = currentProps;
     return {
       relayUrls,
       filters: [

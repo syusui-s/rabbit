@@ -43,12 +43,14 @@ const { exec } = useBatchedEvent<UseProfileProps>(() => ({
   extractKey: (event: NostrEvent): string => event.pubkey,
 }));
 
-const useProfile = (propsProvider: () => UseProfileProps): UseProfile => {
+const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const props = createMemo(propsProvider);
+
   const query = createQuery(
     () => ['useProfile', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
+      if (currentProps == null) return null;
       // TODO timeoutと同時にsignalでキャンセルするようにしたい
       return timeout(15000, `useProfile: ${currentProps.pubkey}`)(exec(currentProps, signal));
     },

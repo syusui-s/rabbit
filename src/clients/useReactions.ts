@@ -29,7 +29,7 @@ const { exec } = useBatchedEvents<UseReactionsProps>(() => ({
   },
 }));
 
-const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
+const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactions => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const queryKey = createMemo(() => ['useReactions', props()] as const);
@@ -38,6 +38,7 @@ const useReactions = (propsProvider: () => UseReactionsProps): UseReactions => {
     () => queryKey(),
     ({ queryKey: currentQueryKey, signal }) => {
       const [, currentProps] = currentQueryKey;
+      if (currentProps == null) return () => ({ events: [], completed: false });
       return timeout(15000, `useReactions: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {

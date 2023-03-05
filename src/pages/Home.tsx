@@ -13,6 +13,7 @@ import useSubscription from '@/clients/useSubscription';
 import useFollowings from '@/clients/useFollowings';
 import usePubkey from '@/clients/usePubkey';
 import useShortcutKeys from '@/hooks/useShortcutKeys';
+import ensureNonNull from '@/hooks/ensureNonNull';
 
 useShortcutKeys({
   onShortcut: (s) => console.log(s),
@@ -106,6 +107,7 @@ const Home: Component = () => {
       });
   };
 
+  const japaneseRegex = /[あ-ん]/;
   return (
     <div class="flex h-screen w-screen flex-row overflow-hidden">
       <SideBar postForm={() => <NotePostForm onPost={handlePost} />} />

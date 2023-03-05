@@ -49,20 +49,20 @@ const getEvents = async ({
  * This is useful when you want to fetch some data which change occasionally:
  * profile or following list, reactions, and something like that.
  */
-const useCachedEvents = (propsProvider: () => UseSubscriptionProps) => {
+const useCachedEvents = (propsProvider: () => UseSubscriptionProps | null) => {
   const pool = usePool();
 
   return createQuery(
     () => {
-      const { relayUrls, filters, continuous, options } = propsProvider();
-      return ['useCachedEvents', relayUrls, filters, continuous, options] as const;
+      const currentProps = propsProvider();
+      return ['useCachedEvents', currentProps] as const;
     },
     ({ queryKey, signal }) => {
-      const [, relayUrls, filters, continuous, options] = queryKey;
-      return getEvents({ pool: pool(), relayUrls, filters, options, continuous, signal });
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return [];
+      return getEvents({ pool: pool(), signal, ...currentProps });
     },
     {
-      // 5 minutes
       staleTime: 5 * 60 * 1000,
       cacheTime: 15 * 60 * 1000,
     },

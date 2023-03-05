@@ -39,6 +39,7 @@ const useDeprecatedReposts = (
     () => queryKey(),
     ({ queryKey: currentQueryKey, signal }) => {
       const [, currentProps] = currentQueryKey;
+      if (currentProps == null) return () => ({ events: [], completed: false });
       return timeout(
         15000,
         `useDeprecatedReposts: ${currentProps.eventId}`,
