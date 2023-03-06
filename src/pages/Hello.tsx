@@ -1,8 +1,10 @@
 import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
+import useLoginStatus from '@/hooks/useLoginStatus';
 
 type SignerStatus = 'checking' | 'available' | 'unavailable';
 
-const Hello: Component = () => {
+const useSignerStatus = () => {
   const [signerStatus, setSignerStatus] = createSignal<SignerStatus>('checking');
 
   const checkStatus = () => {
@@ -20,6 +22,25 @@ const Hello: Component = () => {
       if (count >= 10) clearInterval(intervalId);
       count += 1;
     }, 1000);
+  });
+
+  return signerStatus;
+};
+
+const Hello: Component = () => {
+  const signerStatus = useSignerStatus();
+  const navigate = useNavigate();
+  const { loginStatus, loggedIn } = useLoginStatus();
+
+  const handleLogin = () => {
+    loggedIn();
+    navigate('/');
+  };
+
+  onMount(() => {
+    if (loginStatus().loggedIn) {
+      navigate('/');
+    }
   });
 
   return (
@@ -51,7 +72,10 @@ const Hello: Component = () => {
             </p>
           </Match>
           <Match when={signerStatus() === 'available'}>
-            <button class="rounded bg-rose-400 p-4 text-lg font-bold text-white hover:shadow-md">
+            <button
+              class="rounded bg-rose-400 p-4 text-lg font-bold text-white hover:shadow-md"
+              onClick={handleLogin}
+            >
               NIP-07 拡張機能でログイン
             </button>
           </Match>

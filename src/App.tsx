@@ -1,12 +1,12 @@
-import type { Component } from 'solid-js';
+import { lazy, type Component } from 'solid-js';
 import { Routes, Route } from '@solidjs/router';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 // import { persistQueryClient } from '@tanstack/solid-query-persist-client';
 // import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
-import Home from '@/pages/Home';
-import NotFound from '@/pages/NotFound';
-import Hello from '@/pages/Hello';
+const Home = lazy(() => import('@/pages/Home'));
+const Hello = lazy(() => import('@/pages/Hello'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
 const queryClient = new QueryClient({});
 

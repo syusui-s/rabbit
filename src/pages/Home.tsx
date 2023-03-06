@@ -1,12 +1,11 @@
-import { createSignal, Show, For, createEffect } from 'solid-js';
-import type { Component } from 'solid-js';
+import { Show, For, createSignal, createEffect, onMount, type Component } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
 
 import Column from '@/components/Column';
 import NotePostForm from '@/components/NotePostForm';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
-import TextNote from '@/components/TextNote';
 import usePool from '@/clients/usePool';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
@@ -14,6 +13,7 @@ import useSubscription from '@/clients/useSubscription';
 import useFollowings from '@/clients/useFollowings';
 import usePubkey from '@/clients/usePubkey';
 import useShortcutKeys from '@/hooks/useShortcutKeys';
+import useLoginStatus from '@/hooks/useLoginStatus';
 import ensureNonNull from '@/hooks/ensureNonNull';
 
 useShortcutKeys({
@@ -21,10 +21,19 @@ useShortcutKeys({
 });
 
 const Home: Component = () => {
+  const navigate = useNavigate();
+  const { loginStatus } = useLoginStatus();
+
   const pool = usePool();
   const [config] = useConfig();
   const pubkey = usePubkey();
   const commands = useCommands();
+
+  onMount(() => {
+    if (!loginStatus().loggedIn) {
+      navigate('/hello');
+    }
+  });
 
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {

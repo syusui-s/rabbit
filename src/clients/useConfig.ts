@@ -27,7 +27,7 @@ const serializer = (config: Config): string => JSON.stringify(config);
 const deserializer = (json: string): Config => JSON.parse(json) as Config;
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
-const [config, setConfig] = createSignalWithStorage('rabbit_config', InitialConfig, storage);
+const [config, setConfig] = createSignalWithStorage('RabbitConfig', InitialConfig, storage);
 
 const useConfig = (): Signal<Config> => {
   return [config, setConfig];
