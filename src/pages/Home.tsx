@@ -29,12 +29,6 @@ const Home: Component = () => {
   const pubkey = usePubkey();
   const commands = useCommands();
 
-  onMount(() => {
-    if (!loginStatus().loggedIn) {
-      navigate('/hello');
-    }
-  });
-
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
@@ -127,6 +121,12 @@ const Home: Component = () => {
         console.error('error', err);
       });
   };
+
+  onMount(() => {
+    if (!loginStatus().loggedIn) {
+      navigate('/hello');
+    }
+  });
 
   const japaneseRegex = /[あ-ん]/;
   return (
