@@ -1,4 +1,4 @@
-import type { Event as NostrEvent } from 'nostr-tools/event';
+import type { Event as NostrEvent } from 'nostr-tools';
 
 export type PlainText = {
   type: 'PlainText';

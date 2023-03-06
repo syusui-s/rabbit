@@ -1,5 +1,5 @@
 import { For, Switch, Match, type Component } from 'solid-js';
-import { Kind, type Event as NostrEvent } from 'nostr-tools/event';
+import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
 import TextNote from '@/components/TextNote';
 import Reaction from '@/components/notification/Reaction';

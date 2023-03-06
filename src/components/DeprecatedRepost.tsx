@@ -1,6 +1,6 @@
 // NIP-18 (DEPRECATED)
 import { Show, Switch, Match, type Component } from 'solid-js';
-import { Event as NostrEvent } from 'nostr-tools/event';
+import { Event as NostrEvent } from 'nostr-tools';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 
 import useConfig from '@/clients/useConfig';

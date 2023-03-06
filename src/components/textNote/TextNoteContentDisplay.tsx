@@ -1,6 +1,6 @@
 import { For } from 'solid-js';
 import parseTextNote, { type ParsedTextNoteNode } from '@/core/parseTextNote';
-import type { Event as NostrEvent } from 'nostr-tools/event';
+import type { Event as NostrEvent } from 'nostr-tools';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';

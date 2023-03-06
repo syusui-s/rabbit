@@ -1,5 +1,5 @@
 import { createSignal, createMemo, type Component, type JSX } from 'solid-js';
-import type { Event as NostrEvent } from 'nostr-tools/event';
+import type { Event as NostrEvent } from 'nostr-tools';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 

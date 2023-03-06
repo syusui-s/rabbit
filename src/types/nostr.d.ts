@@ -1,6 +1,6 @@
 // The original code was published under the public domain license (CC0-1.0).
 // https://gist.github.com/syusui-s/cd5482ddfc83792b54a756759acbda55
-import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type Event as NostrEvent } from 'nostr-tools';
 
 type NostrAPI = {
   /** returns a public key as hex */

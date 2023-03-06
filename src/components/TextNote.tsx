@@ -1,5 +1,5 @@
 import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
-import type { Event as NostrEvent } from 'nostr-tools/event';
+import type { Event as NostrEvent } from 'nostr-tools';
 import uniq from 'lodash/uniq';
 
 import HeartOutlined from 'heroicons/24/outline/heart.svg';

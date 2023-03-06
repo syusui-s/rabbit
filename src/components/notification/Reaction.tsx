@@ -1,5 +1,5 @@
 import { Switch, Match, type Component, Show } from 'solid-js';
-import { type Event as NostrEvent } from 'nostr-tools/event';
+import { type Event as NostrEvent } from 'nostr-tools';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 
 import UserDisplayName from '@/components/UserDisplayName';
