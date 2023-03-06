@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 
 import Home from '@/pages/Home';
 import NotFound from '@/pages/NotFound';
+import Hello from '@/pages/Hello';
 
 const queryClient = new QueryClient({});
 
@@ -20,6 +21,7 @@ const App: Component = () => (
   <QueryClientProvider client={queryClient}>
     <Routes>
       <Route path="/" element={() => <Home />} />
+      <Route path="/hello" element={() => <Hello />} />
       <Route path="/*" element={() => <NotFound />} />
     </Routes>
   </QueryClientProvider>

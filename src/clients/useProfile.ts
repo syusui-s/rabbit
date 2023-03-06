@@ -1,6 +1,5 @@
 import { createMemo, type Accessor } from 'solid-js';
-import { type Event as NostrEvent } from 'nostr-tools/event';
-import { type Filter } from 'nostr-tools/filter';
+import { type Event as NostrEvent, type Filter } from 'nostr-tools';
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 
 import useBatchedEvent from '@/clients/useBatchedEvent';

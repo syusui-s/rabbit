@@ -1,6 +1,5 @@
 import { createMemo } from 'solid-js';
-import { type Event as NostrEvent } from 'nostr-tools/event';
-import { type Filter } from 'nostr-tools/filter';
+import { type Event as NostrEvent, type Filter } from 'nostr-tools';
 
 import useConfig from '@/clients/useConfig';
 import useBatch, { type Task } from '@/clients/useBatch';

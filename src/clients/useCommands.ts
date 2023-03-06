@@ -1,6 +1,4 @@
-import { getEventHash } from 'nostr-tools/event';
-import type { Event as NostrEvent } from 'nostr-tools/event';
-import type { Pub } from 'nostr-tools/relay';
+import { getEventHash, type Event as NostrEvent, type Pub } from 'nostr-tools';
 
 import '@/types/nostr.d';
 import usePool from '@/clients/usePool';

@@ -41,7 +41,6 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
 
   onMount(() => {
     const handleKeydown: JSX.EventHandler<Window, KeyboardEvent> = (ev) => {
-      console.log(ev);
       if (ev.type !== 'keydown') return;
       if (ev.target instanceof HTMLTextAreaElement || ev.target instanceof HTMLInputElement) return;
 

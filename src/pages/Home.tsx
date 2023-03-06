@@ -1,4 +1,4 @@
-import { createSignal, Show, For } from 'solid-js';
+import { createSignal, Show, For, createEffect } from 'solid-js';
 import type { Component } from 'solid-js';
 
 import Column from '@/components/Column';
@@ -7,6 +7,7 @@ import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
 import TextNote from '@/components/TextNote';
+import usePool from '@/clients/usePool';
 import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
 import useSubscription from '@/clients/useSubscription';
@@ -20,9 +21,20 @@ useShortcutKeys({
 });
 
 const Home: Component = () => {
+  const pool = usePool();
   const [config] = useConfig();
   const pubkey = usePubkey();
   const commands = useCommands();
+
+  createEffect(() => {
+    config().relayUrls.map(async (relayUrl) => {
+      const relay = await pool().ensureRelay(relayUrl);
+      relay.on('notice', (msg) => {
+        console.error(`NOTICE: ${relayUrl}: ${msg}`);
+      });
+    });
+  });
+
   const { followings } = useFollowings(() => ({
     relayUrls: config().relayUrls,
     pubkey: pubkey(),

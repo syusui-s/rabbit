@@ -1,10 +1,6 @@
-# nostRabbit 🐰
+# Rabbit 🐰
 
 A nostr client like TweetDeck powered by SolidJS.
-
-## Supported features
-
-- [ ] Posting a new text note. (NIP-01)
 
 ## 使い方
 

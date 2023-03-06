@@ -1,7 +1,5 @@
 import { createSignal, createEffect, onCleanup } from 'solid-js';
-import type { Event as NostrEvent } from 'nostr-tools/event';
-import type { Filter } from 'nostr-tools/filter';
-import type { SubscriptionOptions } from 'nostr-tools/relay';
+import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 import usePool from '@/clients/usePool';
 
 export type UseSubscriptionProps = {
