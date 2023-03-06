@@ -42,8 +42,8 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) 
         pushed = true;
         storedEvents.push(event);
       } else {
-        // いったん1000件だけ保持
-        setEvents((prevEvents) => sortEvents([event, ...prevEvents].slice(0, 1000)));
+        // いったん50件だけ保持
+        setEvents((prevEvents) => sortEvents([event, ...prevEvents].slice(0, 50)));
       }
     });
 
