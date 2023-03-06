@@ -4,9 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 // import { persistQueryClient } from '@tanstack/solid-query-persist-client';
 // import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
-const Home = lazy(() => import('@/pages/Home'));
-const Hello = lazy(() => import('@/pages/Hello'));
-const NotFound = lazy(() => import('@/pages/NotFound'));
+import Home from '@/pages/Home';
+import Hello from '@/pages/Hello';
+import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient({});
 
