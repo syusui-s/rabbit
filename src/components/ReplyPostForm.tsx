@@ -18,11 +18,21 @@ const ReplyPostForm: Component<ReplyPostFormProps> = (props: ReplyPostFormProps)
     setText(ev.currentTarget.value);
   };
 
-  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
-    ev.preventDefault();
-    // TODO 投稿完了したかどうかの検知をしたい
+  // TODO 投稿完了したかどうかの検知をしたい
+  const submit = () => {
     props.onPost({ content: text() });
     clearText();
+  };
+
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
+    ev.preventDefault();
+    submit();
+  };
+
+  const handleKeyDown: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent> = (ev) => {
+    if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+      submit();
+    }
   };
 
   const submitDisabled = createMemo(() => text().trim().length === 0);
@@ -40,6 +50,7 @@ const ReplyPostForm: Component<ReplyPostFormProps> = (props: ReplyPostFormProps)
           rows={4}
           placeholder="返信を投稿"
           onInput={handleChangeText}
+          onKeyDown={handleKeyDown}
           value={text()}
         />
         <div class="flex justify-between">

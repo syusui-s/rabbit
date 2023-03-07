@@ -25,7 +25,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     submit();
   };
 
-  const handleKeyDown: JSX.EventHandler<HTMLFormElement, KeyboardEvent> = (ev) => {
+  const handleKeyDown: JSX.EventHandlerUnion<HTMLTextAreaElement, KeyboardEvent> = (ev) => {
     if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
       submit();
     }
