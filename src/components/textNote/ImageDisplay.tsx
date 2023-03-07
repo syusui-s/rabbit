@@ -12,6 +12,9 @@ const fixUrl = (url: URL): string => {
       const imageId = match[1];
       result.pathname = `${imageId}l.webp`;
     }
+  } else if (url.host === 'i.gyazo.com') {
+    result.host = 'thumb.gyazo.com';
+    result.pathname = `/thumb/640_w${url.pathname}`;
   }
   return result.toString();
 };
