@@ -20,8 +20,8 @@ const queryClient = new QueryClient({});
 const App: Component = () => (
   <QueryClientProvider client={queryClient}>
     <Routes>
-      <Route path="/" element={() => <Home />} />
       <Route path="/hello" element={() => <Hello />} />
+      <Route path="/" element={() => <Home />} />
       <Route path="/*" element={() => <NotFound />} />
     </Routes>
   </QueryClientProvider>
