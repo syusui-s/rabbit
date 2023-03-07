@@ -14,7 +14,7 @@ import usePubkey from '@/clients/usePubkey';
 
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import useLoginStatus from '@/hooks/useLoginStatus';
-// import ensureNonNull from '@/hooks/ensureNonNull';
+import ensureNonNull from '@/utils/ensureNonNull';
 
 useMountShortcutKeys();
 
@@ -35,60 +35,70 @@ const Home: Component = () => {
     });
   });
 
-  const { followingPubkeys } = useFollowings(() => ({
-    relayUrls: config().relayUrls,
-    pubkey: pubkey(),
-  }));
+  const { followingPubkeys } = useFollowings(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: config().relayUrls,
+      pubkey: pubkeyNonNull,
+    })),
+  );
 
-  const { events: followingsPosts } = useSubscription(() => ({
-    relayUrls: config().relayUrls,
-    filters: [
-      {
-        kinds: [1, 6],
-        authors: [...followingPubkeys(), pubkey()],
-        limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
-      },
-    ],
-  }));
+  const { events: followingsPosts } = useSubscription(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: config().relayUrls,
+      filters: [
+        {
+          kinds: [1, 6],
+          authors: [...followingPubkeys(), pubkeyNonNull],
+          limit: 25,
+          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        },
+      ],
+    })),
+  );
 
-  const { events: myPosts } = useSubscription(() => ({
-    relayUrls: config().relayUrls,
-    filters: [
-      {
-        kinds: [1, 6],
-        authors: [pubkey()],
-        limit: 25,
-      },
-    ],
-  }));
+  const { events: myPosts } = useSubscription(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: config().relayUrls,
+      filters: [
+        {
+          kinds: [1, 6],
+          authors: [pubkeyNonNull],
+          limit: 25,
+        },
+      ],
+    })),
+  );
 
-  const { events: notifications } = useSubscription(() => ({
-    relayUrls: config().relayUrls,
-    filters: [
-      {
-        kinds: [1, 6, 7],
-        '#p': [pubkey()],
-        limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
-      },
-    ],
-  }));
+  const { events: notifications } = useSubscription(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: config().relayUrls,
+      filters: [
+        {
+          kinds: [1, 6, 7],
+          '#p': [pubkeyNonNull],
+          limit: 25,
+          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        },
+      ],
+    })),
+  );
 
-  const { events: localTimeline } = useSubscription(() => ({
-    relayUrls: [
-      'wss://relay-jp.nostr.wirednet.jp',
-      'wss://nostr.h3z.jp/',
-      'wss://nostr.holybea.com',
-    ],
-    filters: [
-      {
-        kinds: [1, 6],
-        limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
-      },
-    ],
-  }));
+  const { events: localTimeline } = useSubscription(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: [
+        'wss://relay-jp.nostr.wirednet.jp',
+        'wss://nostr.h3z.jp/',
+        'wss://nostr.holybea.com',
+      ],
+      filters: [
+        {
+          kinds: [1, 6],
+          limit: 25,
+          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        },
+      ],
+    })),
+  );
 
   /*
   const { events: searchPosts } = useSubscription(() => ({

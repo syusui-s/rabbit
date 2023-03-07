@@ -17,7 +17,7 @@ export type UseSubscriptionProps = {
 const sortEvents = (events: NostrEvent[]) =>
   Array.from(events).sort((a, b) => b.created_at - a.created_at);
 
-const useSubscription = (propsProvider: () => UseSubscriptionProps | undefined) => {
+const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
 

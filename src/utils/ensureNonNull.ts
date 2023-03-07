@@ -3,8 +3,8 @@ export type TupleNonNull<T extends readonly any[]> = {
 };
 
 const ensureNonNull =
-  <T extends readonly any[], R>(tuple: T) =>
-  (f: (tupleNonNull: TupleNonNull<T>) => R): R | null => {
+  <T extends readonly any[]>(tuple: T) =>
+  <R>(f: (tupleNonNull: TupleNonNull<T>) => R): R | null => {
     if (tuple.some((e) => e == null)) {
       return null;
     }

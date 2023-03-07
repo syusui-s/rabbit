@@ -12,7 +12,7 @@ type Following = {
   petname?: string;
 };
 
-const useFollowings = (propsProvider: () => UseFollowingsProps) => {
+const useFollowings = (propsProvider: () => UseFollowingsProps | null) => {
   const props = createMemo(propsProvider);
   const query = useCachedEvents(() => {
     const currentProps = props();
