@@ -35,9 +35,9 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
       return timeout(15000, `useEvent: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {
-      // 5 minutes
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 15 * 60 * 1000,
+      // a hour
+      staleTime: 60 * 60 * 1000,
+      cacheTime: 60 * 60 * 1000,
     },
   );
 

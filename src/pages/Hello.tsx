@@ -49,6 +49,11 @@ const Hello: Component = () => {
         <div class="text-7xl">🐰</div>
         <h1 class="text-5xl font-bold text-rose-300">Rabbit</h1>
         <div>Rabbit is a Web client for Nostr.</div>
+        <p class="text-center">
+          <span class="font-bold text-rose-400">注意: 現在ベータ版です。</span>
+          <br />
+          未実装の機能やバグがあることを承知の上でご利用ください。
+        </p>
       </div>
       <div class="p-8 shadow-md">
         <Switch>

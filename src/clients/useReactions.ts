@@ -19,7 +19,7 @@ export type UseReactions = {
 };
 
 const { exec } = useBatchedEvents<UseReactionsProps>(() => ({
-  interval: 5000,
+  interval: 3400,
   generateKey: ({ eventId }) => eventId,
   mergeFilters: (args) => {
     const eventIds = args.map((arg) => arg.eventId);
@@ -43,9 +43,9 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
       return timeout(15000, `useReactions: ${currentProps.eventId}`)(exec(currentProps, signal));
     },
     {
-      // 1 minutes
+      // 3 minutes
       staleTime: 1 * 60 * 1000,
-      cacheTime: 1 * 60 * 1000,
+      cacheTime: 3 * 60 * 1000,
     },
   );
 

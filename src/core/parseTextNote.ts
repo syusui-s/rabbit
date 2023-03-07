@@ -26,25 +26,38 @@ export type HashTag = {
   tagName: string;
 };
 
-export type ParsedTextNoteNode = PlainText | MentionedEvent | MentionedUser | HashTag;
+export type UrlText = {
+  type: 'URL';
+  content: string;
+};
+
+export type ParsedTextNoteNode = PlainText | MentionedEvent | MentionedUser | HashTag | UrlText;
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
 export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
-  const matches = Array.from(
-    event.content.matchAll(/(?:#\[(?<idx>\d+)\]|#(?<hashtag>[^\[\]\(\)\s]+))/g),
-  );
+  const matches = [
+    ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
+    ...event.content.matchAll(/#(?<hashtag>[^[]\(\)\s]+)/g),
+    ...event.content.matchAll(
+      /(?<url>https?:\/\/[-a-zA-Z0-9.]+(?:\/[-\w.%]+|\/)*(?:\?[-\w=&]*)?(?:#[-\w]*)?)/g,
+    ),
+  ].sort((a, b) => a?.index - b?.index);
   let pos = 0;
   const result: ParsedTextNote = [];
 
+  const pushPlainText = (index: number | undefined) => {
+    if (index != null && pos !== index) {
+      const content = event.content.slice(pos, index);
+      const plainText: PlainText = { type: 'PlainText', content };
+      result.push(plainText);
+    }
+  };
+
   matches.forEach((match) => {
     if (match.groups?.hashtag) {
+      pushPlainText(match.index);
       const tagName = match.groups?.hashtag;
-      if (pos !== match.index) {
-        const content = event.content.slice(pos, match.index);
-        const plainText: PlainText = { type: 'PlainText', content };
-        result.push(plainText);
-      }
       const hashtag: HashTag = {
         type: 'HashTag',
         content: match[0],
@@ -55,11 +68,9 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
       const tagIndex = parseInt(match.groups.idx, 10);
       const tag = event.tags[tagIndex];
       if (tag == null) return;
-      if (pos !== match.index) {
-        const content = event.content.slice(pos, match.index);
-        const plainText: PlainText = { type: 'PlainText', content };
-        result.push(plainText);
-      }
+
+      pushPlainText(match.index);
+
       const tagName = tag[0];
       if (tagName === 'p') {
         const mentionedUser: MentionedUser = {
@@ -79,6 +90,10 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedEvent);
       }
+    } else if (match.groups?.url) {
+      pushPlainText(match.index);
+      const url: UrlText = { type: 'URL', content: match.groups?.url };
+      result.push(url);
     }
     pos = match.index + match[0].length;
   });
