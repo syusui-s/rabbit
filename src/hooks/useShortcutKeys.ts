@@ -3,24 +3,26 @@
 
 import { onMount, onCleanup, type JSX } from 'solid-js';
 
-type Shortcut = { key: string; command: string };
+import { useRequestCommand, type Command } from '@/hooks/useCommandBus';
+
+type Shortcut = { key: string; command: Command };
 
 const defaultShortcut: Shortcut[] = [
-  { key: 'n', command: 'openPostForm' },
-  { key: 'h', command: 'moveToPrevColumn' },
-  { key: 'j', command: 'moveToNextItem' },
-  { key: 'k', command: 'moveToPrevItem' },
-  { key: 'l', command: 'moveToNextColumn' },
-  { key: 'ArrowLeft', command: 'moveToPrevColumn' },
-  { key: 'ArrowDown', command: 'moveToNextItem' },
-  { key: 'ArrowUp', command: 'moveToPrevItem' },
-  { key: 'ArrowRight', command: 'moveToNextColumn' },
-  { key: 'f', command: 'like' },
-  { key: 't', command: 'repost' },
-  { key: 'r', command: 'openReplyForm' },
-  { key: '?', command: 'openHelp' },
-  { key: 'Enter', command: 'openItemDetail' },
-  { key: 'Backspace', command: 'closeItemDetail' },
+  { key: 'n', command: { command: 'openPostForm' } },
+  { key: 'h', command: { command: 'moveToPrevColumn' } },
+  { key: 'j', command: { command: 'moveToNextItem' } },
+  { key: 'k', command: { command: 'moveToPrevItem' } },
+  { key: 'l', command: { command: 'moveToNextColumn' } },
+  { key: 'ArrowLeft', command: { command: 'moveToPrevColumn' } },
+  { key: 'ArrowDown', command: { command: 'moveToNextItem' } },
+  { key: 'ArrowUp', command: { command: 'moveToPrevItem' } },
+  { key: 'ArrowRight', command: { command: 'moveToNextColumn' } },
+  { key: 'f', command: { command: 'like' } },
+  { key: 't', command: { command: 'repost' } },
+  { key: 'r', command: { command: 'openReplyForm' } },
+  { key: '?', command: { command: 'openHelp' } },
+  { key: 'Enter', command: { command: 'openItemDetail' } },
+  { key: 'Backspace', command: { command: 'closeItemDetail' } },
 ];
 
 type UseShortcutKeysProps = {
@@ -40,7 +42,7 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
   const shortcutsMap = createShortcutsMap(shortcuts);
 
   onMount(() => {
-    const handleKeydown: JSX.EventHandler<Window, KeyboardEvent> = (ev) => {
+    const handleKeydown = (ev: KeyboardEvent) => {
       if (ev.type !== 'keydown') return;
       if (ev.target instanceof HTMLTextAreaElement || ev.target instanceof HTMLInputElement) return;
 
@@ -56,6 +58,16 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
     onCleanup(() => {
       window.removeEventListener('keydown', handleKeydown);
     });
+  });
+};
+
+export const useMountShortcutKeys = () => {
+  const request = useRequestCommand();
+
+  useShortcutKeys({
+    onShortcut: (shortcut) => {
+      request(shortcut.command);
+    },
   });
 };
 

@@ -1,14 +1,43 @@
-import { createSignal, Show } from 'solid-js';
-import type { Component } from 'solid-js';
+import { createSignal, Show, type JSX, Component } from 'solid-js';
 import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
-type SideBarProps = {
-  postForm: () => JSX.Element;
-};
+import NotePostForm from '@/components/NotePostForm';
 
-const SideBar: Component<SideBarProps> = (props) => {
+import useConfig from '@/clients/useConfig';
+import useCommands from '@/clients/useCommands';
+import usePubkey from '@/clients/usePubkey';
+
+import { useHandleCommand } from '@/hooks/useCommandBus';
+
+const SideBar: Component = (props) => {
+  const [config] = useConfig();
+  const pubkey = usePubkey();
+  const commands = useCommands();
+
   const [formOpened, setFormOpened] = createSignal(false);
+
+  const handlePost = ({ content }: { content: string }) => {
+    commands
+      .publishTextNote({
+        relayUrls: config().relayUrls,
+        pubkey: pubkey(),
+        content,
+      })
+      .then(() => {
+        console.log('ok');
+      })
+      .catch((err) => {
+        console.error('error', err);
+      });
+  };
+
+  useHandleCommand(() => ({
+    commandType: 'openPostForm',
+    handler: (cmd) => {
+      setFormOpened(true);
+    },
+  }));
 
   return (
     <div class="flex shrink-0 flex-row border-r bg-sidebar-bg">
@@ -25,7 +54,9 @@ const SideBar: Component<SideBarProps> = (props) => {
         {/* <div>column 1</div> */}
         {/* <div>column 2</div> */}
       </div>
-      <Show when={formOpened()}>{() => props.postForm()}</Show>
+      <Show when={formOpened()}>
+        <NotePostForm onPost={handlePost} onClose={() => setFormOpened(false)} />
+      </Show>
     </div>
   );
 };

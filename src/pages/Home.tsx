@@ -2,23 +2,21 @@ import { Show, For, createSignal, createEffect, onMount, type Component } from '
 import { useNavigate } from '@solidjs/router';
 
 import Column from '@/components/Column';
-import NotePostForm from '@/components/NotePostForm';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
+
 import usePool from '@/clients/usePool';
-import useCommands from '@/clients/useCommands';
 import useConfig from '@/clients/useConfig';
 import useSubscription from '@/clients/useSubscription';
 import useFollowings from '@/clients/useFollowings';
 import usePubkey from '@/clients/usePubkey';
-import useShortcutKeys from '@/hooks/useShortcutKeys';
-import useLoginStatus from '@/hooks/useLoginStatus';
-import ensureNonNull from '@/hooks/ensureNonNull';
 
-useShortcutKeys({
-  onShortcut: (s) => console.log(s),
-});
+import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
+import useLoginStatus from '@/hooks/useLoginStatus';
+// import ensureNonNull from '@/hooks/ensureNonNull';
+
+useMountShortcutKeys();
 
 const Home: Component = () => {
   const navigate = useNavigate();
@@ -27,7 +25,6 @@ const Home: Component = () => {
   const pool = usePool();
   const [config] = useConfig();
   const pubkey = usePubkey();
-  const commands = useCommands();
 
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {
@@ -38,7 +35,7 @@ const Home: Component = () => {
     });
   });
 
-  const { followings } = useFollowings(() => ({
+  const { followingPubkeys } = useFollowings(() => ({
     relayUrls: config().relayUrls,
     pubkey: pubkey(),
   }));
@@ -48,7 +45,7 @@ const Home: Component = () => {
     filters: [
       {
         kinds: [1, 6],
-        authors: [...followings()?.map((f) => f.pubkey), pubkey()] ?? [pubkey()],
+        authors: [...followingPubkeys(), pubkey()],
         limit: 25,
         since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
       },
@@ -107,31 +104,15 @@ const Home: Component = () => {
   }));
    */
 
-  const handlePost = ({ content }: { content: string }) => {
-    commands
-      .publishTextNote({
-        relayUrls: config().relayUrls,
-        pubkey: pubkey(),
-        content,
-      })
-      .then(() => {
-        console.log('ok');
-      })
-      .catch((err) => {
-        console.error('error', err);
-      });
-  };
-
   onMount(() => {
     if (!loginStatus().loggedIn) {
       navigate('/hello');
     }
   });
 
-  const japaneseRegex = /[あ-ん]/;
   return (
     <div class="flex h-screen w-screen flex-row overflow-hidden">
-      <SideBar postForm={() => <NotePostForm onPost={handlePost} />} />
+      <SideBar />
       <div class="flex flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" width="widest">
           <Timeline events={followingsPosts()} />

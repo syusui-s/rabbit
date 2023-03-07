@@ -1,11 +1,14 @@
-import { createSignal, createMemo, type Component, type JSX } from 'solid-js';
+import { createSignal, createMemo, onMount, type Component, type JSX } from 'solid-js';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 
 type NotePostFormProps = {
   onPost: (textNote: { content: string }) => void;
+  onClose: () => void;
 };
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
+  let textAreaRef: HTMLTextAreaElement | undefined;
+
   const [text, setText] = createSignal<string>('');
 
   const clearText = () => setText('');
@@ -28,15 +31,24 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const handleKeyDown: JSX.EventHandlerUnion<HTMLTextAreaElement, KeyboardEvent> = (ev) => {
     if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
       submit();
+    } else if (ev.key === 'Escape') {
+      props.onClose();
     }
   };
 
   const submitDisabled = createMemo(() => text().trim().length === 0);
 
+  onMount(() => {
+    if (textAreaRef != null) {
+      textAreaRef.focus();
+    }
+  });
+
   return (
     <div class="p-1">
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
         <textarea
+          ref={textAreaRef}
           name="text"
           class="rounded border-none"
           rows={4}

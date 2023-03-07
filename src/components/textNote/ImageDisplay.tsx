@@ -25,7 +25,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
   return (
     <a href={props.url} target="_blank" rel="noopener noreferrer">
       <img
-        class="max-h-full max-w-full rounded object-contain shadow"
+        class="inline-block max-h-64 max-w-full rounded object-contain shadow"
         src={fixUrl(url())}
         alt={props.url}
       />

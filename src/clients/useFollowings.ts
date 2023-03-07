@@ -52,7 +52,11 @@ const useFollowings = (propsProvider: () => UseFollowingsProps) => {
     return result;
   };
 
-  return { followings };
+  const followingPubkeys = (): string[] => {
+    return followings().map((follow) => follow.pubkey);
+  };
+
+  return { followings, followingPubkeys };
 };
 
 export default useFollowings;

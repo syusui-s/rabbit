@@ -18,6 +18,7 @@ export type UseDeprecatedReposts = {
 };
 
 const { exec } = useBatchedEvents<UseDeprecatedRepostsProps>(() => ({
+  interval: 3400,
   generateKey: ({ eventId }) => eventId,
   mergeFilters: (args) => {
     const eventIds = args.map((arg) => arg.eventId);
