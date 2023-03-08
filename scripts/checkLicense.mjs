@@ -8,6 +8,7 @@ const acceptableLicenses = [
   'MIT',
   'ISC',
   'Apache-2.0',
+  '0BSD',
   'BSD-3-Clause',
   'CC-BY-4.0',
 ];
