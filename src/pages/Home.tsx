@@ -133,7 +133,7 @@ const Home: Component = () => {
         <Column name="日本サーバ" columnIndex={3} width="medium">
           <Timeline events={localTimeline()} />
         </Column>
-        <Column name="自分の投稿" colmnIndex={4} lastColumn width="medium">
+        <Column name="自分の投稿" columnIndex={4} lastColumn width="medium">
           <Timeline events={myPosts()} />
         </Column>
       </div>
