@@ -39,7 +39,7 @@ export default async function() {
     if (ignorePackageNames.some((ignorePackageName) => name.startsWith(`${ignorePackageName}@`)))
       continue;
 
-    console.error(name);
+    console.error(name, info.licenses);
     ok = false;
   }
 
