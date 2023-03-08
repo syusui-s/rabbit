@@ -3,7 +3,7 @@ import { type Event as NostrEvent } from 'nostr-tools';
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 import timeout from '@/utils/timeout';
 
-import useBatchedEvent from '@/clients/useBatchedEvent';
+import useBatchedEvent from '@/nostr/useBatchedEvent';
 
 export type UseEventProps = {
   // TODO リレーURLを考慮したい

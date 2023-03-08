@@ -8,12 +8,12 @@ import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-squa
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
-import useProfile from '@/clients/useProfile';
-import useConfig from '@/clients/useConfig';
-import usePubkey from '@/clients/usePubkey';
-import useCommands from '@/clients/useCommands';
-import useReactions from '@/clients/useReactions';
-import useDeprecatedReposts from '@/clients/useDeprecatedReposts';
+import useProfile from '@/nostr/useProfile';
+import useConfig from '@/nostr/useConfig';
+import usePubkey from '@/nostr/usePubkey';
+import useCommands from '@/nostr/useCommands';
+import useReactions from '@/nostr/useReactions';
+import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
 import useDatePulser from '@/hooks/useDatePulser';
 import { formatRelative } from '@/utils/formatDate';
 import ColumnItem from '@/components/ColumnItem';

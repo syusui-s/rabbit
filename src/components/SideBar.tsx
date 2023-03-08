@@ -4,9 +4,9 @@ import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
 import NotePostForm from '@/components/NotePostForm';
 
-import useConfig from '@/clients/useConfig';
-import useCommands from '@/clients/useCommands';
-import usePubkey from '@/clients/usePubkey';
+import useConfig from '@/nostr/useConfig';
+import useCommands from '@/nostr/useCommands';
+import usePubkey from '@/nostr/usePubkey';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 import ensureNonNull from '@/utils/ensureNonNull';
 

@@ -1,9 +1,9 @@
 import { createSignal, createMemo, type Signal, type Accessor } from 'solid-js';
 import { type Event as NostrEvent, type Filter } from 'nostr-tools';
 
-import useConfig from '@/clients/useConfig';
-import useBatch, { type Task } from '@/clients/useBatch';
-import useSubscription from '@/clients/useSubscription';
+import useConfig from '@/nostr/useConfig';
+import useBatch, { type Task } from '@/nostr/useBatch';
+import useSubscription from '@/nostr/useSubscription';
 
 export type UseBatchedEventsProps<TaskArgs> = {
   interval?: number;

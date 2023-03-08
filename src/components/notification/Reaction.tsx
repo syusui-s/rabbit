@@ -5,9 +5,9 @@ import HeartSolid from 'heroicons/24/solid/heart.svg';
 import UserDisplayName from '@/components/UserDisplayName';
 import TextNote from '@/components/TextNote';
 
-import useConfig from '@/clients/useConfig';
-import useProfile from '@/clients/useProfile';
-import useEvent from '@/clients/useEvent';
+import useConfig from '@/nostr/useConfig';
+import useProfile from '@/nostr/useProfile';
+import useEvent from '@/nostr/useEvent';
 
 type ReactionProps = {
   event: NostrEvent;

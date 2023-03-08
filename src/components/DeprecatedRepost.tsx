@@ -3,9 +3,9 @@ import { Show, Switch, Match, type Component } from 'solid-js';
 import { Event as NostrEvent } from 'nostr-tools';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 
-import useConfig from '@/clients/useConfig';
-import useEvent from '@/clients/useEvent';
-import useProfile from '@/clients/useProfile';
+import useConfig from '@/nostr/useConfig';
+import useEvent from '@/nostr/useEvent';
+import useProfile from '@/nostr/useProfile';
 
 import UserDisplayName from '@/components/UserDisplayName';
 import TextNote from '@/components/TextNote';

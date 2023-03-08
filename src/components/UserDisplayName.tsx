@@ -1,7 +1,7 @@
 import { Component, Switch, Match } from 'solid-js';
 
-import useConfig from '@/clients/useConfig';
-import useProfile, { type Profile } from '@/clients/useProfile';
+import useConfig from '@/nostr/useConfig';
+import useProfile, { type Profile } from '@/nostr/useProfile';
 
 type UserNameDisplayProps = {
   pubkey: string;

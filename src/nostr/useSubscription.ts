@@ -1,6 +1,6 @@
 import { createSignal, createEffect, onCleanup } from 'solid-js';
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
-import usePool from '@/clients/usePool';
+import usePool from '@/nostr/usePool';
 
 export type UseSubscriptionProps = {
   relayUrls: string[];

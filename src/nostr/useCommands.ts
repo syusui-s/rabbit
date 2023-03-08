@@ -1,7 +1,7 @@
 import { getEventHash, type Event as NostrEvent, type Pub } from 'nostr-tools';
 
 import '@/types/nostr.d';
-import usePool from '@/clients/usePool';
+import usePool from '@/nostr/usePool';
 
 const currentDate = (): number => Math.floor(Date.now() / 1000);
 

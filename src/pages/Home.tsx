@@ -6,11 +6,11 @@ import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
 
-import usePool from '@/clients/usePool';
-import useConfig from '@/clients/useConfig';
-import useSubscription from '@/clients/useSubscription';
-import useFollowings from '@/clients/useFollowings';
-import usePubkey from '@/clients/usePubkey';
+import usePool from '@/nostr/usePool';
+import useConfig from '@/nostr/useConfig';
+import useSubscription from '@/nostr/useSubscription';
+import useFollowings from '@/nostr/useFollowings';
+import usePubkey from '@/nostr/usePubkey';
 
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import useLoginStatus from '@/hooks/useLoginStatus';

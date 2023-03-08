@@ -1,5 +1,5 @@
 import { createQuery } from '@tanstack/solid-query';
-import { type UseSubscriptionProps } from '@/clients/useSubscription';
+import { type UseSubscriptionProps } from '@/nostr/useSubscription';
 import type { Event as NostrEvent, Filter, SimplePool, SubscriptionOptions } from 'nostr-tools';
 import usePool from './usePool';
 

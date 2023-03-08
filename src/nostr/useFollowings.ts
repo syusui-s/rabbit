@@ -1,5 +1,5 @@
 import { createMemo } from 'solid-js';
-import useCachedEvents from '@/clients/useCachedEvents';
+import useCachedEvents from '@/nostr/useCachedEvents';
 
 type UseFollowingsProps = {
   relayUrls: string[];
