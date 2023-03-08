@@ -1,4 +1,3 @@
-import { onMount } from 'solid-js';
 import { useRequestMessage, useHandleMessage } from '@/hooks/useMessageBus';
 
 type UseHandleCommandProps = {

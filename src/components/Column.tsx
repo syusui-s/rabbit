@@ -22,12 +22,12 @@ const Column: Component<ColumnProps> = (props) => {
   };
 
   return (
-    <div class={`h-full shrink-0 border-r ${width()}`}>
-      <div class="flex h-8 items-center border-b bg-white px-2">
+    <div class={`flex shrink-0 flex-col border-r ${width()}`}>
+      <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
         {/* <span class="column-icon">🏠</span> */}
         <span class="column-name">{props.name}</span>
       </div>
-      <div class="h-full overflow-y-scroll pb-8">{props.children}</div>
+      <div class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</div>
     </div>
   );
 };

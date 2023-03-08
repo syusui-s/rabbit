@@ -1,4 +1,4 @@
-import { Show, For, createSignal, createEffect, onMount, type Component } from 'solid-js';
+import { createEffect, onMount, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 
 import Column from '@/components/Column';
@@ -16,9 +16,8 @@ import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import useLoginStatus from '@/hooks/useLoginStatus';
 import ensureNonNull from '@/utils/ensureNonNull';
 
-useMountShortcutKeys();
-
 const Home: Component = () => {
+  useMountShortcutKeys();
   const navigate = useNavigate();
   const { loginStatus } = useLoginStatus();
 
@@ -29,7 +28,8 @@ const Home: Component = () => {
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
-      relay.on('notice', (msg) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      relay.on('notice', (msg: any) => {
         console.error(`NOTICE: ${relayUrl}: ${msg}`);
       });
     });
@@ -123,7 +123,7 @@ const Home: Component = () => {
   return (
     <div class="flex h-screen w-screen flex-row overflow-hidden">
       <SideBar />
-      <div class="flex flex-row overflow-y-hidden overflow-x-scroll">
+      <div class="flex h-full flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" width="widest">
           <Timeline events={followingsPosts()} />
         </Column>
@@ -135,6 +135,9 @@ const Home: Component = () => {
         </Column>
         <Column name="自分の投稿" width="medium">
           <Timeline events={myPosts()} />
+        </Column>
+        <Column name="テスト" width="medium">
+          <></>
         </Column>
       </div>
     </div>

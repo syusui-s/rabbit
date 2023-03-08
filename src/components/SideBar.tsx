@@ -8,15 +8,25 @@ import useConfig from '@/nostr/useConfig';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import { useHandleCommand } from '@/hooks/useCommandBus';
-import ensureNonNull from '@/utils/ensureNonNull';
 
-const SideBar: Component = (props) => {
+const SideBar: Component = () => {
   let formTextAreaRef: HTMLTextAreaElement | undefined;
   const [config] = useConfig();
   const getPubkey = usePubkey();
   const commands = useCommands();
 
   const [formOpened, setFormOpened] = createSignal(false);
+
+  const openForm = () => {
+    setFormOpened(true);
+    setTimeout(() => {
+      formTextAreaRef?.focus?.();
+    }, 100);
+  };
+  const closeForm = () => {
+    setFormOpened(false);
+    formTextAreaRef?.blur?.();
+  };
 
   const handlePost = ({ content }: { content: string }) => {
     const pubkey = getPubkey();
@@ -41,8 +51,7 @@ const SideBar: Component = (props) => {
   useHandleCommand(() => ({
     commandType: 'openPostForm',
     handler: (cmd) => {
-      setFormOpened(true);
-      formTextAreaRef?.focus?.();
+      openForm();
     },
   }));
 
@@ -62,11 +71,7 @@ const SideBar: Component = (props) => {
         {/* <div>column 2</div> */}
       </div>
       <Show when={formOpened()}>
-        <NotePostForm
-          ref={formTextAreaRef}
-          onPost={handlePost}
-          onClose={() => setFormOpened(false)}
-        />
+        <NotePostForm ref={formTextAreaRef} onPost={handlePost} onClose={closeForm} />
       </Show>
     </div>
   );

@@ -68,7 +68,7 @@ export const useMountShortcutKeys = () => {
   useShortcutKeys({
     onShortcut: (shortcut) => {
       request(shortcut.command).then(
-        () => console.debug(`${shortcut.key} was processed successfully`),
+        () => console.debug(`shortcut key '${shortcut.key}' was processed successfully`),
         (err) => console.error(err),
       );
     },
