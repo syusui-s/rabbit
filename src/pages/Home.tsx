@@ -124,20 +124,17 @@ const Home: Component = () => {
     <div class="flex h-screen w-screen flex-row overflow-hidden">
       <SideBar />
       <div class="flex h-full flex-row overflow-y-hidden overflow-x-scroll">
-        <Column name="ホーム" width="widest">
+        <Column name="ホーム" columnIndex={1} width="widest">
           <Timeline events={followingsPosts()} />
         </Column>
-        <Column name="通知" width="medium">
+        <Column name="通知" columnIndex={2} width="medium">
           <Notification events={notifications()} />
         </Column>
-        <Column name="日本サーバ" width="medium">
+        <Column name="日本サーバ" columnIndex={3} width="medium">
           <Timeline events={localTimeline()} />
         </Column>
-        <Column name="自分の投稿" width="medium">
+        <Column name="自分の投稿" colmnIndex={4} lastColumn width="medium">
           <Timeline events={myPosts()} />
-        </Column>
-        <Column name="テスト" width="medium">
-          <></>
         </Column>
       </div>
     </div>

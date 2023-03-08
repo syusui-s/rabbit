@@ -13,7 +13,8 @@ export type MoveToNextItem = CommandBase<'moveToNextItem'>;
 export type MoveToPrevItem = CommandBase<'moveToPrevItem'>;
 export type MoveToPrevColumn = CommandBase<'moveToPrevColumn'>;
 export type MoveToNextColumn = CommandBase<'moveToNextColumn'>;
-export type MoveToColumn = CommandBase<'moveToNextColumn'> & { columnIndex: number };
+export type MoveToColumn = CommandBase<'moveToColumn'> & { columnIndex: number };
+export type MoveToLastColumn = CommandBase<'moveToLastColumn'>;
 export type Like = CommandBase<'like'>;
 export type Repost = CommandBase<'repost'>;
 export type OpenReplyForm = CommandBase<'openReplyForm'>;
@@ -28,6 +29,8 @@ export type Command =
   | MoveToPrevItem
   | MoveToPrevColumn
   | MoveToNextColumn
+  | MoveToColumn
+  | MoveToLastColumn
   | Like
   | Repost
   | OpenReplyForm

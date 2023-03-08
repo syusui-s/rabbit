@@ -14,6 +14,16 @@ const defaultShortcut: Shortcut[] = [
   { key: 'j', command: { command: 'moveToNextItem' } },
   { key: 'k', command: { command: 'moveToPrevItem' } },
   { key: 'l', command: { command: 'moveToNextColumn' } },
+  { key: '1', command: { command: 'moveToColumn', columnIndex: 1 } },
+  { key: '2', command: { command: 'moveToColumn', columnIndex: 2 } },
+  { key: '3', command: { command: 'moveToColumn', columnIndex: 3 } },
+  { key: '4', command: { command: 'moveToColumn', columnIndex: 4 } },
+  { key: '5', command: { command: 'moveToColumn', columnIndex: 5 } },
+  { key: '6', command: { command: 'moveToColumn', columnIndex: 6 } },
+  { key: '7', command: { command: 'moveToColumn', columnIndex: 7 } },
+  { key: '8', command: { command: 'moveToColumn', columnIndex: 8 } },
+  { key: '9', command: { command: 'moveToColumn', columnIndex: 9 } },
+  { key: '0', command: { command: 'moveToLastColumn' } },
   { key: 'ArrowLeft', command: { command: 'moveToPrevColumn' } },
   { key: 'ArrowDown', command: { command: 'moveToNextItem' } },
   { key: 'ArrowUp', command: { command: 'moveToPrevItem' } },
@@ -52,7 +62,7 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
       if (shortcut == null) return;
 
       onShortcut(shortcut);
-    }, 100);
+    }, 50);
 
     window.addEventListener('keydown', handleKeydown);
 
