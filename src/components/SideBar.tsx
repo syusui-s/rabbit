@@ -7,21 +7,27 @@ import NotePostForm from '@/components/NotePostForm';
 import useConfig from '@/clients/useConfig';
 import useCommands from '@/clients/useCommands';
 import usePubkey from '@/clients/usePubkey';
-
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import ensureNonNull from '@/utils/ensureNonNull';
 
 const SideBar: Component = (props) => {
+  let formTextAreaRef: HTMLTextAreaElement | undefined;
   const [config] = useConfig();
-  const pubkey = usePubkey();
+  const getPubkey = usePubkey();
   const commands = useCommands();
 
   const [formOpened, setFormOpened] = createSignal(false);
 
   const handlePost = ({ content }: { content: string }) => {
+    const pubkey = getPubkey();
+    if (pubkey == null) {
+      console.error('pubkey is not available');
+      return;
+    }
     commands
       .publishTextNote({
         relayUrls: config().relayUrls,
-        pubkey: pubkey(),
+        pubkey,
         content,
       })
       .then(() => {
@@ -36,6 +42,7 @@ const SideBar: Component = (props) => {
     commandType: 'openPostForm',
     handler: (cmd) => {
       setFormOpened(true);
+      formTextAreaRef?.focus?.();
     },
   }));
 
@@ -55,7 +62,11 @@ const SideBar: Component = (props) => {
         {/* <div>column 2</div> */}
       </div>
       <Show when={formOpened()}>
-        <NotePostForm onPost={handlePost} onClose={() => setFormOpened(false)} />
+        <NotePostForm
+          ref={formTextAreaRef}
+          onPost={handlePost}
+          onClose={() => setFormOpened(false)}
+        />
       </Show>
     </div>
   );

@@ -2,13 +2,12 @@ import { createSignal, createMemo, onMount, type Component, type JSX } from 'sol
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 
 type NotePostFormProps = {
+  ref?: HTMLTextAreaElement | undefined;
   onPost: (textNote: { content: string }) => void;
   onClose: () => void;
 };
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
-  let textAreaRef: HTMLTextAreaElement | undefined;
-
   const [text, setText] = createSignal<string>('');
 
   const clearText = () => setText('');
@@ -38,17 +37,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submitDisabled = createMemo(() => text().trim().length === 0);
 
-  onMount(() => {
-    if (textAreaRef != null) {
-      textAreaRef.focus();
-    }
-  });
-
   return (
     <div class="p-1">
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
         <textarea
-          ref={textAreaRef}
+          ref={props.ref}
           name="text"
           class="rounded border-none"
           rows={4}

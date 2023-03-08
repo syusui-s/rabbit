@@ -2,6 +2,7 @@
 // type Commands = (typeof commands)[number];
 
 import { onMount, onCleanup, type JSX } from 'solid-js';
+import throttle from 'lodash/throttle';
 
 import { useRequestCommand, type Command } from '@/hooks/useCommandBus';
 
@@ -42,7 +43,7 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
   const shortcutsMap = createShortcutsMap(shortcuts);
 
   onMount(() => {
-    const handleKeydown = (ev: KeyboardEvent) => {
+    const handleKeydown = throttle((ev: KeyboardEvent) => {
       if (ev.type !== 'keydown') return;
       if (ev.target instanceof HTMLTextAreaElement || ev.target instanceof HTMLInputElement) return;
 
@@ -51,7 +52,7 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
       if (shortcut == null) return;
 
       onShortcut(shortcut);
-    };
+    }, 100);
 
     window.addEventListener('keydown', handleKeydown);
 
@@ -66,7 +67,10 @@ export const useMountShortcutKeys = () => {
 
   useShortcutKeys({
     onShortcut: (shortcut) => {
-      request(shortcut.command);
+      request(shortcut.command).then(
+        () => console.debug(`${shortcut.key} was processed successfully`),
+        (err) => console.error(err),
+      );
     },
   });
 };
