@@ -22,7 +22,7 @@ const Home: Component = () => {
   const { loginStatus } = useLoginStatus();
 
   const pool = usePool();
-  const [config] = useConfig();
+  const { config } = useConfig();
   const pubkey = usePubkey();
 
   createEffect(() => {
@@ -87,7 +87,7 @@ const Home: Component = () => {
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
       relayUrls: [
         'wss://relay-jp.nostr.wirednet.jp',
-        'wss://nostr.h3z.jp/',
+        'wss://nostr.h3z.jp',
         'wss://nostr.holybea.com',
       ],
       filters: [
@@ -130,7 +130,7 @@ const Home: Component = () => {
         <Column name="通知" columnIndex={2} width="medium">
           <Notification events={notifications()} />
         </Column>
-        <Column name="日本サーバ" columnIndex={3} width="medium">
+        <Column name="日本リレー" columnIndex={3} width="medium">
           <Timeline events={localTimeline()} />
         </Column>
         <Column name="自分の投稿" columnIndex={4} lastColumn width="medium">

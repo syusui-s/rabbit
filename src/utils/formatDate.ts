@@ -1,27 +1,27 @@
 type ParsedDate =
-  | { kind: 'abs'; value: Date }
-  | { kind: 'days'; value: number }
-  | { kind: 'hours'; value: number }
-  | { kind: 'minutes'; value: number }
+  | { kind: 'now' }
   | { kind: 'seconds'; value: number }
-  | { kind: 'now' };
+  | { kind: 'minutes'; value: number }
+  | { kind: 'hours'; value: number }
+  | { kind: 'days'; value: number }
+  | { kind: 'abs'; value: Date };
 
 export type DateFormatter = (parsedDate: ParsedDate) => string;
 
 const defaultDateFormatter = (parsedDate: ParsedDate): string => {
   switch (parsedDate.kind) {
-    case 'abs':
-      return parsedDate.value.toLocaleDateString();
-    case 'days':
-      return `${parsedDate.value}d`;
-    case 'hours':
-      return `${parsedDate.value}h`;
-    case 'minutes':
-      return `${parsedDate.value}m`;
-    case 'seconds':
-      return `${parsedDate.value}s`;
     case 'now':
       return 'now';
+    case 'seconds':
+      return `${parsedDate.value}s`;
+    case 'minutes':
+      return `${parsedDate.value}m`;
+    case 'hours':
+      return `${parsedDate.value}h`;
+    case 'days':
+      return `${parsedDate.value}d`;
+    case 'abs':
+      return parsedDate.value.toLocaleDateString();
     default:
       return '';
   }

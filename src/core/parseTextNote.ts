@@ -38,9 +38,9 @@ export type ParsedTextNote = ParsedTextNoteNode[];
 export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
     ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
-    ...event.content.matchAll(/#(?<hashtag>[^[]\(\)\s]+)/g),
+    ...event.content.matchAll(/#(?<hashtag>[^[\]()\d\s][^[\]()\s]+)/g),
     ...event.content.matchAll(
-      /(?<url>https?:\/\/[-a-zA-Z0-9.]+(?:\/[-\w.%]+|\/)*(?:\?[-\w=&]*)?(?:#[-\w]*)?)/g,
+      /(?<url>https?:\/\/[-a-zA-Z0-9.]+(?:\/[-\w.%:]+|\/)*(?:\?[-\w=.%:&]*)?(?:#[-\w=.%:&]*)?)/g,
     ),
   ].sort((a, b) => a?.index - b?.index);
   let pos = 0;
@@ -55,16 +55,11 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   };
 
   matches.forEach((match) => {
-    if (match.groups?.hashtag) {
+    if (match.groups?.url && match.index >= pos) {
       pushPlainText(match.index);
-      const tagName = match.groups?.hashtag;
-      const hashtag: HashTag = {
-        type: 'HashTag',
-        content: match[0],
-        tagName,
-      };
-      result.push(hashtag);
-    } else if (match.groups?.idx) {
+      const url: UrlText = { type: 'URL', content: match.groups?.url };
+      result.push(url);
+    } else if (match.groups?.idx && match.index >= pos) {
       const tagIndex = parseInt(match.groups.idx, 10);
       const tag = event.tags[tagIndex];
       if (tag == null) return;
@@ -90,10 +85,15 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedEvent);
       }
-    } else if (match.groups?.url) {
+    } else if (match.groups?.hashtag && match.index >= pos) {
       pushPlainText(match.index);
-      const url: UrlText = { type: 'URL', content: match.groups?.url };
-      result.push(url);
+      const tagName = match.groups?.hashtag;
+      const hashtag: HashTag = {
+        type: 'HashTag',
+        content: match[0],
+        tagName,
+      };
+      result.push(hashtag);
     }
     pos = match.index + match[0].length;
   });
@@ -102,6 +102,10 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     const content = event.content.slice(pos);
     const plainText: PlainText = { type: 'PlainText', content };
     result.push(plainText);
+  }
+
+  if (result.length > 1) {
+    console.log(JSON.stringify(result, null, 2));
   }
 
   return result;

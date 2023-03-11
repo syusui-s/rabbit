@@ -14,7 +14,7 @@ type ReactionProps = {
 };
 
 const Reaction: Component<ReactionProps> = (props) => {
-  const [config] = useConfig();
+  const { config } = useConfig();
   const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
 
   const { profile } = useProfile(() => ({
@@ -61,7 +61,10 @@ const Reaction: Component<ReactionProps> = (props) => {
           </div>
         </div>
         <div class="notification-event">
-          <Show when={reactedEvent() != null} fallback={<>loading {eventId()}</>}>
+          <Show
+            when={reactedEvent() != null}
+            fallback={<div class="truncate">loading {eventId()}</div>}
+          >
             <TextNote event={reactedEvent()} />
           </Show>
         </div>

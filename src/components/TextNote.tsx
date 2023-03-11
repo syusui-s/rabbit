@@ -23,11 +23,15 @@ import ReplyPostForm from '@/components/ReplyPostForm';
 
 export type TextNoteProps = {
   event: NostrEvent;
+  //
+  // displayinlineContent: boolean = true;
+  // リアクションやリポスト等の
+  // actions: boolean = true;
 };
 
 const TextNote: Component<TextNoteProps> = (props) => {
   const currentDate = useDatePulser();
-  const [config] = useConfig();
+  const { config } = useConfig();
   const commands = useCommands();
   const pubkey = usePubkey();
   const [showReplyForm, setShowReplyForm] = createSignal(false);

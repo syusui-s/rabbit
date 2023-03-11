@@ -15,7 +15,7 @@ export type DeprecatedRepostProps = {
 };
 
 const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
-  const [config] = useConfig();
+  const { config } = useConfig();
   const pubkey = () => props.event.pubkey;
   const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
 

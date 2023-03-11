@@ -8,7 +8,7 @@ type UserNameDisplayProps = {
 };
 
 const UserNameDisplay: Component<UserNameDisplayProps> = (props) => {
-  const [config] = useConfig();
+  const { config } = useConfig();
   const { profile } = useProfile(() => ({
     relayUrls: config().relayUrls,
     pubkey: props.pubkey,

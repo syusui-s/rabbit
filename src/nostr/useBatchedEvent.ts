@@ -20,7 +20,7 @@ const useBatchedEvent = <TaskArgs>(propsProvider: () => UseBatchedEventProps<Tas
     executor: (tasks) => {
       const { generateKey, mergeFilters, extractKey } = props();
       // TODO relayUrlsを考慮する
-      const [config] = useConfig();
+      const { config } = useConfig();
 
       const keyTaskMap = new Map<string | number, Task<TaskArgs, NostrEvent>>(
         tasks.map((task) => [generateKey(task.args), task]),
