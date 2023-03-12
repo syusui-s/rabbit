@@ -54,7 +54,11 @@ const parseDateDiff = (date: Date, currentDate: Date): ParsedDate => {
 };
 
 export const formatAbsolute = (date: Date, currentDate: Date = new Date()): string => {
-  if (date.getDate() === currentDate.getDate()) {
+  if (
+    date.getFullYear() === currentDate.getFullYear() &&
+    date.getMonth() === currentDate.getMonth() &&
+    date.getDate() === currentDate.getDate()
+  ) {
     return date.toLocaleTimeString();
   }
   return date.toLocaleString();
