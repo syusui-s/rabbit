@@ -30,11 +30,10 @@ export type UseProfileProps = {
 
 type UseProfile = {
   profile: Accessor<Profile | undefined>;
-  query: CreateQueryResult<NostrEvent>;
+  query: CreateQueryResult<Accessor<NostrEvent> | undefined>;
 };
 
 const { exec } = useBatchedEvent<UseProfileProps>(() => ({
-  interval: 2000,
   generateKey: ({ pubkey }: UseProfileProps): string => pubkey,
   mergeFilters: (args: UseProfileProps[]): Filter[] => {
     const pubkeys = args.map((arg) => arg.pubkey);
@@ -62,12 +61,13 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
   );
 
   const profile = () => {
-    if (query.data == null) return undefined;
+    const content = query.data?.()?.content;
+    if (content == null) return undefined;
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
     try {
-      return JSON.parse(query.data.content) as Profile;
+      return JSON.parse(content) as Profile;
     } catch (e) {
-      console.error(e, query.data.content);
+      console.error(e, content);
       return undefined;
     }
   };

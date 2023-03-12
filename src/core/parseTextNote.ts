@@ -104,10 +104,6 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     result.push(plainText);
   }
 
-  if (result.length > 1) {
-    console.log(JSON.stringify(result, null, 2));
-  }
-
   return result;
 };
 

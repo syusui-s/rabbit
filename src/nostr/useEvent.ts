@@ -13,7 +13,7 @@ export type UseEventProps = {
 
 export type UseEvent = {
   event: Accessor<NostrEvent | undefined>;
-  query: CreateQueryResult<NostrEvent | undefined>;
+  query: CreateQueryResult<Accessor<NostrEvent> | undefined>;
 };
 
 const { exec } = useBatchedEvent<UseEventProps>(() => ({
@@ -41,7 +41,7 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
     },
   );
 
-  const event = () => query.data;
+  const event = () => query.data?.();
 
   return { event, query };
 };
