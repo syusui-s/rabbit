@@ -34,6 +34,7 @@ type UseProfile = {
 };
 
 const { exec } = useBatchedEvent<UseProfileProps>(() => ({
+  interval: 2000,
   generateKey: ({ pubkey }: UseProfileProps): string => pubkey,
   mergeFilters: (args: UseProfileProps[]): Filter[] => {
     const pubkeys = args.map((arg) => arg.pubkey);

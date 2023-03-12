@@ -5,7 +5,7 @@ type ColumnItemProps = {
 };
 
 const ColumnItem: Component<ColumnItemProps> = (props) => {
-  return <div class="overflow-hidden border-b p-1">{props.children}</div>;
+  return <div class="shrink-0 overflow-hidden border-b p-1">{props.children}</div>;
 };
 
 export default ColumnItem;

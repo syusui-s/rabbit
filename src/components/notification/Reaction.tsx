@@ -2,8 +2,9 @@ import { Switch, Match, type Component, Show } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 
+import ColumnItem from '@/components/ColumnItem';
+import TextNoteDisplay from '@/components/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
-import TextNote from '@/components/TextNote';
 
 import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
@@ -30,9 +31,9 @@ const Reaction: Component<ReactionProps> = (props) => {
   return (
     // if the reacted event is not found, it should be a removed event
     <Show when={!isRemoved()}>
-      <div>
-        <div class="notification-icon flex gap-1 px-1 text-sm">
-          <div class="flex place-items-center">
+      <ColumnItem>
+        <div class="flex gap-1 px-1 text-sm">
+          <div class="notification-icon flex place-items-center">
             <Switch fallback={props.event.content}>
               <Match when={props.event.content === '+'}>
                 <span class="h-4 w-4 pt-[1px] text-rose-400">
@@ -41,7 +42,7 @@ const Reaction: Component<ReactionProps> = (props) => {
               </Match>
             </Switch>
           </div>
-          <div class="notification-user flex gap-1 pt-1">
+          <div class="notification-user flex gap-1">
             <div class="author-icon h-5 w-5 shrink-0">
               <Show when={profile()?.picture != null}>
                 <img
@@ -56,19 +57,19 @@ const Reaction: Component<ReactionProps> = (props) => {
               <span class="truncate whitespace-pre-wrap break-all font-bold">
                 <UserDisplayName pubkey={props.event.pubkey} />
               </span>
-              {' reacted'}
+              {' がリアクション'}
             </div>
           </div>
         </div>
-        <div class="notification-event">
+        <div class="notification-event py-1">
           <Show
             when={reactedEvent() != null}
             fallback={<div class="truncate">loading {eventId()}</div>}
           >
-            <TextNote event={reactedEvent()} />
+            <TextNoteDisplay event={reactedEvent()} />
           </Show>
         </div>
-      </div>
+      </ColumnItem>
     </Show>
   );
 };

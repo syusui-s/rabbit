@@ -1,5 +1,5 @@
 // NIP-18 (DEPRECATED)
-import { Show, Switch, Match, type Component } from 'solid-js';
+import { Show, Switch, Match, type Component, createMemo } from 'solid-js';
 import { Event as NostrEvent } from 'nostr-tools';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 
@@ -7,47 +7,38 @@ import useConfig from '@/nostr/useConfig';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 
+import ColumnItem from '@/components/ColumnItem';
 import UserDisplayName from '@/components/UserDisplayName';
 import TextNote from '@/components/TextNote';
+import eventWrapper from '@/core/event';
+import useFormatDate from '@/hooks/useFormatDate';
+import TextNoteDisplayById from './textNote/TextNoteDisplayById';
 
 export type DeprecatedRepostProps = {
   event: NostrEvent;
 };
 
 const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
-  const { config } = useConfig();
-  const pubkey = () => props.event.pubkey;
-  const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
-
-  const { profile } = useProfile(() => ({ relayUrls: config().relayUrls, pubkey: pubkey() }));
-  const { event, query: eventQuery } = useEvent(() => ({
-    relayUrls: config().relayUrls,
-    eventId: eventId(),
-  }));
+  const formatDate = useFormatDate();
+  const repostedId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
+  const event = createMemo(() => eventWrapper(props.event));
 
   return (
-    <div>
-      <div class="flex content-center px-1 text-xs">
+    <ColumnItem>
+      <div class="flex content-center text-xs">
         <div class="h-5 w-5 shrink-0 pr-1 text-green-500" aria-hidden="true">
           <ArrowPathRoundedSquare />
         </div>
-        <div class="truncate break-all">
+        <div class="flex-1 truncate break-all">
           <UserDisplayName pubkey={props.event.pubkey} />
-          {' Reposted'}
+          {' がリポスト'}
         </div>
+        <div>{formatDate(event().createdAtAsDate())}</div>
       </div>
-      <Switch fallback="failed to load">
-        <Match when={event() != null}>
-          <TextNote event={event()} />
-        </Match>
-        <Match when={eventQuery.isLoading}>
-          <div class="truncate">
-            {'loading '}
-            <span>{eventId()}</span>
-          </div>
-        </Match>
-      </Switch>
-    </div>
+      <div class="pt-1">
+        <TextNoteDisplayById eventId={repostedId()} />
+      </div>
+    </ColumnItem>
   );
 };
 

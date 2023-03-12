@@ -1,4 +1,5 @@
 import type { Event as NostrEvent } from 'nostr-tools';
+import uniq from 'lodash/uniq';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 export type TaggedEvent = {
@@ -9,8 +10,23 @@ export type TaggedEvent = {
 
 const eventWrapper = (event: NostrEvent) => {
   return {
-    event(): NostrEvent {
+    get rawEvent(): NostrEvent {
       return event;
+    },
+    get id(): string | undefined {
+      return event.id;
+    },
+    get pubkey(): string {
+      return event.pubkey;
+    },
+    get createdAt(): number {
+      return event.created_at;
+    },
+    get content(): Date {
+      return new Date(event.created_at * 1000);
+    },
+    createdAtAsDate(): Date {
+      return new Date(event.created_at * 1000);
     },
     taggedUsers(): string[] {
       const pubkeys = new Set<string>();
@@ -53,6 +69,9 @@ const eventWrapper = (event: NostrEvent) => {
     },
     mentionedEvents(): TaggedEvent[] {
       return this.taggedEvents().filter(({ marker }) => marker === 'mention');
+    },
+    mentionedPubkeys(): string[] {
+      return uniq(event.tags.filter(([tagName]) => tagName === 'p').map((e) => e[1]));
     },
   };
 };

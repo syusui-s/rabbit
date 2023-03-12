@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, Switch, Match } from 'solid-js';
 import parseTextNote, { type ParsedTextNoteNode } from '@/core/parseTextNote';
 import type { Event as NostrEvent } from 'nostr-tools';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
@@ -21,15 +21,21 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'MentionedUser') {
           return <MentionedUserDisplay mentionedUser={item} />;
         }
-        if (item.type === 'MentionedEvent' && props.embedding) {
-          return <MentionedEventDisplay mentionedEvent={item} />;
+        if (item.type === 'MentionedEvent') {
+          if (props.embedding) {
+            return <MentionedEventDisplay mentionedEvent={item} />;
+          }
+          return <div>mention</div>;
         }
         if (item.type === 'HashTag') {
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'URL') {
           if (item.content.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
-            return <ImageDisplay url={item.content} />;
+            if (props.embedding) {
+              return <ImageDisplay url={item.content} />;
+            }
+            return <div>image</div>;
           }
           return (
             <a

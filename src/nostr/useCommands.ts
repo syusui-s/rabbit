@@ -59,6 +59,7 @@ const useCommands = () => {
     }): Promise<Promise<void>[]> {
       const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
       const eTags = [];
+      // NIP-10
       if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
       if (mentionEventIds != null)
         mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));

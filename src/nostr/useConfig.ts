@@ -6,6 +6,7 @@ import {
 
 type Config = {
   relayUrls: string[];
+  dateFormat: 'relative' | 'absolute';
 };
 
 type UseConfig = {
@@ -25,6 +26,7 @@ const InitialConfig: Config = {
     'wss://nostr-relay.nokotaro.com',
     'wss://nostr.holybea.com',
   ],
+  dateFormat: 'relative',
 };
 
 const serializer = (config: Config): string => JSON.stringify(config);

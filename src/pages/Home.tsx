@@ -69,6 +69,19 @@ const Home: Component = () => {
     })),
   );
 
+  const { events: myReactions } = useSubscription(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      relayUrls: config().relayUrls,
+      filters: [
+        {
+          kinds: [7],
+          authors: [pubkeyNonNull],
+          limit: 25,
+        },
+      ],
+    })),
+  );
+
   const { events: notifications } = useSubscription(() =>
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
       relayUrls: config().relayUrls,
@@ -135,6 +148,9 @@ const Home: Component = () => {
         </Column>
         <Column name="自分の投稿" columnIndex={4} lastColumn width="medium">
           <Timeline events={myPosts()} />
+        </Column>
+        <Column name="自分のいいね" columnIndex={4} lastColumn width="medium">
+          <Notification events={myReactions()} />
         </Column>
       </div>
     </div>

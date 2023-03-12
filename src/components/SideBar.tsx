@@ -68,9 +68,11 @@ const SideBar: Component = () => {
           >
             <PencilSquare />
           </button>
+          {/*
           <button class="h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary">
             <MagnifyingGlass />
           </button>
+          */}
           {/* <div>column 1</div> */}
           {/* <div>column 2</div> */}
         </div>
