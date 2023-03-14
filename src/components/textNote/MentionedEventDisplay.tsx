@@ -1,6 +1,7 @@
 import { Show } from 'solid-js';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import { type MentionedEvent } from '@/core/parseTextNote';
+import EventLink from '../EventLink';
 
 export type MentionedEventDisplayProps = {
   mentionedEvent: MentionedEvent;
@@ -9,8 +10,15 @@ export type MentionedEventDisplayProps = {
 const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
   return (
     <Show
-      when={props.mentionedEvent.marker == null || props.mentionedEvent.marker === 'mention'}
-      fallback={<span class="text-blue-500 underline">{props.mentionedEvent.eventId}</span>}
+      when={
+        props.mentionedEvent.marker == null ||
+        props.mentionedEvent.marker.length === 0 ||
+        props.mentionedEvent.marker === 'mention'
+      }
+      fallback={() => {
+        console.log(props.mentionedEvent);
+        return <EventLink eventId={props.mentionedEvent.eventId} />;
+      }}
     >
       <div class="my-1 rounded border p-1">
         <TextNoteDisplayById

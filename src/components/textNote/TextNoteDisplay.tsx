@@ -24,6 +24,7 @@ import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
 import useFormatDate from '@/hooks/useFormatDate';
 
 import ensureNonNull from '@/utils/ensureNonNull';
+import ContentWarningDisplay from './ContentWarningDisplay';
 
 export type TextNoteDisplayProps = {
   event: NostrEvent;
@@ -31,12 +32,15 @@ export type TextNoteDisplayProps = {
   actions?: boolean;
 };
 
+const ContentWarning = (props) => {};
+
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const { config } = useConfig();
   const formatDate = useFormatDate();
   const commands = useCommands();
   const pubkey = usePubkey();
   const [showReplyForm, setShowReplyForm] = createSignal(false);
+  const [showContentWarning, setShowContentWarning] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
 
@@ -93,7 +97,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           eventId: eventIdNonNull,
           notifyPubkey: props.event.pubkey,
         })
-        .then(() => invalidateDeprecatedReposts());
+        .then(() => invalidateDeprecatedReposts())
+        .catch((err) => console.error('failed to repost: ', err));
     });
   };
 
@@ -113,12 +118,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           eventId: eventIdNonNull,
           notifyPubkey: props.event.pubkey,
         })
-        .then(() => invalidateReactions());
+        .then(() => invalidateReactions())
+        .catch((err) => console.error('failed to publish reaction: ', err));
     });
   };
 
   return (
-    <div class="flex flex-col">
+    <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
         <div class="author-icon h-10 w-10 shrink-0">
           <Show when={author()?.picture}>
@@ -158,11 +164,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               </For>
             </div>
           </Show>
-          <div class="content whitespace-pre-wrap break-all">
-            <TextNoteContentDisplay event={props.event} embedding={embedding()} />
-          </div>
+          <ContentWarningDisplay contentWarning={event().contentWarning()}>
+            <div class="content whitespace-pre-wrap break-all">
+              <TextNoteContentDisplay event={props.event} embedding={embedding()} />
+            </div>
+          </ContentWarningDisplay>
           <Show when={actions()}>
-            <div class="flex w-48 items-center justify-between gap-8 pt-1">
+            <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
                 class="h-4 w-4 text-zinc-400"
                 onClick={() => setShowReplyForm((current) => !current)}

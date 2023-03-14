@@ -55,6 +55,7 @@ const useShortcutKeys = ({ shortcuts = defaultShortcut, onShortcut }: UseShortcu
   onMount(() => {
     const handleKeydown = throttle((ev: KeyboardEvent) => {
       if (ev.type !== 'keydown') return;
+      if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
       if (ev.target instanceof HTMLTextAreaElement || ev.target instanceof HTMLInputElement) return;
 
       const shortcut = shortcutsMap.get(ev.key);

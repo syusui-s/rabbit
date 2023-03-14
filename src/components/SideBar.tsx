@@ -44,7 +44,7 @@ const SideBar: Component = () => {
         content,
       })
       .then(() => {
-        console.log('ok');
+        console.log('succeeded to post');
       })
       .catch((err) => {
         console.error('error', err);

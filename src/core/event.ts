@@ -2,10 +2,16 @@ import type { Event as NostrEvent } from 'nostr-tools';
 import uniq from 'lodash/uniq';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
+
 export type TaggedEvent = {
   id: string;
   relayUrl?: string;
   marker: EventMarker;
+};
+
+export type ContentWarning = {
+  contentWarning: boolean;
+  reason?: string;
 };
 
 const eventWrapper = (event: NostrEvent) => {
@@ -58,7 +64,7 @@ const eventWrapper = (event: NostrEvent) => {
       return events.map(([, eventId, relayUrl, marker], index) => ({
         id: eventId,
         relayUrl,
-        marker: (marker as EventMarker) ?? positionToMarker(index),
+        marker: (marker as EventMarker | undefined) ?? positionToMarker(index),
       }));
     },
     replyingToEvent(): TaggedEvent | undefined {
@@ -72,6 +78,13 @@ const eventWrapper = (event: NostrEvent) => {
     },
     mentionedPubkeys(): string[] {
       return uniq(event.tags.filter(([tagName]) => tagName === 'p').map((e) => e[1]));
+    },
+    contentWarning(): ContentWarning {
+      const tag = event.tags.find(([tagName]) => tagName === 'content-warning');
+      if (tag == null) return { contentWarning: false };
+
+      const reason = (tag[1]?.length ?? 0) > 0 ? tag[1] : undefined;
+      return { contentWarning: true, reason };
     },
   };
 };

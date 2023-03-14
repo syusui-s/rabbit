@@ -40,7 +40,7 @@ const useBatch = <TaskArgs, TaskResult>(
 ) => {
   const props = createMemo(propsProvider);
   const batchSize = createMemo(() => props().batchSize ?? 100);
-  const interval = createMemo(() => props().interval ?? 1000);
+  const interval = createMemo(() => props().interval ?? 2000);
 
   const [seqId, setSeqId] = createSignal<number>(0);
   const [taskQueue, setTaskQueue] = createSignal<Task<TaskArgs, TaskResult>[]>([]);

@@ -5,6 +5,9 @@ import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 import ImageDisplay from '@/components/textNote/ImageDisplay';
+import eventWrapper from '@/core/event';
+import EventLink from '../EventLink';
+import TextNoteDisplayById from './TextNoteDisplayById';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;
@@ -12,6 +15,7 @@ export type TextNoteContentDisplayProps = {
 };
 
 const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
+  const event = () => eventWrapper(props.event);
   return (
     <For each={parseTextNote(props.event)}>
       {(item: ParsedTextNoteNode) => {
@@ -25,17 +29,24 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (props.embedding) {
             return <MentionedEventDisplay mentionedEvent={item} />;
           }
-          return <div>mention</div>;
+          return <EventLink eventId={item.eventId} />;
+        }
+        if (item.type === 'Bech32Entity') {
+          if (item.data.type === 'note' && props.embedding) {
+            return (
+              <div class="my-1 rounded border p-1">
+                <TextNoteDisplayById eventId={item.data.data} actions={false} />
+              </div>
+            );
+          }
+          return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'HashTag') {
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'URL') {
-          if (item.content.match(/\.(jpeg|jpg|png|gif|webp)$/i)) {
-            if (props.embedding) {
-              return <ImageDisplay url={item.content} />;
-            }
-            return <div>image</div>;
+          if (item.content.match(/\.(jpeg|jpg|png|gif|webp)$/i) && props.embedding) {
+            return <ImageDisplay url={item.content} contentWarning={event().contentWarning()} />;
           }
           return (
             <a

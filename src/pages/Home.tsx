@@ -146,10 +146,10 @@ const Home: Component = () => {
         <Column name="日本リレー" columnIndex={3} width="medium">
           <Timeline events={localTimeline()} />
         </Column>
-        <Column name="自分の投稿" columnIndex={4} lastColumn width="medium">
+        <Column name="自分の投稿" columnIndex={4} width="medium">
           <Timeline events={myPosts()} />
         </Column>
-        <Column name="自分のいいね" columnIndex={4} lastColumn width="medium">
+        <Column name="自分のいいね" columnIndex={5} lastColumn width="medium">
           <Notification events={myReactions()} />
         </Column>
       </div>

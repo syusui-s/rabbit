@@ -1,4 +1,5 @@
 import type { Event as NostrEvent } from 'nostr-tools';
+import { decode, type ProfilePointer, type EventPointer } from 'nostr-tools/nip19';
 
 export type PlainText = {
   type: 'PlainText';
@@ -7,17 +8,27 @@ export type PlainText = {
 
 export type MentionedEvent = {
   type: 'MentionedEvent';
-  tagIndex: number;
   content: string;
+  tagIndex: number;
   eventId: string;
   marker: string | null; // TODO 'reply' | 'root' | 'mention' | null;
 };
 
 export type MentionedUser = {
   type: 'MentionedUser';
-  tagIndex: number;
   content: string;
+  tagIndex: number;
   pubkey: string;
+};
+
+export type Bech32Entity = {
+  type: 'Bech32Entity';
+  content: string;
+  data:
+    | { type: 'npub' | 'note'; data: string }
+    | { type: 'nprofile'; data: ProfilePointer }
+    | { type: 'nevent'; data: EventPointer }
+    | { type: 'naddr'; data: AddressPointer };
 };
 
 export type HashTag = {
@@ -31,16 +42,25 @@ export type UrlText = {
   content: string;
 };
 
-export type ParsedTextNoteNode = PlainText | MentionedEvent | MentionedUser | HashTag | UrlText;
+export type ParsedTextNoteNode =
+  | PlainText
+  | MentionedEvent
+  | MentionedUser
+  | Bech32Entity
+  | HashTag
+  | UrlText;
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
 export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
     ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
-    ...event.content.matchAll(/#(?<hashtag>[^[\]()\d\s][^[\]()\s]+)/g),
+    ...event.content.matchAll(/#(?<hashtag>[^[-`:-@!-/{-~\d\s][^[-`:-@!-/{-~\s]+)/g),
     ...event.content.matchAll(
-      /(?<url>https?:\/\/[-a-zA-Z0-9.]+(?:\/[-\w.%:]+|\/)*(?:\?[-\w=.%:&]*)?(?:#[-\w=.%:&]*)?)/g,
+      /(?<nip19>(npub|note|nprofile|nevent|nrelay|naddr)1[ac-hj-np-z02-9]+)/gi,
+    ),
+    ...event.content.matchAll(
+      /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-\w.@%:]+|\/)*(?:\?[-\w=.@%:&]*)?(?:#[-\w=.%:&]*)?)/g,
     ),
   ].sort((a, b) => a?.index - b?.index);
   let pos = 0;
@@ -76,14 +96,27 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedUser);
       } else if (tagName === 'e') {
+        const marker = tag[2] != null && tag[2].length > 0 ? tag[2] : null;
         const mentionedEvent: MentionedEvent = {
           type: 'MentionedEvent',
           tagIndex,
           content: match[0],
           eventId: tag[1],
-          marker: tag[2],
+          marker,
         };
         result.push(mentionedEvent);
+      }
+    } else if (match.groups?.nip19 && match.index >= pos) {
+      try {
+        const decoded = decode(match[0]);
+        const bech32Entity: Bech32Entity = {
+          type: 'Bech32Entity',
+          content: match[0],
+          data: decoded as Bech32Entity['data'],
+        };
+        result.push(bech32Entity);
+      } catch (e) {
+        console.error(`failed to parse Bech32 entity (NIP-19) but ignore this: ${match[0]}`);
       }
     } else if (match.groups?.hashtag && match.index >= pos) {
       pushPlainText(match.index);

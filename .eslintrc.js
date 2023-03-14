@@ -63,7 +63,18 @@ module.exports = {
       },
     ],
     tailwindcss: {
-      whitelist: ['form-input'],
+      whitelist: [
+        'form-input',
+        // rabbit parts
+        'nostr-textnote',
+        'author',
+        'author-icon',
+        'author-name',
+        'author-username',
+        'created-at',
+        'actions',
+        'content',
+      ],
     },
   },
   overrides: [

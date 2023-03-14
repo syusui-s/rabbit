@@ -14,7 +14,7 @@ type NostrAPI = {
   getRelays?(): Promise<{ [url: string]: { read: boolean; write: boolean } }>;
 
   /** NIP-04: Encrypted Direct Messages */
-  nip04: {
+  nip04?: {
     /** returns ciphertext and iv as specified in nip-04 */
     encrypt(pubkey: string, plaintext: string): Promise<string>;
     /** takes ciphertext and iv as specified in nip-04 */
