@@ -51,6 +51,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const pubkey = usePubkey();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
+  const [showMenu, setShowMenu] = createSignal(false);
   const [postingRepost, setPostingRepost] = createSignal(false);
   const [postingReaction, setPostingReaction] = createSignal(false);
 
@@ -172,7 +173,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           </div>
           <Show when={showReplyEvent()} keyed>
             {(id) => (
-              <div class="rounded border p-1">
+              <div class="relative border p-1">
                 <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
               </div>
             )}
@@ -197,13 +198,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           <Show when={actions()}>
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
-                class="h-4 w-4 text-zinc-400"
+                class="h-4 w-4 shrink-0 text-zinc-400"
                 onClick={() => setShowReplyForm((current) => !current)}
               >
                 <ChatBubbleLeft />
               </button>
               <div
-                class="flex items-center gap-1"
+                class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isRepostedByMe(),
                   'text-green-400': isRepostedByMe(),
@@ -217,7 +218,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 </Show>
               </div>
               <div
-                class="flex items-center gap-1"
+                class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isReactedByMe(),
                   'text-rose-400': isReactedByMe(),
@@ -232,9 +233,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   <div class="text-sm text-zinc-400">{reactions().length}</div>
                 </Show>
               </div>
-              <button class="h-4 w-4 text-zinc-400">
-                <EllipsisHorizontal />
-              </button>
+              <div class="relative">
+                <button
+                  class="h-4 w-4 text-zinc-400"
+                  onClick={() => setShowMenu((current) => !current)}
+                >
+                  <EllipsisHorizontal />
+                </button>
+              </div>
             </div>
           </Show>
         </div>

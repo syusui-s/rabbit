@@ -1,5 +1,6 @@
 import type { Event as NostrEvent } from 'nostr-tools';
 import { decode, type ProfilePointer, type EventPointer } from 'nostr-tools/nip19';
+import eventWrapper from './event';
 
 export type PlainText = {
   type: 'PlainText';
@@ -96,13 +97,17 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedUser);
       } else if (tagName === 'e') {
-        const marker = tag[2] != null && tag[2].length > 0 ? tag[2] : null;
+        const mention = eventWrapper(event)
+          .mentionedEvents()
+          .find((ev) => ev.index === tagIndex);
+        if (mention == null) return;
+
         const mentionedEvent: MentionedEvent = {
           type: 'MentionedEvent',
           tagIndex,
           content: match[0],
           eventId: tag[1],
-          marker,
+          marker: mention.marker,
         };
         result.push(mentionedEvent);
       }

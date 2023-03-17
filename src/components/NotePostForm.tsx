@@ -1,4 +1,13 @@
-import { createSignal, createMemo, onMount, For, type Component, type JSX, Show } from 'solid-js';
+import {
+  createSignal,
+  createMemo,
+  onMount,
+  Show,
+  For,
+  type Component,
+  type JSX,
+  type Accessor,
+} from 'solid-js';
 import { Event as NostrEvent } from 'nostr-tools';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
@@ -41,7 +50,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const replyTo = () => props.replyTo && eventWrapper(props.replyTo);
   const mode = () => props.mode ?? 'normal';
-  const notifyPubkeys = createMemo(() => replyTo()?.mentionedPubkeys() ?? []);
+
+  const mentionedPubkeys: Accessor<string[]> = createMemo(
+    () => replyTo()?.mentionedPubkeysWithoutAuthor() ?? [],
+  );
+  const notifyPubkeys = (pubkey: string): string[] | undefined => {
+    if (mentionedPubkeys().length === 0) return undefined;
+    return [...mentionedPubkeys(), pubkey];
+  };
 
   const handleChangeText: JSX.EventHandler<HTMLTextAreaElement, Event> = (ev) => {
     setText(ev.currentTarget.value);
@@ -58,7 +74,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         relayUrls: config().relayUrls,
         pubkey,
         content: text(),
-        notifyPubkeys: notifyPubkeys(),
+        notifyPubkeys: notifyPubkeys(pubkey),
         rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
         replyEventId: replyTo()?.id,
       })
@@ -95,9 +111,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   return (
     <div class="p-1">
-      <Show when={notifyPubkeys().length > 0}>
+      <Show when={mentionedPubkeys().length > 0}>
         <div>
-          <For each={notifyPubkeys()}>
+          <For each={mentionedPubkeys()}>
             {(pubkey) => (
               <>
                 <UserNameDisplay pubkey={pubkey} />{' '}

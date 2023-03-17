@@ -1,4 +1,4 @@
-import { createEffect, onMount, type Component } from 'solid-js';
+import { createSignal, createEffect, onMount, type Component, onCleanup } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 
 import Column from '@/components/Column';

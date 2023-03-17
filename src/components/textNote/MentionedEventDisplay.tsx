@@ -15,10 +15,7 @@ const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
         props.mentionedEvent.marker.length === 0 ||
         props.mentionedEvent.marker === 'mention'
       }
-      fallback={() => {
-        console.log(props.mentionedEvent);
-        return <EventLink eventId={props.mentionedEvent.eventId} />;
-      }}
+      fallback={() => <EventLink eventId={props.mentionedEvent.eventId} />}
     >
       <div class="my-1 rounded border p-1">
         <TextNoteDisplayById
