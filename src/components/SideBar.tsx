@@ -6,56 +6,18 @@ import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import NotePostForm from '@/components/NotePostForm';
 import Config from '@/components/Config';
 
-import useConfig from '@/nostr/useConfig';
-import useCommands from '@/nostr/useCommands';
-import usePubkey from '@/nostr/usePubkey';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 
 const SideBar: Component = () => {
-  let formTextAreaRef: HTMLTextAreaElement | undefined;
-  const { config } = useConfig();
-  const getPubkey = usePubkey();
-  const commands = useCommands();
-
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
 
-  const openForm = () => {
-    setFormOpened(true);
-    setTimeout(() => {
-      formTextAreaRef?.focus?.();
-    }, 100);
-  };
-  const closeForm = () => {
-    setFormOpened(false);
-    formTextAreaRef?.blur?.();
-  };
-
-  const handlePost = ({ content }: { content: string }) => {
-    const pubkey = getPubkey();
-    if (pubkey == null) {
-      console.error('pubkey is not available');
-      return;
-    }
-    commands
-      .publishTextNote({
-        relayUrls: config().relayUrls,
-        pubkey,
-        content,
-      })
-      .then(() => {
-        console.log('succeeded to post');
-      })
-      .catch((err) => {
-        console.error('error', err);
-      });
-  };
+  const openForm = () => setFormOpened(true);
+  const closeForm = () => setFormOpened(false);
 
   useHandleCommand(() => ({
     commandType: 'openPostForm',
-    handler: (cmd) => {
-      openForm();
-    },
+    handler: (cmd) => openForm(),
   }));
 
   return (
@@ -87,7 +49,7 @@ const SideBar: Component = () => {
         </div>
       </div>
       <Show when={formOpened()}>
-        <NotePostForm ref={formTextAreaRef} onPost={handlePost} onClose={closeForm} />
+        <NotePostForm onClose={closeForm} />
       </Show>
       <Show when={configOpened()}>
         <Config onClose={() => setConfigOpened(false)} />

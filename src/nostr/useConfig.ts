@@ -6,12 +6,14 @@ import {
 
 type Config = {
   relayUrls: string[];
-  dateFormat: 'relative' | 'absolute';
+  dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
 };
 
 type UseConfig = {
   config: Accessor<Config>;
   setConfig: Setter<Config>;
+  addRelay: (url: string) => void;
+  removeRelay: (url: string) => void;
 };
 
 const InitialConfig: Config = {
@@ -37,7 +39,21 @@ const storage = createStorageWithSerializer(() => window.localStorage, serialize
 const [config, setConfig] = createSignalWithStorage('RabbitConfig', InitialConfig, storage);
 
 const useConfig = (): UseConfig => {
-  return { config, setConfig };
+  const addRelay = (relayUrl: string) => {
+    setConfig((current) => ({
+      ...current,
+      relayUrls: [...current.relayUrls, relayUrl],
+    }));
+  };
+
+  const removeRelay = (relayUrl: string) => {
+    setConfig((current) => ({
+      ...current,
+      relayUrls: current.relayUrls.filter((e) => e !== relayUrl),
+    }));
+  };
+
+  return { config, setConfig, addRelay, removeRelay };
 };
 
 export default useConfig;

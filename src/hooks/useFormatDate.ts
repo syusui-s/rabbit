@@ -1,20 +1,24 @@
-import { createMemo } from 'solid-js';
-
 import useConfig from '@/nostr/useConfig';
 
 import useDatePulser from '@/hooks/useDatePulser';
 
-import { formatRelative, formatAbsolute } from '@/utils/formatDate';
+import { formatRelative, formatAbsoluteLong, formatAbsoluteShort } from '@/utils/formatDate';
 
 const useFormatDate = () => {
   const { config } = useConfig();
   const currentDate = useDatePulser();
 
   return (date: Date) => {
-    if (config().dateFormat === 'absolute') {
-      return formatAbsolute(date);
+    switch (config().dateFormat) {
+      case 'absolute-long':
+        return formatAbsoluteLong(date, currentDate());
+      case 'absolute-short':
+        return formatAbsoluteShort(date, currentDate());
+      case 'relative':
+        return formatRelative(date, currentDate());
+      default:
+        return formatRelative(date, currentDate());
     }
-    return formatRelative(date, currentDate());
   };
 };
 

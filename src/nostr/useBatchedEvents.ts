@@ -1,4 +1,4 @@
-import { createSignal, createMemo, type Signal, type Accessor } from 'solid-js';
+import { createSignal, createMemo, createRoot, type Signal, type Accessor } from 'solid-js';
 import { type Event as NostrEvent, type Filter } from 'nostr-tools';
 
 import useConfig from '@/nostr/useConfig';
@@ -50,9 +50,11 @@ const useBatchedEvents = <TaskArgs>(propsProvider: () => UseBatchedEventsProps<T
       const getSignalForKey = (key: string | number): Signal<BatchedEvents> => {
         const eventsSignal =
           keyEventSignalsMap.get(key) ??
-          createSignal<BatchedEvents>({
-            events: [],
-            completed: false,
+          createRoot((dispose) => {
+            return createSignal<BatchedEvents>({
+              events: [],
+              completed: false,
+            });
           });
         keyEventSignalsMap.set(key, eventsSignal);
         return eventsSignal;

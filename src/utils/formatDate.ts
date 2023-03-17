@@ -1,4 +1,4 @@
-type ParsedDate =
+export type RelativeDate =
   | { kind: 'now' }
   | { kind: 'seconds'; value: number }
   | { kind: 'minutes'; value: number }
@@ -6,9 +6,15 @@ type ParsedDate =
   | { kind: 'days'; value: number }
   | { kind: 'abs'; value: Date };
 
-export type DateFormatter = (parsedDate: ParsedDate) => string;
+export type AbsoluteDate =
+  | { kind: 'today'; value: Date }
+  | { kind: 'yesterday'; value: Date }
+  | { kind: 'abs'; value: Date };
 
-const defaultDateFormatter = (parsedDate: ParsedDate): string => {
+export type RelativeDateFormatter = (parsedDate: RelativeDate) => string;
+export type AbsoluteDateFormatter = (parsedDate: AbsoluteDate) => string;
+
+const defaultRelativeDateFormatter = (parsedDate: RelativeDate): string => {
   switch (parsedDate.kind) {
     case 'now':
       return 'now';
@@ -21,16 +27,41 @@ const defaultDateFormatter = (parsedDate: ParsedDate): string => {
     case 'days':
       return `${parsedDate.value}d`;
     case 'abs':
-      return parsedDate.value.toLocaleDateString();
     default:
-      return '';
+      return parsedDate.value.toLocaleDateString();
+  }
+};
+
+const formatTime = (date: Date): string =>
+  `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+const defaultAbsoluteDateLongFormatter = (parsedDate: AbsoluteDate): string => {
+  switch (parsedDate.kind) {
+    case 'today':
+      return parsedDate.value.toLocaleTimeString();
+    case 'yesterday':
+    case 'abs':
+    default:
+      return parsedDate.value.toLocaleDateString();
+  }
+};
+
+const defaultAbsoluteDateShortFormatter = (parsedDate: AbsoluteDate): string => {
+  switch (parsedDate.kind) {
+    case 'today':
+      return formatTime(parsedDate.value);
+    case 'yesterday':
+      return `昨日 ${formatTime(parsedDate.value)}`;
+    case 'abs':
+    default:
+      return parsedDate.value.toLocaleString();
   }
 };
 
 const calcDiffSec = (date: Date, currentDate: Date): number =>
   (Number(currentDate) - Number(date)) / 1000;
 
-const parseDateDiff = (date: Date, currentDate: Date): ParsedDate => {
+const parseDateDiff = (date: Date, currentDate: Date): RelativeDate => {
   const diffSec = calcDiffSec(date, currentDate);
 
   if (diffSec < 10) {
@@ -53,19 +84,35 @@ const parseDateDiff = (date: Date, currentDate: Date): ParsedDate => {
   return { kind: 'abs', value: date };
 };
 
-export const formatAbsolute = (date: Date, currentDate: Date = new Date()): string => {
-  if (
-    date.getFullYear() === currentDate.getFullYear() &&
-    date.getMonth() === currentDate.getMonth() &&
-    date.getDate() === currentDate.getDate()
-  ) {
-    return date.toLocaleTimeString();
+const isSameDate = (lhs: Date, rhs: Date): boolean =>
+  lhs.getFullYear() === rhs.getFullYear() &&
+  lhs.getMonth() === rhs.getMonth() &&
+  lhs.getDate() === rhs.getDate();
+
+const yesterdayOf = (date: Date): Date => new Date(+date - 24 * 60 * 60 * 1000);
+
+const formatAbsolute = (
+  date: Date,
+  currentDate: Date,
+  formatter: AbsoluteDateFormatter,
+): string => {
+  if (isSameDate(date, currentDate)) {
+    return formatter({ kind: 'today', value: date });
   }
-  return date.toLocaleString();
+  if (isSameDate(date, yesterdayOf(currentDate))) {
+    return formatter({ kind: 'yesterday', value: date });
+  }
+  return formatter({ kind: 'abs', value: date });
 };
+
+export const formatAbsoluteLong = (date: Date, currentDate: Date = new Date()) =>
+  formatAbsolute(date, currentDate, defaultAbsoluteDateLongFormatter);
+
+export const formatAbsoluteShort = (date: Date, currentDate: Date = new Date()) =>
+  formatAbsolute(date, currentDate, defaultAbsoluteDateShortFormatter);
 
 export const formatRelative = (
   date: Date,
   currentDate: Date = new Date(),
-  formatter: DateFormatter = defaultDateFormatter,
+  formatter: RelativeDateFormatter = defaultRelativeDateFormatter,
 ): string => formatter(parseDateDiff(date, currentDate));

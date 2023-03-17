@@ -1,4 +1,4 @@
-import { For, Switch, Match } from 'solid-js';
+import { For } from 'solid-js';
 import parseTextNote, { type ParsedTextNoteNode } from '@/core/parseTextNote';
 import type { Event as NostrEvent } from 'nostr-tools';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
@@ -6,6 +6,7 @@ import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 import ImageDisplay from '@/components/textNote/ImageDisplay';
 import eventWrapper from '@/core/event';
+import { isImageUrl } from '@/utils/imageUrl';
 import EventLink from '../EventLink';
 import TextNoteDisplayById from './TextNoteDisplayById';
 
@@ -45,8 +46,13 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'URL') {
-          if (item.content.match(/\.(jpeg|jpg|png|gif|webp)$/i) && props.embedding) {
-            return <ImageDisplay url={item.content} contentWarning={event().contentWarning()} />;
+          if (isImageUrl(new URL(item.content))) {
+            return (
+              <ImageDisplay
+                url={item.content}
+                initialHidden={event().contentWarning().contentWarning || !props.embedding}
+              />
+            );
           }
           return (
             <a

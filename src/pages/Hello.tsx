@@ -62,7 +62,7 @@ const Hello: Component = () => {
           </Match>
           <Match when={signerStatus() === 'unavailable'}>
             <div class="pb-1 text-lg font-bold">拡張機能がインストールされていません！</div>
-            <p>
+            <p class="pt-2">
               利用にはNIP-07に対応した拡張機能が必要です。
               <br />
               <a
@@ -73,7 +73,19 @@ const Hello: Component = () => {
               >
                 こちらを参考
               </a>
-              に拡張機能をインストールしてください
+              に拡張機能をインストールしてください。
+            </p>
+            <p class="pt-2">
+              はじめてNostrを利用する方は
+              <a
+                class="text-blue-500 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://scrapbox.io/nostr/%E3%81%AF%E3%81%98%E3%82%81%E3%81%A6%E3%81%AENostr%E3%80%90%E3%81%AF%E3%81%98%E3%82%81%E3%81%A6%E3%81%AE%E6%96%B9%E3%81%AF%E3%81%93%E3%81%A1%E3%82%89%E3%80%91"
+              >
+                はじめてのNostr
+              </a>
+              を参考にするとよいでしょう。
             </p>
           </Match>
           <Match when={signerStatus() === 'available'}>

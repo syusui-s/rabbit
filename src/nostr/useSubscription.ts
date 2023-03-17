@@ -8,6 +8,7 @@ export type UseSubscriptionProps = {
   options?: SubscriptionOptions;
   // subscribe not only stored events but also new events published after the subscription
   // default is true
+  clientEventFilter?: (event: NostrEvent) => boolean;
   continuous?: boolean;
   onEvent?: (event: NostrEvent) => void;
   onEOSE?: () => void;
@@ -35,6 +36,9 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     sub.on('event', (event: NostrEvent) => {
       if (onEvent != null) {
         onEvent(event);
+      }
+      if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
+        return;
       }
       if (!eose) {
         pushed = true;

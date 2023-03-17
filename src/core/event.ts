@@ -6,6 +6,7 @@ export type EventMarker = 'reply' | 'root' | 'mention';
 export type TaggedEvent = {
   id: string;
   relayUrl?: string;
+  index: number;
   marker: EventMarker;
 };
 
@@ -28,8 +29,8 @@ const eventWrapper = (event: NostrEvent) => {
     get createdAt(): number {
       return event.created_at;
     },
-    get content(): Date {
-      return new Date(event.created_at * 1000);
+    get content(): string {
+      return event.content;
     },
     createdAtAsDate(): Date {
       return new Date(event.created_at * 1000);
@@ -44,7 +45,9 @@ const eventWrapper = (event: NostrEvent) => {
       return Array.from(pubkeys);
     },
     taggedEvents(): TaggedEvent[] {
-      const events = event.tags.filter(([tagName]) => tagName === 'e');
+      const events = event.tags
+        .map((tag, originalIndex) => [tag, originalIndex] as const)
+        .filter(([[tagName]]) => tagName === 'e');
 
       // NIP-10: Positional "e" tags (DEPRECATED)
       const positionToMarker = (index: number): EventMarker => {
@@ -61,10 +64,11 @@ const eventWrapper = (event: NostrEvent) => {
         return 'mention';
       };
 
-      return events.map(([, eventId, relayUrl, marker], index) => ({
+      return events.map(([[, eventId, relayUrl, marker], originalIndex], eTagIndex) => ({
         id: eventId,
         relayUrl,
-        marker: (marker as EventMarker | undefined) ?? positionToMarker(index),
+        marker: (marker as EventMarker | undefined) ?? positionToMarker(eTagIndex),
+        index: originalIndex,
       }));
     },
     replyingToEvent(): TaggedEvent | undefined {
@@ -79,12 +83,24 @@ const eventWrapper = (event: NostrEvent) => {
     mentionedPubkeys(): string[] {
       return uniq(event.tags.filter(([tagName]) => tagName === 'p').map((e) => e[1]));
     },
+    mentionedPubkeysWithoutAuthor(): string[] {
+      return this.mentionedPubkeys().filter((pubkey) => pubkey !== event.pubkey);
+    },
     contentWarning(): ContentWarning {
       const tag = event.tags.find(([tagName]) => tagName === 'content-warning');
       if (tag == null) return { contentWarning: false };
 
       const reason = (tag[1]?.length ?? 0) > 0 ? tag[1] : undefined;
       return { contentWarning: true, reason };
+    },
+    containsEventMention(eventId: string): boolean {
+      const tagIndex = event.tags.findIndex(([tagName, id]) => tagName === 'e' && id === eventId);
+      if (tagIndex < 0) return false;
+      return this.containsEventMentionIndex(tagIndex);
+    },
+    containsEventMentionIndex(index: number): boolean {
+      if (index < 0 || index >= event.tags.length) return false;
+      return event.content.includes(`#[${index}]`);
     },
   };
 };

@@ -9,6 +9,7 @@ import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
 import useEvent from '@/nostr/useEvent';
+import { npubEncode } from 'nostr-tools/nip19';
 
 type ReactionProps = {
   event: NostrEvent;
@@ -63,10 +64,11 @@ const Reaction: Component<ReactionProps> = (props) => {
         </div>
         <div class="notification-event py-1">
           <Show
-            when={reactedEvent() != null}
+            when={reactedEvent()}
             fallback={<div class="truncate">loading {eventId()}</div>}
+            keyed
           >
-            <TextNoteDisplay event={reactedEvent()} />
+            {(event) => <TextNoteDisplay event={event} />}
           </Show>
         </div>
       </ColumnItem>

@@ -1,4 +1,5 @@
 import { Component, Switch, Match } from 'solid-js';
+import { npubEncode } from 'nostr-tools/nip19';
 
 import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
@@ -15,7 +16,7 @@ const UserNameDisplay: Component<UserNameDisplayProps> = (props) => {
   }));
 
   return (
-    <Switch fallback={`@${props.pubkey}`}>
+    <Switch fallback={npubEncode(props.pubkey)}>
       <Match when={(profile()?.display_name?.length ?? 0) > 0}>{profile()?.display_name}</Match>
       <Match when={(profile()?.name?.length ?? 0) > 0}>@{profile()?.name}</Match>
     </Switch>

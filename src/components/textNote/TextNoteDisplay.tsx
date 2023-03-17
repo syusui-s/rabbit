@@ -1,4 +1,13 @@
-import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
+import {
+  Show,
+  For,
+  createSignal,
+  createMemo,
+  type JSX,
+  type Component,
+  Match,
+  Switch,
+} from 'solid-js';
 import type { Event as NostrEvent } from 'nostr-tools';
 
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
@@ -9,8 +18,9 @@ import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
 import ColumnItem from '@/components/ColumnItem';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
+import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
 import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
-import ReplyPostForm from '@/components/ReplyPostForm';
+import NotePostForm from '@/components/NotePostForm';
 
 import eventWrapper from '@/core/event';
 
@@ -24,7 +34,9 @@ import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
 import useFormatDate from '@/hooks/useFormatDate';
 
 import ensureNonNull from '@/utils/ensureNonNull';
-import ContentWarningDisplay from './ContentWarningDisplay';
+import { npubEncode } from 'nostr-tools/nip19';
+import UserNameDisplay from '../UserDisplayName';
+import TextNoteDisplayById from './TextNoteDisplayById';
 
 export type TextNoteDisplayProps = {
   event: NostrEvent;
@@ -32,15 +44,15 @@ export type TextNoteDisplayProps = {
   actions?: boolean;
 };
 
-const ContentWarning = (props) => {};
-
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const { config } = useConfig();
   const formatDate = useFormatDate();
   const commands = useCommands();
   const pubkey = usePubkey();
+
   const [showReplyForm, setShowReplyForm] = createSignal(false);
-  const [showContentWarning, setShowContentWarning] = createSignal(false);
+  const [postingRepost, setPostingRepost] = createSignal(false);
+  const [postingReaction, setPostingReaction] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
 
@@ -54,41 +66,41 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
     relayUrls: config().relayUrls,
-    eventId: props.event.id,
+    eventId: props.event.id as string, // TODO いつかなおす
   }));
 
   const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
     relayUrls: config().relayUrls,
-    eventId: props.event.id,
+    eventId: props.event.id as string, // TODO いつかなおす
   }));
 
   const isReactedByMe = createMemo(() => isReactedBy(pubkey()));
   const isRepostedByMe = createMemo(() => isRepostedBy(pubkey()));
 
-  const createdAt = () => formatDate(event().createdAtAsDate());
-
-  const handleReplyPost = ({ content }: { content: string }) => {
-    commands
-      .publishTextNote({
-        relayUrls: config().relayUrls,
-        pubkey: pubkey(),
-        content,
-        notifyPubkeys: [event().pubkey, ...event().mentionedPubkeys()],
-        rootEventId: event().rootEvent()?.id ?? props.event.id,
-        replyEventId: props.event.id,
-      })
-      .then(() => {
-        setShowReplyForm(false);
-      });
+  const showReplyEvent = (): string | undefined => {
+    const replyingToEvent = event().replyingToEvent();
+    if (
+      embedding() &&
+      replyingToEvent != null &&
+      !event().containsEventMentionIndex(replyingToEvent.index)
+    ) {
+      return replyingToEvent.id;
+    }
+    return undefined;
   };
+
+  const createdAt = () => formatDate(event().createdAtAsDate());
 
   const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     if (isRepostedByMe()) {
       // TODO remove reaction
       return;
     }
-    ev.preventDefault();
+    if (postingRepost()) {
+      return;
+    }
 
+    setPostingRepost(true);
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
       commands
         .publishDeprecatedRepost({
@@ -98,7 +110,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           notifyPubkey: props.event.pubkey,
         })
         .then(() => invalidateDeprecatedReposts())
-        .catch((err) => console.error('failed to repost: ', err));
+        .catch((err) => console.error('failed to repost: ', err))
+        .finally(() => setPostingRepost(false));
     });
   };
 
@@ -107,8 +120,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       // TODO remove reaction
       return;
     }
-    ev.preventDefault();
+    if (postingReaction()) {
+      return;
+    }
 
+    setPostingReaction(true);
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
       commands
         .publishReaction({
@@ -119,7 +135,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           notifyPubkey: props.event.pubkey,
         })
         .then(() => invalidateReactions())
-        .catch((err) => console.error('failed to publish reaction: ', err));
+        .catch((err) => console.error('failed to publish reaction: ', err))
+        .finally(() => setPostingReaction(false));
     });
   };
 
@@ -145,23 +162,31 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 <div class="author-name truncate pr-1 font-bold">{author()?.display_name}</div>
               </Show>
               <div class="author-username truncate text-zinc-600">
-                <Show when={author()?.name} fallback={props.event.pubkey}>
+                <Show when={author()?.name != null} fallback={`@${npubEncode(props.event.pubkey)}`}>
                   @{author()?.name}
                 </Show>
+                {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
               </div>
             </div>
             <div class="created-at shrink-0">{createdAt()}</div>
           </div>
-          <Show when={event().mentionedPubkeys().length > 0}>
+          <Show when={showReplyEvent()} keyed>
+            {(id) => (
+              <div class="rounded border p-1">
+                <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
+              </div>
+            )}
+          </Show>
+          <Show when={event().mentionedPubkeysWithoutAuthor().length > 0}>
             <div class="text-xs">
-              {'Replying to '}
-              <For each={event().mentionedPubkeys()}>
+              <For each={event().mentionedPubkeysWithoutAuthor()}>
                 {(replyToPubkey: string) => (
                   <span class="pr-1 text-blue-500 underline">
                     <GeneralUserMentionDisplay pubkey={replyToPubkey} />
                   </span>
                 )}
               </For>
+              {'への返信'}
             </div>
           </Show>
           <ContentWarningDisplay contentWarning={event().contentWarning()}>
@@ -184,7 +209,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   'text-green-400': isRepostedByMe(),
                 }}
               >
-                <button class="h-4 w-4" onClick={handleRepost}>
+                <button class="h-4 w-4" onClick={handleRepost} disabled={postingRepost()}>
                   <ArrowPathRoundedSquare />
                 </button>
                 <Show when={reposts().length > 0}>
@@ -198,7 +223,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   'text-rose-400': isReactedByMe(),
                 }}
               >
-                <button class="h-4 w-4" onClick={handleReaction}>
+                <button class="h-4 w-4" onClick={handleReaction} disabled={postingReaction()}>
                   <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
                     <HeartSolid />
                   </Show>
@@ -215,11 +240,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         </div>
       </div>
       <Show when={showReplyForm()}>
-        <ReplyPostForm
-          replyTo={props.event}
-          onPost={handleReplyPost}
-          onClose={() => setShowReplyForm(false)}
-        />
+        <NotePostForm mode="reply" replyTo={props.event} onClose={() => setShowReplyForm(false)} />
       </Show>
     </div>
   );

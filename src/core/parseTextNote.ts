@@ -55,7 +55,7 @@ export type ParsedTextNote = ParsedTextNoteNode[];
 export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
     ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
-    ...event.content.matchAll(/#(?<hashtag>[^[-`:-@!-/{-~\d\s][^[-`:-@!-/{-~\s]+)/g),
+    ...event.content.matchAll(/#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g),
     ...event.content.matchAll(
       /(?<nip19>(npub|note|nprofile|nevent|nrelay|naddr)1[ac-hj-np-z02-9]+)/gi,
     ),
