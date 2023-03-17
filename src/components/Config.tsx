@@ -48,21 +48,25 @@ const RelayConfig = () => {
   );
 };
 
-const dateFormats: { id: Config['dateFormat']; name: string; example: string }[] = [
+const dateFormats: {
+  id: Config['dateFormat'];
+  name: string;
+  example: string;
+}[] = [
   {
     id: 'relative',
-    name: '相対',
-    example: '〜秒前',
+    name: '相対表記',
+    example: '7秒前',
   },
   {
     id: 'absolute-short',
-    name: '絶対 (短形式)',
-    example: '昨日 12:34',
+    name: '絶対表記 (短形式)',
+    example: '昨日 23:55',
   },
   {
     id: 'absolute-long',
-    name: '絶対 (長形式)',
-    example: '2023',
+    name: '絶対表記 (長形式)',
+    example: '2020/11/8 21:02:53',
   },
 ];
 
@@ -76,13 +80,13 @@ const DateFormatConfig = () => {
   return (
     <div>
       <h3 class="font-bold">時刻の表記</h3>
-      <div class="flex justify-evenly gap-2">
+      <div class="flex flex-col justify-evenly gap-2 md:flex-row">
         <For each={dateFormats}>
           {({ id, name, example }) => (
-            <div class="flex flex-1 flex-col items-center">
+            <div class="flex flex-1 flex-row items-center gap-1 md:flex-col">
               <button
                 type="button"
-                class="w-full rounded border border-rose-300 p-2 font-bold"
+                class="w-48 rounded border border-rose-300 p-2 font-bold md:w-full"
                 classList={{
                   'bg-rose-300': config().dateFormat === id,
                   'text-white': config().dateFormat === id,
@@ -93,7 +97,7 @@ const DateFormatConfig = () => {
               >
                 {name}
               </button>
-              {example}
+              <div class="text-xs">{example}</div>
             </div>
           )}
         </For>
@@ -118,7 +122,7 @@ const ConfigUI = (props: ConfigProps) => {
       role="button"
       onClick={handleClickContainer}
     >
-      <div class="w-[480px] max-w-[100vw] rounded bg-white p-4 shadow">
+      <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
         <div class="relative">
           <h2 class="flex-1 text-center font-bold">設定</h2>
           <button class="absolute top-1 right-0" onClick={() => props.onClose()}>
