@@ -45,4 +45,3 @@ const applyContentFilter = (contentFilter: ContentFilter): boolean => {
 // DOUBLEQUOTE
 // A filter '"HELLO WORLD"' should match 'HELLO WORLD'
 // A filter '"HELLO WORLD"' should not match 'hello world'
-

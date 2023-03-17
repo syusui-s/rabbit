@@ -8,7 +8,9 @@ import {
   type JSX,
   type Accessor,
 } from 'solid-js';
+import { createMutation } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
+import uniq from 'lodash/uniq';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
@@ -41,26 +43,35 @@ const placeholder = (mode: NotePostFormProps['mode']) => {
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   let textAreaRef: HTMLTextAreaElement | undefined;
 
+  const [text, setText] = createSignal<string>('');
+  const clearText = () => setText('');
+
   const { config } = useConfig();
   const getPubkey = usePubkey();
   const commands = useCommands();
 
-  const [text, setText] = createSignal<string>('');
-  const clearText = () => setText('');
-
   const replyTo = () => props.replyTo && eventWrapper(props.replyTo);
   const mode = () => props.mode ?? 'normal';
+
+  const publishTextNoteMutation = createMutation({
+    mutationKey: ['publishTextNote'],
+    mutationFn: commands.publishTextNote.bind(commands),
+    onSuccess: () => {
+      console.log('succeeded to post');
+      clearText();
+      props?.onClose();
+    },
+    onError: (err) => {
+      console.error('error', err);
+    },
+  });
 
   const mentionedPubkeys: Accessor<string[]> = createMemo(
     () => replyTo()?.mentionedPubkeysWithoutAuthor() ?? [],
   );
   const notifyPubkeys = (pubkey: string): string[] | undefined => {
-    if (mentionedPubkeys().length === 0) return undefined;
-    return [...mentionedPubkeys(), pubkey];
-  };
-
-  const handleChangeText: JSX.EventHandler<HTMLTextAreaElement, Event> = (ev) => {
-    setText(ev.currentTarget.value);
+    if (props.replyTo === undefined) return undefined;
+    return uniq([props.replyTo.pubkey, ...mentionedPubkeys(), pubkey]);
   };
 
   const submit = () => {
@@ -69,23 +80,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       console.error('pubkey is not available');
       return;
     }
-    commands
-      .publishTextNote({
-        relayUrls: config().relayUrls,
-        pubkey,
-        content: text(),
-        notifyPubkeys: notifyPubkeys(pubkey),
-        rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
-        replyEventId: replyTo()?.id,
-      })
-      .then(() => {
-        console.log('succeeded to post');
-        clearText();
-        props?.onClose();
-      })
-      .catch((err) => {
-        console.error('error', err);
-      });
+    publishTextNoteMutation.mutate({
+      relayUrls: config().relayUrls,
+      pubkey,
+      content: text(),
+      notifyPubkeys: notifyPubkeys(pubkey),
+      rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
+      replyEventId: replyTo()?.id,
+    });
   };
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
@@ -101,7 +103,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const submitDisabled = createMemo(() => text().trim().length === 0);
+  const submitDisabled = createMemo(
+    () => text().trim().length === 0 || publishTextNoteMutation.isLoading,
+  );
 
   onMount(() => {
     setTimeout(() => {
@@ -130,7 +134,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           class="rounded border-none"
           rows={4}
           placeholder={placeholder(mode())}
-          onInput={handleChangeText}
+          onInput={(ev) => setText(ev.currentTarget.value)}
           onKeyDown={handleKeyDown}
           value={text()}
         />

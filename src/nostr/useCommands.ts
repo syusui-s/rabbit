@@ -38,46 +38,48 @@ const useCommands = () => {
     });
   };
 
-  return {
-    // NIP-01
-    publishTextNote({
-      relayUrls,
+  // NIP-01
+  const publishTextNote = ({
+    relayUrls,
+    pubkey,
+    content,
+    tags,
+    notifyPubkeys,
+    rootEventId,
+    mentionEventIds,
+    replyEventId,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    content: string;
+    tags?: string[][];
+    notifyPubkeys?: string[];
+    rootEventId?: string;
+    mentionEventIds?: string[];
+    replyEventId?: string;
+  }): Promise<Promise<void>[]> => {
+    const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
+    const eTags = [];
+    // NIP-10
+    if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
+    if (mentionEventIds != null)
+      mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
+    if (replyEventId != null) eTags.push(['e', replyEventId, '', 'reply']);
+
+    const mergedTags = [...eTags, ...pTags, ...(tags ?? [])];
+
+    const preSignedEvent: NostrEvent = {
+      kind: 1,
       pubkey,
+      created_at: currentDate(),
+      tags: mergedTags,
       content,
-      tags,
-      notifyPubkeys,
-      rootEventId,
-      mentionEventIds,
-      replyEventId,
-    }: {
-      relayUrls: string[];
-      pubkey: string;
-      content: string;
-      tags?: string[][];
-      notifyPubkeys?: string[];
-      rootEventId?: string;
-      mentionEventIds?: string[];
-      replyEventId?: string;
-    }): Promise<Promise<void>[]> {
-      const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
-      const eTags = [];
-      // NIP-10
-      if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
-      if (mentionEventIds != null)
-        mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
-      if (replyEventId != null) eTags.push(['e', replyEventId, '', 'reply']);
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
 
-      const mergedTags = [...eTags, ...pTags, ...(tags ?? [])];
-
-      const preSignedEvent: NostrEvent = {
-        kind: 1,
-        pubkey,
-        created_at: currentDate(),
-        tags: mergedTags,
-        content,
-      };
-      return publishEvent(relayUrls, preSignedEvent);
-    },
+  return {
+    publishTextNote,
     // NIP-25
     publishReaction({
       relayUrls,

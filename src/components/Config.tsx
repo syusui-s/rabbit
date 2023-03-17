@@ -12,9 +12,9 @@ const RelayConfig = () => {
 
   const handleClickAddRelay: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
-    const relayUrl = ev.currentTarget?.relayUrl?.value as string | undefined;
-    if (relayUrl == null) return;
+    if (relayUrlInput().length > 0) return;
     addRelay(relayUrlInput());
+    setRelayUrlInput('');
   };
 
   return (
@@ -80,13 +80,13 @@ const DateFormatConfig = () => {
   return (
     <div>
       <h3 class="font-bold">時刻の表記</h3>
-      <div class="flex flex-col justify-evenly gap-2 md:flex-row">
+      <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
         <For each={dateFormats}>
           {({ id, name, example }) => (
-            <div class="flex flex-1 flex-row items-center gap-1 md:flex-col">
+            <div class="flex flex-1 flex-row items-center gap-1 sm:flex-col">
               <button
                 type="button"
-                class="w-48 rounded border border-rose-300 p-2 font-bold md:w-full"
+                class="w-48 rounded border border-rose-300 p-2 font-bold sm:w-full"
                 classList={{
                   'bg-rose-300': config().dateFormat === id,
                   'text-white': config().dateFormat === id,

@@ -10,11 +10,7 @@ export type MentionedEventDisplayProps = {
 const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
   return (
     <Show
-      when={
-        props.mentionedEvent.marker == null ||
-        props.mentionedEvent.marker.length === 0 ||
-        props.mentionedEvent.marker === 'mention'
-      }
+      when={props.mentionedEvent.marker != null && props.mentionedEvent.marker.length > 0}
       fallback={() => <EventLink eventId={props.mentionedEvent.eventId} />}
     >
       <div class="my-1 rounded border p-1">

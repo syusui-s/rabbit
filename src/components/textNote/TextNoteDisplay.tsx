@@ -1,14 +1,6 @@
-import {
-  Show,
-  For,
-  createSignal,
-  createMemo,
-  type JSX,
-  type Component,
-  Match,
-  Switch,
-} from 'solid-js';
+import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
 import type { Event as NostrEvent } from 'nostr-tools';
+import { createMutation } from '@tanstack/solid-query';
 
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
@@ -47,13 +39,10 @@ export type TextNoteDisplayProps = {
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const { config } = useConfig();
   const formatDate = useFormatDate();
-  const commands = useCommands();
   const pubkey = usePubkey();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const [showMenu, setShowMenu] = createSignal(false);
-  const [postingRepost, setPostingRepost] = createSignal(false);
-  const [postingReaction, setPostingReaction] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
 
@@ -74,6 +63,34 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     relayUrls: config().relayUrls,
     eventId: props.event.id as string, // TODO いつかなおす
   }));
+
+  const commands = useCommands();
+
+  const publishReactionMutation = createMutation({
+    mutationKey: ['publishReaction', event().id],
+    mutationFn: commands.publishReaction.bind(commands),
+    onSuccess: () => {
+      console.log('succeeded to publish reaction');
+      invalidateReactions().catch((err) => console.error('failed to refetch reactions', err));
+    },
+    onError: (err) => {
+      console.error('failed to publish reaction: ', err);
+    },
+  });
+
+  const publishDeprecatedRepostMutation = createMutation({
+    mutationKey: ['publishDeprecatedRepost', event().id],
+    mutationFn: commands.publishDeprecatedRepost.bind(commands),
+    onSuccess: () => {
+      console.log('succeeded to publish deprecated reposts');
+      invalidateDeprecatedReposts().catch((err) =>
+        console.error('failed to refetch deprecated reposts', err),
+      );
+    },
+    onError: (err) => {
+      console.error('failed to publish deprecated repost: ', err);
+    },
+  });
 
   const isReactedByMe = createMemo(() => isReactedBy(pubkey()));
   const isRepostedByMe = createMemo(() => isRepostedBy(pubkey()));
@@ -97,22 +114,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       // TODO remove reaction
       return;
     }
-    if (postingRepost()) {
-      return;
-    }
 
-    setPostingRepost(true);
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      commands
-        .publishDeprecatedRepost({
-          relayUrls: config().relayUrls,
-          pubkey: pubkeyNonNull,
-          eventId: eventIdNonNull,
-          notifyPubkey: props.event.pubkey,
-        })
-        .then(() => invalidateDeprecatedReposts())
-        .catch((err) => console.error('failed to repost: ', err))
-        .finally(() => setPostingRepost(false));
+      publishDeprecatedRepostMutation.mutate({
+        relayUrls: config().relayUrls,
+        pubkey: pubkeyNonNull,
+        eventId: eventIdNonNull,
+        notifyPubkey: props.event.pubkey,
+      });
     });
   };
 
@@ -121,23 +130,15 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       // TODO remove reaction
       return;
     }
-    if (postingReaction()) {
-      return;
-    }
 
-    setPostingReaction(true);
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      commands
-        .publishReaction({
-          relayUrls: config().relayUrls,
-          pubkey: pubkeyNonNull,
-          content: '+',
-          eventId: eventIdNonNull,
-          notifyPubkey: props.event.pubkey,
-        })
-        .then(() => invalidateReactions())
-        .catch((err) => console.error('failed to publish reaction: ', err))
-        .finally(() => setPostingReaction(false));
+      publishReactionMutation.mutate({
+        relayUrls: config().relayUrls,
+        pubkey: pubkeyNonNull,
+        content: '+',
+        eventId: eventIdNonNull,
+        notifyPubkey: props.event.pubkey,
+      });
     });
   };
 
@@ -173,14 +174,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           </div>
           <Show when={showReplyEvent()} keyed>
             {(id) => (
-              <div class="border p-1">
+              <div class="mt-1 rounded border p-1">
                 <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
               </div>
             )}
           </Show>
-          <Show when={event().mentionedPubkeysWithoutAuthor().length > 0}>
+          <Show when={event().mentionedPubkeys().length > 0}>
             <div class="text-xs">
-              <For each={event().mentionedPubkeysWithoutAuthor()}>
+              <For each={event().mentionedPubkeys()}>
                 {(replyToPubkey: string) => (
                   <span class="pr-1 text-blue-500 underline">
                     <GeneralUserMentionDisplay pubkey={replyToPubkey} />
@@ -207,10 +208,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isRepostedByMe(),
-                  'text-green-400': isRepostedByMe(),
+                  'text-green-400': isRepostedByMe() || publishDeprecatedRepostMutation.isLoading,
                 }}
               >
-                <button class="h-4 w-4" onClick={handleRepost} disabled={postingRepost()}>
+                <button
+                  class="h-4 w-4"
+                  onClick={handleRepost}
+                  disabled={publishDeprecatedRepostMutation.isLoading}
+                >
                   <ArrowPathRoundedSquare />
                 </button>
                 <Show when={reposts().length > 0}>
@@ -221,10 +226,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isReactedByMe(),
-                  'text-rose-400': isReactedByMe(),
+                  'text-rose-400': isReactedByMe() || publishReactionMutation.isLoading,
                 }}
               >
-                <button class="h-4 w-4" onClick={handleReaction} disabled={postingReaction()}>
+                <button
+                  class="h-4 w-4"
+                  onClick={handleReaction}
+                  disabled={publishReactionMutation.isLoading}
+                >
                   <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
                     <HeartSolid />
                   </Show>

@@ -48,7 +48,7 @@ const Home: Component = () => {
       filters: [
         {
           kinds: [1, 6],
-          authors: [...followingPubkeys(), pubkeyNonNull],
+          authors: followingPubkeys(),
           limit: 25,
           since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
         },

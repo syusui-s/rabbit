@@ -12,7 +12,7 @@ export type MentionedEvent = {
   content: string;
   tagIndex: number;
   eventId: string;
-  marker: string | null; // TODO 'reply' | 'root' | 'mention' | null;
+  marker: 'reply' | 'root' | 'mention' | undefined;
 };
 
 export type MentionedUser = {
@@ -98,22 +98,21 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         result.push(mentionedUser);
       } else if (tagName === 'e') {
         const mention = eventWrapper(event)
-          .mentionedEvents()
+          .taggedEvents()
           .find((ev) => ev.index === tagIndex);
-        if (mention == null) return;
 
         const mentionedEvent: MentionedEvent = {
           type: 'MentionedEvent',
           tagIndex,
           content: match[0],
           eventId: tag[1],
-          marker: mention.marker,
+          marker: mention?.marker,
         };
         result.push(mentionedEvent);
       }
     } else if (match.groups?.nip19 && match.index >= pos) {
       try {
-        const decoded = decode(match[0]);
+        const decoded = decode(match[0].toLowerCase());
         const bech32Entity: Bech32Entity = {
           type: 'Bech32Entity',
           content: match[0],

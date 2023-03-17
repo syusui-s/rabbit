@@ -59,7 +59,7 @@ const defaultAbsoluteDateShortFormatter = (parsedDate: AbsoluteDate): string => 
 };
 
 const calcDiffSec = (date: Date, currentDate: Date): number =>
-  (Number(currentDate) - Number(date)) / 1000;
+  Math.round(Number(currentDate) - Number(date)) / 1000;
 
 const parseDateDiff = (date: Date, currentDate: Date): RelativeDate => {
   const diffSec = calcDiffSec(date, currentDate);
