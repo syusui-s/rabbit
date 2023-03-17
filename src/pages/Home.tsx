@@ -1,5 +1,6 @@
 import { createSignal, createEffect, onMount, type Component, onCleanup } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
+import uniq from 'lodash/uniq';
 
 import Column from '@/components/Column';
 import SideBar from '@/components/SideBar';
@@ -48,7 +49,7 @@ const Home: Component = () => {
       filters: [
         {
           kinds: [1, 6],
-          authors: followingPubkeys(),
+          authors: uniq([...followingPubkeys(), pubkeyNonNull]),
           limit: 25,
           since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
         },

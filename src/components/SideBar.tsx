@@ -7,8 +7,12 @@ import NotePostForm from '@/components/NotePostForm';
 import Config from '@/components/Config';
 
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import useConfig from '@/nostr/useConfig';
 
 const SideBar: Component = () => {
+  let textAreaRef: HTMLTextAreaElement | undefined;
+
+  const { config } = useConfig();
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
 
@@ -17,7 +21,10 @@ const SideBar: Component = () => {
 
   useHandleCommand(() => ({
     commandType: 'openPostForm',
-    handler: (cmd) => openForm(),
+    handler: () => {
+      openForm();
+      setTimeout(() => textAreaRef?.focus?.(), 100);
+    },
   }));
 
   return (
@@ -48,8 +55,13 @@ const SideBar: Component = () => {
           </button>
         </div>
       </div>
-      <Show when={formOpened()}>
-        <NotePostForm onClose={closeForm} />
+      <Show when={formOpened() || config().keepOpenPostForm}>
+        <NotePostForm
+          textAreaRef={(el) => {
+            textAreaRef = el;
+          }}
+          onClose={closeForm}
+        />
       </Show>
       <Show when={configOpened()}>
         <Config onClose={() => setConfigOpened(false)} />

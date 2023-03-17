@@ -42,6 +42,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const pubkey = usePubkey();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
+  const closeReplyForm = () => setShowReplyForm(false);
   const [showMenu, setShowMenu] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
@@ -255,7 +256,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         </div>
       </div>
       <Show when={showReplyForm()}>
-        <NotePostForm mode="reply" replyTo={props.event} onClose={() => setShowReplyForm(false)} />
+        <NotePostForm
+          mode="reply"
+          replyTo={props.event}
+          onClose={closeReplyForm}
+          onPost={closeReplyForm}
+        />
       </Show>
     </div>
   );

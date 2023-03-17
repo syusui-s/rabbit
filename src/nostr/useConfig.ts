@@ -7,6 +7,7 @@ import {
 export type Config = {
   relayUrls: string[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
+  keepOpenPostForm: boolean;
 };
 
 type UseConfig = {
@@ -29,6 +30,7 @@ const InitialConfig: Config = {
     'wss://nostr.holybea.com',
   ],
   dateFormat: 'relative',
+  keepOpenPostForm: false,
 };
 
 const serializer = (config: Config): string => JSON.stringify(config);

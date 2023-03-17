@@ -106,6 +106,53 @@ const DateFormatConfig = () => {
   );
 };
 
+const ToggleButton = (props: {
+  value: boolean;
+  onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent>;
+}) => {
+  return (
+    <button
+      class="flex h-[24px] w-[48px] items-center rounded-full border border-primary px-1"
+      classList={{
+        'bg-white': !props.value,
+        'justify-start': !props.value,
+        'bg-rose-300': props.value,
+        'justify-end': props.value,
+      }}
+      area-label={props.value}
+      onClick={props.onClick}
+    >
+      <span class="m-[-2px] inline-block h-5 w-5 rounded-full border border-primary bg-white shadow" />
+    </button>
+  );
+};
+
+const OtherConfig = () => {
+  const { config, setConfig } = useConfig();
+
+  const toggleKeepOpenPostForm = () => {
+    setConfig((current) => ({
+      ...current,
+      keepOpenPostForm: !(current.keepOpenPostForm ?? false),
+    }));
+  };
+
+  return (
+    <div>
+      <h3 class="font-bold">その他</h3>
+      <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
+        <div class="flex w-full">
+          <div class="flex-1">投稿欄を開いたままにする</div>
+          <ToggleButton
+            value={config().keepOpenPostForm}
+            onClick={() => toggleKeepOpenPostForm()}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ConfigUI = (props: ConfigProps) => {
   let containerRef: HTMLDivElement | undefined;
 
@@ -131,6 +178,7 @@ const ConfigUI = (props: ConfigProps) => {
         </div>
         <RelayConfig />
         <DateFormatConfig />
+        <OtherConfig />
       </div>
     </div>
   );

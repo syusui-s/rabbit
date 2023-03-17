@@ -112,7 +112,7 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
       }
     } else if (match.groups?.nip19 && match.index >= pos) {
       try {
-        const decoded = decode(match[0].toLowerCase());
+        const decoded = decode(match[0]);
         const bech32Entity: Bech32Entity = {
           type: 'Bech32Entity',
           content: match[0],

@@ -22,19 +22,21 @@ import eventWrapper from '@/core/event';
 import useConfig from '@/nostr/useConfig';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
+import { useHandleCommand } from '@/hooks/useCommandBus';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;
   mode?: 'normal' | 'reply';
   onClose: () => void;
+  onPost?: () => void;
+  textAreaRef?: (textAreaRef: HTMLTextAreaElement) => void;
 };
 
 const placeholder = (mode: NotePostFormProps['mode']) => {
   switch (mode) {
-    case 'normal':
-      return 'いまどうしてる？';
     case 'reply':
       return '返信を投稿';
+    case 'normal':
     default:
       return 'いまどうしてる？';
   }
@@ -59,7 +61,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     onSuccess: () => {
       console.log('succeeded to post');
       clearText();
-      props?.onClose();
+      props.onPost?.();
     },
     onError: (err) => {
       console.error('error', err);
@@ -99,6 +101,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
       submit();
     } else if (ev.key === 'Escape') {
+      textAreaRef?.blur();
       props.onClose();
     }
   };
@@ -129,7 +132,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       </Show>
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
         <textarea
-          ref={textAreaRef}
+          ref={(el) => {
+            textAreaRef = el;
+            props.textAreaRef?.(el);
+          }}
           name="text"
           class="rounded border-none"
           rows={4}
