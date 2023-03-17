@@ -4,7 +4,7 @@ import {
   createSignalWithStorage,
 } from '@/hooks/createSignalWithStorage';
 
-type Config = {
+export type Config = {
   relayUrls: string[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
 };

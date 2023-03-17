@@ -173,7 +173,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           </div>
           <Show when={showReplyEvent()} keyed>
             {(id) => (
-              <div class="relative border p-1">
+              <div class="border p-1">
                 <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
               </div>
             )}
@@ -233,7 +233,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   <div class="text-sm text-zinc-400">{reactions().length}</div>
                 </Show>
               </div>
-              <div class="relative">
+              <div>
                 <button
                   class="h-4 w-4 text-zinc-400"
                   onClick={() => setShowMenu((current) => !current)}

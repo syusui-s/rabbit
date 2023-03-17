@@ -1,4 +1,4 @@
-import useConfig from '@/nostr/useConfig';
+import useConfig, { type Config } from '@/nostr/useConfig';
 import { createSignal, For, type JSX } from 'solid-js';
 
 type ConfigProps = {
@@ -48,7 +48,61 @@ const RelayConfig = () => {
   );
 };
 
-const Config = (props: ConfigProps) => {
+const dateFormats: { id: Config['dateFormat']; name: string; example: string }[] = [
+  {
+    id: 'relative',
+    name: '相対',
+    example: '〜秒前',
+  },
+  {
+    id: 'absolute-short',
+    name: '絶対 (短形式)',
+    example: '昨日 12:34',
+  },
+  {
+    id: 'absolute-long',
+    name: '絶対 (長形式)',
+    example: '2023',
+  },
+];
+
+const DateFormatConfig = () => {
+  const { config, setConfig } = useConfig();
+
+  const updateDateFormat = (dateFormat: Config['dateFormat']) => {
+    setConfig((current) => ({ ...current, dateFormat }));
+  };
+
+  return (
+    <div>
+      <h3 class="font-bold">時刻の表記</h3>
+      <div class="flex justify-evenly gap-2">
+        <For each={dateFormats}>
+          {({ id, name, example }) => (
+            <div class="flex flex-1 flex-col items-center">
+              <button
+                type="button"
+                class="w-full rounded border border-rose-300 p-2 font-bold"
+                classList={{
+                  'bg-rose-300': config().dateFormat === id,
+                  'text-white': config().dateFormat === id,
+                  'bg-white': config().dateFormat !== id,
+                  'text-rose-300': config().dateFormat !== id,
+                }}
+                onClick={() => updateDateFormat(id)}
+              >
+                {name}
+              </button>
+              {example}
+            </div>
+          )}
+        </For>
+      </div>
+    </div>
+  );
+};
+
+const ConfigUI = (props: ConfigProps) => {
   let containerRef: HTMLDivElement | undefined;
 
   const handleClickContainer: JSX.EventHandler<HTMLDivElement, MouseEvent> = (ev) => {
@@ -72,9 +126,10 @@ const Config = (props: ConfigProps) => {
           </button>
         </div>
         <RelayConfig />
+        <DateFormatConfig />
       </div>
     </div>
   );
 };
 
-export default Config;
+export default ConfigUI;
