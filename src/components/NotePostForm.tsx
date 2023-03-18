@@ -75,6 +75,12 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     },
   });
 
+  const resizeTextArea = () => {
+    if (textAreaRef == null) return;
+    textAreaRef.style.height = 'auto';
+    textAreaRef.style.height = `${textAreaRef.scrollHeight}px`;
+  };
+
   const uploadFilesMutation = createMutation({
     mutationKey: ['uploadFiles'],
     mutationFn: (files: File[]) => {
@@ -84,6 +90,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             if (result.status === 'fulfilled') {
               console.log('succeeded to upload', result);
               setText((current) => `${current} ${result.value.imageUrl}`);
+              resizeTextArea();
             } else {
               console.error('failed to upload', result);
             }
@@ -102,6 +109,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   };
 
   const submit = () => {
+    if (text().length === 0) return;
+    if (publishTextNoteMutation.isLoading) return;
+
     const pubkey = getPubkey();
     if (pubkey == null) {
       console.error('pubkey is not available');
@@ -115,6 +125,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
       replyEventId: replyTo()?.id,
     });
+  };
+
+  const handleInput: JSX.EventHandler<HTMLTextAreaElement, InputEvent> = (ev) => {
+    setText(ev.currentTarget.value);
+    resizeTextArea();
   };
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
@@ -140,6 +155,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const handleDrop: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
+    if (uploadFilesMutation.isLoading) return;
     const files = [...(ev?.dataTransfer?.files ?? [])];
     uploadFilesMutation.mutate(files);
   };
@@ -186,7 +202,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           class="rounded border-none"
           rows={4}
           placeholder={placeholder(mode())}
-          onInput={(ev) => setText(ev.currentTarget.value)}
+          onInput={handleInput}
           onKeyDown={handleKeyDown}
           onDragOver={handleDragOver}
           onDrop={handleDrop}

@@ -64,6 +64,7 @@ module.exports = {
     ],
     tailwindcss: {
       whitelist: [
+        'h-fill-available',
         'form-input',
         // rabbit parts
         'nostr-textnote',

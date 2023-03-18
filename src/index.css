@@ -23,3 +23,7 @@ code {
 .link {
   @apply underline text-blue-500;
 }
+
+.h-fill-available {
+  height: -webkit-fill-available;
+}
