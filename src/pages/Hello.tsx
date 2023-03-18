@@ -1,6 +1,7 @@
 import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import useLoginStatus from '@/hooks/useLoginStatus';
+import usePersistStatus from '@/hooks/usePersistStatus';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
 
 type SignerStatus = 'checking' | 'available' | 'unavailable';
 
@@ -30,7 +31,7 @@ const useSignerStatus = () => {
 const Hello: Component = () => {
   const signerStatus = useSignerStatus();
   const navigate = useNavigate();
-  const { loginStatus, loggedIn } = useLoginStatus();
+  const { persistStatus, loggedIn } = usePersistStatus();
 
   const handleLogin = () => {
     loggedIn();
@@ -38,7 +39,7 @@ const Hello: Component = () => {
   };
 
   onMount(() => {
-    if (loginStatus().loggedIn) {
+    if (persistStatus().loggedIn) {
       navigate('/');
     }
   });

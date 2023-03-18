@@ -14,13 +14,13 @@ import useFollowings from '@/nostr/useFollowings';
 import usePubkey from '@/nostr/usePubkey';
 
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
-import useLoginStatus from '@/hooks/useLoginStatus';
+import usePersistStatus from '@/hooks/usePersistStatus';
 import ensureNonNull from '@/utils/ensureNonNull';
 
 const Home: Component = () => {
   useMountShortcutKeys();
   const navigate = useNavigate();
-  const { loginStatus } = useLoginStatus();
+  const { persistStatus } = usePersistStatus();
 
   const pool = usePool();
   const { config } = useConfig();
@@ -129,13 +129,13 @@ const Home: Component = () => {
    */
 
   onMount(() => {
-    if (!loginStatus().loggedIn) {
+    if (!persistStatus().loggedIn) {
       navigate('/hello');
     }
   });
 
   return (
-    <div class="h-fill-available flex h-screen w-screen flex-row overflow-hidden">
+    <div class="flex h-screen w-screen flex-row overflow-hidden">
       <SideBar />
       <div class="flex h-full flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" columnIndex={1} width="widest">
