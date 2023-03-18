@@ -6,13 +6,13 @@ type ConfigProps = {
 };
 
 const RelayConfig = () => {
-  const { config, setConfig, addRelay, removeRelay } = useConfig();
+  const { config, addRelay, removeRelay } = useConfig();
 
   const [relayUrlInput, setRelayUrlInput] = createSignal<string>('');
 
   const handleClickAddRelay: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
-    if (relayUrlInput().length > 0) return;
+    if (relayUrlInput().length === 0) return;
     addRelay(relayUrlInput());
     setRelayUrlInput('');
   };

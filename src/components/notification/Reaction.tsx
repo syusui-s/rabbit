@@ -44,7 +44,7 @@ const Reaction: Component<ReactionProps> = (props) => {
             </Switch>
           </div>
           <div class="notification-user flex gap-1">
-            <div class="author-icon h-5 w-5 shrink-0">
+            <div class="author-icon h-5 w-5 shrink-0 overflow-hidden object-cover">
               <Show when={profile()?.picture != null}>
                 <img
                   src={profile()?.picture}

@@ -14,7 +14,7 @@ type UsePersistStatus = {
   loggedIn: () => void;
 };
 
-const InitialLoginStatus = {
+const InitialPersistStatus = {
   loggedIn: false,
   agreeWithNostrBuild: false,
 };
@@ -25,25 +25,21 @@ const deserializer = (json: string): PersistStatus => JSON.parse(json) as Persis
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
 
-const [persistStatus, setLoginStatus] = createSignalWithStorage(
-  'RabbitLoginStatus',
-  InitialLoginStatus,
+const [persistStatus, setPersistStatus] = createSignalWithStorage(
+  'RabbitPersistStatus',
+  InitialPersistStatus,
   storage,
 );
 
 const usePersistStatus = (): UsePersistStatus => {
   const loggedIn = () => {
-    setLoginStatus((current) => ({ ...current, loggedIn: true }));
+    setPersistStatus((current) => ({ ...current, loggedIn: true }));
   };
 
   return {
     persistStatus: () => ({
-      get loggedIn() {
-        return persistStatus().loggedIn ?? false;
-      },
-      get agreeWithNostrBuild() {
-        return persistStatus().agreeWithNostrBuild ?? false;
-      },
+      ...InitialPersistStatus,
+      ...persistStatus(),
     }),
     loggedIn,
   };

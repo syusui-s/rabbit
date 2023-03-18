@@ -146,7 +146,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   return (
     <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
-        <div class="author-icon h-10 w-10 shrink-0">
+        <div class="author-icon h-10 w-10 shrink-0 overflow-hidden object-cover">
           <Show when={author()?.picture}>
             {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
             <img

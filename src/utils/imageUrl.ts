@@ -1,8 +1,5 @@
-const domains = ['i.imgur.com', 'imgur.com', 'i.gyazo.com'];
-
 export const isImageUrl = (url: URL): boolean => {
   if (url.pathname.match(/\.(jpeg|jpg|png|gif|webp)$/i)) return true;
-  if (domains.includes(url.host)) return true;
 
   return false;
 };

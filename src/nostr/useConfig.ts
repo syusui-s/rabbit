@@ -20,7 +20,7 @@ type UseConfig = {
 const InitialConfig: Config = {
   relayUrls: [
     'wss://relay-jp.nostr.wirednet.jp',
-    'wss://nostr.h3z.jp/',
+    'wss://nostr.h3z.jp',
     'wss://relay.damus.io',
     'wss://nos.lol',
     'wss://relay.snort.social',
@@ -55,7 +55,12 @@ const useConfig = (): UseConfig => {
     }));
   };
 
-  return { config, setConfig, addRelay, removeRelay };
+  return {
+    config: () => ({ ...InitialConfig, ...config() }),
+    setConfig,
+    addRelay,
+    removeRelay,
+  };
 };
 
 export default useConfig;
