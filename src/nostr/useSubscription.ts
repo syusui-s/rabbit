@@ -1,5 +1,6 @@
 import { createSignal, createEffect, onCleanup } from 'solid-js';
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
+import uniqBy from 'lodash/uniqBy';
 import usePool from '@/nostr/usePool';
 
 export type UseSubscriptionProps = {
@@ -44,8 +45,17 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
         pushed = true;
         storedEvents.push(event);
       } else {
-        // いったん50件だけ保持
-        setEvents((prevEvents) => sortEvents([event, ...prevEvents].slice(0, 50)));
+        setEvents((current) => {
+          // いったん50件だけ保持
+          const sorted = sortEvents([event, ...current].slice(0, 50));
+          // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
+          // https://github.com/syusui-s/rabbit/issues/5
+          const deduped = uniqBy(sorted, (e) => e.id);
+          if (deduped.length !== sorted.length) {
+            console.warn('duplicated event', event);
+          }
+          return deduped;
+        });
       }
     });
 

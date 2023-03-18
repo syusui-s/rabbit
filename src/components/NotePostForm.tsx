@@ -13,6 +13,7 @@ import { Event as NostrEvent } from 'nostr-tools';
 import uniq from 'lodash/uniq';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
+import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import UserNameDisplay from '@/components/UserDisplayName';
@@ -23,6 +24,8 @@ import useConfig from '@/nostr/useConfig';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import { useHandleCommand } from '@/hooks/useCommandBus';
+
+import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;
@@ -44,8 +47,12 @@ const placeholder = (mode: NotePostFormProps['mode']) => {
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   let textAreaRef: HTMLTextAreaElement | undefined;
+  let fileInputRef: HTMLInputElement | undefined;
 
   const [text, setText] = createSignal<string>('');
+  const [isUploading, setIsUploading] = createSignal(false);
+  const [isDragging, setIsDragging] = createSignal(false);
+
   const clearText = () => setText('');
 
   const { config } = useConfig();
@@ -65,6 +72,24 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     },
     onError: (err) => {
       console.error('error', err);
+    },
+  });
+
+  const uploadFilesMutation = createMutation({
+    mutationKey: ['uploadFiles'],
+    mutationFn: (files: File[]) => {
+      return uploadFiles(uploadNostrBuild)(files)
+        .then((uploadResults) => {
+          uploadResults.forEach((result) => {
+            if (result.status === 'fulfilled') {
+              console.log('succeeded to upload', result);
+              setText((current) => `${current} ${result.value.imageUrl}`);
+            } else {
+              console.error('failed to upload', result);
+            }
+          });
+        })
+        .catch((err) => console.error(err));
     },
   });
 
@@ -106,9 +131,30 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const submitDisabled = createMemo(
-    () => text().trim().length === 0 || publishTextNoteMutation.isLoading,
-  );
+  const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
+    ev.preventDefault();
+    const files = [...(ev.currentTarget.files ?? [])];
+    uploadFilesMutation.mutate(files);
+    ev.currentTarget.value = '';
+  };
+
+  const handleDrop: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
+    ev.preventDefault();
+    const files = [...(ev?.dataTransfer?.files ?? [])];
+    uploadFilesMutation.mutate(files);
+  };
+
+  const handleDragOver: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
+    ev.preventDefault();
+    setIsDragging(true);
+  };
+
+  const submitDisabled = () =>
+    text().trim().length === 0 ||
+    publishTextNoteMutation.isLoading ||
+    uploadFilesMutation.isLoading;
+
+  const fileUploadDisabled = () => uploadFilesMutation.isLoading;
 
   onMount(() => {
     setTimeout(() => {
@@ -142,9 +188,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           placeholder={placeholder(mode())}
           onInput={(ev) => setText(ev.currentTarget.value)}
           onKeyDown={handleKeyDown}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
           value={text()}
         />
-        <div class="flex items-end justify-end">
+        <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply'}>
             <div class="flex-1">
               <button class="h-5 w-5 text-stone-500" onClick={() => props.onClose()}>
@@ -152,6 +200,22 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </button>
             </div>
           </Show>
+          <button
+            class="rounded bg-primary p-2 font-bold text-white"
+            classList={{
+              'bg-primary-disabled': fileUploadDisabled(),
+              'bg-primary': !fileUploadDisabled(),
+              'h-8': mode() === 'normal',
+              'w-8': mode() === 'normal',
+              'h-7': mode() === 'reply',
+              'w-7': mode() === 'reply',
+            }}
+            type="button"
+            disabled={fileUploadDisabled()}
+            onClick={() => fileInputRef?.click()}
+          >
+            <Photo />
+          </button>
           <button
             class="rounded bg-primary p-2 font-bold text-white"
             classList={{
@@ -168,6 +232,15 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <PaperAirplane />
           </button>
         </div>
+        <input
+          ref={fileInputRef}
+          class="rounded bg-primary"
+          type="file"
+          hidden
+          name="image"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          onChange={handleChangeFile}
+        />
       </form>
     </div>
   );

@@ -9,7 +9,33 @@ const toHexString = (buff: ArrayBuffer): string => {
   return arr.join();
 };
 
-const upload = async (blob: Blob): Promise<object> => {
+export type UploadResult = {
+  imageUrl: string;
+};
+
+export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
+  const form = new FormData();
+  form.set('fileToUpload', blob);
+  form.set('img_url', '');
+  form.set('submit', 'Upload');
+
+  const res = await fetch('https://nostr.build/api/upload/uploadapi.php', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+    },
+    mode: 'cors',
+    body: form,
+  });
+
+  if (!res.ok) throw new Error('failed to post image: status code was not 2xx');
+
+  const imageUrl = (await res.json()) as string;
+
+  return { imageUrl };
+};
+
+export const uploadVoidCat = async (blob: Blob): Promise<any> => {
   const data = await blob.arrayBuffer();
   const digestBuffer = await window.crypto.subtle.digest('SHA-256', data);
   const digest = toHexString(digestBuffer);
@@ -17,6 +43,7 @@ const upload = async (blob: Blob): Promise<object> => {
   const res = await fetch('https://void.cat/upload', {
     method: 'POST',
     headers: {
+      Accept: 'application/json',
       'V-Content-Type': blob.type,
       'V-Full-Digest': digest,
     },
@@ -29,4 +56,8 @@ const upload = async (blob: Blob): Promise<object> => {
   return res.json();
 };
 
-export default upload;
+export const uploadFiles =
+  <T>(uploadFn: (file: Blob) => Promise<T>) =>
+  (files: File[]): Promise<PromiseSettledResult<Awaited<T>>[]> => {
+    return Promise.allSettled(files.map((file) => uploadFn(file)));
+  };
