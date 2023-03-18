@@ -245,7 +245,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             </div>
           </Show>
           <button
-            class="flex items-center justify-center rounded p-2 text-xs font-bold text-white hover:bg-rose-300"
+            class="flex items-center justify-center rounded p-2 text-xs font-bold text-white"
             classList={{
               'bg-rose-300': !contentWarning(),
               'bg-rose-400': contentWarning(),
