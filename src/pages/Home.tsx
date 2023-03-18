@@ -135,9 +135,9 @@ const Home: Component = () => {
   });
 
   return (
-    <div class="flex h-screen w-screen flex-row overflow-hidden">
+    <div class="absolute inset-0 flex w-screen flex-row overflow-hidden">
       <SideBar />
-      <div class="flex h-full flex-row overflow-y-hidden overflow-x-scroll">
+      <div class="flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" columnIndex={1} width="widest">
           <Timeline events={followingsPosts()} />
         </Column>

@@ -1,30 +1,18 @@
 import type { Component, JSX } from 'solid-js';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 
-const widthToClass = {
-  widest: 'w-[500px]',
-  wide: 'w-[350px]',
-  medium: 'w-[310px]',
-  narrow: 'w-[270px]',
-} as const;
-
 type ColumnProps = {
   name: string;
   columnIndex: number;
   lastColumn?: true;
-  width: keyof typeof widthToClass | null | undefined;
+  width: 'widest' | 'wide' | 'medium' | 'narrow' | null | undefined;
   children: JSX.Element;
 };
 
 const Column: Component<ColumnProps> = (props) => {
   let columnDivRef: HTMLDivElement | undefined;
 
-  const width = () => {
-    if (props.width == null) {
-      return widthToClass.medium;
-    }
-    return widthToClass[props.width];
-  };
+  const width = () => props.width ?? 'medium';
 
   useHandleCommand(() => ({
     commandType: 'moveToColumn',
@@ -45,7 +33,16 @@ const Column: Component<ColumnProps> = (props) => {
   }));
 
   return (
-    <div ref={columnDivRef} class={`flex shrink-0 flex-col border-r ${width()}`}>
+    <div
+      ref={columnDivRef}
+      class="flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r sm:snap-align-none"
+      classList={{
+        'sm:w-[500px]': width() === 'widest',
+        'sm:w-[350px]': width() === 'wide',
+        'sm:w-[310px]': width() === 'medium',
+        'sm:w-[270px]': width() === 'narrow',
+      }}
+    >
       <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
         {/* <span class="column-icon">🏠</span> */}
         <span class="column-name">{props.name}</span>

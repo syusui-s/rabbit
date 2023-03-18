@@ -44,6 +44,7 @@ const useCommands = () => {
     pubkey,
     content,
     tags,
+    contentWarning,
     notifyPubkeys,
     rootEventId,
     mentionEventIds,
@@ -57,16 +58,22 @@ const useCommands = () => {
     rootEventId?: string;
     mentionEventIds?: string[];
     replyEventId?: string;
+    contentWarning?: string;
   }): Promise<Promise<void>[]> => {
+    // NIP-10
     const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
     const eTags = [];
-    // NIP-10
     if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
     if (mentionEventIds != null)
       mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
     if (replyEventId != null) eTags.push(['e', replyEventId, '', 'reply']);
 
-    const mergedTags = [...eTags, ...pTags, ...(tags ?? [])];
+    const additionalTags = tags != null ? [...tags] : [];
+    if (contentWarning != null && content.length > 0) {
+      additionalTags.push(['content-warning', contentWarning]);
+    }
+
+    const mergedTags = [...eTags, ...pTags, ...additionalTags];
 
     const preSignedEvent: NostrEvent = {
       kind: 1,

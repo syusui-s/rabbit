@@ -14,6 +14,8 @@ import uniq from 'lodash/uniq';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
+import Eye from 'heroicons/24/solid/eye.svg';
+import EyeSlash from 'heroicons/24/outline/eye-slash.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import UserNameDisplay from '@/components/UserDisplayName';
@@ -50,10 +52,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   let fileInputRef: HTMLInputElement | undefined;
 
   const [text, setText] = createSignal<string>('');
-  const [isUploading, setIsUploading] = createSignal(false);
-  const [isDragging, setIsDragging] = createSignal(false);
+  const [contentWarning, setContentWarning] = createSignal(false);
+  const [contentWarningReason, setContentWarningReason] = createSignal('');
 
-  const clearText = () => setText('');
+  const clearText = () => {
+    setText('');
+    setContentWarningReason('');
+    setContentWarning(false);
+  };
 
   const { config } = useConfig();
   const getPubkey = usePubkey();
@@ -117,14 +123,26 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       console.error('pubkey is not available');
       return;
     }
-    publishTextNoteMutation.mutate({
+    let textNote: Parameters<typeof commands.publishTextNote>[0] = {
       relayUrls: config().relayUrls,
       pubkey,
       content: text(),
-      notifyPubkeys: notifyPubkeys(pubkey),
-      rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
-      replyEventId: replyTo()?.id,
-    });
+    };
+    if (replyTo() != null) {
+      textNote = {
+        ...textNote,
+        notifyPubkeys: notifyPubkeys(pubkey),
+        rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
+        replyEventId: replyTo()?.id,
+      };
+    }
+    if (contentWarning()) {
+      textNote = {
+        ...textNote,
+        contentWarning: contentWarningReason(),
+      };
+    }
+    publishTextNoteMutation.mutate(textNote);
   };
 
   const handleInput: JSX.EventHandler<HTMLTextAreaElement, InputEvent> = (ev) => {
@@ -162,11 +180,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const handleDragOver: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
-    setIsDragging(true);
   };
 
   const submitDisabled = () =>
     text().trim().length === 0 ||
+    (contentWarning() && contentWarningReason().length === 0) ||
     publishTextNoteMutation.isLoading ||
     uploadFilesMutation.isLoading;
 
@@ -193,6 +211,16 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         </div>
       </Show>
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
+        <Show when={contentWarning()}>
+          <input
+            type="text"
+            class="rounded"
+            placeholder="警告の理由"
+            maxLength={32}
+            onInput={(ev) => setContentWarningReason(ev.currentTarget.value)}
+            value={contentWarningReason()}
+          />
+        </Show>
         <textarea
           ref={(el) => {
             textAreaRef = el;
@@ -217,6 +245,23 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             </div>
           </Show>
           <button
+            class="flex items-center justify-center rounded p-2 text-xs font-bold text-white hover:bg-rose-300"
+            classList={{
+              'bg-rose-300': !contentWarning(),
+              'bg-rose-400': contentWarning(),
+              'h-8': mode() === 'normal',
+              'w-8': mode() === 'normal',
+              'h-7': mode() === 'reply',
+              'w-7': mode() === 'reply',
+            }}
+            type="button"
+            area-label="コンテンツ警告を設定"
+            title="コンテンツ警告を設定"
+            onClick={() => setContentWarning((e) => !e)}
+          >
+            <span>CW</span>
+          </button>
+          <button
             class="rounded bg-primary p-2 font-bold text-white"
             classList={{
               'bg-primary-disabled': fileUploadDisabled(),
@@ -227,6 +272,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="button"
+            title="画像を投稿"
+            area-label="画像を投稿"
             disabled={fileUploadDisabled()}
             onClick={() => fileInputRef?.click()}
           >
@@ -243,6 +290,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="submit"
+            area-label="投稿"
+            title="投稿"
             disabled={submitDisabled()}
           >
             <PaperAirplane />

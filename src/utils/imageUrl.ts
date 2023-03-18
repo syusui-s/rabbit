@@ -1,7 +1,5 @@
 export const isImageUrl = (url: URL): boolean => {
-  if (url.pathname.match(/\.(jpeg|jpg|png|gif|webp)$/i)) return true;
-
-  return false;
+  return /\.(jpeg|jpg|png|gif|webp)$/i.test(url.pathname);
 };
 
 export const fixUrl = (url: URL): URL => {
