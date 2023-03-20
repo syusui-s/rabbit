@@ -61,6 +61,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const close = () => {
     textAreaRef?.blur();
+    clearText();
     props.onClose();
   };
 

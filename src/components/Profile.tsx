@@ -15,9 +15,7 @@ export type ProfileDisplayProps = {
 };
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
-  const { config } = useConfig();
   const { profile, query } = useProfile(() => ({
-    relayUrls: config().relayUrls,
     pubkey: props.pubkey,
   }));
 

@@ -145,7 +145,7 @@ const OtherConfig = () => {
   return (
     <div>
       <h3 class="font-bold">その他</h3>
-      <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
+      <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
           <div class="flex-1">投稿欄を開いたままにする</div>
           <ToggleButton
@@ -153,6 +153,16 @@ const OtherConfig = () => {
             onClick={() => toggleKeepOpenPostForm()}
           />
         </div>
+        {/*
+        <div class="flex w-full">
+          <div class="flex-1">リアクションのデフォルト</div>
+          <input
+            type="text"
+            maxlength="1"
+            // onBlur={handleChangeReaction}
+          />
+        </div>
+        */}
       </div>
     </div>
   );
@@ -160,7 +170,7 @@ const OtherConfig = () => {
 
 const ConfigUI = (props: ConfigProps) => {
   return (
-    <Modal title="設定" onClose={props.onClose}>
+    <Modal onClose={props.onClose}>
       <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
         <div class="relative">
           <div class="flex flex-col gap-1">

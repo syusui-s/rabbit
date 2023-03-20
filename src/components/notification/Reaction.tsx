@@ -6,7 +6,6 @@ import ColumnItem from '@/components/ColumnItem';
 import TextNoteDisplay from '@/components/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
 
-import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
 import useEvent from '@/nostr/useEvent';
 import { npubEncode } from 'nostr-tools/nip19';
@@ -16,15 +15,12 @@ type ReactionProps = {
 };
 
 const Reaction: Component<ReactionProps> = (props) => {
-  const { config } = useConfig();
   const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
 
   const { profile } = useProfile(() => ({
-    relayUrls: config().relayUrls,
     pubkey: props.event.pubkey,
   }));
   const { event: reactedEvent, query: reactedEventQuery } = useEvent(() => ({
-    relayUrls: config().relayUrls,
     eventId: eventId(),
   }));
   const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;

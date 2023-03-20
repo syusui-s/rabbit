@@ -1,9 +1,16 @@
-import { createSignal, createMemo, untrack, type Accessor, type Signal } from 'solid-js';
+import {
+  createSignal,
+  createEffect,
+  createMemo,
+  createRoot,
+  observable,
+  type Accessor,
+  type Signal,
+} from 'solid-js';
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 
 import timeout from '@/utils/timeout';
-import usePool from '@/nostr/usePool';
 import useBatch, { type Task } from '@/nostr/useBatch';
 import eventWrapper from '@/core/event';
 import useSubscription from '@/nostr/useSubscription';
@@ -47,7 +54,7 @@ export type UseProfileProps = {
 
 type UseProfile = {
   profile: () => Profile | undefined;
-  query: CreateQueryResult<Accessor<NostrEvent> | undefined>;
+  query: CreateQueryResult<NostrEvent | undefined>;
 };
 
 // Textnote
@@ -57,7 +64,7 @@ export type UseTextNoteProps = {
 
 export type UseTextNote = {
   event: Accessor<NostrEvent | undefined>;
-  query: CreateQueryResult<Accessor<NostrEvent> | undefined>;
+  query: CreateQueryResult<NostrEvent | undefined>;
 };
 
 // Reactions
@@ -70,7 +77,7 @@ export type UseReactions = {
   reactionsGroupedByContent: Accessor<Map<string, NostrEvent[]>>;
   isReactedBy: (pubkey: string) => boolean;
   invalidateReactions: () => Promise<void>;
-  query: CreateQueryResult<Accessor<BatchedEvents>>;
+  query: CreateQueryResult<NostrEvent[]>;
 };
 
 // DeprecatedReposts
@@ -82,7 +89,7 @@ export type UseDeprecatedReposts = {
   reposts: Accessor<NostrEvent[]>;
   isRepostedBy: (pubkey: string) => boolean;
   invalidateDeprecatedReposts: () => Promise<void>;
-  query: CreateQueryResult<Accessor<BatchedEvents>>;
+  query: CreateQueryResult<NostrEvent[]>;
 };
 
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
@@ -134,7 +141,9 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
     const resolveTasks = (registeredTasks: Task<TaskArg, TaskRes>[], event: NostrEvent) => {
       registeredTasks.forEach((task) => {
-        const signal = signals.get(task.id) ?? createSignal({ events: [], completed: false });
+        const signal =
+          signals.get(task.id) ?? createRoot(() => createSignal({ events: [], completed: false }));
+        signals.set(task.id, signal);
         const [batchedEvents, setBatchedEvents] = signal;
         setBatchedEvents((current) => ({
           ...current,
@@ -196,6 +205,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
 export const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const props = createMemo(propsProvider);
+  const queryClient = useQueryClient();
 
   const query = createQuery(
     () => ['useProfile', props()] as const,
@@ -204,28 +214,34 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
       if (currentProps == null) return undefined;
       const { pubkey } = currentProps;
       const promise = exec({ type: 'Profile', pubkey }, signal).then((batchedEvents) => {
-        return createMemo(() => {
+        const latestEvent = () => {
           const { events } = batchedEvents();
-          if (events == null || events.length === 0)
-            throw new Error(`profile not found: ${pubkey}`);
+          if (events.length === 0) throw new Error(`profile not found: ${pubkey}`);
           const latest = events.reduce((a, b) => (a.created_at > b.created_at ? a : b));
           return latest;
+        };
+        observable(batchedEvents).subscribe(() => {
+          try {
+            queryClient.setQueryData(queryKey, latestEvent());
+          } catch (err) {
+            console.error(err);
+          }
         });
+        return latestEvent();
       });
       // TODO timeoutと同時にsignalでキャンセルするようにしたい
       return timeout(15000, `useProfile: ${pubkey}`)(promise);
     },
     {
-      // 5 minutes
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 15 * 60 * 1000,
+      // profile is updated occasionally
+      staleTime: 5 * 60 * 1000, // 5min
+      cacheTime: 24 * 60 * 60 * 1000, // 1day
     },
   );
 
   const profile = createMemo((): Profile | undefined => {
-    const event = query.data;
-    if (event == null) return undefined;
-    const { content } = event();
+    if (query.data == null) return undefined;
+    const { content } = query.data;
     if (content == null || content.length === 0) return undefined;
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
     try {
@@ -239,28 +255,67 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
   return { profile, query };
 };
 
-export const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactions => {
-  const queryClient = useQueryClient();
+export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTextNote => {
   const props = createMemo(propsProvider);
-  const queryKey = createMemo(() => ['useReactions', props()] as const);
+  const queryClient = useQueryClient();
 
   const query = createQuery(
-    () => queryKey(),
-    ({ queryKey: currentQueryKey, signal }) => {
-      const [, currentProps] = currentQueryKey;
-      if (currentProps == null) return () => ({ events: [], completed: false });
-      const { eventId: mentionedEventId } = currentProps;
-      const promise = exec({ type: 'Reactions', mentionedEventId }, signal);
-      return timeout(15000, `useReactions: ${mentionedEventId}`)(promise);
+    () => ['useTextNote', props()] as const,
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return undefined;
+      const { eventId } = currentProps;
+      const promise = exec({ type: 'TextNote', eventId }, signal).then((batchedEvents) => {
+        const event = batchedEvents().events[0];
+        if (event == null) throw new Error(`event not found: ${eventId}`);
+        return event;
+      });
+      return timeout(15000, `useTextNote: ${eventId}`)(promise);
     },
     {
-      // 3 minutes
-      staleTime: 1 * 60 * 1000,
-      cacheTime: 3 * 60 * 1000,
+      // text note cannot be updated.
+      staleTime: 24 * 60 * 60 * 1000, // 1 day
+      cacheTime: 24 * 60 * 60 * 1000, // 1 day
     },
   );
 
-  const reactions = () => query.data?.()?.events ?? [];
+  const event = () => query.data;
+
+  return { event, query };
+};
+
+export const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactions => {
+  const queryClient = useQueryClient();
+  const props = createMemo(propsProvider);
+  const genQueryKey = createMemo(() => ['useReactions', props()] as const);
+
+  const query = createQuery(
+    genQueryKey,
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return [];
+
+      const { eventId: mentionedEventId } = currentProps;
+      const promise = exec({ type: 'Reactions', mentionedEventId }, signal).then(
+        (batchedEvents) => {
+          const events = () => batchedEvents().events;
+          setTimeout(() => {
+            observable(batchedEvents).subscribe(() => {
+              queryClient.setQueryData(queryKey, events());
+            });
+          });
+          return events();
+        },
+      );
+      return timeout(15000, `useReactions: ${mentionedEventId}`)(promise);
+    },
+    {
+      staleTime: 1 * 60 * 1000, // 1 min
+      cacheTime: 5 * 60 * 1000, // 5 min
+    },
+  );
+
+  const reactions = () => query.data ?? [];
 
   const reactionsGroupedByContent = () => {
     const result = new Map<string, NostrEvent[]>();
@@ -275,38 +330,9 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
   const isReactedBy = (pubkey: string): boolean =>
     reactions().findIndex((event) => event.pubkey === pubkey) !== -1;
 
-  const invalidateReactions = (): Promise<void> => queryClient.invalidateQueries(queryKey());
+  const invalidateReactions = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
 
   return { reactions, reactionsGroupedByContent, isReactedBy, invalidateReactions, query };
-};
-
-export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTextNote => {
-  const props = createMemo(propsProvider);
-  const query = createQuery(
-    () => ['useEvent', props()] as const,
-    ({ queryKey, signal }) => {
-      const [, currentProps] = queryKey;
-      if (currentProps == null) return undefined;
-      const { eventId } = currentProps;
-      const promise = exec({ type: 'TextNote', eventId }, signal).then((events) => {
-        return createMemo(() => {
-          const event = events().events[0];
-          if (event == null) throw new Error(`event not found: ${eventId}`);
-          return event;
-        });
-      });
-      return timeout(15000, `useEvent: ${eventId}`)(promise);
-    },
-    {
-      // a hour
-      staleTime: 60 * 60 * 1000,
-      cacheTime: 60 * 60 * 1000,
-    },
-  );
-
-  const event = () => query.data?.();
-
-  return { event, query };
 };
 
 export const useDeprecatedReposts = (
@@ -314,31 +340,40 @@ export const useDeprecatedReposts = (
 ): UseDeprecatedReposts => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const queryKey = createMemo(() => ['useDeprecatedReposts', props()] as const);
+  const genQueryKey = createMemo(() => ['useDeprecatedReposts', props()] as const);
 
   const query = createQuery(
-    () => queryKey(),
-    ({ queryKey: currentQueryKey, signal }) => {
-      const [, currentProps] = currentQueryKey;
-      if (currentProps == null) return () => ({ events: [], completed: false });
+    genQueryKey,
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return [];
       const { eventId: mentionedEventId } = currentProps;
-      const promise = exec({ type: 'DeprecatedReposts', mentionedEventId }, signal);
+      const promise = exec({ type: 'DeprecatedReposts', mentionedEventId }, signal).then(
+        (batchedEvents) => {
+          const events = () => batchedEvents().events;
+          setTimeout(() => {
+            observable(batchedEvents).subscribe(() => {
+              queryClient.setQueryData(queryKey, events());
+            });
+          });
+          return events();
+        },
+      );
       return timeout(15000, `useDeprecatedReposts: ${mentionedEventId}`)(promise);
     },
     {
-      // 1 minutes
-      staleTime: 1 * 60 * 1000,
-      cacheTime: 1 * 60 * 1000,
+      staleTime: 1 * 60 * 1000, // 1 min
+      cacheTime: 5 * 60 * 1000, // 5 min
     },
   );
 
-  const reposts = () => query.data?.()?.events ?? [];
+  const reposts = () => query.data ?? [];
 
   const isRepostedBy = (pubkey: string): boolean =>
     reposts().findIndex((event) => event.pubkey === pubkey) !== -1;
 
   const invalidateDeprecatedReposts = (): Promise<void> =>
-    queryClient.invalidateQueries(queryKey());
+    queryClient.invalidateQueries(genQueryKey());
 
   return { reposts, isRepostedBy, invalidateDeprecatedReposts, query };
 };

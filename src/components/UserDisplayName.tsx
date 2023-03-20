@@ -1,7 +1,6 @@
 import { Component, Switch, Match } from 'solid-js';
 import { npubEncode } from 'nostr-tools/nip19';
 
-import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
 
 type UserNameDisplayProps = {
@@ -9,9 +8,7 @@ type UserNameDisplayProps = {
 };
 
 const UserNameDisplay: Component<UserNameDisplayProps> = (props) => {
-  const { config } = useConfig();
   const { profile } = useProfile(() => ({
-    relayUrls: config().relayUrls,
     pubkey: props.pubkey,
   }));
 

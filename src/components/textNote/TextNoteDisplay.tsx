@@ -51,17 +51,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const actions = () => props.actions ?? true;
 
   const { profile: author } = useProfile(() => ({
-    relayUrls: config().relayUrls,
     pubkey: props.event.pubkey,
   }));
 
   const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
-    relayUrls: config().relayUrls,
     eventId: props.event.id as string, // TODO いつかなおす
   }));
 
   const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
-    relayUrls: config().relayUrls,
     eventId: props.event.id as string, // TODO いつかなおす
   }));
 

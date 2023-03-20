@@ -21,7 +21,7 @@ const Notification: Component<NotificationProps> = (props) => {
             <Reaction event={event} />
           </Match>
           {/* TODO ちゃんとnotification用のコンポーネント使う */}
-          <Match when={event.kind === 6}>
+          <Match when={(event.kind as number) === 6}>
             <DeprecatedRepost event={event} />
           </Match>
         </Switch>

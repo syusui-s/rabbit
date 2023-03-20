@@ -14,10 +14,8 @@ type TextNoteDisplayByIdProps = Omit<TextNoteDisplayProps, 'event'> & {
 };
 
 const TextNoteDisplayById: Component<TextNoteDisplayByIdProps> = (props) => {
-  const { config } = useConfig();
   const { event, query: eventQuery } = useEvent(() =>
     ensureNonNull([props.eventId] as const)(([eventIdNonNull]) => ({
-      relayUrls: config().relayUrls,
       eventId: eventIdNonNull,
     })),
   );

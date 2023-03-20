@@ -1,13 +1,20 @@
-import { createSignal, type Accessor } from 'solid-js';
+import { createSignal, createEffect, onCleanup, type Accessor } from 'solid-js';
 
-const [currentDate, setCurrentDate] = createSignal(new Date());
+type DatePulserProps = {
+  interval: number;
+};
 
-// 7 seconds is used for the interval so that the last digit of relative time is changed.
-setInterval(() => {
-  setCurrentDate(new Date());
-}, 7000);
+const useDatePulser = (propsProvider: () => DatePulserProps): Accessor<Date> => {
+  const [currentDate, setCurrentDate] = createSignal(new Date());
 
-const useDatePulser = (): Accessor<Date> => {
+  createEffect(() => {
+    const id = setInterval(() => {
+      setCurrentDate(new Date());
+    }, propsProvider().interval);
+
+    onCleanup(() => clearInterval(id));
+  });
+
   return currentDate;
 };
 
