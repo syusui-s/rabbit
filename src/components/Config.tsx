@@ -1,5 +1,8 @@
 import useConfig, { type Config } from '@/nostr/useConfig';
 import { createSignal, For, type JSX } from 'solid-js';
+import XMark from 'heroicons/24/outline/x-mark.svg';
+
+import Modal from '@/components/Modal';
 
 type ConfigProps = {
   onClose: () => void;
@@ -24,9 +27,11 @@ const RelayConfig = () => {
         <For each={config().relayUrls}>
           {(relayUrl: string) => {
             return (
-              <li class="flex">
-                <div class="flex-1">{relayUrl}</div>
-                <button onClick={() => removeRelay(relayUrl)}>x</button>
+              <li class="flex items-center">
+                <div class="flex-1 truncate">{relayUrl}</div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
+                  <XMark />
+                </button>
               </li>
             );
           }}
@@ -154,33 +159,22 @@ const OtherConfig = () => {
 };
 
 const ConfigUI = (props: ConfigProps) => {
-  let containerRef: HTMLDivElement | undefined;
-
-  const handleClickContainer: JSX.EventHandler<HTMLDivElement, MouseEvent> = (ev) => {
-    if (ev.target === containerRef) {
-      props.onClose();
-    }
-  };
-
   return (
-    <div
-      ref={containerRef}
-      class="absolute top-0 left-0 flex h-screen w-screen cursor-default place-content-center place-items-center bg-black/25"
-      role="button"
-      onClick={handleClickContainer}
-    >
+    <Modal title="設定" onClose={props.onClose}>
       <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
         <div class="relative">
-          <h2 class="flex-1 text-center font-bold">設定</h2>
-          <button class="absolute top-1 right-0" onClick={() => props.onClose()}>
-            X
-          </button>
+          <div class="flex flex-col gap-1">
+            <h2 class="flex-1 text-center font-bold">設定</h2>
+            <button class="absolute top-1 right-0 h-4 w-4" onClick={() => props.onClose?.()}>
+              <XMark />
+            </button>
+          </div>
         </div>
         <RelayConfig />
         <DateFormatConfig />
         <OtherConfig />
       </div>
-    </div>
+    </Modal>
   );
 };
 

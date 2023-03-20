@@ -7,7 +7,7 @@ export type TaggedEvent = {
   id: string;
   relayUrl?: string;
   index: number;
-  marker: EventMarker;
+  marker?: EventMarker;
 };
 
 export type ContentWarning = {
@@ -50,7 +50,10 @@ const eventWrapper = (event: NostrEvent) => {
         .filter(([[tagName]]) => tagName === 'e');
 
       // NIP-10: Positional "e" tags (DEPRECATED)
-      const positionToMarker = (index: number): EventMarker => {
+      const positionToMarker = (marker: string, index: number): EventMarker | undefined => {
+        // NIP-10 is applied to only kind:1 text note.
+        if (event.kind !== 1) return undefined;
+        if (marker === 'root' || marker === 'reply' || marker === 'mention') return marker;
         // One "e" tag
         if (events.length === 1) return 'reply';
         // Two "e" tags  or many "e" tags : first tag is root
@@ -67,7 +70,7 @@ const eventWrapper = (event: NostrEvent) => {
       return events.map(([[, eventId, relayUrl, marker], originalIndex], eTagIndex) => ({
         id: eventId,
         relayUrl,
-        marker: (marker as EventMarker | undefined) ?? positionToMarker(eTagIndex),
+        marker: positionToMarker(marker, eTagIndex),
         index: originalIndex,
       }));
     },

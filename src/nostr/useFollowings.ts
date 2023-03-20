@@ -31,7 +31,10 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null) => {
   });
 
   const followings = () => {
-    const event = query?.data?.[0];
+    if (query.data != null && query.data.length === 0) return [];
+
+    const event = query.data?.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+
     if (event == null) return [];
 
     const result: Following[] = [];

@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onMount, type Component, onCleanup } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup, Show, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import uniq from 'lodash/uniq';
 
@@ -16,6 +16,7 @@ import usePubkey from '@/nostr/usePubkey';
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import ensureNonNull from '@/utils/ensureNonNull';
+import ProfileDisplay from '@/components/Profile';
 
 const Home: Component = () => {
   useMountShortcutKeys();
@@ -51,7 +52,6 @@ const Home: Component = () => {
           kinds: [1, 6],
           authors: uniq([...followingPubkeys(), pubkeyNonNull]),
           limit: 25,
-          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
         },
       ],
     })),
@@ -91,7 +91,6 @@ const Home: Component = () => {
           kinds: [1, 6, 7],
           '#p': [pubkeyNonNull],
           limit: 25,
-          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
         },
       ],
     })),
@@ -135,7 +134,7 @@ const Home: Component = () => {
   });
 
   return (
-    <div class="absolute inset-0 flex w-screen flex-row overflow-hidden">
+    <div class="absolute inset-0 flex w-screen touch-manipulation flex-row overflow-hidden">
       <SideBar />
       <div class="flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll">
         <Column name="ホーム" columnIndex={1} width="widest">
@@ -154,6 +153,11 @@ const Home: Component = () => {
           <Notification events={myReactions()} />
         </Column>
       </div>
+      {/*
+      <Show when={pubkey()} keyed>
+        {(pubkeyNonNull: string) => <ProfileDisplay pubkey={pubkeyNonNull} />}
+      </Show>
+      */}
     </div>
   );
 };

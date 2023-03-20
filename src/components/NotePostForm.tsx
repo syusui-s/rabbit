@@ -14,8 +14,6 @@ import uniq from 'lodash/uniq';
 
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
-import Eye from 'heroicons/24/solid/eye.svg';
-import EyeSlash from 'heroicons/24/outline/eye-slash.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import UserNameDisplay from '@/components/UserDisplayName';
@@ -59,6 +57,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     setText('');
     setContentWarningReason('');
     setContentWarning(false);
+  };
+
+  const close = () => {
+    textAreaRef?.blur();
+    props.onClose();
   };
 
   const { config } = useConfig();
@@ -160,7 +163,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       submit();
     } else if (ev.key === 'Escape') {
       textAreaRef?.blur();
-      props.onClose();
+      close();
     }
   };
 
@@ -168,6 +171,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ev.preventDefault();
     const files = [...(ev.currentTarget.files ?? [])];
     uploadFilesMutation.mutate(files);
+    // eslint-disable-next-line no-param-reassign
     ev.currentTarget.value = '';
   };
 
@@ -184,7 +188,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submitDisabled = () =>
     text().trim().length === 0 ||
-    (contentWarning() && contentWarningReason().length === 0) ||
     publishTextNoteMutation.isLoading ||
     uploadFilesMutation.isLoading;
 
@@ -192,6 +195,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   onMount(() => {
     setTimeout(() => {
+      textAreaRef?.click();
       textAreaRef?.focus();
     }, 50);
   });
@@ -239,7 +243,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply'}>
             <div class="flex-1">
-              <button class="h-5 w-5 text-stone-500" onClick={() => props.onClose()}>
+              <button class="h-5 w-5 text-stone-500" onClick={() => close()}>
                 <XMark />
               </button>
             </div>

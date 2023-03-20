@@ -16,14 +16,21 @@ const SideBar: Component = () => {
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
 
+  const focusTextArea = () => {
+    textAreaRef?.focus();
+    textAreaRef?.click();
+  };
   const openForm = () => setFormOpened(true);
   const closeForm = () => setFormOpened(false);
+  const toggleForm = () => setFormOpened((current) => !current);
 
   useHandleCommand(() => ({
     commandType: 'openPostForm',
     handler: () => {
       openForm();
-      setTimeout(() => textAreaRef?.focus?.(), 100);
+      if (textAreaRef != null) {
+        setTimeout(() => focusTextArea(), 100);
+      }
     },
   }));
 
@@ -32,8 +39,8 @@ const SideBar: Component = () => {
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-rose-200 pt-5">
         <div class="flex flex-col items-center gap-3">
           <button
-            class={`h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl font-bold text-white`}
-            onClick={() => setFormOpened((current) => !current)}
+            class="h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl font-bold text-white"
+            onClick={() => toggleForm()}
           >
             <PencilSquare />
           </button>
@@ -55,14 +62,19 @@ const SideBar: Component = () => {
           </button>
         </div>
       </div>
-      <Show when={formOpened() || config().keepOpenPostForm}>
+      <div
+        classList={{
+          static: formOpened() || config().keepOpenPostForm,
+          hidden: !(formOpened() || config().keepOpenPostForm),
+        }}
+      >
         <NotePostForm
           textAreaRef={(el) => {
             textAreaRef = el;
           }}
           onClose={closeForm}
         />
-      </Show>
+      </div>
       <Show when={configOpened()}>
         <Config onClose={() => setConfigOpened(false)} />
       </Show>

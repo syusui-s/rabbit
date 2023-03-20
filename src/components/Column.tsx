@@ -47,7 +47,7 @@ const Column: Component<ColumnProps> = (props) => {
         {/* <span class="column-icon">🏠</span> */}
         <span class="column-name">{props.name}</span>
       </div>
-      <ul class="block flex flex-col overflow-y-scroll scroll-smooth">{props.children}</ul>
+      <ul class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</ul>
     </div>
   );
 };

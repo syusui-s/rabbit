@@ -11,7 +11,7 @@ export type UseSubscriptionProps = {
   // default is true
   clientEventFilter?: (event: NostrEvent) => boolean;
   continuous?: boolean;
-  onEvent?: (event: NostrEvent) => void;
+  onEvent?: (event: NostrEvent & { id: string }) => void;
   onEOSE?: () => void;
   signal?: AbortSignal;
 };
@@ -19,24 +19,30 @@ export type UseSubscriptionProps = {
 const sortEvents = (events: NostrEvent[]) =>
   Array.from(events).sort((a, b) => b.created_at - a.created_at);
 
+let count = 0;
+
+setInterval(() => console.log(count), 1000);
+
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
 
-  createEffect(() => {
+  const startSubscription = () => {
     const props = propsProvider();
     if (props == null) return;
 
     const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
 
     const sub = pool().sub(relayUrls, filters, options);
+    count += 1;
+
     let pushed = false;
     let eose = false;
     const storedEvents: NostrEvent[] = [];
 
     sub.on('event', (event: NostrEvent) => {
       if (onEvent != null) {
-        onEvent(event);
+        onEvent(event as NostrEvent & { id: string });
       }
       if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
         return;
@@ -69,6 +75,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
 
       if (!continuous) {
         sub.unsub();
+        count -= 1;
       }
     });
 
@@ -86,8 +93,13 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
 
     onCleanup(() => {
       sub.unsub();
+      // count -= 1;
       clearInterval(intervalId);
     });
+  };
+
+  createEffect(() => {
+    startSubscription();
   });
 
   return { events };
