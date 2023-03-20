@@ -28,9 +28,9 @@ export type Bech32Entity = {
   data:
     | { type: 'npub' | 'note'; data: string }
     | { type: 'nprofile'; data: ProfilePointer }
-    | { type: 'nevent'; data: EventPointer }
-    | { type: 'naddr'; data: AddressPointer };
+    | { type: 'nevent'; data: EventPointer };
 };
+// | { type: 'naddr'; data: AddressPointer };
 
 export type HashTag = {
   type: 'HashTag';
@@ -63,7 +63,7 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     ...event.content.matchAll(
       /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-\w.@%:]+|\/)*(?:\?[-\w=.@%:&]*)?(?:#[-\w=.%:&]*)?)/g,
     ),
-  ].sort((a, b) => a?.index - b?.index);
+  ].sort((a, b) => (a.index as number) - (b.index as number));
   let pos = 0;
   const result: ParsedTextNote = [];
 
@@ -76,16 +76,17 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   };
 
   matches.forEach((match) => {
-    if (match.groups?.url && match.index >= pos) {
-      pushPlainText(match.index);
+    const { index } = match as RegExpMatchArray & { index: number };
+    if (match.groups?.url && index >= pos) {
+      pushPlainText(index);
       const url: UrlText = { type: 'URL', content: match.groups?.url };
       result.push(url);
-    } else if (match.groups?.idx && match.index >= pos) {
+    } else if (match.groups?.idx && index >= pos) {
       const tagIndex = parseInt(match.groups.idx, 10);
       const tag = event.tags[tagIndex];
       if (tag == null) return;
 
-      pushPlainText(match.index);
+      pushPlainText(index);
 
       const tagName = tag[0];
       if (tagName === 'p') {
@@ -110,7 +111,8 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedEvent);
       }
-    } else if (match.groups?.nip19 && match.index >= pos) {
+    } else if (match.groups?.nip19 && index >= pos) {
+      pushPlainText(index);
       try {
         const decoded = decode(match[0]);
         const bech32Entity: Bech32Entity = {
@@ -122,8 +124,8 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
       } catch (e) {
         console.error(`failed to parse Bech32 entity (NIP-19) but ignore this: ${match[0]}`);
       }
-    } else if (match.groups?.hashtag && match.index >= pos) {
-      pushPlainText(match.index);
+    } else if (match.groups?.hashtag && index >= pos) {
+      pushPlainText(index);
       const tagName = match.groups?.hashtag;
       const hashtag: HashTag = {
         type: 'HashTag',
@@ -132,7 +134,7 @@ export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
       };
       result.push(hashtag);
     }
-    pos = match.index + match[0].length;
+    pos = index + match[0].length;
   });
 
   if (pos !== event.content.length) {

@@ -1,6 +1,6 @@
 ---
 name: 機能要望
-about: このプロジェクトへのアイデアの提案
+about: このプロジェクトにアイデアを提案します
 title: ''
 labels: enhancement
 assignees: syusui-s
