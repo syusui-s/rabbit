@@ -21,7 +21,7 @@ const sortEvents = (events: NostrEvent[]) =>
 
 let count = 0;
 
-setInterval(() => console.log(count), 1000);
+setInterval(() => console.log('sub', count), 1000);
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const pool = usePool();
@@ -34,6 +34,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
 
     const sub = pool().sub(relayUrls, filters, options);
+    let subscribing = true;
     count += 1;
 
     let pushed = false;
@@ -75,7 +76,10 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
 
       if (!continuous) {
         sub.unsub();
-        count -= 1;
+        if (subscribing) {
+          subscribing = false;
+          count -= 1;
+        }
       }
     });
 
@@ -93,7 +97,10 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
 
     onCleanup(() => {
       sub.unsub();
-      // count -= 1;
+      if (subscribing) {
+        subscribing = false;
+        count -= 1;
+      }
       clearInterval(intervalId);
     });
   };

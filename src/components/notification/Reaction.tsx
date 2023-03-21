@@ -8,7 +8,6 @@ import UserDisplayName from '@/components/UserDisplayName';
 
 import useProfile from '@/nostr/useProfile';
 import useEvent from '@/nostr/useEvent';
-import { npubEncode } from 'nostr-tools/nip19';
 
 type ReactionProps = {
   event: NostrEvent;

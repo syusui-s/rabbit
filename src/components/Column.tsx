@@ -1,7 +1,7 @@
 import type { Component, JSX } from 'solid-js';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 
-type ColumnProps = {
+export type ColumnProps = {
   name: string;
   columnIndex: number;
   lastColumn?: true;

@@ -1,13 +1,14 @@
 import { type Accessor, type Setter } from 'solid-js';
 import {
   createStorageWithSerializer,
-  createSignalWithStorage,
+  createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
 
 export type Config = {
   relayUrls: string[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
+  showImage: boolean;
 };
 
 type UseConfig = {
@@ -38,6 +39,7 @@ const InitialConfig = (): Config => {
     relayUrls,
     dateFormat: 'relative',
     keepOpenPostForm: false,
+    showImage: true,
   };
 };
 
@@ -50,25 +52,19 @@ const deserializer = (json: string): Config =>
   } as Config);
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
-const [config, setConfig] = createSignalWithStorage('RabbitConfig', InitialConfig(), storage);
+const [config, setConfig] = createStoreWithStorage('RabbitConfig', InitialConfig(), storage);
 
 const useConfig = (): UseConfig => {
   const addRelay = (relayUrl: string) => {
-    setConfig((current) => ({
-      ...current,
-      relayUrls: [...current.relayUrls, relayUrl],
-    }));
+    setConfig('relayUrls', (current) => [...current, relayUrl]);
   };
 
   const removeRelay = (relayUrl: string) => {
-    setConfig((current) => ({
-      ...current,
-      relayUrls: current.relayUrls.filter((e) => e !== relayUrl),
-    }));
+    setConfig('relayUrls', (current) => current.filter((e) => e !== relayUrl));
   };
 
   return {
-    config,
+    config: () => config,
     setConfig,
     addRelay,
     removeRelay,

@@ -1,4 +1,13 @@
-import { createSignal, createEffect, onMount, onCleanup, Show, type Component } from 'solid-js';
+import {
+  createSignal,
+  createEffect,
+  onMount,
+  onCleanup,
+  Show,
+  Switch,
+  Match,
+  type Component,
+} from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import uniq from 'lodash/uniq';
 
@@ -16,12 +25,14 @@ import usePubkey from '@/nostr/usePubkey';
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import ensureNonNull from '@/utils/ensureNonNull';
-import ProfileDisplay from '@/components/Profile';
+import ProfileDisplay from '@/components/ProfileDisplay';
+import useModalState from '@/hooks/useModalState';
 
 const Home: Component = () => {
   useMountShortcutKeys();
   const navigate = useNavigate();
   const { persistStatus } = usePersistStatus();
+  const { modalState, closeModal } = useModalState();
 
   const pool = usePool();
   const { config } = useConfig();
@@ -156,11 +167,17 @@ const Home: Component = () => {
           <Notification events={myReactions()} />
         </Column>
       </div>
-      {/*
-      <Show when={pubkey()} keyed>
-        {(pubkeyNonNull: string) => <ProfileDisplay pubkey={pubkeyNonNull} />}
+      <Show when={modalState()} keyed>
+        {(state) => (
+          <Switch>
+            <Match when={state.type === 'Profile' && state.pubkey} keyed>
+              {(pubkeyNonNull: string) => (
+                <ProfileDisplay pubkey={pubkeyNonNull} onClose={closeModal} />
+              )}
+            </Match>
+          </Switch>
+        )}
       </Show>
-      */}
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import {
   createSignal,
-  createEffect,
   createMemo,
   createRoot,
   observable,
@@ -8,13 +7,16 @@ import {
   type Signal,
 } from 'solid-js';
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
+import { npubEncode } from 'nostr-tools/nip19';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 
 import timeout from '@/utils/timeout';
 import useBatch, { type Task } from '@/nostr/useBatch';
 import eventWrapper from '@/core/event';
 import useSubscription from '@/nostr/useSubscription';
+import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import useConfig from './useConfig';
+import usePool from './usePool';
 
 type TaskArg =
   | { type: 'Profile'; pubkey: string }
@@ -54,8 +56,8 @@ export type UseProfileProps = {
 };
 
 type UseProfile = {
-  profile: () => Profile | undefined;
-  query: CreateQueryResult<NostrEvent | undefined>;
+  profile: () => Profile | null;
+  query: CreateQueryResult<NostrEvent | null>;
 };
 
 // Textnote
@@ -64,8 +66,8 @@ export type UseTextNoteProps = {
 };
 
 export type UseTextNote = {
-  event: Accessor<NostrEvent | undefined>;
-  query: CreateQueryResult<NostrEvent | undefined>;
+  event: Accessor<NostrEvent | null>;
+  query: CreateQueryResult<NostrEvent | null>;
 };
 
 // Reactions
@@ -107,10 +109,16 @@ type Following = {
 export type UseFollowings = {
   followings: Accessor<Following[]>;
   followingPubkeys: Accessor<string[]>;
-  query: CreateQueryResult<NostrEvent | undefined>;
+  query: CreateQueryResult<NostrEvent | null>;
 };
 
+let count = 0;
+
+setInterval(() => console.log('batchSub', count), 1000);
+
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
+  interval: 2000,
+  batchSize: 100,
   executor: (tasks) => {
     const profileTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const textNoteTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
@@ -194,46 +202,49 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     };
 
     const { config } = useConfig();
+    const pool = usePool();
 
-    useSubscription(() => ({
-      relayUrls: config().relayUrls,
-      filters,
-      continuous: false,
-      onEvent: (event: NostrEvent & { id: string }) => {
-        if (event.kind === Kind.Metadata) {
-          const registeredTasks = profileTasks.get(event.pubkey) ?? [];
+    const sub = pool().sub(config().relayUrls, filters);
+
+    count += 1;
+
+    sub.on('event', (event: NostrEvent & { id: string }) => {
+      if (event.kind === Kind.Metadata) {
+        const registeredTasks = profileTasks.get(event.pubkey) ?? [];
+        resolveTasks(registeredTasks, event);
+      } else if (event.kind === Kind.Text) {
+        const registeredTasks = textNoteTasks.get(event.id) ?? [];
+        resolveTasks(registeredTasks, event);
+      } else if (event.kind === Kind.Reaction) {
+        const eventTags = eventWrapper(event).taggedEvents();
+        eventTags.forEach((eventTag) => {
+          const taggedEventId = eventTag.id;
+          const registeredTasks = reactionsTasks.get(taggedEventId) ?? [];
           resolveTasks(registeredTasks, event);
-        } else if (event.kind === Kind.Text) {
-          const registeredTasks = textNoteTasks.get(event.id) ?? [];
+        });
+      } else if ((event.kind as number) === 6) {
+        const eventTags = eventWrapper(event).taggedEvents();
+        eventTags.forEach((eventTag) => {
+          const taggedEventId = eventTag.id;
+          const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
           resolveTasks(registeredTasks, event);
-        } else if (event.kind === Kind.Reaction) {
-          const eventTags = eventWrapper(event).taggedEvents();
-          eventTags.forEach((eventTag) => {
-            const taggedEventId = eventTag.id;
-            const registeredTasks = reactionsTasks.get(taggedEventId) ?? [];
-            resolveTasks(registeredTasks, event);
-          });
-        } else if ((event.kind as number) === 6) {
-          const eventTags = eventWrapper(event).taggedEvents();
-          eventTags.forEach((eventTag) => {
-            const taggedEventId = eventTag.id;
-            const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
-            resolveTasks(registeredTasks, event);
-          });
-        } else if (event.kind === Kind.Contacts) {
-          const registeredTasks = followingsTasks.get(event.pubkey) ?? [];
-          resolveTasks(registeredTasks, event);
-        }
-      },
-      onEOSE: () => {
-        finalizeTasks();
-      },
-    }));
+        });
+      } else if (event.kind === Kind.Contacts) {
+        const registeredTasks = followingsTasks.get(event.pubkey) ?? [];
+        resolveTasks(registeredTasks, event);
+      }
+    });
+
+    sub.on('eose', () => {
+      finalizeTasks();
+      sub.unsub();
+      count -= 1;
+    });
   },
 }));
 
-const pickLatestEvent = (events: NostrEvent[]): NostrEvent | undefined => {
-  if (events.length === 0) return undefined;
+const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
+  if (events.length === 0) return null;
   return events.reduce((a, b) => (a.created_at > b.created_at ? a : b));
 };
 
@@ -245,8 +256,9 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
     () => ['useProfile', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
-      if (currentProps == null) return undefined;
+      if (currentProps == null) return Promise.resolve(null);
       const { pubkey } = currentProps;
+      if (pubkey.startsWith('npub1')) return Promise.resolve(null);
       const promise = exec({ type: 'Profile', pubkey }, signal).then((batchedEvents) => {
         const latestEvent = () => {
           const latest = pickLatestEvent(batchedEvents().events);
@@ -257,7 +269,7 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error(err);
+            console.error('updating profile error', err);
           }
         });
         return latestEvent();
@@ -273,16 +285,16 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
     },
   );
 
-  const profile = createMemo((): Profile | undefined => {
-    if (query.data == null) return undefined;
+  const profile = createMemo((): Profile | null => {
+    if (query.data == null) return null;
     const { content } = query.data;
-    if (content == null || content.length === 0) return undefined;
+    if (content == null || content.length === 0) return null;
     // TODO 大きすぎたりしないかどうか、JSONかどうかのチェック
     try {
       return JSON.parse(content) as Profile;
     } catch (err) {
       console.error('failed to parse profile (kind 0): ', err, content);
-      return undefined;
+      return null;
     }
   });
 
@@ -297,7 +309,7 @@ export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTe
     () => ['useTextNote', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
-      if (currentProps == null) return undefined;
+      if (currentProps == null) return null;
       const { eventId } = currentProps;
       const promise = exec({ type: 'TextNote', eventId }, signal).then((batchedEvents) => {
         const event = batchedEvents().events[0];
@@ -417,7 +429,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
     genQueryKey,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
-      if (currentProps == null) return undefined;
+      if (currentProps == null) return Promise.resolve(null);
       const { pubkey } = currentProps;
       const promise = exec({ type: 'Followings', pubkey }, signal).then((batchedEvents) => {
         const latestEvent = () => {
@@ -429,7 +441,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error(err);
+            console.error('updating followings error', err);
           }
         });
         return latestEvent();

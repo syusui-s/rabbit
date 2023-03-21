@@ -142,6 +142,13 @@ const OtherConfig = () => {
     }));
   };
 
+  const toggleShowImage = () => {
+    setConfig((current) => ({
+      ...current,
+      showImage: !(current.showImage ?? true),
+    }));
+  };
+
   return (
     <div>
       <h3 class="font-bold">その他</h3>
@@ -152,6 +159,10 @@ const OtherConfig = () => {
             value={config().keepOpenPostForm}
             onClick={() => toggleKeepOpenPostForm()}
           />
+        </div>
+        <div class="flex w-full">
+          <div class="flex-1">画像をデフォルトで表示する</div>
+          <ToggleButton value={config().showImage} onClick={() => toggleShowImage()} />
         </div>
         {/*
         <div class="flex w-full">

@@ -1,4 +1,5 @@
-import { createSignal, createEffect, onMount, Accessor, Setter } from 'solid-js';
+import { createSignal, createEffect, onMount, type Signal } from 'solid-js';
+import { createStore, SetStoreFunction, type Store, type StoreNode } from 'solid-js/store';
 
 type GenericStorage<T> = {
   getItem(key: string): T | null;
@@ -28,20 +29,42 @@ export const createSignalWithStorage = <T>(
   key: string,
   initialValue: T,
   storage: GenericStorage<T>,
-): [Accessor<T>, Setter<T>] => {
+): Signal<T> => {
   const [loaded, setLoaded] = createSignal<boolean>(false);
-  const [value, setValue] = createSignal<T>(initialValue);
+  const [state, setState] = createSignal(initialValue);
 
   onMount(() => {
     const data = storage.getItem(key);
     // If there is no data, default value is used.
-    if (data != null) setValue(() => data);
+    if (data != null) setState(() => data);
     setLoaded(true);
   });
 
   createEffect(() => {
-    if (loaded()) storage.setItem(key, value());
+    if (loaded()) storage.setItem(key, state());
   });
 
-  return [value, setValue];
+  return [state, setState];
+};
+
+export const createStoreWithStorage = <T extends StoreNode>(
+  key: string,
+  initialValue: T,
+  storage: GenericStorage<T>,
+): [Store<T>, SetStoreFunction<T>] => {
+  const [loaded, setLoaded] = createSignal<boolean>(false);
+  const [state, setState] = createStore<T>(initialValue);
+
+  onMount(() => {
+    const data = storage.getItem(key);
+    // If there is no data, default value is used.
+    if (data != null) setState(data);
+    setLoaded(true);
+  });
+
+  createEffect(() => {
+    if (loaded()) storage.setItem(key, state);
+  });
+
+  return [state, setState];
 };

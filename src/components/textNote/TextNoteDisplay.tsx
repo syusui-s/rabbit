@@ -25,7 +25,8 @@ import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
 import useFormatDate from '@/hooks/useFormatDate';
 
 import ensureNonNull from '@/utils/ensureNonNull';
-import { npubEncode } from 'nostr-tools/nip19';
+import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import useModalState from '@/hooks/useModalState';
 import UserNameDisplay from '../UserDisplayName';
 import TextNoteDisplayById from './TextNoteDisplayById';
 
@@ -39,6 +40,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const { config } = useConfig();
   const formatDate = useFormatDate();
   const pubkey = usePubkey();
+  const { showProfile } = useModalState();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
@@ -142,7 +144,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   return (
     <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
-        <div class="author-icon h-10 w-10 shrink-0 overflow-hidden object-cover">
+        <button
+          class="author-icon h-10 w-10 shrink-0 overflow-hidden object-cover"
+          onClick={() => showProfile(event().pubkey)}
+        >
           <Show when={author()?.picture}>
             {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
             <img
@@ -152,21 +157,27 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               class="h-10 w-10 rounded"
             />
           </Show>
-        </div>
+        </button>
         <div class="min-w-0 flex-auto">
           <div class="flex justify-between gap-1 text-xs">
-            <div class="author flex min-w-0 truncate">
+            <button
+              class="author flex min-w-0 truncate"
+              onClick={() => showProfile(event().pubkey)}
+            >
               {/* TODO link to author */}
               <Show when={(author()?.display_name?.length ?? 0) > 0}>
                 <div class="author-name truncate pr-1 font-bold">{author()?.display_name}</div>
               </Show>
               <div class="author-username truncate text-zinc-600">
-                <Show when={author()?.name != null} fallback={`@${npubEncode(props.event.pubkey)}`}>
+                <Show
+                  when={author()?.name != null}
+                  fallback={`@${npubEncodeFallback(event().pubkey)}`}
+                >
                   @{author()?.name}
                 </Show>
                 {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
               </div>
-            </div>
+            </button>
             <div class="created-at shrink-0">{createdAt()}</div>
           </div>
           <Show when={showReplyEvent()} keyed>
@@ -180,9 +191,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             <div class="text-xs">
               <For each={event().mentionedPubkeys()}>
                 {(replyToPubkey: string) => (
-                  <span class="pr-1 text-blue-500 underline">
+                  <button
+                    class="pr-1 text-blue-500 underline"
+                    onClick={() => showProfile(replyToPubkey)}
+                  >
                     <GeneralUserMentionDisplay pubkey={replyToPubkey} />
-                  </span>
+                  </button>
                 )}
               </For>
               {'への返信'}

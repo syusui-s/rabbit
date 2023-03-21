@@ -1,5 +1,4 @@
 import { Component, createMemo, Show } from 'solid-js';
-import { npubEncode } from 'nostr-tools/nip19';
 
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
@@ -8,10 +7,11 @@ import Modal from '@/components/Modal';
 import Copy from '@/components/utils/Copy';
 
 import useProfile from '@/nostr/useProfile';
-import useConfig from '@/nostr/useConfig';
+import npubEncodeFallback from '@/utils/npubEncodeFallback';
 
 export type ProfileDisplayProps = {
   pubkey: string;
+  onClose?: () => void;
 };
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
@@ -19,13 +19,17 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     pubkey: props.pubkey,
   }));
 
-  const npub = createMemo(() => npubEncode(props.pubkey));
+  const npub = createMemo(() => npubEncodeFallback(props.pubkey));
 
   return (
-    <Modal>
+    <Modal onClose={() => props.onClose?.()}>
       <div class="max-h-full w-[640px] max-w-full overflow-scroll">
         <div class="flex justify-end">
-          <button class="h-8 w-8 text-stone-700">
+          <button
+            class="h-8 w-8 text-stone-700"
+            aria-label="Close"
+            onClick={() => props.onClose?.()}
+          >
             <XMark />
           </button>
         </div>
@@ -38,16 +42,22 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 )}
               </Show>
             </div>
-            <div class="flex h-[64px] items-center gap-2 px-2">
-              <div class="mt-[-64px] h-28 w-28 shrink-0 rounded-lg border-2 object-cover">
+            <div class="flex h-[64px] items-center gap-4 px-4">
+              <div class="mt-[-64px] h-28 w-28 shrink-0 rounded-lg bg-stone-400 shadow-md">
                 <Show when={profile()?.picture} keyed>
-                  {(pictureUrl) => <img src={pictureUrl} alt="user icon" class="h-full w-full" />}
+                  {(pictureUrl) => (
+                    <img
+                      src={pictureUrl}
+                      alt="user icon"
+                      class="h-full w-full rounded-lg object-cover"
+                    />
+                  )}
                 </Show>
               </div>
               <div>
                 <div class="flex items-center gap-2">
                   <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
-                  <div class="shrink-0 text-sm">@{profile()?.name}</div>
+                  <div class="shrink-0 text-sm font-bold">@{profile()?.name}</div>
                 </div>
                 <div class="flex gap-1">
                   <div class="truncate text-xs">{npub()}</div>
@@ -55,23 +65,27 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </div>
               </div>
             </div>
-            <div class="max-h-32 overflow-scroll whitespace-pre-wrap px-4 pt-1 text-sm">
+            <div class="max-h-32 overflow-scroll whitespace-pre-wrap px-5 py-2 text-sm">
               {profile()?.about}
             </div>
-            <ul class="px-4 py-2 text-xs">
+            <ul class="border-t px-5 py-2 text-xs">
               <Show when={profile()?.website}>
                 <li class="flex items-center gap-1">
                   <span class="inline-block h-4 w-4" area-label="website" title="website">
                     <GlobeAlt />
                   </span>
-                  <a href={profile()?.website} target="_blank" rel="noreferrer noopener">
+                  <a
+                    class="text-blue-500 underline"
+                    href={profile()?.website}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     {profile()?.website}
                   </a>
                 </li>
               </Show>
             </ul>
           </Show>
-          <div class="h-16 border" />
         </div>
       </div>
     </Modal>

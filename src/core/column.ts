@@ -1,6 +1,6 @@
 // import { z } from 'zod';
 import { type Event as NostrEvent, type Filter } from 'nostr-tools';
-import ColumnComponent from '@/components/Column';
+import { type ColumnProps } from '@/components/Column';
 
 export type NotificationType =
   // The event which includes ["p", ...] tags.
@@ -42,7 +42,8 @@ type BulidOptions = {
 // export const buildFilter = (options: BuildOptions) => {};
 
 export type BaseColumn = {
-  columnWidth: (typeof ColumnComponent)['width'];
+  title: string;
+  columnWidth: ColumnProps['width'];
 };
 
 /** A column which shows posts by following users */

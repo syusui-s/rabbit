@@ -7,6 +7,7 @@ import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 import ImageDisplay from '@/components/textNote/ImageDisplay';
 import eventWrapper from '@/core/event';
 import { isImageUrl } from '@/utils/imageUrl';
+import useConfig from '@/nostr/useConfig';
 import EventLink from '../EventLink';
 import TextNoteDisplayById from './TextNoteDisplayById';
 
@@ -16,6 +17,7 @@ export type TextNoteContentDisplayProps = {
 };
 
 const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
+  const { config } = useConfig();
   const event = () => eventWrapper(props.event);
   return (
     <For each={parseTextNote(props.event)}>
@@ -50,7 +52,9 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
             return (
               <ImageDisplay
                 url={item.content}
-                initialHidden={event().contentWarning().contentWarning || !props.embedding}
+                initialHidden={
+                  !config().showImage || event().contentWarning().contentWarning || !props.embedding
+                }
               />
             );
           }

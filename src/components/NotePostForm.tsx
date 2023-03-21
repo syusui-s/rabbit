@@ -232,7 +232,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             props.textAreaRef?.(el);
           }}
           name="text"
-          class="rounded border-none"
+          class="min-h-[40px] rounded border-none"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}
@@ -260,7 +260,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="button"
-            area-label="コンテンツ警告を設定"
+            aria-label="コンテンツ警告を設定"
             title="コンテンツ警告を設定"
             onClick={() => setContentWarning((e) => !e)}
           >
@@ -278,7 +278,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             }}
             type="button"
             title="画像を投稿"
-            area-label="画像を投稿"
+            aria-label="画像を投稿"
             disabled={fileUploadDisabled()}
             onClick={() => fileInputRef?.click()}
           >
@@ -295,7 +295,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="submit"
-            area-label="投稿"
+            aria-label="投稿"
             title="投稿"
             disabled={submitDisabled()}
           >
