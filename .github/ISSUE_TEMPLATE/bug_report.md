@@ -1,38 +1,38 @@
 ---
-name: バグ報告
-about: 改善に取り組めるように報告を作成します
+name: Bug report
+about: Create a report to help us improve
 title: ''
 labels: bug
 assignees: syusui-s
 
 ---
 
-**バグの説明**
-バグについて、明確かつ簡潔に説明してください。
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-**再現手順**
-発生させる手順を説明してください:
-1. '...'に移動
-2. '....'をクリック
-3. '....'までスクロールする
-4. エラーが表示される
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-**期待される挙動**
-どうなってほしいかについて、明確かつ簡潔に説明してください。
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-**スクリーンショット**
-スクリーンショットがあればこちらに。
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-**デスクトップ （該当する場合は以下の情報を埋めてください）:**
- - OS: （例: Windows 11, macOS Ventura）
- - ブラウザ: （例: Chrome, Firefox, Safari, Edge）
- - バージョン: （例: 110）
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
 
-**スマートフォン （該当する場合は以下の情報を埋めてください）:**
- - デバイス: (例: iPhone 12)
- - OS: （例: iOS 16.2, Android 13）
- - ブラウザ: （例: Safari, Chrome）
- - バージョン: （例: 110）
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
 
-**追加の情報**
-問題に関する他の情報があればこちらに。
+**Additional context**
+Add any other context about the problem here.
