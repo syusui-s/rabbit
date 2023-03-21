@@ -25,7 +25,7 @@ const usePubkey = (): Accessor<string | undefined> => {
         window.nostr
           .getPublicKey()
           .then((key) => setPubkey(key))
-          .catch((err) => console.error(`failed to obtain public key: ${err}`));
+          .catch((err) => console.error('failed to obtain public key: ', err));
       }
       count += 1;
     }, 1000);

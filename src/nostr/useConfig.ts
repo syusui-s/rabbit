@@ -17,28 +17,40 @@ type UseConfig = {
   removeRelay: (url: string) => void;
 };
 
-const InitialConfig: Config = {
-  relayUrls: [
-    'wss://relay-jp.nostr.wirednet.jp',
-    'wss://nostr.h3z.jp',
+const InitialConfig = (): Config => {
+  const relayUrls = [
     'wss://relay.damus.io',
     'wss://nos.lol',
     'wss://relay.snort.social',
     'wss://relay.current.fyi',
-    'wss://relay.nostr.wirednet.jp',
-    'wss://nostr-relay.nokotaro.com',
-    'wss://nostr.holybea.com',
-  ],
-  dateFormat: 'relative',
-  keepOpenPostForm: false,
+  ];
+  if (navigator.language === 'ja') {
+    relayUrls.push(
+      'wss://nostr.h3z.jp',
+      'wss://relay.nostr.wirednet.jp',
+      'wss://relay-jp.nostr.wirednet.jp',
+      'wss://nostr.holybea.com',
+      'wss://nostr-relay.nokotaro.com',
+    );
+  }
+
+  return {
+    relayUrls,
+    dateFormat: 'relative',
+    keepOpenPostForm: false,
+  };
 };
 
 const serializer = (config: Config): string => JSON.stringify(config);
 // TODO zod使う
-const deserializer = (json: string): Config => JSON.parse(json) as Config;
+const deserializer = (json: string): Config =>
+  ({
+    ...InitialConfig(),
+    ...JSON.parse(json),
+  } as Config);
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
-const [config, setConfig] = createSignalWithStorage('RabbitConfig', InitialConfig, storage);
+const [config, setConfig] = createSignalWithStorage('RabbitConfig', InitialConfig(), storage);
 
 const useConfig = (): UseConfig => {
   const addRelay = (relayUrl: string) => {
@@ -56,7 +68,7 @@ const useConfig = (): UseConfig => {
   };
 
   return {
-    config: () => ({ ...InitialConfig, ...config() }),
+    config,
     setConfig,
     addRelay,
     removeRelay,

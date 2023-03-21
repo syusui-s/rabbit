@@ -20,7 +20,8 @@ type TaskArg =
   | { type: 'Profile'; pubkey: string }
   | { type: 'TextNote'; eventId: string }
   | { type: 'Reactions'; mentionedEventId: string }
-  | { type: 'DeprecatedReposts'; mentionedEventId: string };
+  | { type: 'DeprecatedReposts'; mentionedEventId: string }
+  | { type: 'Followings'; pubkey: string };
 
 type BatchedEvents = { completed: boolean; events: NostrEvent[] };
 
@@ -92,12 +93,30 @@ export type UseDeprecatedReposts = {
   query: CreateQueryResult<NostrEvent[]>;
 };
 
+// Followings
+type UseFollowingsProps = {
+  pubkey: string;
+};
+
+type Following = {
+  pubkey: string;
+  mainRelayUrl?: string;
+  petname?: string;
+};
+
+export type UseFollowings = {
+  followings: Accessor<Following[]>;
+  followingPubkeys: Accessor<string[]>;
+  query: CreateQueryResult<NostrEvent | undefined>;
+};
+
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
   executor: (tasks) => {
     const profileTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const textNoteTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const reactionsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const repostsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
+    const followingsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
 
     tasks.forEach((task) => {
       if (task.args.type === 'Profile') {
@@ -112,6 +131,9 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
       } else if (task.args.type === 'DeprecatedReposts') {
         const current = repostsTasks.get(task.args.mentionedEventId) ?? [];
         repostsTasks.set(task.args.mentionedEventId, [...current, task]);
+      } else if (task.args.type === 'Followings') {
+        const current = followingsTasks.get(task.args.pubkey) ?? [];
+        followingsTasks.set(task.args.pubkey, [...current, task]);
       }
     });
 
@@ -119,6 +141,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     const textNoteIds = [...textNoteTasks.keys()];
     const reactionsIds = [...reactionsTasks.keys()];
     const repostsIds = [...repostsTasks.keys()];
+    const followingsIds = [...followingsTasks.keys()];
 
     const filters: Filter[] = [];
 
@@ -133,6 +156,9 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     }
     if (repostsIds.length > 0) {
       filters.push({ kinds: [6], '#e': repostsIds });
+    }
+    if (followingsIds.length > 0) {
+      filters.push({ kinds: [Kind.Contacts], authors: followingsIds });
     }
 
     if (filters.length === 0) return;
@@ -194,6 +220,9 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
             const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
             resolveTasks(registeredTasks, event);
           });
+        } else if (event.kind === Kind.Contacts) {
+          const registeredTasks = followingsTasks.get(event.pubkey) ?? [];
+          resolveTasks(registeredTasks, event);
         }
       },
       onEOSE: () => {
@@ -202,6 +231,11 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     }));
   },
 }));
+
+const pickLatestEvent = (events: NostrEvent[]): NostrEvent | undefined => {
+  if (events.length === 0) return undefined;
+  return events.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+};
 
 export const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const props = createMemo(propsProvider);
@@ -215,9 +249,8 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
       const { pubkey } = currentProps;
       const promise = exec({ type: 'Profile', pubkey }, signal).then((batchedEvents) => {
         const latestEvent = () => {
-          const { events } = batchedEvents();
-          if (events.length === 0) throw new Error(`profile not found: ${pubkey}`);
-          const latest = events.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+          const latest = pickLatestEvent(batchedEvents().events);
+          if (latest == null) throw new Error(`profile not found: ${pubkey}`);
           return latest;
         };
         observable(batchedEvents).subscribe(() => {
@@ -233,9 +266,10 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
       return timeout(15000, `useProfile: ${pubkey}`)(promise);
     },
     {
-      // profile is updated occasionally
-      staleTime: 5 * 60 * 1000, // 5min
-      cacheTime: 24 * 60 * 60 * 1000, // 1day
+      // Profiles are updated occasionally, so a short staleTime is used here.
+      // cacheTime is long so that the user see profiles instantly.
+      staleTime: 5 * 60 * 1000, // 5 min
+      cacheTime: 24 * 60 * 60 * 1000, // 1 day
     },
   );
 
@@ -273,9 +307,9 @@ export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTe
       return timeout(15000, `useTextNote: ${eventId}`)(promise);
     },
     {
-      // text note cannot be updated.
-      staleTime: 24 * 60 * 60 * 1000, // 1 day
-      cacheTime: 24 * 60 * 60 * 1000, // 1 day
+      // Text notes never change, so they can be stored for a long time.
+      staleTime: 4 * 60 * 60 * 1000, // 4 hour
+      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
     },
   );
 
@@ -299,10 +333,8 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
       const promise = exec({ type: 'Reactions', mentionedEventId }, signal).then(
         (batchedEvents) => {
           const events = () => batchedEvents().events;
-          setTimeout(() => {
-            observable(batchedEvents).subscribe(() => {
-              queryClient.setQueryData(queryKey, events());
-            });
+          observable(batchedEvents).subscribe(() => {
+            queryClient.setQueryData(queryKey, events());
           });
           return events();
         },
@@ -311,7 +343,7 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
     },
     {
       staleTime: 1 * 60 * 1000, // 1 min
-      cacheTime: 5 * 60 * 1000, // 5 min
+      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
     },
   );
 
@@ -351,10 +383,8 @@ export const useDeprecatedReposts = (
       const promise = exec({ type: 'DeprecatedReposts', mentionedEventId }, signal).then(
         (batchedEvents) => {
           const events = () => batchedEvents().events;
-          setTimeout(() => {
-            observable(batchedEvents).subscribe(() => {
-              queryClient.setQueryData(queryKey, events());
-            });
+          observable(batchedEvents).subscribe(() => {
+            queryClient.setQueryData(queryKey, events());
           });
           return events();
         },
@@ -363,7 +393,7 @@ export const useDeprecatedReposts = (
     },
     {
       staleTime: 1 * 60 * 1000, // 1 min
-      cacheTime: 5 * 60 * 1000, // 5 min
+      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
     },
   );
 
@@ -377,3 +407,70 @@ export const useDeprecatedReposts = (
 
   return { reposts, isRepostedBy, invalidateDeprecatedReposts, query };
 };
+
+export const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
+  const queryClient = useQueryClient();
+  const props = createMemo(propsProvider);
+  const genQueryKey = () => ['useFollowings', props()] as const;
+
+  const query = createQuery(
+    genQueryKey,
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return undefined;
+      const { pubkey } = currentProps;
+      const promise = exec({ type: 'Followings', pubkey }, signal).then((batchedEvents) => {
+        const latestEvent = () => {
+          const latest = pickLatestEvent(batchedEvents().events);
+          if (latest == null) throw new Error(`followings not found: ${pubkey}`);
+          return latest;
+        };
+        observable(batchedEvents).subscribe(() => {
+          try {
+            queryClient.setQueryData(queryKey, latestEvent());
+          } catch (err) {
+            console.error(err);
+          }
+        });
+        return latestEvent();
+      });
+      return timeout(15000, `useFollowings: ${pubkey}`)(promise);
+    },
+    {
+      staleTime: 5 * 60 * 1000, // 5 min
+      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  const followings = () => {
+    if (query.data == null) return [];
+
+    const event = query.data;
+
+    const result: Following[] = [];
+    event.tags.forEach((tag) => {
+      // TODO zodにする
+      const [tagName, followingPubkey, mainRelayUrl, petname] = tag;
+      if (!tag.every((e) => typeof e === 'string')) return;
+      if (tagName !== 'p') return;
+
+      const following: Following = { pubkey: followingPubkey, petname };
+      if (mainRelayUrl != null && mainRelayUrl.length > 0) {
+        following.mainRelayUrl = mainRelayUrl;
+      }
+
+      result.push(following);
+    });
+
+    return result;
+  };
+
+  const followingPubkeys = (): string[] => {
+    return followings().map((follow) => follow.pubkey);
+  };
+
+  return { followings, followingPubkeys, query };
+};
+
+export default useFollowings;

@@ -1,7 +1,6 @@
 import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import usePersistStatus from '@/hooks/usePersistStatus';
-import { persistQueryClient } from '@tanstack/react-query-persist-client';
 
 type SignerStatus = 'checking' | 'available' | 'unavailable';
 

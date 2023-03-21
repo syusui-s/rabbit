@@ -1,15 +1,10 @@
 // NIP-18 (DEPRECATED)
-import { Show, Switch, Match, type Component, createMemo } from 'solid-js';
+import { type Component, createMemo } from 'solid-js';
 import { Event as NostrEvent } from 'nostr-tools';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 
-import useConfig from '@/nostr/useConfig';
-import useEvent from '@/nostr/useEvent';
-import useProfile from '@/nostr/useProfile';
-
 import ColumnItem from '@/components/ColumnItem';
 import UserDisplayName from '@/components/UserDisplayName';
-import TextNote from '@/components/TextNote';
 import eventWrapper from '@/core/event';
 import useFormatDate from '@/hooks/useFormatDate';
 import TextNoteDisplayById from './textNote/TextNoteDisplayById';

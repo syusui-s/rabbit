@@ -25,7 +25,7 @@ const Column: Component<ColumnProps> = (props) => {
 
   useHandleCommand(() => ({
     commandType: 'moveToLastColumn',
-    handler: (command) => {
+    handler: () => {
       if (props.lastColumn) {
         columnDivRef?.scrollIntoView({ behavior: 'smooth' });
       }

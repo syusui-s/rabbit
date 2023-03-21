@@ -8,7 +8,6 @@ import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-squa
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
-import ColumnItem from '@/components/ColumnItem';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
 import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
 import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
@@ -107,7 +106,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const createdAt = () => formatDate(event().createdAtAsDate());
 
-  const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
+  const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
     if (isRepostedByMe()) {
       // TODO remove reaction
       return;
@@ -123,7 +122,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     });
   };
 
-  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
+  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
     if (isReactedByMe()) {
       // TODO remove reaction
       return;

@@ -6,7 +6,7 @@ import usePool from '@/nostr/usePool';
 const currentDate = (): number => Math.floor(Date.now() / 1000);
 
 // NIP-20: Command Result
-const waitCommandResult = (pub: Pub): Promise<void> => {
+const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     pub.on('ok', () => {
       console.log(`${relayUrl} has accepted our event`);
@@ -34,7 +34,7 @@ const useCommands = () => {
     return relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
       const pub = relay.publish(signedEvent);
-      return waitCommandResult(pub);
+      return waitCommandResult(pub, relayUrl);
     });
   };
 

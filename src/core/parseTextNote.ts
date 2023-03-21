@@ -30,7 +30,6 @@ export type Bech32Entity = {
     | { type: 'nprofile'; data: ProfilePointer }
     | { type: 'nevent'; data: EventPointer };
 };
-// | { type: 'naddr'; data: AddressPointer };
 
 export type HashTag = {
   type: 'HashTag';
@@ -53,13 +52,12 @@ export type ParsedTextNoteNode =
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
-export const parseTextNote = (event: NostrEvent): ParsedTextNote => {
+const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
     ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
     ...event.content.matchAll(/#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g),
-    ...event.content.matchAll(
-      /(?<nip19>(npub|note|nprofile|nevent|nrelay|naddr)1[ac-hj-np-z02-9]+)/gi,
-    ),
+    // nrelay and naddr is not supported by nostr-tools
+    ...event.content.matchAll(/(?<nip19>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi),
     ...event.content.matchAll(
       /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-\w.@%:]+|\/)*(?:\?[-\w=.@%:&]*)?(?:#[-\w=.%:&]*)?)/g,
     ),

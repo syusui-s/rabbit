@@ -125,7 +125,7 @@ const ToggleButton = (props: {
         'justify-end': props.value,
       }}
       area-label={props.value}
-      onClick={props.onClick}
+      onClick={(event) => props.onClick(event)}
     >
       <span class="m-[-2px] inline-block h-5 w-5 rounded-full border border-primary bg-white shadow" />
     </button>

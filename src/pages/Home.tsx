@@ -30,8 +30,7 @@ const Home: Component = () => {
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      relay.on('notice', (msg: any) => {
+      relay.on('notice', (msg: string) => {
         console.error(`NOTICE: ${relayUrl}: ${msg}`);
       });
     });
@@ -43,6 +42,10 @@ const Home: Component = () => {
       pubkey: pubkeyNonNull,
     })),
   );
+
+  createEffect(() => {
+    console.log(followingPubkeys());
+  });
 
   const { events: followingsPosts } = useSubscription(() =>
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
