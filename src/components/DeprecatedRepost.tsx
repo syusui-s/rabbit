@@ -7,6 +7,7 @@ import ColumnItem from '@/components/ColumnItem';
 import UserDisplayName from '@/components/UserDisplayName';
 import eventWrapper from '@/core/event';
 import useFormatDate from '@/hooks/useFormatDate';
+import useModalState from '@/hooks/useModalState';
 import TextNoteDisplayById from './textNote/TextNoteDisplayById';
 
 export type DeprecatedRepostProps = {
@@ -14,6 +15,7 @@ export type DeprecatedRepostProps = {
 };
 
 const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
+  const { showProfile } = useModalState();
   const formatDate = useFormatDate();
   const repostedId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
   const event = createMemo(() => eventWrapper(props.event));
@@ -25,7 +27,12 @@ const DeprecatedRepost: Component<DeprecatedRepostProps> = (props) => {
           <ArrowPathRoundedSquare />
         </div>
         <div class="flex-1 truncate break-all">
-          <UserDisplayName pubkey={props.event.pubkey} />
+          <button
+            class="hover:text-blue-500 hover:underline"
+            onClick={() => showProfile(props.event.pubkey)}
+          >
+            <UserDisplayName pubkey={props.event.pubkey} />
+          </button>
           {' がリポスト'}
         </div>
         <div>{formatDate(event().createdAtAsDate())}</div>

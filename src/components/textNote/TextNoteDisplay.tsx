@@ -161,12 +161,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         <div class="min-w-0 flex-auto">
           <div class="flex justify-between gap-1 text-xs">
             <button
-              class="author flex min-w-0 truncate"
+              class="author flex min-w-0 truncate hover:text-blue-500"
               onClick={() => showProfile(event().pubkey)}
             >
               {/* TODO link to author */}
               <Show when={(author()?.display_name?.length ?? 0) > 0}>
-                <div class="author-name truncate pr-1 font-bold">{author()?.display_name}</div>
+                <div class="author-name truncate pr-1 font-bold hover:underline">
+                  {author()?.display_name}
+                </div>
               </Show>
               <div class="author-username truncate text-zinc-600">
                 <Show
@@ -192,7 +194,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               <For each={event().mentionedPubkeys()}>
                 {(replyToPubkey: string) => (
                   <button
-                    class="pr-1 text-blue-500 underline"
+                    class="pr-1 text-blue-500 hover:underline"
                     onClick={() => showProfile(replyToPubkey)}
                   >
                     <GeneralUserMentionDisplay pubkey={replyToPubkey} />

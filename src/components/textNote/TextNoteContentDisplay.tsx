@@ -5,6 +5,7 @@ import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 import ImageDisplay from '@/components/textNote/ImageDisplay';
+import SafeLink from '@/components/utils/SafeLink';
 import eventWrapper from '@/core/event';
 import { isImageUrl } from '@/utils/imageUrl';
 import useConfig from '@/nostr/useConfig';
@@ -58,16 +59,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
               />
             );
           }
-          return (
-            <a
-              class="text-blue-500 underline"
-              href={item.content}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {item.content}
-            </a>
-          );
+          return <SafeLink class="text-blue-500 underline" href={item.content} />;
         }
         return null;
       }}

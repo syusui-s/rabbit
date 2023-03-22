@@ -8,13 +8,17 @@ import UserDisplayName from '@/components/UserDisplayName';
 
 import useProfile from '@/nostr/useProfile';
 import useEvent from '@/nostr/useEvent';
+import eventWrapper from '@/core/event';
+import useModalState from '@/hooks/useModalState';
 
 type ReactionProps = {
   event: NostrEvent;
 };
 
 const Reaction: Component<ReactionProps> = (props) => {
-  const eventId = () => props.event.tags.find(([tagName]) => tagName === 'e')?.[1];
+  const { showProfile } = useModalState();
+  const event = () => eventWrapper(props.event);
+  const eventId = () => event().taggedEvents()[0].id;
 
   const { profile } = useProfile(() => ({
     pubkey: props.event.pubkey,
@@ -50,9 +54,12 @@ const Reaction: Component<ReactionProps> = (props) => {
               </Show>
             </div>
             <div>
-              <span class="truncate whitespace-pre-wrap break-all font-bold">
+              <button
+                class="truncate whitespace-pre-wrap break-all font-bold hover:text-blue-500 hover:underline"
+                onClick={() => showProfile(props.event.pubkey)}
+              >
                 <UserDisplayName pubkey={props.event.pubkey} />
-              </span>
+              </button>
               {' がリアクション'}
             </div>
           </div>
@@ -63,7 +70,7 @@ const Reaction: Component<ReactionProps> = (props) => {
             fallback={<div class="truncate">loading {eventId()}</div>}
             keyed
           >
-            {(event) => <TextNoteDisplay event={event} />}
+            {(ev) => <TextNoteDisplay event={ev} />}
           </Show>
         </div>
       </ColumnItem>
