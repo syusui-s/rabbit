@@ -1,0 +1,1 @@
+{"version":3,"file":"NotFound-346660fd.js","sources":["../../src/pages/NotFound.tsx"],"sourcesContent":["import type { Component } from 'solid-js';\n\nconst NotFound: Component = () => {\n  return 'not found';\n};\n\nexport default NotFound;\n"],"names":["NotFound"],"mappings":"AAEMA,MAAAA,EAAsBA,IACnB"}
