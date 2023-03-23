@@ -56,11 +56,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   }));
 
   const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
-    eventId: props.event.id as string, // TODO いつかなおす
+    eventId: props.event.id, // TODO いつかなおす
   }));
 
   const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
-    eventId: props.event.id as string, // TODO いつかなおす
+    eventId: props.event.id, // TODO いつかなおす
   }));
 
   const commands = useCommands();
@@ -145,17 +145,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
         <button
-          class="author-icon h-10 w-10 shrink-0 overflow-hidden object-cover"
+          class="author-icon h-10 w-10 shrink-0 overflow-hidden"
           onClick={() => showProfile(event().pubkey)}
         >
           <Show when={author()?.picture}>
             {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
-            <img
-              src={author()?.picture}
-              alt="icon"
-              // TODO autofit
-              class="h-10 w-10 rounded"
-            />
+            <img src={author()?.picture} alt="icon" class="h-full w-full rounded object-cover" />
           </Show>
         </button>
         <div class="min-w-0 flex-auto">
