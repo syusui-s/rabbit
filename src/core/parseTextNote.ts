@@ -1,6 +1,10 @@
-import type { Event as NostrEvent } from 'nostr-tools';
-import { decode, type ProfilePointer, type EventPointer } from 'nostr-tools/nip19';
+import { nip19, type Event as NostrEvent } from 'nostr-tools';
 import eventWrapper from './event';
+
+type ProfilePointer = nip19.ProfilePointer;
+type EventPointer = nip19.EventPointer;
+
+const { decode } = nip19;
 
 export type PlainText = {
   type: 'PlainText';

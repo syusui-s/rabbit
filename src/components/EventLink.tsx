@@ -1,5 +1,7 @@
 import { Component } from 'solid-js';
-import { noteEncode } from 'nostr-tools/nip19';
+import { nip19 } from 'nostr-tools';
+
+const { noteEncode } = nip19;
 
 type EventLinkProps = {
   eventId: string;

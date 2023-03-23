@@ -54,10 +54,6 @@ const Home: Component = () => {
     })),
   );
 
-  createEffect(() => {
-    console.log(followingPubkeys());
-  });
-
   const { events: followingsPosts } = useSubscription(() =>
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
       relayUrls: config().relayUrls,
@@ -110,22 +106,20 @@ const Home: Component = () => {
     })),
   );
 
-  const { events: localTimeline } = useSubscription(() =>
-    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
-      relayUrls: [
-        'wss://relay-jp.nostr.wirednet.jp',
-        'wss://nostr.h3z.jp',
-        'wss://nostr.holybea.com',
-      ],
-      filters: [
-        {
-          kinds: [1, 6],
-          limit: 25,
-          since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
-        },
-      ],
-    })),
-  );
+  const { events: localTimeline } = useSubscription(() => ({
+    relayUrls: [
+      'wss://relay-jp.nostr.wirednet.jp',
+      'wss://nostr.h3z.jp',
+      'wss://nostr.holybea.com',
+    ],
+    filters: [
+      {
+        kinds: [1, 6],
+        limit: 25,
+        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+      },
+    ],
+  }));
 
   /*
   const { events: searchPosts } = useSubscription(() => ({

@@ -7,14 +7,11 @@ import {
   type Signal,
 } from 'solid-js';
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
-import { npubEncode } from 'nostr-tools/nip19';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 
 import timeout from '@/utils/timeout';
 import useBatch, { type Task } from '@/nostr/useBatch';
 import eventWrapper from '@/core/event';
-import useSubscription from '@/nostr/useSubscription';
-import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import useConfig from './useConfig';
 import usePool from './usePool';
 

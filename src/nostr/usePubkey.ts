@@ -7,11 +7,13 @@ const [pubkey, setPubkey] = createSignal<string | undefined>(undefined);
 // TODO 失敗したときに通知等を表示したい
 const usePubkey = (): Accessor<string | undefined> => {
   onMount(() => {
+    console.time('pubkey loaded');
     let count = 0;
-    const intervalId = setInterval(() => {
-      if (count >= 5) {
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const loadPubkey = () => {
+      if (count >= 20) {
         clearInterval(intervalId);
-        if (pubkey() == null && !asking) {
+        if (pubkey() == null) {
           if (window.nostr == null) {
             throw new Error('Failed to obtain public key: Timeout. window.nostr is not defined.');
           }
@@ -24,11 +26,19 @@ const usePubkey = (): Accessor<string | undefined> => {
         asking = true;
         window.nostr
           .getPublicKey()
-          .then((key) => setPubkey(key))
-          .catch((err) => console.error('failed to obtain public key: ', err));
+          .then((key) => {
+            clearInterval(intervalId);
+            setPubkey(key);
+            console.timeEnd('pubkey loaded');
+          })
+          .catch((err) => console.error('failed to obtain public key: ', err))
+          .finally(() => {
+            asking = false;
+          });
       }
       count += 1;
-    }, 1000);
+    };
+    intervalId = setInterval(loadPubkey, 200);
   });
 
   return pubkey;

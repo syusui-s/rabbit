@@ -1,5 +1,4 @@
 import { Switch, Match, type Component } from 'solid-js';
-import { noteEncode } from 'nostr-tools/nip19';
 
 import TextNoteDisplay, { type TextNoteDisplayProps } from '@/components/textNote/TextNoteDisplay';
 
