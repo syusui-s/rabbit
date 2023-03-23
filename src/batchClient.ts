@@ -50,11 +50,20 @@ export class ObservableTask<BatchRequest, BatchResponse> {
 
   #completeListeners: (() => void)[] = [];
 
-  #promise: Promise<BatchResponse> | undefined;
+  #promise: Promise<BatchResponse>;
 
   constructor(req: BatchRequest) {
     this.id = nextId();
     this.req = req;
+    this.#promise = new Promise((resolve, reject) => {
+      this.onComplete(() => {
+        if (this.res != null) {
+          resolve(this.res);
+        } else {
+          reject();
+        }
+      });
+    });
   }
 
   #executeUpdateListeners() {
@@ -92,17 +101,6 @@ export class ObservableTask<BatchRequest, BatchResponse> {
   }
 
   toPromise(): Promise<BatchResponse> {
-    if (this.#promise == null) {
-      this.#promise = new Promise((resolve, reject) => {
-        this.onComplete(() => {
-          if (this.res != null) {
-            resolve(this.res);
-          } else {
-            reject();
-          }
-        });
-      });
-    }
     return this.#promise;
   }
 }

@@ -17,7 +17,7 @@ const Modal: Component<ModalProps> = (props) => {
   return (
     <div
       ref={containerRef}
-      class="absolute top-0 left-0 flex h-screen w-screen cursor-default place-content-center place-items-center bg-black/25"
+      class="absolute top-0 left-0 flex h-screen w-screen cursor-default place-content-center place-items-center bg-black/30"
       onClick={handleClickContainer}
     >
       {props.children}
