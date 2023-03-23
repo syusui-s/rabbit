@@ -447,7 +447,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
     },
     {
       staleTime: 5 * 60 * 1000, // 5 min
-      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+      cacheTime: 24 * 60 * 60 * 1000, // 24 hour
       refetchOnWindowFocus: false,
     },
   );
@@ -475,9 +475,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
     return result;
   };
 
-  const followingPubkeys = (): string[] => {
-    return followings().map((follow) => follow.pubkey);
-  };
+  const followingPubkeys = (): string[] => followings().map((follow) => follow.pubkey);
 
   return { followings, followingPubkeys, query };
 };

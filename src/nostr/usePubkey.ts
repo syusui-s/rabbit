@@ -7,10 +7,10 @@ const [pubkey, setPubkey] = createSignal<string | undefined>(undefined);
 // TODO 失敗したときに通知等を表示したい
 const usePubkey = (): Accessor<string | undefined> => {
   onMount(() => {
-    console.time('pubkey loaded');
+    if (pubkey() != null) return;
+
     let count = 0;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
-    const loadPubkey = () => {
+    const intervalId = setInterval(() => {
       if (count >= 20) {
         clearInterval(intervalId);
         if (pubkey() == null) {
@@ -29,7 +29,6 @@ const usePubkey = (): Accessor<string | undefined> => {
           .then((key) => {
             clearInterval(intervalId);
             setPubkey(key);
-            console.timeEnd('pubkey loaded');
           })
           .catch((err) => console.error('failed to obtain public key: ', err))
           .finally(() => {
@@ -37,8 +36,7 @@ const usePubkey = (): Accessor<string | undefined> => {
           });
       }
       count += 1;
-    };
-    intervalId = setInterval(loadPubkey, 200);
+    }, 200);
   });
 
   return pubkey;

@@ -54,18 +54,20 @@ const Home: Component = () => {
     })),
   );
 
-  const { events: followingsPosts } = useSubscription(() =>
-    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+  const { events: followingsPosts } = useSubscription(() => {
+    const authors = uniq([...followingPubkeys()]);
+    if (authors.length === 0) return null;
+    return {
       relayUrls: config().relayUrls,
       filters: [
         {
           kinds: [1, 6],
-          authors: uniq([...followingPubkeys(), pubkeyNonNull]),
+          authors,
           limit: 25,
         },
       ],
-    })),
-  );
+    };
+  });
 
   const { events: myPosts } = useSubscription(() =>
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
