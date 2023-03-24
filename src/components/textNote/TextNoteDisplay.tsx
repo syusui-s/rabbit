@@ -1,4 +1,4 @@
-import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
+import { Show, For, createSignal, createMemo, onMount, type JSX, type Component } from 'solid-js';
 import type { Event as NostrEvent } from 'nostr-tools';
 import { createMutation } from '@tanstack/solid-query';
 
@@ -37,6 +37,8 @@ export type TextNoteDisplayProps = {
 };
 
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
+  let contentRef: HTMLDivElement | undefined;
+
   const { config } = useConfig();
   const formatDate = useFormatDate();
   const pubkey = usePubkey();
@@ -44,6 +46,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
+  const [showOverflow, setShowOverflow] = createSignal(false);
+  const [overflow, setOverflow] = createSignal(false);
   const [showMenu, setShowMenu] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
@@ -91,8 +95,14 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     },
   });
 
-  const isReactedByMe = createMemo(() => isReactedBy(pubkey()));
-  const isRepostedByMe = createMemo(() => isRepostedBy(pubkey()));
+  const isReactedByMe = createMemo(() => {
+    const p = pubkey();
+    return p != null && isReactedBy(p);
+  });
+  const isRepostedByMe = createMemo(() => {
+    const p = pubkey();
+    return p != null && isRepostedBy(p);
+  });
 
   const showReplyEvent = (): string | undefined => {
     const replyingToEvent = event().replyingToEvent();
@@ -141,6 +151,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     });
   };
 
+  onMount(() => {
+    if (contentRef != null) {
+      setOverflow(contentRef.scrollHeight > contentRef.clientHeight);
+    }
+  });
+
   return (
     <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
@@ -177,33 +193,49 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             </button>
             <div class="created-at shrink-0">{createdAt()}</div>
           </div>
-          <Show when={showReplyEvent()} keyed>
-            {(id) => (
-              <div class="mt-1 rounded border p-1">
-                <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
+          <div
+            ref={contentRef}
+            class="overflow-hidden"
+            classList={{ 'max-h-screen': !showOverflow() }}
+          >
+            <Show when={showReplyEvent()} keyed>
+              {(id) => (
+                <div class="mt-1 rounded border p-1">
+                  <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
+                </div>
+              )}
+            </Show>
+            <Show when={event().mentionedPubkeys().length > 0}>
+              <div class="text-xs">
+                <For each={event().mentionedPubkeys()}>
+                  {(replyToPubkey: string) => (
+                    <button
+                      class="pr-1 text-blue-500 hover:underline"
+                      onClick={() => showProfile(replyToPubkey)}
+                    >
+                      <GeneralUserMentionDisplay pubkey={replyToPubkey} />
+                    </button>
+                  )}
+                </For>
+                {'への返信'}
               </div>
-            )}
+            </Show>
+            <ContentWarningDisplay contentWarning={event().contentWarning()}>
+              <div class="content whitespace-pre-wrap break-all">
+                <TextNoteContentDisplay event={props.event} embedding={embedding()} />
+              </div>
+            </ContentWarningDisplay>
+          </div>
+          <Show when={overflow()}>
+            <button
+              class="text-xs text-stone-600 hover:text-stone-800"
+              onClick={() => setShowOverflow((current) => !current)}
+            >
+              <Show when={!showOverflow()} fallback="隠す">
+                続きを読む
+              </Show>
+            </button>
           </Show>
-          <Show when={event().mentionedPubkeys().length > 0}>
-            <div class="text-xs">
-              <For each={event().mentionedPubkeys()}>
-                {(replyToPubkey: string) => (
-                  <button
-                    class="pr-1 text-blue-500 hover:underline"
-                    onClick={() => showProfile(replyToPubkey)}
-                  >
-                    <GeneralUserMentionDisplay pubkey={replyToPubkey} />
-                  </button>
-                )}
-              </For>
-              {'への返信'}
-            </div>
-          </Show>
-          <ContentWarningDisplay contentWarning={event().contentWarning()}>
-            <div class="content whitespace-pre-wrap break-all">
-              <TextNoteContentDisplay event={props.event} embedding={embedding()} />
-            </div>
-          </ContentWarningDisplay>
           <Show when={actions()}>
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button

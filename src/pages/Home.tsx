@@ -15,6 +15,7 @@ import Column from '@/components/Column';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
+import ProfileDisplay from '@/components/ProfileDisplay';
 
 import usePool from '@/nostr/usePool';
 import useConfig from '@/nostr/useConfig';
@@ -24,9 +25,10 @@ import usePubkey from '@/nostr/usePubkey';
 
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import usePersistStatus from '@/hooks/usePersistStatus';
-import ensureNonNull from '@/utils/ensureNonNull';
-import ProfileDisplay from '@/components/ProfileDisplay';
 import useModalState from '@/hooks/useModalState';
+
+import ensureNonNull from '@/utils/ensureNonNull';
+import epoch from '@/utils/epoch';
 
 const Home: Component = () => {
   useMountShortcutKeys();
@@ -118,7 +120,7 @@ const Home: Component = () => {
       {
         kinds: [1, 6],
         limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        since: epoch() - 12 * 60 * 60,
       },
     ],
   }));
@@ -131,7 +133,7 @@ const Home: Component = () => {
         kinds: [1],
         search: '#nostrstudy',
         limit: 25,
-        since: Math.floor(Date.now() / 1000) - 12 * 60 * 60,
+        since: epoch() - 12 * 60 * 60,
       },
     ],
   }));

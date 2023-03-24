@@ -7,10 +7,16 @@ export type UseSubscriptionProps = {
   relayUrls: string[];
   filters: Filter[];
   options?: SubscriptionOptions;
-  // subscribe not only stored events but also new events published after the subscription
-  // default is true
-  clientEventFilter?: (event: NostrEvent) => boolean;
+  /**
+   * subscribe not only stored events but also new events published after the subscription
+   * default is true
+   */
   continuous?: boolean;
+  /**
+   * limit the number of events
+   */
+  limit?: number;
+  clientEventFilter?: (event: NostrEvent) => boolean;
   onEvent?: (event: NostrEvent & { id: string }) => void;
   onEOSE?: () => void;
   signal?: AbortSignal;
@@ -32,6 +38,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     if (props == null) return;
 
     const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
+    const limit = props.limit ?? 50;
 
     const sub = pool().sub(relayUrls, filters, options);
     let subscribing = true;
@@ -53,8 +60,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
         storedEvents.push(event);
       } else {
         setEvents((current) => {
-          // いったん50件だけ保持
-          const sorted = sortEvents([event, ...current].slice(0, 50));
+          const sorted = sortEvents([event, ...current].slice(0, limit));
           // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
           // https://github.com/syusui-s/rabbit/issues/5
           const deduped = uniqBy(sorted, (e) => e.id);

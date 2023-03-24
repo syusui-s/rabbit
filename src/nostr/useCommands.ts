@@ -1,9 +1,15 @@
-import { getEventHash, type Event as NostrEvent, type Pub } from 'nostr-tools';
+import {
+  getEventHash,
+  type UnsignedEvent,
+  type Event as NostrEvent,
+  type Pub,
+  type Kind,
+} from 'nostr-tools';
 
 import '@/types/nostr.d';
 import usePool from '@/nostr/usePool';
 
-const currentDate = (): number => Math.floor(Date.now() / 1000);
+import epoch from '@/utils/epoch';
 
 // NIP-20: Command Result
 const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
@@ -22,8 +28,11 @@ const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
 const useCommands = () => {
   const pool = usePool();
 
-  const publishEvent = async (relayUrls: string[], event: NostrEvent): Promise<Promise<void>[]> => {
-    const preSignedEvent: NostrEvent = { ...event };
+  const publishEvent = async (
+    relayUrls: string[],
+    event: UnsignedEvent,
+  ): Promise<Promise<void>[]> => {
+    const preSignedEvent: UnsignedEvent = { ...event };
     preSignedEvent.id = getEventHash(preSignedEvent);
 
     if (window.nostr == null) {
@@ -75,10 +84,10 @@ const useCommands = () => {
 
     const mergedTags = [...eTags, ...pTags, ...additionalTags];
 
-    const preSignedEvent: NostrEvent = {
+    const preSignedEvent: UnsignedEvent = {
       kind: 1,
       pubkey,
-      created_at: currentDate(),
+      created_at: epoch(),
       tags: mergedTags,
       content,
     };
@@ -102,17 +111,16 @@ const useCommands = () => {
       notifyPubkey: string;
     }): Promise<Promise<void>[]> {
       // TODO ensure that content is + or - or emoji.
-      const preSignedEvent: NostrEvent = {
+      const preSignedEvent: UnsignedEvent = {
         kind: 7,
         pubkey,
-        created_at: currentDate(),
+        created_at: epoch(),
         tags: [
           ['e', eventId, ''],
           ['p', notifyPubkey],
         ],
         content,
       };
-      console.log(preSignedEvent);
       return publishEvent(relayUrls, preSignedEvent);
     },
     // NIP-18
@@ -127,10 +135,10 @@ const useCommands = () => {
       eventId: string;
       notifyPubkey: string;
     }): Promise<Promise<void>[]> {
-      const preSignedEvent: NostrEvent = {
-        kind: 6,
+      const preSignedEvent: UnsignedEvent = {
+        kind: 6 as Kind,
         pubkey,
-        created_at: currentDate(),
+        created_at: epoch(),
         tags: [
           ['e', eventId, ''],
           ['p', notifyPubkey],

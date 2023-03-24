@@ -479,5 +479,3 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
 
   return { followings, followingPubkeys, query };
 };
-
-export default useFollowings;

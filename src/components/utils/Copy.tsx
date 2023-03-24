@@ -29,7 +29,7 @@ const Copy: Component<CopyProps> = (props) => {
       </button>
       <Show when={showPopup()}>
         <div
-          class="absolute left-[-1rem] top-[-1.5rem] rounded
+          class="absolute left-[-2.5rem] top-[-1.5rem] rounded
                  bg-rose-300 p-1 text-xs font-bold text-white shadow"
         >
           Copied!
