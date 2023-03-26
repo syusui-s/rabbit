@@ -63,7 +63,7 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     // nrelay and naddr is not supported by nostr-tools
     ...event.content.matchAll(/(?<nip19>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi),
     ...event.content.matchAll(
-      /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-\w.@%:]+|\/)*(?:\?[-\w=.@%:&]+)?(?:#[-\w=.%:&]+)?)/g,
+      /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-[\]~!$&'()*+,:;@%\w]+|\/)*(?:\?[-[\]~!$&'()*+,/:;%@\w&=]+)?(?:#[-[\]~!$&'()*+,/:;%@\w?&=#]+)?)/g,
     ),
   ].sort((a, b) => (a.index as number) - (b.index as number));
   let pos = 0;
@@ -79,11 +79,15 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
 
   matches.forEach((match) => {
     const { index } = match as RegExpMatchArray & { index: number };
-    if (match.groups?.url && index >= pos) {
+
+    // skip if it was already processed
+    if (index <= pos) return;
+
+    if (match.groups?.url) {
       pushPlainText(index);
       const url: UrlText = { type: 'URL', content: match.groups?.url };
       result.push(url);
-    } else if (match.groups?.idx && index >= pos) {
+    } else if (match.groups?.idx) {
       const tagIndex = parseInt(match.groups.idx, 10);
       const tag = event.tags[tagIndex];
       if (tag == null) return;
@@ -113,7 +117,7 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedEvent);
       }
-    } else if (match.groups?.nip19 && index >= pos) {
+    } else if (match.groups?.nip19) {
       pushPlainText(index);
       try {
         const decoded = decode(match[0]);
@@ -126,7 +130,7 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
       } catch (e) {
         console.error(`failed to parse Bech32 entity (NIP-19) but ignore this: ${match[0]}`);
       }
-    } else if (match.groups?.hashtag && index >= pos) {
+    } else if (match.groups?.hashtag) {
       pushPlainText(index);
       const tagName = match.groups?.hashtag;
       const hashtag: HashTag = {
