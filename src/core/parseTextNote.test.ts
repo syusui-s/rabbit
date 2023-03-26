@@ -62,6 +62,25 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
+  it('should parse text note which includes image URL', () => {
+    const parsed = parseTextNote({
+      id: '',
+      sig: '',
+      kind: 1,
+      content: 'this is my page\nhttps://i.gyazo.com/8f177b9953fdb9513ad00d0743d9c608.png',
+      tags: [],
+      created_at: 1678377182,
+      pubkey: '9366708117c4a7edf9178acdce538c95059b9eb3394808cdd90564094172d972',
+    });
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'this is my page\n' },
+      { type: 'URL', content: 'https://i.gyazo.com/8f177b9953fdb9513ad00d0743d9c608.png' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
   it('should parse text note which includes URL with + symbol', () => {
     const parsed = parseTextNote({
       id: '',
