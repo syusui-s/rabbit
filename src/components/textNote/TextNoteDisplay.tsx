@@ -252,7 +252,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           </div>
           <Show when={overflow()}>
             <button
-              class="text-xs text-stone-600 hover:text-stone-800"
+              class="mt-2 w-full rounded border p-2 text-center text-xs text-stone-600 shadow-sm hover:shadow"
               onClick={(ev) => {
                 ev.stopPropagation();
                 setShowOverflow((current) => !current);
