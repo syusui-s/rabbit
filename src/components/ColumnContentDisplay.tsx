@@ -17,7 +17,7 @@ const RepliesDisplay: Component<{ eventId: string }> = (props) => {
     ],
   }));
 
-  return <Timeline events={[...events()].reverse()} />;
+  return <Timeline events={[...events()].reverse()} embedding={false} />;
 };
 
 const ColumnContentDisplay: Component<{ columnContent: ColumnContent }> = (props) => {

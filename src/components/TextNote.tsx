@@ -1,17 +1,14 @@
 import { type Component } from 'solid-js';
-import type { Event as NostrEvent } from 'nostr-tools';
 
 import ColumnItem from '@/components/ColumnItem';
-import TextNoteDisplay from './textNote/TextNoteDisplay';
+import TextNoteDisplay, { TextNoteDisplayProps } from './textNote/TextNoteDisplay';
 
-export type TextNoteProps = {
-  event: NostrEvent;
-};
+export type TextNoteProps = TextNoteDisplayProps;
 
 const TextNote: Component<TextNoteProps> = (props) => {
   return (
     <ColumnItem>
-      <TextNoteDisplay event={props.event} />
+      <TextNoteDisplay {...props} />
     </ColumnItem>
   );
 };
