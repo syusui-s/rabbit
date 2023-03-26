@@ -166,7 +166,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   return (
     <div
-      class="nostr-textnote flex flex-col"
+      class="nostr-textnote flex cursor-pointer flex-col"
       onClick={() => {
         columnContext?.setColumnContent({
           type: 'Replies',
@@ -191,7 +191,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           <div class="flex justify-between gap-1 text-xs">
             <button
               class="author flex min-w-0 truncate hover:text-blue-500"
-              onClick={() => {
+              onClick={(ev) => {
                 ev.stopPropagation();
                 showProfile(event().pubkey);
               }}
@@ -267,8 +267,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
                 class="h-4 w-4 shrink-0 text-zinc-400"
-                onClick={() => {
-                  stopPropagation();
+                onClick={(ev) => {
+                  ev.stopPropagation();
                   setShowReplyForm((current) => !current);
                 }}
               >
