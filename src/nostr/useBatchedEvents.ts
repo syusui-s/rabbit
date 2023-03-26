@@ -286,6 +286,7 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
       // cacheTime is long so that the user see profiles instantly.
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 1 day
+      refetchInterval: 5 * 60 * 1000, // 5 min
     },
   );
 
@@ -331,7 +332,7 @@ export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTe
     },
   );
 
-  const event = () => query.data;
+  const event = () => query.data ?? null;
 
   return { event, query };
 };
@@ -362,6 +363,7 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
     {
       staleTime: 1 * 60 * 1000, // 1 min
       cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+      refetchInterval: 1 * 60 * 1000, // 1 min
     },
   );
 
@@ -412,6 +414,7 @@ export const useDeprecatedReposts = (
     {
       staleTime: 1 * 60 * 1000, // 1 min
       cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+      refetchInterval: 1 * 60 * 1000, // 1 min
     },
   );
 
@@ -458,7 +461,6 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 24 hour
       refetchOnWindowFocus: false,
-      refetchInterval: 5 * 60 * 1000, // 5 min
     },
   );
 

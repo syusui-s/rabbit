@@ -3,18 +3,18 @@ import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionD
 import useModalState from '@/hooks/useModalState';
 
 export type MentionedUserDisplayProps = {
-  mentionedUser: MentionedUser;
+  pubkey: string;
 };
 
 const MentionedUserDisplay = (props: MentionedUserDisplayProps) => {
   const { showProfile } = useModalState();
 
   const handleClick = () => {
-    showProfile(props.mentionedUser.pubkey);
+    showProfile(props.pubkey);
   };
   return (
     <button class="inline text-blue-500 underline" onClick={handleClick}>
-      <GeneralUserMentionDisplay pubkey={props.mentionedUser.pubkey} />
+      <GeneralUserMentionDisplay pubkey={props.pubkey} />
     </button>
   );
 };

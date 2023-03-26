@@ -27,7 +27,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <PlainTextDisplay plainText={item} />;
         }
         if (item.type === 'MentionedUser') {
-          return <MentionedUserDisplay mentionedUser={item} />;
+          return <MentionedUserDisplay pubkey={item.pubkey} />;
         }
         if (item.type === 'MentionedEvent') {
           if (props.embedding) {
@@ -42,6 +42,12 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
                 <TextNoteDisplayById eventId={item.data.data} actions={false} />
               </div>
             );
+          }
+          if (item.data.type === 'npub' && props.embedding) {
+            return <MentionedUserDisplay pubkey={item.data.data} />;
+          }
+          if (item.data.type === 'nprofile' && props.embedding) {
+            return <MentionedUserDisplay pubkey={item.data.data.pubkey} />;
           }
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
@@ -61,6 +67,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           }
           return <SafeLink class="text-blue-500 underline" href={item.content} />;
         }
+        console.error('Not all ParsedTextNoteNodes are covered', item);
         return null;
       }}
     </For>

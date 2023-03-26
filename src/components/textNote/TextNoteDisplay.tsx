@@ -165,16 +165,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   });
 
   return (
-    <div
-      class="nostr-textnote flex flex-col"
-      onClick={() => {
-        // FIXME
-        // columnContext?.setColumnContent({
-        //   type: 'Replies',
-        //   eventId: event().rootEvent()?.id ?? props.event.id,
-        // });
-      }}
-    >
+    <div class="nostr-textnote flex flex-col">
       <div class="flex w-full gap-1">
         <button
           class="author-icon h-10 w-10 shrink-0 overflow-hidden"
@@ -213,7 +204,20 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
               </div>
             </button>
-            <div class="created-at shrink-0">{createdAt()}</div>
+            <div class="created-at shrink-0">
+              <button
+                type="button"
+                class="hover:underline"
+                onClick={() => {
+                  columnContext?.setColumnContent({
+                    type: 'Replies',
+                    eventId: event().rootEvent()?.id ?? props.event.id,
+                  });
+                }}
+              >
+                {createdAt()}
+              </button>
+            </div>
           </div>
           <div
             ref={contentRef}

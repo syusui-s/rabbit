@@ -60,8 +60,11 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
     ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
     ...event.content.matchAll(/#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g),
+    // raw NIP-19 codes, NIP-21 links (NIP-27)
     // nrelay and naddr is not supported by nostr-tools
-    ...event.content.matchAll(/(?<nip19>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi),
+    ...event.content.matchAll(
+      /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi,
+    ),
     ...event.content.matchAll(
       /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-[\]~!$&'()*+.,:;@%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@\w&=]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w?&=#]+)?)/g,
     ),
@@ -117,10 +120,10 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         };
         result.push(mentionedEvent);
       }
-    } else if (match.groups?.nip19) {
+    } else if (match.groups?.mention) {
       pushPlainText(index);
       try {
-        const decoded = decode(match[0]);
+        const decoded = decode(match[1]);
         const bech32Entity: Bech32Entity = {
           type: 'Bech32Entity',
           content: match[0],
@@ -129,6 +132,8 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
         result.push(bech32Entity);
       } catch (e) {
         console.error(`failed to parse Bech32 entity (NIP-19) but ignore this: ${match[0]}`);
+        pushPlainText(index + match[0].length);
+        return;
       }
     } else if (match.groups?.hashtag) {
       pushPlainText(index);

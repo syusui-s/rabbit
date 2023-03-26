@@ -7,8 +7,17 @@ type EventLinkProps = {
   eventId: string;
 };
 
-const EventLink: Component<EventLinkProps> = (props) => (
-  <span class="text-blue-500 underline">{noteEncode(props.eventId)}</span>
-);
+const tryEncode = (eventId: string) => {
+  try {
+    return noteEncode(eventId);
+  } catch (err) {
+    console.error('failed to encode event id into Bech32 entity (NIP-19) but ignore', eventId, err);
+    return eventId;
+  }
+};
+
+const EventLink: Component<EventLinkProps> = (props) => {
+  return <button class="text-blue-500 underline">{tryEncode(props.eventId)}</button>;
+};
 
 export default EventLink;

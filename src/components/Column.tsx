@@ -1,4 +1,6 @@
 import { Show, type JSX, type Component } from 'solid-js';
+import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
+
 import { useHandleCommand } from '@/hooks/useCommandBus';
 import { ColumnContext, useColumnState } from '@/components/ColumnContext';
 import ColumnContentDisplay from '@/components/ColumnContentDisplay';
@@ -57,8 +59,14 @@ const Column: Component<ColumnProps> = (props) => {
           {(columnContent) => (
             <div class="absolute h-full w-full bg-white">
               <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
-                <button class="w-full text-left" onClick={() => columnState?.clearColumnContext()}>
-                  ＜ホームに戻る
+                <button
+                  class="flex w-full items-center gap-1"
+                  onClick={() => columnState?.clearColumnContext()}
+                >
+                  <div class="inline-block h-4 w-4">
+                    <ArrowLeft />
+                  </div>
+                  <div>ホームに戻る</div>
                 </button>
               </div>
               <ul class="flex h-full flex-col overflow-y-scroll scroll-smooth">
