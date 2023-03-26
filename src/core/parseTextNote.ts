@@ -63,7 +63,7 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     // nrelay and naddr is not supported by nostr-tools
     ...event.content.matchAll(/(?<nip19>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi),
     ...event.content.matchAll(
-      /(?<url>(https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-[\]~!$&'()*+.,:;@%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@\w&=]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w?&=#]+)?)/g,
+      /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-[\]~!$&'()*+.,:;@%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@\w&=]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w?&=#]+)?)/g,
     ),
   ].sort((a, b) => (a.index as number) - (b.index as number));
   let pos = 0;
@@ -81,7 +81,7 @@ const parseTextNote = (event: NostrEvent): ParsedTextNote => {
     const { index } = match as RegExpMatchArray & { index: number };
 
     // skip if it was already processed
-    if (index <= pos) return;
+    if (index < pos) return;
 
     if (match.groups?.url) {
       pushPlainText(index);
