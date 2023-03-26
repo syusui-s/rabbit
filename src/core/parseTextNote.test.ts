@@ -62,6 +62,25 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
+  it('should parse text note which includes punycode URL', () => {
+    const parsed = parseTextNote({
+      id: '',
+      sig: '',
+      kind: 1,
+      content: 'This is Japanese domain: https://xn--p8j9a0d9c9a.xn--q9jyb4c/',
+      tags: [],
+      created_at: 1678377182,
+      pubkey: '9366708117c4a7edf9178acdce538c95059b9eb3394808cdd90564094172d972',
+    });
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'This is Japanese domain: ' },
+      { type: 'URL', content: 'https://xn--p8j9a0d9c9a.xn--q9jyb4c/' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
   it('should parse text note which includes image URLs', () => {
     const parsed = parseTextNote({
       id: '',
