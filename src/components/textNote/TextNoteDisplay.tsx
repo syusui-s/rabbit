@@ -8,11 +8,6 @@ import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-squa
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
-import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
-import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
-import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
-import NotePostForm from '@/components/NotePostForm';
-
 import eventWrapper from '@/core/event';
 
 import useProfile from '@/nostr/useProfile';
@@ -23,12 +18,19 @@ import useReactions from '@/nostr/useReactions';
 import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
 
 import useFormatDate from '@/hooks/useFormatDate';
+import useModalState from '@/hooks/useModalState';
+
+import UserNameDisplay from '@/components/UserDisplayName';
+import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
+import { useColumnContext } from '@/components/ColumnContext';
+import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
+import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
+import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
+import NotePostForm from '@/components/NotePostForm';
 
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
-import useModalState from '@/hooks/useModalState';
-import UserNameDisplay from '../UserDisplayName';
-import TextNoteDisplayById from './TextNoteDisplayById';
+import useSubscription from '@/nostr/useSubscription';
 
 export type TextNoteDisplayProps = {
   event: NostrEvent;
@@ -43,6 +45,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const formatDate = useFormatDate();
   const pubkey = usePubkey();
   const { showProfile } = useModalState();
+  const columnContext = useColumnContext();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
@@ -60,11 +63,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   }));
 
   const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
-    eventId: props.event.id, // TODO いつかなおす
+    eventId: props.event.id,
   }));
 
   const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
-    eventId: props.event.id, // TODO いつかなおす
+    eventId: props.event.id,
   }));
 
   const commands = useCommands();
@@ -118,7 +121,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const createdAt = () => formatDate(event().createdAtAsDate());
 
-  const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
+  const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
+    ev.stopPropagation();
+
     if (isRepostedByMe()) {
       // TODO remove reaction
       return;
@@ -134,7 +139,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     });
   };
 
-  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
+  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
+    ev.stopPropagation();
+
     if (isReactedByMe()) {
       // TODO remove reaction
       return;
@@ -158,11 +165,22 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   });
 
   return (
-    <div class="nostr-textnote flex flex-col">
+    <div
+      class="nostr-textnote flex flex-col"
+      onClick={() => {
+        columnContext?.setColumnContent({
+          type: 'Replies',
+          eventId: event().rootEvent()?.id ?? props.event.id,
+        });
+      }}
+    >
       <div class="flex w-full gap-1">
         <button
           class="author-icon h-10 w-10 shrink-0 overflow-hidden"
-          onClick={() => showProfile(event().pubkey)}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            showProfile(event().pubkey);
+          }}
         >
           <Show when={author()?.picture}>
             {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
@@ -173,7 +191,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           <div class="flex justify-between gap-1 text-xs">
             <button
               class="author flex min-w-0 truncate hover:text-blue-500"
-              onClick={() => showProfile(event().pubkey)}
+              onClick={() => {
+                ev.stopPropagation();
+                showProfile(event().pubkey);
+              }}
             >
               {/* TODO link to author */}
               <Show when={(author()?.display_name?.length ?? 0) > 0}>
@@ -211,7 +232,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   {(replyToPubkey: string) => (
                     <button
                       class="pr-1 text-blue-500 hover:underline"
-                      onClick={() => showProfile(replyToPubkey)}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        showProfile(replyToPubkey);
+                      }}
                     >
                       <GeneralUserMentionDisplay pubkey={replyToPubkey} />
                     </button>
@@ -229,7 +253,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           <Show when={overflow()}>
             <button
               class="text-xs text-stone-600 hover:text-stone-800"
-              onClick={() => setShowOverflow((current) => !current)}
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setShowOverflow((current) => !current);
+              }}
             >
               <Show when={!showOverflow()} fallback="隠す">
                 続きを読む
@@ -240,7 +267,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
                 class="h-4 w-4 shrink-0 text-zinc-400"
-                onClick={() => setShowReplyForm((current) => !current)}
+                onClick={() => {
+                  stopPropagation();
+                  setShowReplyForm((current) => !current);
+                }}
               >
                 <ChatBubbleLeft />
               </button>
@@ -285,7 +315,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               <div>
                 <button
                   class="h-4 w-4 text-zinc-400"
-                  onClick={() => setShowMenu((current) => !current)}
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    setShowMenu((current) => !current);
+                  }}
                 >
                   <EllipsisHorizontal />
                 </button>

@@ -9,11 +9,14 @@ import {
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 
-import timeout from '@/utils/timeout';
-import useBatch, { type Task } from '@/nostr/useBatch';
 import eventWrapper from '@/core/event';
-import useConfig from './useConfig';
-import usePool from './usePool';
+
+import useBatch, { type Task } from '@/nostr/useBatch';
+import useStats from '@/nostr/useStats';
+import useConfig from '@/nostr/useConfig';
+import usePool from '@/nostr/usePool';
+
+import timeout from '@/utils/timeout';
 
 type TaskArg =
   | { type: 'Profile'; pubkey: string }
@@ -63,7 +66,7 @@ export type UseTextNoteProps = {
 };
 
 export type UseTextNote = {
-  event: Accessor<NostrEvent | null>;
+  event: () => NostrEvent | null;
   query: CreateQueryResult<NostrEvent | null>;
 };
 
@@ -73,8 +76,8 @@ export type UseReactionsProps = {
 };
 
 export type UseReactions = {
-  reactions: Accessor<NostrEvent[]>;
-  reactionsGroupedByContent: Accessor<Map<string, NostrEvent[]>>;
+  reactions: () => NostrEvent[];
+  reactionsGroupedByContent: () => Map<string, NostrEvent[]>;
   isReactedBy: (pubkey: string) => boolean;
   invalidateReactions: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
@@ -86,7 +89,7 @@ export type UseDeprecatedRepostsProps = {
 };
 
 export type UseDeprecatedReposts = {
-  reposts: Accessor<NostrEvent[]>;
+  reposts: () => NostrEvent[];
   isRepostedBy: (pubkey: string) => boolean;
   invalidateDeprecatedReposts: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
@@ -104,18 +107,22 @@ type Following = {
 };
 
 export type UseFollowings = {
-  followings: Accessor<Following[]>;
-  followingPubkeys: Accessor<string[]>;
+  followings: () => Following[];
+  followingPubkeys: () => string[];
   query: CreateQueryResult<NostrEvent | null>;
 };
 
 let count = 0;
 
-setInterval(() => console.log('batchSub', count), 1000);
+const { setActiveBatchSubscriptions } = useStats();
+
+setInterval(() => {
+  setActiveBatchSubscriptions(count);
+}, 1000);
 
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
   interval: 2000,
-  batchSize: 100,
+  batchSize: 150,
   executor: (tasks) => {
     const profileTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const textNoteTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
@@ -201,7 +208,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     const { config } = useConfig();
     const pool = usePool();
 
-    const sub = pool().sub(config().relayUrls, filters);
+    const sub = pool().sub(config().relayUrls, filters, {});
 
     count += 1;
 
@@ -300,7 +307,6 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
 
 export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTextNote => {
   const props = createMemo(propsProvider);
-  const queryClient = useQueryClient();
 
   const query = createQuery(
     () => ['useTextNote', props()] as const,
@@ -317,8 +323,11 @@ export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTe
     },
     {
       // Text notes never change, so they can be stored for a long time.
+      // However, events tend to be unreferenced as time passes.
       staleTime: 4 * 60 * 60 * 1000, // 4 hour
       cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
     },
   );
 
@@ -449,6 +458,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 24 hour
       refetchOnWindowFocus: false,
+      refetchInterval: 5 * 60 * 1000, // 5 min
     },
   );
 

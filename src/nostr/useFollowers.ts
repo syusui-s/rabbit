@@ -22,5 +22,7 @@ export default function useFollowers(propsProvider: () => UseFollowersProps) {
 
   const followersPubkeys = () => uniq(events()?.map((ev) => ev.pubkey));
 
-  return { followersPubkeys };
+  const count = () => followersPubkeys().length;
+
+  return { followersPubkeys, count };
 }

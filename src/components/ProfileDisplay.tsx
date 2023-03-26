@@ -29,11 +29,11 @@ export type ProfileDisplayProps = {
 };
 
 const FollowersCount: Component<{ pubkey: string }> = (props) => {
-  const { followersPubkeys } = useFollowers(() => ({
+  const { count } = useFollowers(() => ({
     pubkey: props.pubkey,
   }));
 
-  return <span>{followersPubkeys().length}</span>;
+  return <>{count()}</>;
 };
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
@@ -66,9 +66,11 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   );
   const following = () => myFollowingPubkeys().includes(props.pubkey);
 
-  const { followingPubkeys: userFollowingPubkeys } = useFollowings(() => ({
-    pubkey: props.pubkey,
-  }));
+  const { followingPubkeys: userFollowingPubkeys, query: userFollowingQuery } = useFollowings(
+    () => ({
+      pubkey: props.pubkey,
+    }),
+  );
   const followed = () => {
     const p = pubkey();
     return p != null && userFollowingPubkeys().includes(p);
@@ -86,6 +88,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         until: epoch(),
       },
     ],
+    continuous: false,
   }));
 
   return (
@@ -210,14 +213,28 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
             <div class="flex border-t px-4 py-2">
               <div class="flex flex-1 flex-col items-start">
                 <div class="text-sm">フォロー</div>
-                <div class="text-xl">{userFollowingPubkeys().length}</div>
+                <div class="text-xl">
+                  <Show
+                    when={userFollowingQuery.isFetched}
+                    fallback={<span class="text-sm">読み込み中</span>}
+                  >
+                    {userFollowingPubkeys().length}
+                  </Show>
+                </div>
               </div>
               <div class="flex flex-1 flex-col items-start">
                 <div class="text-sm">フォロワー</div>
                 <div class="text-xl">
                   <Show
                     when={showFollowers()}
-                    fallback={<button onClick={() => setShowFollowers(true)}>読み込む</button>}
+                    fallback={
+                      <button
+                        class="text-sm hover:text-stone-800 hover:underline"
+                        onClick={() => setShowFollowers(true)}
+                      >
+                        読み込む
+                      </button>
+                    }
                     keyed
                   >
                     <FollowersCount pubkey={props.pubkey} />

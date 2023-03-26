@@ -8,7 +8,7 @@ export type Task<TaskArgs, TaskResult> = {
 };
 
 export type UseBatchProps<TaskArgs, TaskResult> = {
-  executor: (task: Task<TaskArgs, TaskResult>[]) => void;
+  executor: (tasks: Task<TaskArgs, TaskResult>[]) => void;
   interval?: number;
   batchSize?: number;
 };

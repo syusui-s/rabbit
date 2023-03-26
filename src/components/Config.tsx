@@ -186,7 +186,7 @@ const ConfigUI = (props: ConfigProps) => {
         <div class="relative">
           <div class="flex flex-col gap-1">
             <h2 class="flex-1 text-center font-bold">設定</h2>
-            <button class="absolute top-1 right-0 h-4 w-4" onClick={() => props.onClose?.()}>
+            <button class="absolute top-1 right-0 z-0 h-4 w-4" onClick={() => props.onClose?.()}>
               <XMark />
             </button>
           </div>

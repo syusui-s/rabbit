@@ -2,6 +2,7 @@ import { createSignal, createEffect, onCleanup } from 'solid-js';
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 import uniqBy from 'lodash/uniqBy';
 import usePool from '@/nostr/usePool';
+import useStats from './useStats';
 
 export type UseSubscriptionProps = {
   relayUrls: string[];
@@ -27,7 +28,10 @@ const sortEvents = (events: NostrEvent[]) =>
 
 let count = 0;
 
-setInterval(() => console.log('sub', count), 1000);
+const { setActiveSubscriptions } = useStats();
+setInterval(() => {
+  setActiveSubscriptions(count);
+}, 1000);
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const pool = usePool();

@@ -1,5 +1,7 @@
-import type { Component, JSX } from 'solid-js';
+import { Show, type JSX, type Component } from 'solid-js';
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import { ColumnContext, useColumnState } from '@/components/ColumnContext';
+import ColumnContentDisplay from '@/components/ColumnContentDisplay';
 
 export type ColumnProps = {
   name: string;
@@ -11,6 +13,8 @@ export type ColumnProps = {
 
 const Column: Component<ColumnProps> = (props) => {
   let columnDivRef: HTMLDivElement | undefined;
+
+  const columnState = useColumnState();
 
   const width = () => props.width ?? 'medium';
 
@@ -33,22 +37,38 @@ const Column: Component<ColumnProps> = (props) => {
   }));
 
   return (
-    <div
-      ref={columnDivRef}
-      class="flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r sm:snap-align-none"
-      classList={{
-        'sm:w-[500px]': width() === 'widest',
-        'sm:w-[350px]': width() === 'wide',
-        'sm:w-[310px]': width() === 'medium',
-        'sm:w-[270px]': width() === 'narrow',
-      }}
-    >
-      <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
-        {/* <span class="column-icon">🏠</span> */}
-        <span class="column-name">{props.name}</span>
+    <ColumnContext.Provider value={columnState}>
+      <div
+        ref={columnDivRef}
+        class="relative flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r sm:snap-align-none"
+        classList={{
+          'sm:w-[500px]': width() === 'widest',
+          'sm:w-[350px]': width() === 'wide',
+          'sm:w-[310px]': width() === 'medium',
+          'sm:w-[270px]': width() === 'narrow',
+        }}
+      >
+        <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
+          {/* <span class="column-icon">🏠</span> */}
+          <span class="column-name">{props.name}</span>
+        </div>
+        <ul class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</ul>
+        <Show when={columnState.columnState.content} keyed>
+          {(columnContent) => (
+            <div class="absolute h-full w-full bg-white">
+              <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
+                <button class="w-full text-left" onClick={() => columnState?.clearColumnContext()}>
+                  ＜ホームに戻る
+                </button>
+              </div>
+              <ul class="flex h-full flex-col overflow-y-scroll scroll-smooth">
+                <ColumnContentDisplay columnContent={columnContent} />
+              </ul>
+            </div>
+          )}
+        </Show>
       </div>
-      <ul class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</ul>
-    </div>
+    </ColumnContext.Provider>
   );
 };
 
