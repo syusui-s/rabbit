@@ -166,12 +166,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   return (
     <div
-      class="nostr-textnote flex cursor-pointer flex-col"
+      class="nostr-textnote flex flex-col"
       onClick={() => {
-        columnContext?.setColumnContent({
-          type: 'Replies',
-          eventId: event().rootEvent()?.id ?? props.event.id,
-        });
+        // FIXME
+        // columnContext?.setColumnContent({
+        //   type: 'Replies',
+        //   eventId: event().rootEvent()?.id ?? props.event.id,
+        // });
       }}
     >
       <div class="flex w-full gap-1">
