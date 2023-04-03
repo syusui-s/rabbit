@@ -56,18 +56,20 @@ export type ParsedTextNoteNode =
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
+const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
+const hashTagRegex = /#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g;
+// raw NIP-19 codes, NIP-21 links (NIP-27)
+// nrelay and naddr is not supported by nostr-tools
+const mentionRegex = /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi;
+const urlRegex =
+  /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.:]+(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
+
 const parseTextNote = (event: NostrEvent): ParsedTextNote => {
   const matches = [
-    ...event.content.matchAll(/(?:#\[(?<idx>\d+)\])/g),
-    ...event.content.matchAll(/#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g),
-    // raw NIP-19 codes, NIP-21 links (NIP-27)
-    // nrelay and naddr is not supported by nostr-tools
-    ...event.content.matchAll(
-      /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi,
-    ),
-    ...event.content.matchAll(
-      /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(?:\/[-[\]~!$&'()*+.,:;@%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@\w&=]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w?&=#]+)?)/g,
-    ),
+    ...event.content.matchAll(tagRefRegex),
+    ...event.content.matchAll(hashTagRegex),
+    ...event.content.matchAll(mentionRegex),
+    ...event.content.matchAll(urlRegex),
   ].sort((a, b) => (a.index as number) - (b.index as number));
   let pos = 0;
   const result: ParsedTextNote = [];

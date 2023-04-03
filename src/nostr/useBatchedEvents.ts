@@ -179,8 +179,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
     const resolveTasks = (registeredTasks: Task<TaskArg, TaskRes>[], event: NostrEvent) => {
       registeredTasks.forEach((task) => {
-        const signal =
-          signals.get(task.id) ?? createRoot(() => createSignal({ events: [], completed: false }));
+        const signal = signals.get(task.id) ?? createSignal({ events: [], completed: false });
         signals.set(task.id, signal);
         const [batchedEvents, setBatchedEvents] = signal;
         setBatchedEvents((current) => ({
@@ -213,10 +212,12 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     count += 1;
 
     sub.on('event', (event: NostrEvent & { id: string }) => {
+      if (config().mutedPubkeys.includes(event.id)) return;
       if (event.kind === Kind.Metadata) {
         const registeredTasks = profileTasks.get(event.pubkey) ?? [];
         resolveTasks(registeredTasks, event);
       } else if (event.kind === Kind.Text) {
+        if (config().mutedPubkeys.includes(event.pubkey)) return;
         const registeredTasks = textNoteTasks.get(event.id) ?? [];
         resolveTasks(registeredTasks, event);
       } else if (event.kind === Kind.Reaction) {
@@ -227,6 +228,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
           resolveTasks(registeredTasks, event);
         });
       } else if ((event.kind as number) === 6) {
+        if (config().mutedPubkeys.includes(event.pubkey)) return;
         const eventTags = eventWrapper(event).taggedEvents();
         eventTags.forEach((eventTag) => {
           const taggedEventId = eventTag.id;
@@ -461,6 +463,8 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 24 hour
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: 0,
     },
   );
 

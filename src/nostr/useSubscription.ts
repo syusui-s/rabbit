@@ -3,6 +3,7 @@ import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-too
 import uniqBy from 'lodash/uniqBy';
 import usePool from '@/nostr/usePool';
 import useStats from './useStats';
+import useConfig from './useConfig';
 
 export type UseSubscriptionProps = {
   relayUrls: string[];
@@ -34,6 +35,7 @@ setInterval(() => {
 }, 1000);
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
+  const { config } = useConfig();
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
 
@@ -55,6 +57,9 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     sub.on('event', (event: NostrEvent) => {
       if (onEvent != null) {
         onEvent(event as NostrEvent & { id: string });
+      }
+      if (config().mutedPubkeys.includes(event.pubkey)) {
+        return;
       }
       if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
         return;

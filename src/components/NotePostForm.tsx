@@ -183,6 +183,23 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     uploadFilesMutation.mutate(files);
   };
 
+  const handlePaste: JSX.EventHandler<HTMLTextAreaElement, ClipboardEvent> = (ev) => {
+    if (uploadFilesMutation.isLoading) return;
+    const items = [...(ev?.clipboardData?.items ?? [])];
+
+    const files: File[] = [];
+    items.forEach((item) => {
+      if (item.kind === 'file') {
+        ev.preventDefault();
+        const file = item.getAsFile();
+        if (file == null) return;
+        files.push(file);
+      }
+    });
+    if (files.length === 0) return;
+    uploadFilesMutation.mutate(files);
+  };
+
   const handleDragOver: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
   };
@@ -239,6 +256,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           onKeyDown={handleKeyDown}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
+          onPaste={handlePaste}
           value={text()}
         />
         <div class="flex items-end justify-end gap-1">

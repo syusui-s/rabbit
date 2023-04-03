@@ -9,6 +9,7 @@ export type Config = {
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   showImage: boolean;
+  mutedPubkeys: string[];
 };
 
 type UseConfig = {
@@ -16,6 +17,8 @@ type UseConfig = {
   setConfig: Setter<Config>;
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
+  addMutedPubkey: (pubkey: string) => void;
+  removeMutedPubkey: (pubkey: string) => void;
 };
 
 const InitialConfig = (): Config => {
@@ -40,6 +43,7 @@ const InitialConfig = (): Config => {
     dateFormat: 'relative',
     keepOpenPostForm: false,
     showImage: true,
+    mutedPubkeys: [],
   };
 };
 
@@ -63,11 +67,21 @@ const useConfig = (): UseConfig => {
     setConfig('relayUrls', (current) => current.filter((e) => e !== relayUrl));
   };
 
+  const addMutedPubkey = (pubkey: string) => {
+    setConfig('mutedPubkeys', (current) => [...current, pubkey]);
+  };
+
+  const removeMutedPubkey = (pubkey: string) => {
+    setConfig('mutedPubkeys', (current) => current.filter((e) => e !== pubkey));
+  };
+
   return {
     config: () => config,
     setConfig,
     addRelay,
     removeRelay,
+    addMutedPubkey,
+    removeMutedPubkey,
   };
 };
 

@@ -39,7 +39,7 @@ const useResizedImage = ({
 
       ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, dw, dh);
 
-      const dataUrl = canvas.toDataURL('image/jpeg', encoderOption);
+      const dataUrl = canvas.toDataURL('image/jpeg');
 
       setResizedImage(dataUrl);
     });

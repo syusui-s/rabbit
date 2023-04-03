@@ -22,7 +22,7 @@ import useModalState from '@/hooks/useModalState';
 
 import UserNameDisplay from '@/components/UserDisplayName';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
-import { useColumnContext } from '@/components/ColumnContext';
+import { useTimelineContext } from '@/components/TimelineContext';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
 import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
 import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
@@ -45,7 +45,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const formatDate = useFormatDate();
   const pubkey = usePubkey();
   const { showProfile } = useModalState();
-  const columnContext = useColumnContext();
+  const timelineContext = useTimelineContext();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
@@ -209,9 +209,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 type="button"
                 class="hover:underline"
                 onClick={() => {
-                  columnContext?.setColumnContent({
+                  timelineContext?.setTimeline({
                     type: 'Replies',
-                    eventId: event().rootEvent()?.id ?? props.event.id,
+                    event: props.event,
                   });
                 }}
               >

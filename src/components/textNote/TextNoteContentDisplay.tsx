@@ -43,10 +43,10 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
               </div>
             );
           }
-          if (item.data.type === 'npub' && props.embedding) {
+          if (item.data.type === 'npub') {
             return <MentionedUserDisplay pubkey={item.data.data} />;
           }
-          if (item.data.type === 'nprofile' && props.embedding) {
+          if (item.data.type === 'nprofile') {
             return <MentionedUserDisplay pubkey={item.data.data.pubkey} />;
           }
           return <span class="text-blue-500 underline">{item.content}</span>;

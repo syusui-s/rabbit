@@ -11,6 +11,18 @@ import usePool from '@/nostr/usePool';
 
 import epoch from '@/utils/epoch';
 
+export type PublishTextNoteParams = {
+  relayUrls: string[];
+  pubkey: string;
+  content: string;
+  tags?: string[][];
+  notifyPubkeys?: string[];
+  rootEventId?: string;
+  mentionEventIds?: string[];
+  replyEventId?: string;
+  contentWarning?: string;
+};
+
 // NIP-20: Command Result
 const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -25,6 +37,41 @@ const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
   });
 };
 
+export const buildTags = ({
+  notifyPubkeys,
+  rootEventId,
+  mentionEventIds,
+  replyEventId,
+  contentWarning,
+  tags,
+}: PublishTextNoteParams): string[][] => {
+  // NIP-10
+  const eTags = [];
+  const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
+  const otherTags = [];
+
+  // the order of e tags should be [rootId, ...mentionIds, replyIds] for old clients
+  if (rootEventId != null) {
+    eTags.push(['e', rootEventId, '', 'root']);
+  }
+  if (mentionEventIds != null) {
+    mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
+  }
+  if (replyEventId != null) {
+    eTags.push(['e', replyEventId, '', 'reply']);
+  }
+
+  if (contentWarning != null) {
+    otherTags.push(['content-warning', contentWarning]);
+  }
+
+  if (tags != null && tags.length > 0) {
+    otherTags.push(...tags);
+  }
+
+  return [...eTags, ...pTags, ...otherTags];
+};
+
 const useCommands = () => {
   const pool = usePool();
 
@@ -32,7 +79,7 @@ const useCommands = () => {
     relayUrls: string[],
     event: UnsignedEvent,
   ): Promise<Promise<void>[]> => {
-    const preSignedEvent: UnsignedEvent = { ...event };
+    const preSignedEvent: UnsignedEvent & { id?: string } = { ...event };
     preSignedEvent.id = getEventHash(preSignedEvent);
 
     if (window.nostr == null) {
@@ -48,47 +95,15 @@ const useCommands = () => {
   };
 
   // NIP-01
-  const publishTextNote = ({
-    relayUrls,
-    pubkey,
-    content,
-    tags,
-    contentWarning,
-    notifyPubkeys,
-    rootEventId,
-    mentionEventIds,
-    replyEventId,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    content: string;
-    tags?: string[][];
-    notifyPubkeys?: string[];
-    rootEventId?: string;
-    mentionEventIds?: string[];
-    replyEventId?: string;
-    contentWarning?: string;
-  }): Promise<Promise<void>[]> => {
-    // NIP-10
-    const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
-    const eTags = [];
-    if (rootEventId != null) eTags.push(['e', rootEventId, '', 'root']);
-    if (mentionEventIds != null)
-      mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
-    if (replyEventId != null) eTags.push(['e', replyEventId, '', 'reply']);
-
-    const additionalTags = tags != null ? [...tags] : [];
-    if (contentWarning != null && content.length > 0) {
-      additionalTags.push(['content-warning', contentWarning]);
-    }
-
-    const mergedTags = [...eTags, ...pTags, ...additionalTags];
+  const publishTextNote = (params: PublishTextNoteParams): Promise<Promise<void>[]> => {
+    const { relayUrls, pubkey, content } = params;
+    const tags = buildTags(params);
 
     const preSignedEvent: UnsignedEvent = {
       kind: 1,
       pubkey,
       created_at: epoch(),
-      tags: mergedTags,
+      tags,
       content,
     };
     return publishEvent(relayUrls, preSignedEvent);

@@ -42,7 +42,7 @@ const Reaction: Component<ReactionProps> = (props) => {
               </Match>
             </Switch>
           </div>
-          <div class="notification-user flex gap-1">
+          <div class="notification-user flex gap-1 overflow-hidden">
             <div class="author-icon h-5 w-5 shrink-0 overflow-hidden object-cover">
               <Show when={profile()?.picture != null}>
                 <img
@@ -53,9 +53,9 @@ const Reaction: Component<ReactionProps> = (props) => {
                 />
               </Show>
             </div>
-            <div>
+            <div class="flex-1 overflow-hidden">
               <button
-                class="truncate whitespace-pre-wrap break-all font-bold hover:text-blue-500 hover:underline"
+                class="truncate font-bold hover:text-blue-500 hover:underline"
                 onClick={() => showProfile(props.event.pubkey)}
               >
                 <UserDisplayName pubkey={props.event.pubkey} />

@@ -6,16 +6,15 @@ import DeprecatedRepost from '@/components/DeprecatedRepost';
 
 export type TimelineProps = {
   events: NostrEvent[];
-  embedding?: boolean;
 };
 
 const Timeline: Component<TimelineProps> = (props) => {
   return (
     <For each={props.events}>
       {(event) => (
-        <Switch fallback={<div>unknown event</div>}>
+        <Switch fallback={<div>未対応のイベント種別（{event.kind}）</div>}>
           <Match when={event.kind === Kind.Text}>
-            <TextNote event={event} embedding={props.embedding ?? true} />
+            <TextNote event={event} />
           </Match>
           <Match when={(event.kind as number) === 6}>
             <DeprecatedRepost event={event} />

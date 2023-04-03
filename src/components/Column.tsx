@@ -2,8 +2,8 @@ import { Show, type JSX, type Component } from 'solid-js';
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 
 import { useHandleCommand } from '@/hooks/useCommandBus';
-import { ColumnContext, useColumnState } from '@/components/ColumnContext';
-import ColumnContentDisplay from '@/components/ColumnContentDisplay';
+import { TimelineContext, useTimelineState } from '@/components/TimelineContext';
+import TimelineContentDisplay from '@/components/TimelineContentDisplay';
 
 export type ColumnProps = {
   name: string;
@@ -16,7 +16,7 @@ export type ColumnProps = {
 const Column: Component<ColumnProps> = (props) => {
   let columnDivRef: HTMLDivElement | undefined;
 
-  const columnState = useColumnState();
+  const timelineState = useTimelineState();
 
   const width = () => props.width ?? 'medium';
 
@@ -39,7 +39,7 @@ const Column: Component<ColumnProps> = (props) => {
   }));
 
   return (
-    <ColumnContext.Provider value={columnState}>
+    <TimelineContext.Provider value={timelineState}>
       <div
         ref={columnDivRef}
         class="relative flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r sm:snap-align-none"
@@ -54,14 +54,14 @@ const Column: Component<ColumnProps> = (props) => {
           {/* <span class="column-icon">🏠</span> */}
           <span class="column-name">{props.name}</span>
         </div>
-        <ul class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</ul>
-        <Show when={columnState.columnState.content} keyed>
-          {(columnContent) => (
+        <div class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</div>
+        <Show when={timelineState.timelineState.content} keyed>
+          {(timeline) => (
             <div class="absolute h-full w-full bg-white">
               <div class="flex h-8 shrink-0 items-center border-b bg-white px-2">
                 <button
                   class="flex w-full items-center gap-1"
-                  onClick={() => columnState?.clearColumnContext()}
+                  onClick={() => timelineState?.clearTimeline()}
                 >
                   <div class="inline-block h-4 w-4">
                     <ArrowLeft />
@@ -70,13 +70,13 @@ const Column: Component<ColumnProps> = (props) => {
                 </button>
               </div>
               <ul class="flex h-full flex-col overflow-y-scroll scroll-smooth">
-                <ColumnContentDisplay columnContent={columnContent} />
+                <TimelineContentDisplay timelineContent={timeline} />
               </ul>
             </div>
           )}
         </Show>
       </div>
-    </ColumnContext.Provider>
+    </TimelineContext.Provider>
   );
 };
 
