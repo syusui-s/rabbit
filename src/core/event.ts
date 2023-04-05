@@ -20,7 +20,7 @@ const eventWrapper = (event: NostrEvent) => {
     get rawEvent(): NostrEvent {
       return event;
     },
-    get id(): string | undefined {
+    get id(): string {
       return event.id;
     },
     get pubkey(): string {

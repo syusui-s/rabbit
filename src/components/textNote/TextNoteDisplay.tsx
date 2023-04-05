@@ -1,5 +1,5 @@
 import { Show, For, createSignal, createMemo, onMount, type JSX, type Component } from 'solid-js';
-import type { Event as NostrEvent } from 'nostr-tools';
+import { nip19, type Event as NostrEvent } from 'nostr-tools';
 import { createMutation } from '@tanstack/solid-query';
 
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
@@ -31,6 +31,7 @@ import NotePostForm from '@/components/NotePostForm';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import useSubscription from '@/nostr/useSubscription';
+import ContextMenu, { MenuItem } from '../ContextMenu';
 
 export type TextNoteDisplayProps = {
   event: NostrEvent;
@@ -38,8 +39,25 @@ export type TextNoteDisplayProps = {
   actions?: boolean;
 };
 
+const { noteEncode } = nip19;
+
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   let contentRef: HTMLDivElement | undefined;
+
+  const menu: MenuItem[] = [
+    {
+      content: () => 'IDをコピー',
+      onSelect: () => {
+        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
+      },
+    },
+    {
+      content: () => 'JSONとしてコピー',
+      onSelect: () => {
+        navigator.clipboard.writeText(JSON.stringify(props.event)).catch((err) => window.alert(err));
+      },
+    },
+  ];
 
   const { config } = useConfig();
   const formatDate = useFormatDate();
@@ -51,7 +69,6 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const closeReplyForm = () => setShowReplyForm(false);
   const [showOverflow, setShowOverflow] = createSignal(false);
   const [overflow, setOverflow] = createSignal(false);
-  const [showMenu, setShowMenu] = createSignal(false);
 
   const event = createMemo(() => eventWrapper(props.event));
 
@@ -88,13 +105,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     mutationKey: ['publishDeprecatedRepost', event().id],
     mutationFn: commands.publishDeprecatedRepost.bind(commands),
     onSuccess: () => {
-      console.log('succeeded to publish deprecated reposts');
-      invalidateDeprecatedReposts().catch((err) =>
-        console.error('failed to refetch deprecated reposts', err),
-      );
+      console.log('succeeded to publish reposts');
+      invalidateDeprecatedReposts().catch((err) => console.error('failed to refetch reposts', err));
     },
     onError: (err) => {
-      console.error('failed to publish deprecated repost: ', err);
+      console.error('failed to publish repost: ', err);
     },
   });
 
@@ -205,10 +220,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               </div>
             </button>
             <div class="created-at shrink-0">
-              <button
+              <a
+                href={`nostr:${noteEncode(event().id)}`}
                 type="button"
                 class="hover:underline"
-                onClick={() => {
+                onClick={(ev) => {
+                  ev.preventDefault();
                   timelineContext?.setTimeline({
                     type: 'Replies',
                     event: props.event,
@@ -216,7 +233,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 }}
               >
                 {createdAt()}
-              </button>
+              </a>
             </div>
           </div>
           <div
@@ -318,15 +335,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 </Show>
               </div>
               <div>
-                <button
-                  class="h-4 w-4 text-zinc-400"
-                  onClick={(ev) => {
-                    ev.stopPropagation();
-                    setShowMenu((current) => !current);
-                  }}
-                >
-                  <EllipsisHorizontal />
-                </button>
+                <ContextMenu menu={menu}>
+                  <span class="inline-block h-4 w-4 text-zinc-400">
+                    <EllipsisHorizontal />
+                  </span>
+                </ContextMenu>
               </div>
             </div>
           </Show>
