@@ -2,7 +2,11 @@ import assert from 'assert';
 import { describe, it } from 'vitest';
 import { type Event as NostrEvent } from 'nostr-tools';
 
-import parseTextNote, { resolveTagReference, type ParsedTextNoteNode, TagReference } from './parseTextNote';
+import parseTextNote, {
+  resolveTagReference,
+  type ParsedTextNoteNode,
+  TagReference,
+} from './parseTextNote';
 
 describe('parseTextNote', () => {
   /*
@@ -59,7 +63,9 @@ describe('parseTextNote', () => {
   });
 
   it('should parse text note which includes image URLs', () => {
-    const parsed = parseTextNote('https://i.gyazo.com/8f177b9953fdb9513ad00d0743d9c608.png\nhttps://i.gyazo.com/346ad7260f6a999720c2d13317ff795f.jpg');
+    const parsed = parseTextNote(
+      'https://i.gyazo.com/8f177b9953fdb9513ad00d0743d9c608.png\nhttps://i.gyazo.com/346ad7260f6a999720c2d13317ff795f.jpg',
+    );
 
     const expected: ParsedTextNoteNode[] = [
       { type: 'URL', content: 'https://i.gyazo.com/8f177b9953fdb9513ad00d0743d9c608.png' },
@@ -81,7 +87,6 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
-  //
   it('should parse text note which includes URL with + symbol', () => {
     const parsed = parseTextNote('I wrote this page\nhttps://example.com/test(test)?q=(q)#(h)');
 
@@ -97,13 +102,28 @@ describe('parseTextNote', () => {
   });
 
   it('should parse text note which includes wss URL', () => {
-    const parsed = parseTextNote('this is my using relays: wss://relay.damus.io, wss://relay.snort.social');
+    const parsed = parseTextNote(
+      'this is my using relays: wss://relay.damus.io, wss://relay.snort.social, ws://localhost:3000',
+    );
 
     const expected: ParsedTextNoteNode[] = [
       { type: 'PlainText', content: 'this is my using relays: ' },
       { type: 'URL', content: 'wss://relay.damus.io' },
       { type: 'PlainText', content: ', ' },
       { type: 'URL', content: 'wss://relay.snort.social' },
+      { type: 'PlainText', content: ', ' },
+      { type: 'URL', content: 'ws://localhost:3000' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
+  it('should ignore invalid URL', () => {
+    const parsed = parseTextNote('ws://localhost:port');
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'URL', content: 'ws://localhost' },
+      { type: 'PlainText', content: ':port' },
     ];
 
     assert.deepStrictEqual(parsed, expected);
@@ -114,16 +134,18 @@ describe('parseTextNote', () => {
 
     const expected: ParsedTextNoteNode[] = [
       { type: 'PlainText', content: 'this is pubkey\n' },
-      { type: 'TagReference', tagIndex: 0, content: '#[0]'},
+      { type: 'TagReference', tagIndex: 0, content: '#[0]' },
       { type: 'PlainText', content: ' ' },
-      { type: 'TagReference', tagIndex: 1, content: '#[1]'},
+      { type: 'TagReference', tagIndex: 1, content: '#[1]' },
     ];
 
     assert.deepStrictEqual(parsed, expected);
   });
 
   it('should parse text note which includes npub string', () => {
-    const parsed = parseTextNote('this is pubkey\nnpub1srf6g8v2qpnecqg9l2kzehmkg0ym5f5rtnlsj6lhl8r6pmhger7q5mtt3q\nhello');
+    const parsed = parseTextNote(
+      'this is pubkey\nnpub1srf6g8v2qpnecqg9l2kzehmkg0ym5f5rtnlsj6lhl8r6pmhger7q5mtt3q\nhello',
+    );
 
     const expected: ParsedTextNoteNode[] = [
       { type: 'PlainText', content: 'this is pubkey\n' },

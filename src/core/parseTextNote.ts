@@ -62,7 +62,7 @@ const hashTagRegex = /#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g;
 // nrelay and naddr is not supported by nostr-tools
 const mentionRegex = /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi;
 const urlRegex =
-  /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.:]+(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
+  /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(:\d{1,5})?(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
 
 const parseTextNote = (textNoteContent: string) => {
   const matches = [
