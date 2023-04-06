@@ -1,5 +1,10 @@
-export const isImageUrl = (url: URL): boolean => {
-  return /\.(jpeg|jpg|png|gif|webp)$/i.test(url.pathname);
+export const isImageUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return /\.(jpeg|jpg|png|gif|webp)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
 };
 
 export const fixUrl = (urlString: string): string => {

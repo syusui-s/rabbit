@@ -3,6 +3,7 @@ import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/c
 import type { Event as NostrEvent } from 'nostr-tools';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
+// eslint-disable-next-line import/no-cycle
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
 import ImageDisplay from '@/components/textNote/ImageDisplay';
 import SafeLink from '@/components/utils/SafeLink';
@@ -59,7 +60,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'URL') {
-          if (isImageUrl(new URL(item.content))) {
+          if (isImageUrl(item.content)) {
             return (
               <ImageDisplay
                 url={item.content}
