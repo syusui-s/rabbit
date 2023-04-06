@@ -1,5 +1,5 @@
 import { For } from 'solid-js';
-import parseTextNote, { type ParsedTextNoteNode } from '@/core/parseTextNote';
+import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/core/parseTextNote';
 import type { Event as NostrEvent } from 'nostr-tools';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
@@ -21,19 +21,23 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
   const { config } = useConfig();
   const event = () => eventWrapper(props.event);
   return (
-    <For each={parseTextNote(props.event)}>
+    <For each={parseTextNote(props.event.content)}>
       {(item: ParsedTextNoteNode) => {
         if (item.type === 'PlainText') {
           return <PlainTextDisplay plainText={item} />;
         }
-        if (item.type === 'MentionedUser') {
-          return <MentionedUserDisplay pubkey={item.pubkey} />;
-        }
-        if (item.type === 'MentionedEvent') {
-          if (props.embedding) {
-            return <MentionedEventDisplay mentionedEvent={item} />;
+        if (item.type === 'TagReference') {
+          const resolved = resolveTagReference(item, props.event);
+          if (resolved == null) return null;
+          if (resolved.type === 'MentionedUser') {
+            return <MentionedUserDisplay pubkey={resolved.pubkey} />;
           }
-          return <EventLink eventId={item.eventId} />;
+          if (resolved.type === 'MentionedEvent') {
+            if (props.embedding) {
+              return <MentionedEventDisplay mentionedEvent={resolved} />;
+            }
+            return <EventLink eventId={resolved.eventId} />;
+          }
         }
         if (item.type === 'Bech32Entity') {
           if (item.data.type === 'note' && props.embedding) {
