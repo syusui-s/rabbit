@@ -118,6 +118,15 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
+  it('should parse text note which includes only a URL', () => {
+    const parsed = parseTextNote('https://syusui-s.github.io/rabbit/');
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'URL', content: 'https://syusui-s.github.io/rabbit/' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
   it('should ignore invalid URL', () => {
     const parsed = parseTextNote('ws://localhost:port');
 

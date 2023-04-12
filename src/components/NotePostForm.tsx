@@ -21,11 +21,12 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import eventWrapper from '@/core/event';
 
 import useConfig from '@/nostr/useConfig';
-import useCommands from '@/nostr/useCommands';
+import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 
 import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
+import parseTextNote from '@/core/parseTextNote';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;
@@ -43,6 +44,36 @@ const placeholder = (mode: NotePostFormProps['mode']) => {
     default:
       return 'いまどうしてる？';
   }
+};
+
+const parseAndExtract = (content: string) => {
+  const parsed = parseTextNote(content);
+
+  const hashtags: string[] = [];
+  const pubkeyReferences: string[] = [];
+  const eventReferences: string[] = [];
+  const urlReferences: string[] = [];
+
+  parsed.forEach((node) => {
+    if (node.type === 'HashTag') {
+      hashtags.push(node.tagName);
+    } else if (node.type === 'URL') {
+      urlReferences.push(node.content);
+    } else if (node.type === 'Bech32Entity') {
+      if (node.data.type === 'npub') {
+        pubkeyReferences.push(node.data.data);
+      } else if (node.data.type === 'note') {
+        eventReferences.push(node.data.data);
+      }
+    }
+  });
+
+  return {
+    hashtags,
+    pubkeyReferences,
+    eventReferences,
+    urlReferences,
+  };
 };
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
@@ -113,9 +144,19 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const mentionedPubkeys: Accessor<string[]> = createMemo(
     () => replyTo()?.mentionedPubkeysWithoutAuthor() ?? [],
   );
-  const notifyPubkeys = (pubkey: string): string[] | undefined => {
-    if (props.replyTo === undefined) return undefined;
-    return uniq([props.replyTo.pubkey, ...mentionedPubkeys(), pubkey]);
+
+  const notifyPubkeys = (pubkey: string, pubkeyReferences: string[]): string[] => {
+    if (props.replyTo == null) return pubkeyReferences;
+    return uniq([
+      // 返信先を先頭に
+      props.replyTo.pubkey,
+      // 自分も通知欄に表示するために表示（他アプリとの互換性）
+      pubkey,
+      // その他の返信先
+      ...mentionedPubkeys(),
+      // 本文中の公開鍵（npub)
+      ...pubkeyReferences,
+    ]);
   };
 
   const submit = () => {
@@ -127,15 +168,23 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       console.error('pubkey is not available');
       return;
     }
-    let textNote: Parameters<typeof commands.publishTextNote>[0] = {
+
+    const { hashtags, pubkeyReferences, eventReferences, urlReferences } = parseAndExtract(text());
+
+    let textNote: PublishTextNoteParams = {
       relayUrls: config().relayUrls,
       pubkey,
       content: text(),
+      notifyPubkeys: pubkeyReferences,
+      mentionEventIds: eventReferences,
+      hashtags,
+      urls: urlReferences,
     };
+
     if (replyTo() != null) {
       textNote = {
         ...textNote,
-        notifyPubkeys: notifyPubkeys(pubkey),
+        notifyPubkeys: notifyPubkeys(pubkey, pubkeyReferences),
         rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
         replyEventId: replyTo()?.id,
       };

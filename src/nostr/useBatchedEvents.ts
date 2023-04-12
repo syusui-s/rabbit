@@ -120,6 +120,9 @@ setInterval(() => {
   setActiveBatchSubscriptions(count);
 }, 1000);
 
+const EmptyBatchedEvents = Object.freeze({ events: Object.freeze([]), completed: true });
+const emptyBatchedEvents = () => EmptyBatchedEvents;
+
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
   interval: 2000,
   batchSize: 150,
@@ -189,8 +192,6 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
         task.resolve(batchedEvents);
       });
     };
-
-    const emptyBatchedEvents = () => ({ events: [], completed: true });
 
     const finalizeTasks = () => {
       tasks.forEach((task) => {

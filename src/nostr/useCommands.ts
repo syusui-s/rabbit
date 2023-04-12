@@ -1,27 +1,26 @@
-import {
-  getEventHash,
-  type UnsignedEvent,
-  type Event as NostrEvent,
-  type Pub,
-  type Kind,
-} from 'nostr-tools';
+import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
 
-import '@/types/nostr.d';
+// import '@/types/nostr.d';
 import usePool from '@/nostr/usePool';
 
 import epoch from '@/utils/epoch';
 
-export type PublishTextNoteParams = {
-  relayUrls: string[];
-  pubkey: string;
-  content: string;
+export type TagParams = {
   tags?: string[][];
   notifyPubkeys?: string[];
   rootEventId?: string;
   mentionEventIds?: string[];
   replyEventId?: string;
+  hashtags?: string[];
+  urls?: string[];
   contentWarning?: string;
 };
+
+export type PublishTextNoteParams = {
+  relayUrls: string[];
+  pubkey: string;
+  content: string;
+} & TagParams;
 
 // NIP-20: Command Result
 const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
@@ -43,8 +42,10 @@ export const buildTags = ({
   mentionEventIds,
   replyEventId,
   contentWarning,
+  hashtags,
+  urls,
   tags,
-}: PublishTextNoteParams): string[][] => {
+}: TagParams): string[][] => {
   // NIP-10
   const eTags = [];
   const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
@@ -59,6 +60,14 @@ export const buildTags = ({
   }
   if (replyEventId != null) {
     eTags.push(['e', replyEventId, '', 'reply']);
+  }
+
+  if (hashtags != null) {
+    hashtags.forEach((tag) => otherTags.push(['t', tag]));
+  }
+
+  if (urls != null) {
+    urls.forEach((url) => otherTags.push(['r', url]));
   }
 
   if (contentWarning != null) {
@@ -161,6 +170,31 @@ const useCommands = () => {
         content: '',
       };
       return publishEvent(relayUrls, preSignedEvent);
+    },
+    // useFollowingsのisFetchedが呼ばれたとしても全てのリレーから取得できたとは限らない
+    // 半数以上、あるいは5秒待ってみて応答があればそれを利用するみたいな仕組みが必要か？
+    updateContacts({
+      relayUrls,
+      pubkey,
+      followingPubkeys,
+      content,
+    }: {
+      relayUrls: string[];
+      pubkey: string;
+      followingPubkeys: string[];
+      content: string;
+    }): Promise<Promise<void>[]> {
+      const pTags = followingPubkeys.map((key) => ['p', key]);
+
+      const preSignedEvent: UnsignedEvent = {
+        kind: Kind.Contacts,
+        pubkey,
+        created_at: epoch(),
+        tags: pTags,
+        content,
+      };
+      return publishEvent(relayUrls, preSignedEvent);
+      // TODO publishできたら、invalidateをしないといけない
     },
   };
 };
