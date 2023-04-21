@@ -46,8 +46,8 @@ const Hello: Component = () => {
   return (
     <div class="mx-auto flex max-w-[640px] flex-col items-center p-4 text-stone-600">
       <div class="flex flex-col items-center gap-4 rounded bg-white p-4">
-        <div class="text-7xl">🐰</div>
-        <h1 class="text-5xl font-bold text-rose-300">Rabbit</h1>
+        <img src="./images/rabbit_light_256.png" width="96" alt="logo" height="96" />
+        <h1 class="text-5xl font-black text-rose-300">Rabbit</h1>
         <div>Rabbit is a Web client for Nostr.</div>
         <p class="text-center">
           <span class="font-bold text-rose-400">注意: 現在ベータ版です。</span>
