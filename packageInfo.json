@@ -54,6 +54,17 @@
       "licenseText": "MIT License\n\nCopyright (c) 2021-present Tanner Linsley\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
     },
     {
+      "name": "@tanstack/solid-virtual",
+      "version": "3.0.0-beta.6",
+      "licenseSpdx": "MIT"
+    },
+    {
+      "name": "@reach/observe-rect",
+      "version": "1.2.0",
+      "licenseSpdx": "MIT",
+      "licenseText": "<p align=\"center\">\n  <a href=\"https://reach.tech\">\n    <img alt=\"Reach observeRect\" src=\"./logo.png\" width=\"400\">\n  </a>\n</p>\n\n<p align=\"center\">\n  Observe the rect of a DOM element.\n</p>\n\n<p align=\"center\">\n  <a href=\"https://www.npmjs.com/package/@reach/observe-rect\"><img src=\"https://img.shields.io/npm/v/@reach/observe-rect.svg?style=flat-square\"></a>\n  <a href=\"https://www.npmjs.com/package/@reach/observe-rect\"><img src=\"https://img.shields.io/npm/dm/@reach/observe-rect.svg?style=flat-square\"></a>\n</p>\n\n<p align=\"center\">\n  <img src=\"./demo.gif\" alt=\"Demo\"/>\n</p>\n\n## Installation\n\n```\nnpm install @reach/observe-rect\n# or\nyarn add @reach/observe-rect\n```\n\n## Usage\n\n```js\nimport observeRect from \"@reach/observe-rect\";\n\nlet node = document.getElementById(\"some-node\");\n\nlet rectObserver = observeRect(node, rect => {\n  console.log(\"left\", rect.left);\n  console.log(\"top\", rect.top);\n  console.log(\"height\", rect.height);\n  console.log(\"width\", rect.width);\n});\n\n// start observing\nrectObserver.observe();\n\n// stop observing\nrectObserver.unobserve();\n```\n\n## About\n\nA lot of things can change the position or size of an element, like scrolling, content reflows and user input. This utility observes and notifies you when your element's rect changes.\n\n## Legal\n\nMIT License\nCopyright (c) 2018-present, Ryan Florence\n"
+    },
+    {
       "name": "@thisbeyond/solid-dnd",
       "version": "0.7.3",
       "licenseSpdx": "MIT",
