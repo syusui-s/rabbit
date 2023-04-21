@@ -14,14 +14,21 @@ type TextNoteDisplayByIdProps = Omit<TextNoteDisplayProps, 'event'> & {
 };
 
 const TextNoteDisplayById: Component<TextNoteDisplayByIdProps> = (props) => {
+  const { shouldMuteEvent } = useConfig();
   const { event, query: eventQuery } = useEvent(() =>
     ensureNonNull([props.eventId] as const)(([eventIdNonNull]) => ({
       eventId: eventIdNonNull,
     })),
   );
 
+  const hidden = (): boolean => {
+    const ev = event();
+    return ev != null && shouldMuteEvent(ev);
+  };
+
   return (
     <Switch fallback="投稿が見つかりません">
+      <Match when={hidden()}>{null}</Match>
       <Match when={event()} keyed>
         {(ev) => <TextNoteDisplay event={ev} {...props} />}
       </Match>

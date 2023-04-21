@@ -9,6 +9,7 @@ import {
   type Component,
 } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
+import { createVirtualizer } from '@tanstack/solid-virtual';
 import uniq from 'lodash/uniq';
 
 import Column from '@/components/Column';
@@ -124,20 +125,6 @@ const Home: Component = () => {
       },
     ],
   }));
-
-  /*
-  const { events: searchPosts } = useSubscription(() => ({
-    relayUrls: ['wss://relay.nostr.band/'],
-    filters: [
-      {
-        kinds: [1],
-        search: '#nostrstudy',
-        limit: 25,
-        since: epoch() - 12 * 60 * 60,
-      },
-    ],
-  }));
-   */
 
   onMount(() => {
     if (!persistStatus().loggedIn) {

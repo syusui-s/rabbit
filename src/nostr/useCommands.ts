@@ -148,7 +148,7 @@ const useCommands = () => {
       return publishEvent(relayUrls, preSignedEvent);
     },
     // NIP-18
-    publishDeprecatedRepost({
+    async publishDeprecatedRepost({
       relayUrls,
       pubkey,
       eventId,
@@ -171,8 +171,6 @@ const useCommands = () => {
       };
       return publishEvent(relayUrls, preSignedEvent);
     },
-    // useFollowingsのisFetchedが呼ばれたとしても全てのリレーから取得できたとは限らない
-    // 半数以上、あるいは5秒待ってみて応答があればそれを利用するみたいな仕組みが必要か？
     updateContacts({
       relayUrls,
       pubkey,
@@ -194,7 +192,6 @@ const useCommands = () => {
         content,
       };
       return publishEvent(relayUrls, preSignedEvent);
-      // TODO publishできたら、invalidateをしないといけない
     },
   };
 };

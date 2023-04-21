@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onCleanup } from 'solid-js';
+import { createSignal, createEffect, onCleanup, on } from 'solid-js';
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 import uniqBy from 'lodash/uniqBy';
 import usePool from '@/nostr/usePool';
@@ -35,9 +35,19 @@ setInterval(() => {
 }, 1000);
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
-  const { config } = useConfig();
+  const { config, shouldMuteEvent } = useConfig();
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
+
+  createEffect(
+    on(
+      () => [config().mutedPubkeys, config().mutedKeywords],
+      () => {
+        setEvents((currentEvents) => currentEvents.filter((event) => !shouldMuteEvent(event)));
+      },
+      { defer: true },
+    ),
+  );
 
   const startSubscription = () => {
     const props = propsProvider();
@@ -58,7 +68,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
       if (onEvent != null) {
         onEvent(event as NostrEvent & { id: string });
       }
-      if (config().mutedPubkeys.includes(event.pubkey)) {
+      if (shouldMuteEvent(event)) {
         return;
       }
       if (props.clientEventFilter != null && !props.clientEventFilter(event)) {

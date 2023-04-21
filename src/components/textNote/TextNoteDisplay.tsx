@@ -54,7 +54,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     {
       content: () => 'JSONとしてコピー',
       onSelect: () => {
-        navigator.clipboard.writeText(JSON.stringify(props.event)).catch((err) => window.alert(err));
+        navigator.clipboard
+          .writeText(JSON.stringify(props.event))
+          .catch((err) => window.alert(err));
       },
     },
   ];
@@ -94,10 +96,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     mutationFn: commands.publishReaction.bind(commands),
     onSuccess: () => {
       console.log('succeeded to publish reaction');
-      invalidateReactions().catch((err) => console.error('failed to refetch reactions', err));
     },
     onError: (err) => {
       console.error('failed to publish reaction: ', err);
+    },
+    onSettled: () => {
+      invalidateReactions().catch((err) => console.error('failed to refetch reactions', err));
     },
   });
 
@@ -106,10 +110,12 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     mutationFn: commands.publishDeprecatedRepost.bind(commands),
     onSuccess: () => {
       console.log('succeeded to publish reposts');
-      invalidateDeprecatedReposts().catch((err) => console.error('failed to refetch reposts', err));
     },
     onError: (err) => {
       console.error('failed to publish repost: ', err);
+    },
+    onSettled: () => {
+      invalidateDeprecatedReposts().catch((err) => console.error('failed to refetch reposts', err));
     },
   });
 

@@ -3,6 +3,7 @@ import { createSignal, For, type JSX } from 'solid-js';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import Modal from '@/components/Modal';
+import UserNameDisplay from './UserDisplayName';
 
 type ConfigProps = {
   onClose: () => void;
@@ -21,7 +22,7 @@ const RelayConfig = () => {
   };
 
   return (
-    <div>
+    <div class="py-2">
       <h3 class="font-bold">リレー</h3>
       <ul>
         <For each={config().relayUrls}>
@@ -83,7 +84,7 @@ const DateFormatConfig = () => {
   };
 
   return (
-    <div>
+    <div class="py-2">
       <h3 class="font-bold">時刻の表記</h3>
       <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
         <For each={dateFormats}>
@@ -132,6 +133,68 @@ const ToggleButton = (props: {
   );
 };
 
+const MuteConfig = () => {
+  const { config, removeMutedPubkey, addMutedKeyword, removeMutedKeyword } = useConfig();
+
+  const [keywordInput, setKeywordInput] = createSignal('');
+
+  const handleClickAddKeyword: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
+    ev.preventDefault();
+    if (keywordInput().length === 0) return;
+    addMutedKeyword(keywordInput());
+    setKeywordInput('');
+  };
+
+  return (
+    <>
+      <div class="py-2">
+        <h3 class="font-bold">ミュートしたユーザ</h3>
+        <ul class="flex flex-col">
+          <For each={config().mutedPubkeys}>
+            {(pubkey) => (
+              <li class="flex items-center">
+                <div class="flex-1 truncate">
+                  <UserNameDisplay pubkey={pubkey} />
+                </div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeMutedPubkey(pubkey)}>
+                  <XMark />
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </div>
+      <div class="py-2">
+        <h3 class="font-bold">ミュートした単語</h3>
+        <ul class="flex flex-col">
+          <For each={config().mutedKeywords}>
+            {(keyword) => (
+              <li class="flex items-center">
+                <div class="flex-1 truncate">{keyword}</div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeMutedKeyword(keyword)}>
+                  <XMark />
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+        <form class="flex gap-2" onSubmit={handleClickAddKeyword}>
+          <input
+            class="flex-1"
+            type="text"
+            name="keyword"
+            value={keywordInput()}
+            onChange={(ev) => setKeywordInput(ev.currentTarget.value)}
+          />
+          <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
+            追加
+          </button>
+        </form>
+      </div>
+    </>
+  );
+};
+
 const OtherConfig = () => {
   const { config, setConfig } = useConfig();
 
@@ -150,7 +213,7 @@ const OtherConfig = () => {
   };
 
   return (
-    <div>
+    <div class="py-2">
       <h3 class="font-bold">その他</h3>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
@@ -194,6 +257,7 @@ const ConfigUI = (props: ConfigProps) => {
         <RelayConfig />
         <DateFormatConfig />
         <OtherConfig />
+        <MuteConfig />
       </div>
     </Modal>
   );

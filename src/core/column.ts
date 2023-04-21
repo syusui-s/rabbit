@@ -1,5 +1,5 @@
 // import { z } from 'zod';
-import { type Event as NostrEvent, type Filter } from 'nostr-tools';
+import { type Filter } from 'nostr-tools';
 import { type ColumnProps } from '@/components/Column';
 
 export type NotificationType =
@@ -43,42 +43,42 @@ type BulidOptions = {
 
 export type BaseColumn = {
   title: string;
-  columnWidth: ColumnProps['width'];
+  width: ColumnProps['width'];
 };
 
 /** A column which shows posts by following users */
-export type FollowingColumn = {
+export type FollowingColumn = BaseColumn & {
   columnType: 'Following';
   pubkey: string;
 };
 
 /** A column which shows replies, reactions, reposts to the specific user */
-export type NotificationColumn = {
+export type NotificationColumn = BaseColumn & {
   columnType: 'Notification';
-  notificationTypes: NotificationType[];
+  // notificationTypes: NotificationType[];
   pubkey: string;
 };
 
 /** A column which shows posts from the specific user */
-export type PostsColumn = {
+export type PostsColumn = BaseColumn & {
   columnType: 'Posts';
   pubkey: string;
 };
 
 /** A column which shows reactions published by the specific user */
-export type ReactionsColumn = {
+export type ReactionsColumn = BaseColumn & {
   columnType: 'Reactions';
   pubkey: string;
 };
 
 /** A column which shows text notes and reposts posted to the specific relays */
-export type GlobalColumn = {
+export type GlobalColumn = BaseColumn & {
   columnType: 'Global';
   relayUrls: string[];
 };
 
 /** A column which shows text notes and reposts posted to the specific relays */
-export type CustomFilterColumn = {
+export type CustomFilterColumn = BaseColumn & {
   columnType: 'CustomFilter';
   filters: Filter[];
 };

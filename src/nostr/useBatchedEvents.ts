@@ -109,6 +109,7 @@ type Following = {
 export type UseFollowings = {
   followings: () => Following[];
   followingPubkeys: () => string[];
+  invalidateFollowings: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
 
@@ -205,7 +206,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
       });
     };
 
-    const { config } = useConfig();
+    const { config, shouldMuteEvent } = useConfig();
     const pool = usePool();
 
     const sub = pool().sub(config().relayUrls, filters, {});
@@ -213,12 +214,15 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     count += 1;
 
     sub.on('event', (event: NostrEvent & { id: string }) => {
-      if (config().mutedPubkeys.includes(event.id)) return;
       if (event.kind === Kind.Metadata) {
         const registeredTasks = profileTasks.get(event.pubkey) ?? [];
         resolveTasks(registeredTasks, event);
-      } else if (event.kind === Kind.Text) {
-        if (config().mutedPubkeys.includes(event.pubkey)) return;
+        return;
+      }
+
+      if (shouldMuteEvent(event)) return;
+
+      if (event.kind === Kind.Text) {
         const registeredTasks = textNoteTasks.get(event.id) ?? [];
         resolveTasks(registeredTasks, event);
       } else if (event.kind === Kind.Reaction) {
@@ -229,7 +233,6 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
           resolveTasks(registeredTasks, event);
         });
       } else if ((event.kind as number) === 6) {
-        if (config().mutedPubkeys.includes(event.pubkey)) return;
         const eventTags = eventWrapper(event).taggedEvents();
         eventTags.forEach((eventTag) => {
           const taggedEventId = eventTag.id;
@@ -494,5 +497,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
 
   const followingPubkeys = (): string[] => followings().map((follow) => follow.pubkey);
 
-  return { followings, followingPubkeys, query };
+  const invalidateFollowings = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
+
+  return { followings, followingPubkeys, invalidateFollowings, query };
 };

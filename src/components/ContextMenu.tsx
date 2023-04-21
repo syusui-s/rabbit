@@ -11,7 +11,9 @@ export type ContextMenuProps = {
 };
 
 export type MenuDisplayProps = {
+  menuRef: (elem: HTMLUListElement) => void;
   menu: MenuItem[];
+  isOpen: boolean;
   onClose: () => void;
 };
 
@@ -37,7 +39,11 @@ const MenuItemDisplay: Component<MenuItemDisplayProps> = (props) => {
 
 const MenuDisplay: Component<MenuDisplayProps> = (props) => {
   return (
-    <ul>
+    <ul
+      ref={props.menuRef}
+      class="absolute z-20 min-w-[48px] rounded border bg-white shadow-md"
+      classList={{ hidden: !props.isOpen, block: props.isOpen }}
+    >
       <For each={props.menu}>
         {(item) => <MenuItemDisplay item={item} onClose={props.onClose} />}
       </For>
@@ -46,7 +52,7 @@ const MenuDisplay: Component<MenuDisplayProps> = (props) => {
 };
 
 const ContextMenu: Component<ContextMenuProps> = (props) => {
-  let menuRef: HTMLDivElement | undefined;
+  let menuRef: HTMLUListElement | undefined;
 
   const [isOpen, setIsOpen] = createSignal(false);
 
@@ -66,8 +72,9 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
   const handleClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     if (menuRef == null) return;
 
-    const buttonRect = ev.target.getBoundingClientRect();
-    menuRef.style.left = `${buttonRect.left}px`;
+    const buttonRect = ev.currentTarget.getBoundingClientRect();
+    const menuRect = menuRef.getBoundingClientRect();
+    menuRef.style.left = `${buttonRect.left - buttonRect.width}px`;
     menuRef.style.top = `${buttonRect.top + buttonRect.height}px`;
 
     setIsOpen(true);
@@ -86,13 +93,14 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
   return (
     <div>
       <button onClick={handleClick}>{props.children}</button>
-      <div
-        ref={menuRef}
-        class="absolute z-20 min-w-[48px] rounded border bg-white shadow-md"
-        classList={{ hidden: !isOpen(), block: isOpen() }}
-      >
-        <MenuDisplay menu={props.menu} onClose={() => setIsOpen(false)} />
-      </div>
+      <MenuDisplay
+        menuRef={(e) => {
+          menuRef = e;
+        }}
+        menu={props.menu}
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+      />
     </div>
   );
 };

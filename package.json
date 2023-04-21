@@ -50,6 +50,7 @@
     "@tanstack/query-persist-client-core": "^4.24.10",
     "@tanstack/query-sync-storage-persister": "^4.24.10",
     "@tanstack/solid-query": "^4.24.10",
+    "@tanstack/solid-virtual": "^3.0.0-beta.6",
     "@thisbeyond/solid-dnd": "^0.7.3",
     "@types/lodash": "^4.14.191",
     "heroicons": "^2.0.15",

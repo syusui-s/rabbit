@@ -1,10 +1,12 @@
 import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
+import { createMutation } from '@tanstack/solid-query';
 
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
+import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
 import Modal from '@/components/Modal';
 import Timeline from '@/components/Timeline';
@@ -17,11 +19,14 @@ import useVerification from '@/nostr/useVerification';
 import useFollowings from '@/nostr/useFollowings';
 import useFollowers from '@/nostr/useFollowers';
 import useConfig from '@/nostr/useConfig';
+import useCommands from '@/nostr/useCommands';
 import useSubscription from '@/nostr/useSubscription';
 
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
+import timeout from '@/utils/timeout';
+import ContextMenu, { MenuItem } from './ContextMenu';
 
 export type ProfileDisplayProps = {
   pubkey: string;
@@ -37,8 +42,11 @@ const FollowersCount: Component<{ pubkey: string }> = (props) => {
 };
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
-  const { config } = useConfig();
-  const pubkey = usePubkey();
+  const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted } = useConfig();
+  const commands = useCommands();
+  const myPubkey = usePubkey();
+
+  const npub = createMemo(() => npubEncodeFallback(props.pubkey));
 
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
@@ -58,25 +66,103 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     return { user, domain, ident };
   };
   const isVerified = () => verification()?.pubkey === props.pubkey;
+  const isMuted = () => isPubkeyMuted(props.pubkey);
 
-  const { followingPubkeys: myFollowingPubkeys } = useFollowings(() =>
-    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+  const {
+    followingPubkeys: myFollowingPubkeys,
+    invalidateFollowings: invalidateMyFollowings,
+    query: myFollowingQuery,
+  } = useFollowings(() =>
+    ensureNonNull([myPubkey()] as const)(([pubkeyNonNull]) => ({
       pubkey: pubkeyNonNull,
     })),
   );
   const following = () => myFollowingPubkeys().includes(props.pubkey);
 
   const { followingPubkeys: userFollowingPubkeys, query: userFollowingQuery } = useFollowings(
-    () => ({
-      pubkey: props.pubkey,
-    }),
+    () => ({ pubkey: props.pubkey }),
   );
+
   const followed = () => {
-    const p = pubkey();
+    const p = myPubkey();
     return p != null && userFollowingPubkeys().includes(p);
   };
 
-  const npub = createMemo(() => npubEncodeFallback(props.pubkey));
+  const updateContactsMutation = createMutation({
+    mutationKey: ['updateContacts'],
+    mutationFn: (...params: Parameters<typeof commands.updateContacts>) =>
+      commands
+        .updateContacts(...params)
+        .then((promises) => Promise.allSettled(promises.map(timeout(5000)))),
+    onSuccess: (results) => {
+      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+      if (succeeded === results.length) {
+        console.log('succeeded to update contacts');
+      } else if (succeeded > 0) {
+        console.log(
+          `succeeded to update contacts for ${succeeded} relays but failed for ${failed} relays`,
+        );
+      } else {
+        console.error('failed to update contacts');
+      }
+    },
+    onError: (err) => {
+      console.error('failed to update contacts: ', err);
+    },
+    onSettled: () => {
+      invalidateMyFollowings()
+        .then(() => myFollowingQuery.refetch())
+        .catch((err) => console.error('failed to refetch contacts', err));
+    },
+  });
+
+  const follow = () => {
+    const p = myPubkey();
+    if (p == null) return;
+    if (!myFollowingQuery.isFetched) return;
+
+    updateContactsMutation.mutate({
+      relayUrls: config().relayUrls,
+      pubkey: p,
+      content: myFollowingQuery.data?.content ?? '',
+      followingPubkeys: [...myFollowingPubkeys(), props.pubkey],
+    });
+  };
+
+  const unfollow = () => {
+    const p = myPubkey();
+    if (p == null) return;
+    if (!myFollowingQuery.isFetched) return;
+
+    if (!window.confirm('本当にフォロー解除しますか？')) return;
+
+    updateContactsMutation.mutate({
+      relayUrls: config().relayUrls,
+      pubkey: p,
+      content: myFollowingQuery.data?.content ?? '',
+      followingPubkeys: myFollowingPubkeys().filter((k) => k !== props.pubkey),
+    });
+  };
+
+  const menu: MenuItem[] = [
+    {
+      content: () => 'IDをコピー',
+      onSelect: () => {
+        navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+      },
+    },
+    {
+      content: () => (!isMuted() ? 'ミュート' : 'ミュート解除'),
+      onSelect: () => {
+        if (!isMuted()) {
+          addMutedPubkey(props.pubkey);
+        } else {
+          removeMutedPubkey(props.pubkey);
+        }
+      },
+    },
+  ];
 
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
@@ -113,100 +199,118 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               )}
             </Show>
             <div class="mt-[-54px] flex items-end gap-4 px-4 pt-4">
-              <div class="h-28 w-28 shrink-0 rounded-lg shadow-md">
-                <Show when={profile()?.picture} keyed>
-                  {(pictureUrl) => (
-                    <img
-                      src={pictureUrl}
-                      alt="user icon"
-                      class="h-full w-full rounded-lg object-cover"
-                    />
-                  )}
-                </Show>
-              </div>
-              <div class="flex items-start overflow-hidden">
-                <div class="h-16 shrink overflow-hidden">
-                  <Show when={(profile()?.display_name?.length ?? 0) > 0}>
-                    <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
+              <div class="flex-1 shrink-0">
+                <div class="h-28 w-28 rounded-lg shadow-md">
+                  <Show when={profile()?.picture} keyed>
+                    {(pictureUrl) => (
+                      <img
+                        src={pictureUrl}
+                        alt="user icon"
+                        class="h-full w-full rounded-lg object-cover"
+                      />
+                    )}
                   </Show>
-                  <div class="flex items-center gap-2">
-                    <Show when={(profile()?.name?.length ?? 0) > 0}>
-                      <div class="truncate text-xs">@{profile()?.name}</div>
-                    </Show>
-                    <Show when={(profile()?.nip05?.length ?? 0) > 0}>
-                      <div class="flex items-center text-xs">
-                        {nip05Identifier()?.ident}
-                        <Switch
-                          fallback={
-                            <span class="inline-block h-4 w-4 text-rose-500">
-                              <ExclamationCircle />
-                            </span>
-                          }
-                        >
-                          <Match when={verificationQuery.isLoading}>
-                            <span class="inline-block h-3 w-3">
-                              <ArrowPath />
-                            </span>
-                          </Match>
-                          <Match when={isVerified()}>
-                            <span class="inline-block h-4 w-4 text-blue-400">
-                              <CheckCircle />
-                            </span>
-                          </Match>
-                        </Switch>
-                      </div>
-                    </Show>
-                  </div>
-                  <div class="flex gap-1">
-                    <div class="truncate text-xs">{npub()}</div>
-                    <Copy
-                      class="h-4 w-4 shrink-0 text-stone-500 hover:text-stone-700"
-                      text={npub()}
-                    />
-                  </div>
                 </div>
-                <div class="flex shrink-0 flex-col items-center justify-center gap-1">
-                  {/*
-                  <Switch
-                    fallback={
-                      <button
-                        class="w-24 rounded-full border border-primary px-4 py-2 text-primary
-                                     hover:border-rose-400 hover:text-rose-400"
-                      >
-                        フォロー
-                      </button>
-                    }
-                  >
-                    <Match when={props.pubkey === pubkey()}>
-                      <button
-                        class="w-20 rounded-full border border-primary px-4 py-2 text-primary
-                               hover:border-rose-400 hover:text-rose-400"
-                      >
-                        編集
-                      </button>
+              </div>
+              <div class="flex shrink-0 flex-col items-center gap-1">
+                <div class="flex flex-row justify-start gap-1">
+                  <Switch>
+                    <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
+                      <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
+                        読み込み中
+                      </span>
                     </Match>
+                    <Match when={updateContactsMutation.isLoading}>
+                      <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
+                        更新中
+                      </span>
+                    </Match>
+                    {/*
+                    <Match when={props.pubkey === myPubkey()}>
+                      <span class="rounded-full border border-primary px-4 py-2 text-primary">
+                        あなたです
+                      </span>
+                    </Match>
+                    */}
                     <Match when={following()}>
                       <button
-                        class="w-32 rounded-full border border-primary bg-primary px-4 py-2
-                               text-center font-bold text-white hover:bg-rose-500"
+                        class="rounded-full border border-primary bg-primary px-4 py-2
+                        text-center font-bold text-white hover:bg-rose-500 sm:w-32"
                         onMouseEnter={() => setHoverFollowButton(true)}
                         onMouseLeave={() => setHoverFollowButton(false)}
+                        onClick={() => unfollow()}
+                        disabled={updateContactsMutation.isLoading}
                       >
                         <Show when={!hoverFollowButton()} fallback="フォロー解除">
                           フォロー中
                         </Show>
                       </button>
                     </Match>
+                    <Match when={!following()}>
+                      <button
+                        class="w-24 rounded-full border border-primary px-4 py-2 text-primary
+                                     hover:border-rose-400 hover:text-rose-400"
+                        onClick={() => follow()}
+                        disabled={updateContactsMutation.isLoading}
+                      >
+                        フォロー
+                      </button>
+                    </Match>
                   </Switch>
-                  */}
-                  <Show when={followed()}>
-                    <div class="shrink-0 text-xs">フォローされています</div>
+                  <ContextMenu menu={menu}>
+                    <button
+                      class="w-10 rounded-full border border-primary p-2 text-primary
+                             hover:border-rose-400 hover:text-rose-400"
+                    >
+                      <EllipsisHorizontal />
+                    </button>
+                  </ContextMenu>
+                </div>
+                <Show when={followed()}>
+                  <div class="shrink-0 text-xs">フォローされています</div>
+                </Show>
+              </div>
+            </div>
+            <div class="flex items-start px-4 pt-2">
+              <div class="h-16 shrink overflow-hidden">
+                <Show when={(profile()?.display_name?.length ?? 0) > 0}>
+                  <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
+                </Show>
+                <div class="flex items-center gap-2">
+                  <Show when={(profile()?.name?.length ?? 0) > 0}>
+                    <div class="truncate text-xs">@{profile()?.name}</div>
                   </Show>
+                  <Show when={(profile()?.nip05?.length ?? 0) > 0}>
+                    <div class="flex items-center text-xs">
+                      {nip05Identifier()?.ident}
+                      <Switch
+                        fallback={
+                          <span class="inline-block h-4 w-4 text-rose-500">
+                            <ExclamationCircle />
+                          </span>
+                        }
+                      >
+                        <Match when={verificationQuery.isLoading}>
+                          <span class="inline-block h-3 w-3">
+                            <ArrowPath />
+                          </span>
+                        </Match>
+                        <Match when={isVerified()}>
+                          <span class="inline-block h-4 w-4 text-blue-400">
+                            <CheckCircle />
+                          </span>
+                        </Match>
+                      </Switch>
+                    </div>
+                  </Show>
+                </div>
+                <div class="flex gap-1">
+                  <div class="truncate text-xs">{npub()}</div>
                 </div>
               </div>
             </div>
             <Show when={(profile()?.about ?? '').length > 0}>
-              <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-5 py-3 text-sm">
+              <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
                 {profile()?.about}
               </div>
             </Show>

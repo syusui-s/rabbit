@@ -1,15 +1,19 @@
 import { type Accessor, type Setter } from 'solid-js';
+import { Kind, type Event as NostrEvent } from 'nostr-tools';
 import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
+import { ColumnConfig } from '@/core/column';
 
 export type Config = {
   relayUrls: string[];
+  columns: ColumnConfig[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   showImage: boolean;
   mutedPubkeys: string[];
+  mutedKeywords: string[];
 };
 
 type UseConfig = {
@@ -19,31 +23,46 @@ type UseConfig = {
   removeRelay: (url: string) => void;
   addMutedPubkey: (pubkey: string) => void;
   removeMutedPubkey: (pubkey: string) => void;
+  addMutedKeyword: (keyword: string) => void;
+  removeMutedKeyword: (keyword: string) => void;
+  isPubkeyMuted: (pubkey: string) => boolean;
+  shouldMuteEvent: (event: NostrEvent) => boolean;
+  initializeColumns: (param: { pubkey: string }) => void;
 };
 
+const relaysGlobal = [
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+  'wss://relay.snort.social',
+  'wss://relay.current.fyi',
+];
+
+const relaysOnlyAvailableInJP = [
+  'wss://relay-jp.nostr.wirednet.jp',
+  'wss://nostr.h3z.jp',
+  'wss://nostr.holybea.com',
+];
+
+const relaysInJP = [
+  ...relaysOnlyAvailableInJP,
+  'wss://nostr.holybea.com',
+  'wss://nostr-relay.nokotaro.com',
+];
+
 const InitialConfig = (): Config => {
-  const relayUrls = [
-    'wss://relay.damus.io',
-    'wss://nos.lol',
-    'wss://relay.snort.social',
-    'wss://relay.current.fyi',
-  ];
+  const relayUrls = [...relaysGlobal];
   if (navigator.language === 'ja') {
-    relayUrls.push(
-      'wss://nostr.h3z.jp',
-      'wss://relay.nostr.wirednet.jp',
-      'wss://relay-jp.nostr.wirednet.jp',
-      'wss://nostr.holybea.com',
-      'wss://nostr-relay.nokotaro.com',
-    );
+    relayUrls.push(...relaysInJP);
   }
 
   return {
     relayUrls,
+    columns: [],
     dateFormat: 'relative',
     keepOpenPostForm: false,
     showImage: true,
     mutedPubkeys: [],
+    mutedKeywords: [],
   };
 };
 
@@ -75,6 +94,40 @@ const useConfig = (): UseConfig => {
     setConfig('mutedPubkeys', (current) => current.filter((e) => e !== pubkey));
   };
 
+  const addMutedKeyword = (keyword: string) => {
+    setConfig('mutedKeywords', (current) => [...current, keyword]);
+  };
+
+  const removeMutedKeyword = (keyword: string) => {
+    setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
+  };
+
+  const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
+
+  const hasMutedKeyword = (event: NostrEvent) => {
+    if (event.kind === Kind.Text) {
+      return config.mutedKeywords.some((keyword) => event.content.includes(keyword));
+    }
+    return false;
+  };
+
+  const shouldMuteEvent = (event: NostrEvent) => isPubkeyMuted(event.pubkey) || hasMutedKeyword(event);
+
+  const initializeColumns = ({ pubkey }: { pubkey: string }) => {
+    // すでに設定されている場合は終了
+    if ((config.columns?.length ?? 0) > 0) return;
+
+    const myColumns: ColumnConfig[] = [
+      { columnType: 'Following', title: 'ホーム', width: 'widest', pubkey },
+      { columnType: 'Notification', title: '通知', width: 'medium', pubkey },
+      { columnType: 'Posts', title: '自分の投稿', width: 'medium', pubkey },
+      { columnType: 'Reactions', title: '自分のリアクション', width: 'medium', pubkey },
+      // { columnType: 'Global', relays: [] },
+    ];
+
+    setConfig('columns', () => [...myColumns]);
+  };
+
   return {
     config: () => config,
     setConfig,
@@ -82,6 +135,11 @@ const useConfig = (): UseConfig => {
     removeRelay,
     addMutedPubkey,
     removeMutedPubkey,
+    addMutedKeyword,
+    removeMutedKeyword,
+    isPubkeyMuted,
+    shouldMuteEvent,
+    initializeColumns,
   };
 };
 
