@@ -19,7 +19,7 @@ export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
   form.set('img_url', '');
   form.set('submit', 'Upload');
 
-  const res = await fetch('https://nostr.build/api/upload/uploadapi.php', {
+  const res = await fetch('https://nostr.build/api/upload/ios.php', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
