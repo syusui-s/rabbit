@@ -1,5 +1,6 @@
-import type { Event as NostrEvent } from 'nostr-tools';
 import uniq from 'lodash/uniq';
+
+import type { Event as NostrEvent } from 'nostr-tools';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 

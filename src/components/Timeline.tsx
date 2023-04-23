@@ -1,8 +1,9 @@
 import { For, Switch, Match, type Component } from 'solid-js';
+
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
-import TextNote from '@/components/TextNote';
 import DeprecatedRepost from '@/components/DeprecatedRepost';
+import TextNote from '@/components/TextNote';
 
 export type TimelineProps = {
   events: NostrEvent[];

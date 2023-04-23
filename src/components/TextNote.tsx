@@ -2,6 +2,7 @@ import { Show, type Component } from 'solid-js';
 
 import ColumnItem from '@/components/ColumnItem';
 import useConfig from '@/nostr/useConfig';
+
 import TextNoteDisplay, { TextNoteDisplayProps } from './textNote/TextNoteDisplay';
 
 export type TextNoteProps = TextNoteDisplayProps;

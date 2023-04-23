@@ -1,31 +1,30 @@
 import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
-import { createMutation } from '@tanstack/solid-query';
 
+import { createMutation } from '@tanstack/solid-query';
+import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
+import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
-import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
-import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 
 import Modal from '@/components/Modal';
 import Timeline from '@/components/Timeline';
 import Copy from '@/components/utils/Copy';
 import SafeLink from '@/components/utils/SafeLink';
-
-import usePubkey from '@/nostr/usePubkey';
-import useProfile from '@/nostr/useProfile';
-import useVerification from '@/nostr/useVerification';
-import useFollowings from '@/nostr/useFollowings';
-import useFollowers from '@/nostr/useFollowers';
-import useConfig from '@/nostr/useConfig';
 import useCommands from '@/nostr/useCommands';
+import useConfig from '@/nostr/useConfig';
+import useFollowers from '@/nostr/useFollowers';
+import useFollowings from '@/nostr/useFollowings';
+import useProfile from '@/nostr/useProfile';
+import usePubkey from '@/nostr/usePubkey';
 import useSubscription from '@/nostr/useSubscription';
-
-import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
+import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
+
 import ContextMenu, { MenuItem } from './ContextMenu';
 
 export type ProfileDisplayProps = {

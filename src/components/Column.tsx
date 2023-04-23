@@ -1,9 +1,10 @@
 import { Show, type JSX, type Component } from 'solid-js';
+
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 
-import { useHandleCommand } from '@/hooks/useCommandBus';
-import { TimelineContext, useTimelineState } from '@/components/TimelineContext';
 import TimelineContentDisplay from '@/components/TimelineContentDisplay';
+import { TimelineContext, useTimelineState } from '@/components/TimelineContext';
+import { useHandleCommand } from '@/hooks/useCommandBus';
 
 export type ColumnProps = {
   name: string;

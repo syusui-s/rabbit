@@ -1,8 +1,9 @@
 import { createEffect, onCleanup, lazy, type Component } from 'solid-js';
+
 import { Routes, Route } from '@solidjs/router';
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { persistQueryClient } from '@tanstack/query-persist-client-core';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 
 const Home = lazy(() => import('@/pages/Home'));
 const Hello = lazy(() => import('@/pages/Hello'));

@@ -1,5 +1,5 @@
-import type { Accessor } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
+import type { Accessor } from 'solid-js';
 
 export type UseResizedImageProps = {
   imageUrl: Accessor<string | undefined>;

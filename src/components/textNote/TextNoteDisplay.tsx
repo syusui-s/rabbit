@@ -1,36 +1,33 @@
 import { Show, For, createSignal, createMemo, onMount, type JSX, type Component } from 'solid-js';
-import { nip19, type Event as NostrEvent } from 'nostr-tools';
-import { createMutation } from '@tanstack/solid-query';
 
-import HeartOutlined from 'heroicons/24/outline/heart.svg';
-import HeartSolid from 'heroicons/24/solid/heart.svg';
+import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
+import HeartOutlined from 'heroicons/24/outline/heart.svg';
+import HeartSolid from 'heroicons/24/solid/heart.svg';
+import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
-import eventWrapper from '@/core/event';
-
-import useProfile from '@/nostr/useProfile';
-import useConfig from '@/nostr/useConfig';
-import usePubkey from '@/nostr/usePubkey';
-import useCommands from '@/nostr/useCommands';
-import useReactions from '@/nostr/useReactions';
-import useDeprecatedReposts from '@/nostr/useDeprecatedReposts';
-
-import useFormatDate from '@/hooks/useFormatDate';
-import useModalState from '@/hooks/useModalState';
-
-import UserNameDisplay from '@/components/UserDisplayName';
+import NotePostForm from '@/components/NotePostForm';
+import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
+import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
+// eslint-disable-next-line import/no-cycle
+import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import { useTimelineContext } from '@/components/TimelineContext';
-import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
-import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
-import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
-import NotePostForm from '@/components/NotePostForm';
-
+import eventWrapper from '@/core/event';
+import useFormatDate from '@/hooks/useFormatDate';
+import useModalState from '@/hooks/useModalState';
+import useCommands from '@/nostr/useCommands';
+import useConfig from '@/nostr/useConfig';
+import useProfile from '@/nostr/useProfile';
+import usePubkey from '@/nostr/usePubkey';
+import useReactions from '@/nostr/useReactions';
+import useReposts from '@/nostr/useReposts';
+import useSubscription from '@/nostr/useSubscription';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
-import useSubscription from '@/nostr/useSubscription';
+
 import ContextMenu, { MenuItem } from '../ContextMenu';
 
 export type TextNoteDisplayProps = {
@@ -85,7 +82,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     eventId: props.event.id,
   }));
 
-  const { reposts, isRepostedBy, invalidateDeprecatedReposts } = useDeprecatedReposts(() => ({
+  const { reposts, isRepostedBy, invalidateReposts } = useReposts(() => ({
     eventId: props.event.id,
   }));
 
@@ -105,9 +102,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     },
   });
 
-  const publishDeprecatedRepostMutation = createMutation({
-    mutationKey: ['publishDeprecatedRepost', event().id],
-    mutationFn: commands.publishDeprecatedRepost.bind(commands),
+  const publishRepostMutation = createMutation({
+    mutationKey: ['publishRepost', event().id],
+    mutationFn: commands.publishRepost.bind(commands),
     onSuccess: () => {
       console.log('succeeded to publish reposts');
     },
@@ -115,7 +112,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       console.error('failed to publish repost: ', err);
     },
     onSettled: () => {
-      invalidateDeprecatedReposts().catch((err) => console.error('failed to refetch reposts', err));
+      invalidateReposts().catch((err) => console.error('failed to refetch reposts', err));
     },
   });
 
@@ -151,7 +148,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishDeprecatedRepostMutation.mutate({
+      publishRepostMutation.mutate({
         relayUrls: config().relayUrls,
         pubkey: pubkeyNonNull,
         eventId: eventIdNonNull,
@@ -306,13 +303,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isRepostedByMe(),
-                  'text-green-400': isRepostedByMe() || publishDeprecatedRepostMutation.isLoading,
+                  'text-green-400': isRepostedByMe() || publishRepostMutation.isLoading,
                 }}
               >
                 <button
                   class="h-4 w-4"
                   onClick={handleRepost}
-                  disabled={publishDeprecatedRepostMutation.isLoading}
+                  disabled={publishRepostMutation.isLoading}
                 >
                   <ArrowPathRoundedSquare />
                 </button>

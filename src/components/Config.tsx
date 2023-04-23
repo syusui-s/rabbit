@@ -1,8 +1,10 @@
-import useConfig, { type Config } from '@/nostr/useConfig';
 import { createSignal, For, type JSX } from 'solid-js';
+
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import Modal from '@/components/Modal';
+import useConfig, { type Config } from '@/nostr/useConfig';
+
 import UserNameDisplay from './UserDisplayName';
 
 type ConfigProps = {

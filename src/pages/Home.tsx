@@ -8,26 +8,24 @@ import {
   Match,
   type Component,
 } from 'solid-js';
+
 import { useNavigate } from '@solidjs/router';
 import { createVirtualizer } from '@tanstack/solid-virtual';
 import uniq from 'lodash/uniq';
 
 import Column from '@/components/Column';
-import SideBar from '@/components/SideBar';
-import Timeline from '@/components/Timeline';
 import Notification from '@/components/Notification';
 import ProfileDisplay from '@/components/ProfileDisplay';
-
-import usePool from '@/nostr/usePool';
-import useConfig from '@/nostr/useConfig';
-import useSubscription from '@/nostr/useSubscription';
-import useFollowings from '@/nostr/useFollowings';
-import usePubkey from '@/nostr/usePubkey';
-
-import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
-import usePersistStatus from '@/hooks/usePersistStatus';
+import SideBar from '@/components/SideBar';
+import Timeline from '@/components/Timeline';
 import useModalState from '@/hooks/useModalState';
-
+import usePersistStatus from '@/hooks/usePersistStatus';
+import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
+import useConfig from '@/nostr/useConfig';
+import useFollowings from '@/nostr/useFollowings';
+import usePool from '@/nostr/usePool';
+import usePubkey from '@/nostr/usePubkey';
+import useSubscription from '@/nostr/useSubscription';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 

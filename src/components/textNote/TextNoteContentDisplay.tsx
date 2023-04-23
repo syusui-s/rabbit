@@ -1,17 +1,20 @@
 import { For } from 'solid-js';
-import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/core/parseTextNote';
-import type { Event as NostrEvent } from 'nostr-tools';
-import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
-import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
+
+import EventLink from '@/components/EventLink';
+import ImageDisplay from '@/components/textNote/ImageDisplay';
 // eslint-disable-next-line import/no-cycle
 import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
-import ImageDisplay from '@/components/textNote/ImageDisplay';
+import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
+import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
+import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import SafeLink from '@/components/utils/SafeLink';
 import eventWrapper from '@/core/event';
-import { isImageUrl } from '@/utils/imageUrl';
+import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/core/parseTextNote';
+
+import type { Event as NostrEvent } from 'nostr-tools';
+
 import useConfig from '@/nostr/useConfig';
-import EventLink from '../EventLink';
-import TextNoteDisplayById from './TextNoteDisplayById';
+import { isImageUrl } from '@/utils/imageUrl';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;

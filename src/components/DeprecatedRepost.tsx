@@ -1,13 +1,15 @@
 // NIP-18 (DEPRECATED)
 import { type Component, createMemo } from 'solid-js';
-import { Event as NostrEvent } from 'nostr-tools';
+
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
+import { Event as NostrEvent } from 'nostr-tools';
 
 import ColumnItem from '@/components/ColumnItem';
 import UserDisplayName from '@/components/UserDisplayName';
 import eventWrapper from '@/core/event';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
+
 import TextNoteDisplayById from './textNote/TextNoteDisplayById';
 
 export type DeprecatedRepostProps = {

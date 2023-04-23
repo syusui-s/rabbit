@@ -1,4 +1,5 @@
 import { createMemo, type Accessor } from 'solid-js';
+
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 import { nip05, nip19 } from 'nostr-tools';
 

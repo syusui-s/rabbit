@@ -6,23 +6,23 @@ import {
   type Accessor,
   type Signal,
 } from 'solid-js';
-import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
+
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 
 import eventWrapper from '@/core/event';
-
 import useBatch, { type Task } from '@/nostr/useBatch';
-import useStats from '@/nostr/useStats';
 import useConfig from '@/nostr/useConfig';
 import usePool from '@/nostr/usePool';
-
+import useStats from '@/nostr/useStats';
 import timeout from '@/utils/timeout';
 
 type TaskArg =
   | { type: 'Profile'; pubkey: string }
   | { type: 'TextNote'; eventId: string }
   | { type: 'Reactions'; mentionedEventId: string }
-  | { type: 'DeprecatedReposts'; mentionedEventId: string }
+  | { type: 'ZapReceipts'; mentionedEventId: string }
+  | { type: 'Reposts'; mentionedEventId: string }
   | { type: 'Followings'; pubkey: string };
 
 type BatchedEvents = { completed: boolean; events: NostrEvent[] };
@@ -83,15 +83,15 @@ export type UseReactions = {
   query: CreateQueryResult<NostrEvent[]>;
 };
 
-// DeprecatedReposts
-export type UseDeprecatedRepostsProps = {
+// Reposts
+export type UseRepostsProps = {
   eventId: string;
 };
 
-export type UseDeprecatedReposts = {
+export type UseReposts = {
   reposts: () => NostrEvent[];
   isRepostedBy: (pubkey: string) => boolean;
-  invalidateDeprecatedReposts: () => Promise<void>;
+  invalidateReposts: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
 };
 
@@ -121,7 +121,7 @@ setInterval(() => {
   setActiveBatchSubscriptions(count);
 }, 1000);
 
-const EmptyBatchedEvents = Object.freeze({ events: Object.freeze([]), completed: true });
+const EmptyBatchedEvents = { events: [], completed: true };
 const emptyBatchedEvents = () => EmptyBatchedEvents;
 
 const { exec } = useBatch<TaskArg, TaskRes>(() => ({
@@ -132,6 +132,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     const textNoteTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const reactionsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const repostsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
+    const zapReceiptsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const followingsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
 
     tasks.forEach((task) => {
@@ -144,8 +145,11 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
       } else if (task.args.type === 'Reactions') {
         const current = reactionsTasks.get(task.args.mentionedEventId) ?? [];
         reactionsTasks.set(task.args.mentionedEventId, [...current, task]);
-      } else if (task.args.type === 'DeprecatedReposts') {
+      } else if (task.args.type === 'Reposts') {
         const current = repostsTasks.get(task.args.mentionedEventId) ?? [];
+        repostsTasks.set(task.args.mentionedEventId, [...current, task]);
+      } else if (task.args.type === 'ZapReceipts') {
+        const current = zapReceiptsTasks.get(task.args.mentionedEventId) ?? [];
         repostsTasks.set(task.args.mentionedEventId, [...current, task]);
       } else if (task.args.type === 'Followings') {
         const current = followingsTasks.get(task.args.pubkey) ?? [];
@@ -157,6 +161,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     const textNoteIds = [...textNoteTasks.keys()];
     const reactionsIds = [...reactionsTasks.keys()];
     const repostsIds = [...repostsTasks.keys()];
+    const zapReceiptsIds = [...zapReceiptsTasks.keys()];
     const followingsIds = [...followingsTasks.keys()];
 
     const filters: Filter[] = [];
@@ -172,6 +177,9 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     }
     if (repostsIds.length > 0) {
       filters.push({ kinds: [6], '#e': repostsIds });
+    }
+    if (zapReceiptsIds.length > 0) {
+      filters.push({ kinds: [9735], '#e': zapReceiptsIds });
     }
     if (followingsIds.length > 0) {
       filters.push({ kinds: [Kind.Contacts], authors: followingsIds });
@@ -233,6 +241,13 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
           resolveTasks(registeredTasks, event);
         });
       } else if ((event.kind as number) === 6) {
+        const eventTags = eventWrapper(event).taggedEvents();
+        eventTags.forEach((eventTag) => {
+          const taggedEventId = eventTag.id;
+          const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
+          resolveTasks(registeredTasks, event);
+        });
+      } else if (event.kind === Kind.Zap) {
         const eventTags = eventWrapper(event).taggedEvents();
         eventTags.forEach((eventTag) => {
           const taggedEventId = eventTag.id;
@@ -393,12 +408,10 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
   return { reactions, reactionsGroupedByContent, isReactedBy, invalidateReactions, query };
 };
 
-export const useDeprecatedReposts = (
-  propsProvider: () => UseDeprecatedRepostsProps,
-): UseDeprecatedReposts => {
+export const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = createMemo(() => ['useDeprecatedReposts', props()] as const);
+  const genQueryKey = createMemo(() => ['useReposts', props()] as const);
 
   const query = createQuery(
     genQueryKey,
@@ -406,16 +419,14 @@ export const useDeprecatedReposts = (
       const [, currentProps] = queryKey;
       if (currentProps == null) return [];
       const { eventId: mentionedEventId } = currentProps;
-      const promise = exec({ type: 'DeprecatedReposts', mentionedEventId }, signal).then(
-        (batchedEvents) => {
-          const events = () => batchedEvents().events;
-          observable(batchedEvents).subscribe(() => {
-            queryClient.setQueryData(queryKey, events());
-          });
-          return events();
-        },
-      );
-      return timeout(15000, `useDeprecatedReposts: ${mentionedEventId}`)(promise);
+      const promise = exec({ type: 'Reposts', mentionedEventId }, signal).then((batchedEvents) => {
+        const events = () => batchedEvents().events;
+        observable(batchedEvents).subscribe(() => {
+          queryClient.setQueryData(queryKey, events());
+        });
+        return events();
+      });
+      return timeout(15000, `useReposts: ${mentionedEventId}`)(promise);
     },
     {
       staleTime: 1 * 60 * 1000, // 1 min
@@ -429,10 +440,9 @@ export const useDeprecatedReposts = (
   const isRepostedBy = (pubkey: string): boolean =>
     reposts().findIndex((event) => event.pubkey === pubkey) !== -1;
 
-  const invalidateDeprecatedReposts = (): Promise<void> =>
-    queryClient.invalidateQueries(genQueryKey());
+  const invalidateReposts = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
 
-  return { reposts, isRepostedBy, invalidateDeprecatedReposts, query };
+  return { reposts, isRepostedBy, invalidateReposts, query };
 };
 
 export const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {

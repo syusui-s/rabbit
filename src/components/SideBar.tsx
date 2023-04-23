@@ -1,11 +1,11 @@
 import { createSignal, Show, type JSX, Component } from 'solid-js';
+
+import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
-import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 
-import NotePostForm from '@/components/NotePostForm';
 import Config from '@/components/Config';
-
+import NotePostForm from '@/components/NotePostForm';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 import useConfig from '@/nostr/useConfig';
 

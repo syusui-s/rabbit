@@ -2,6 +2,7 @@
 // type Commands = (typeof commands)[number];
 
 import { onMount, onCleanup, type JSX } from 'solid-js';
+
 import throttle from 'lodash/throttle';
 
 import { useRequestCommand, type Command } from '@/hooks/useCommandBus';

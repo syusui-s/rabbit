@@ -1,4 +1,5 @@
 import { Component } from 'solid-js';
+
 import { nip19 } from 'nostr-tools';
 
 const { noteEncode } = nip19;

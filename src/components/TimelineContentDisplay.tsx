@@ -1,13 +1,13 @@
 import { Switch, Match, type Component } from 'solid-js';
-import { Filter, Event as NostrEvent } from 'nostr-tools';
+
 import uniq from 'lodash/uniq';
+import { Filter, Event as NostrEvent } from 'nostr-tools';
 
-import useConfig from '@/nostr/useConfig';
-
-import { type TimelineContent } from '@/components/TimelineContext';
 import Timeline from '@/components/Timeline';
-import useSubscription from '@/nostr/useSubscription';
+import { type TimelineContent } from '@/components/TimelineContext';
 import eventWrapper from '@/core/event';
+import useConfig from '@/nostr/useConfig';
+import useSubscription from '@/nostr/useSubscription';
 
 const relatedEvents = (rawEvent: NostrEvent) => {
   const event = () => eventWrapper(rawEvent);

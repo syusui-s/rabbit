@@ -1,5 +1,7 @@
-import { Component, createEffect, createSignal, onMount, Show, JSX } from 'solid-js';
+import { Component, createSignal, Show } from 'solid-js';
+
 import { fixUrl } from '@/utils/imageUrl';
+
 import SafeLink from '../utils/SafeLink';
 
 type ImageDisplayProps = {
@@ -14,12 +16,13 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
   const [hidden, setHidden] = createSignal(props.initialHidden);
   const [playing, setPlaying] = createSignal(true);
 
-  const isGIF = () => props.url.match(/\.gif/i);
+  // const isGIF = () => props.url.match(/\.gif/i);
 
   const play = () => {
     setPlaying(true);
   };
 
+  /*
   const stop = () => {
     if (canvasRef == null || imageRef == null) return;
     canvasRef.width = imageRef.width;
@@ -39,6 +42,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
       );
     setPlaying(false);
   };
+  */
 
   return (
     <Show

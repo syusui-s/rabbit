@@ -4,6 +4,7 @@ export type Task<TaskArgs, TaskResult> = {
   id: number;
   args: TaskArgs;
   resolve: (result: TaskResult) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reject: (error: any) => void;
 };
 
@@ -16,11 +17,13 @@ export type UseBatchProps<TaskArgs, TaskResult> = {
 export type PromiseWithCallbacks<T> = {
   promise: Promise<T>;
   resolve: (e: T) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reject: (e: any) => void;
 };
 
 const promiseWithCallbacks = <T>(): PromiseWithCallbacks<T> => {
   let resolve: ((e: T) => void) | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let reject: ((e: any) => void) | undefined;
 
   const promise = new Promise<T>((resolveFn, rejectFn) => {

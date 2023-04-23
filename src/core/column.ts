@@ -1,5 +1,6 @@
 // import { z } from 'zod';
 import { type Filter } from 'nostr-tools';
+
 import { type ColumnProps } from '@/components/Column';
 
 export type NotificationType =

@@ -1,4 +1,4 @@
-/* eslint global-require: "off" */
+/* eslint global-require: "off", @typescript-eslint/no-var-requires: "off" */
 const colors = require('tailwindcss/colors');
 
 module.exports = {

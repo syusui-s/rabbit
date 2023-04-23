@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from 'solid-js';
-import { Kind } from 'nostr-tools';
+
 import uniq from 'lodash/uniq';
+import { Kind } from 'nostr-tools';
 
 import useConfig from '@/nostr/useConfig';
 import useSubscription from '@/nostr/useSubscription';

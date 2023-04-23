@@ -8,25 +8,22 @@ import {
   type JSX,
   type Accessor,
 } from 'solid-js';
-import { createMutation } from '@tanstack/solid-query';
-import { Event as NostrEvent } from 'nostr-tools';
-import uniq from 'lodash/uniq';
 
-import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
+import { createMutation } from '@tanstack/solid-query';
 import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
+import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
+import uniq from 'lodash/uniq';
+import { Event as NostrEvent } from 'nostr-tools';
 
 import UserNameDisplay from '@/components/UserDisplayName';
-
 import eventWrapper from '@/core/event';
-
-import useConfig from '@/nostr/useConfig';
-import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
-import usePubkey from '@/nostr/usePubkey';
-import { useHandleCommand } from '@/hooks/useCommandBus';
-
-import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
 import parseTextNote from '@/core/parseTextNote';
+import { useHandleCommand } from '@/hooks/useCommandBus';
+import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
+import useConfig from '@/nostr/useConfig';
+import usePubkey from '@/nostr/usePubkey';
+import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;

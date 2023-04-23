@@ -1,7 +1,5 @@
-import useConfig from '@/nostr/useConfig';
-
 import useDatePulser from '@/hooks/useDatePulser';
-
+import useConfig from '@/nostr/useConfig';
 import { formatRelative, formatAbsoluteLong, formatAbsoluteShort } from '@/utils/formatDate';
 
 // 7 seconds is used here so that the last digit of relative time is changed.

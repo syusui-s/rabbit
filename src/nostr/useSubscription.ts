@@ -1,9 +1,13 @@
 import { createSignal, createEffect, onCleanup, on } from 'solid-js';
-import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
+
 import uniqBy from 'lodash/uniqBy';
+
 import usePool from '@/nostr/usePool';
-import useStats from './useStats';
+
 import useConfig from './useConfig';
+import useStats from './useStats';
+
+import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 
 export type UseSubscriptionProps = {
   relayUrls: string[];

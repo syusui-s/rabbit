@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'solid-js';
-import { createStore } from 'solid-js/store';
+
 import { Event as NostrEvent } from 'nostr-tools';
+import { createStore } from 'solid-js/store';
 
 export type TimelineContent = {
   type: 'Replies';

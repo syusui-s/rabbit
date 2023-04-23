@@ -1,6 +1,7 @@
 import assert from 'assert';
-import { describe, it } from 'vitest';
+
 import { type Event as NostrEvent } from 'nostr-tools';
+import { describe, it } from 'vitest';
 
 import parseTextNote, {
   resolveTagReference,

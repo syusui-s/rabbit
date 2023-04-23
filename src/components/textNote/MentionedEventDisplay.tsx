@@ -1,6 +1,9 @@
 import { Show } from 'solid-js';
+
+// eslint-disable-next-line import/no-cycle
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import { type MentionedEvent } from '@/core/parseTextNote';
+
 import EventLink from '../EventLink';
 
 export type MentionedEventDisplayProps = {

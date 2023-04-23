@@ -2,7 +2,6 @@ import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
 
 // import '@/types/nostr.d';
 import usePool from '@/nostr/usePool';
-
 import epoch from '@/utils/epoch';
 
 export type TagParams = {
@@ -148,7 +147,7 @@ const useCommands = () => {
       return publishEvent(relayUrls, preSignedEvent);
     },
     // NIP-18
-    async publishDeprecatedRepost({
+    async publishRepost({
       relayUrls,
       pubkey,
       eventId,

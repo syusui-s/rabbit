@@ -1,10 +1,12 @@
 import { type Accessor, type Setter } from 'solid-js';
+
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
+
+import { ColumnConfig } from '@/core/column';
 import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
-import { ColumnConfig } from '@/core/column';
 
 export type Config = {
   relayUrls: string[];
@@ -111,7 +113,8 @@ const useConfig = (): UseConfig => {
     return false;
   };
 
-  const shouldMuteEvent = (event: NostrEvent) => isPubkeyMuted(event.pubkey) || hasMutedKeyword(event);
+  const shouldMuteEvent = (event: NostrEvent) =>
+    isPubkeyMuted(event.pubkey) || hasMutedKeyword(event);
 
   const initializeColumns = ({ pubkey }: { pubkey: string }) => {
     // すでに設定されている場合は終了

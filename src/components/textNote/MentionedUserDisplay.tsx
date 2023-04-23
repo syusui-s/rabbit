@@ -1,6 +1,7 @@
-import type { MentionedUser } from '@/core/parseTextNote';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
 import useModalState from '@/hooks/useModalState';
+
+import type { MentionedUser } from '@/core/parseTextNote';
 
 export type MentionedUserDisplayProps = {
   pubkey: string;

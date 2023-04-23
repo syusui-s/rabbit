@@ -1,15 +1,15 @@
 import { Switch, Match, type Component, Show } from 'solid-js';
-import { type Event as NostrEvent } from 'nostr-tools';
+
 import HeartSolid from 'heroicons/24/solid/heart.svg';
+import { type Event as NostrEvent } from 'nostr-tools';
 
 import ColumnItem from '@/components/ColumnItem';
 import TextNoteDisplay from '@/components/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
-
-import useProfile from '@/nostr/useProfile';
-import useEvent from '@/nostr/useEvent';
 import eventWrapper from '@/core/event';
 import useModalState from '@/hooks/useModalState';
+import useEvent from '@/nostr/useEvent';
+import useProfile from '@/nostr/useProfile';
 
 type ReactionProps = {
   event: NostrEvent;
