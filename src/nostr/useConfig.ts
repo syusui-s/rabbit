@@ -1,5 +1,6 @@
 import { type Accessor, type Setter } from 'solid-js';
 
+import uniq from 'lodash/uniq';
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
 import { ColumnConfig } from '@/core/column';
@@ -81,7 +82,7 @@ const [config, setConfig] = createStoreWithStorage('RabbitConfig', InitialConfig
 
 const useConfig = (): UseConfig => {
   const addRelay = (relayUrl: string) => {
-    setConfig('relayUrls', (current) => [...current, relayUrl]);
+    setConfig('relayUrls', (current) => uniq([...current, relayUrl]));
   };
 
   const removeRelay = (relayUrl: string) => {
@@ -89,7 +90,7 @@ const useConfig = (): UseConfig => {
   };
 
   const addMutedPubkey = (pubkey: string) => {
-    setConfig('mutedPubkeys', (current) => [...current, pubkey]);
+    setConfig('mutedPubkeys', (current) => uniq([...current, pubkey]));
   };
 
   const removeMutedPubkey = (pubkey: string) => {
@@ -97,7 +98,7 @@ const useConfig = (): UseConfig => {
   };
 
   const addMutedKeyword = (keyword: string) => {
-    setConfig('mutedKeywords', (current) => [...current, keyword]);
+    setConfig('mutedKeywords', (current) => uniq([...current, keyword]));
   };
 
   const removeMutedKeyword = (keyword: string) => {
