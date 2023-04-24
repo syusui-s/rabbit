@@ -58,7 +58,7 @@ export type MentionedUser = {
 };
 
 const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
-const hashTagRegex = /#(?<hashtag>[^[-^`:-@!-/{-~\d\s][^[-^`:-@!-/{-~\s]+)/g;
+const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
 // raw NIP-19 codes, NIP-21 links (NIP-27)
 // nrelay and naddr is not supported by nostr-tools
 const mentionRegex = /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi;

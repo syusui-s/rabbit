@@ -122,6 +122,9 @@ const Home: Component = () => {
         since: epoch() - 12 * 60 * 60,
       },
     ],
+    clientEventFilter: (ev) => {
+      return /[\p{scx=Hiragana}\p{scx=Katakana}\p{sc=Han}]/u.test(ev.content);
+    },
   }));
 
   onMount(() => {
