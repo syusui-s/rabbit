@@ -65,6 +65,7 @@ const Home: Component = () => {
           kinds: [1, 6],
           authors,
           limit: 25,
+          since: epoch() - 12 * 60 * 60,
         },
       ],
     };
