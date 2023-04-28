@@ -17,11 +17,11 @@ import uniq from 'lodash/uniq';
 import { Event as NostrEvent } from 'nostr-tools';
 
 import UserNameDisplay from '@/components/UserDisplayName';
-import eventWrapper from '@/core/event';
-import parseTextNote from '@/core/parseTextNote';
+import useConfig from '@/core/useConfig';
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import eventWrapper from '@/nostr/event';
+import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
-import useConfig from '@/nostr/useConfig';
 import usePubkey from '@/nostr/usePubkey';
 import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
 
@@ -43,9 +43,7 @@ const placeholder = (mode: NotePostFormProps['mode']) => {
   }
 };
 
-const parseAndExtract = (content: string) => {
-  const parsed = parseTextNote(content);
-
+const extract = (parsed: ParsedTextNote) => {
   const hashtags: string[] = [];
   const pubkeyReferences: string[] = [];
   const eventReferences: string[] = [];
@@ -71,6 +69,18 @@ const parseAndExtract = (content: string) => {
     eventReferences,
     urlReferences,
   };
+};
+
+const format = (parsed: ParsedTextNote) => {
+  const content = [];
+  parsed.forEach((node) => {
+    if (node.type === 'Bech32Entity' && !node.isNIP19) {
+      content.push(`nostr:${node.content}`);
+    } else {
+      content.push(node.content);
+    }
+  });
+  return content.join('');
 };
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
@@ -166,12 +176,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       return;
     }
 
-    const { hashtags, pubkeyReferences, eventReferences, urlReferences } = parseAndExtract(text());
+    const parsed = parseTextNote(text());
+    const { hashtags, pubkeyReferences, eventReferences, urlReferences } = extract(parsed);
+    const formattedContent = format(parsed);
 
     let textNote: PublishTextNoteParams = {
       relayUrls: config().relayUrls,
       pubkey,
-      content: text(),
+      content: formattedContent,
       notifyPubkeys: pubkeyReferences,
       mentionEventIds: eventReferences,
       hashtags,

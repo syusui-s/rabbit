@@ -2,7 +2,7 @@ import { Switch, Match, type Component } from 'solid-js';
 
 // eslint-disable-next-line import/no-cycle
 import TextNoteDisplay, { type TextNoteDisplayProps } from '@/components/textNote/TextNoteDisplay';
-import useConfig from '@/nostr/useConfig';
+import useConfig from '@/core/useConfig';
 import useEvent from '@/nostr/useEvent';
 import ensureNonNull from '@/utils/ensureNonNull';
 

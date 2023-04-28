@@ -8,12 +8,12 @@ import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import SafeLink from '@/components/utils/SafeLink';
-import eventWrapper from '@/core/event';
-import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/core/parseTextNote';
+import useConfig from '@/core/useConfig';
+import eventWrapper from '@/nostr/event';
+import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 
 import type { Event as NostrEvent } from 'nostr-tools';
 
-import useConfig from '@/nostr/useConfig';
 import { isImageUrl } from '@/utils/imageUrl';
 
 export type TextNoteContentDisplayProps = {

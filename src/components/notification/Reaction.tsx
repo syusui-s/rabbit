@@ -6,8 +6,8 @@ import { type Event as NostrEvent } from 'nostr-tools';
 import ColumnItem from '@/components/ColumnItem';
 import TextNoteDisplay from '@/components/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
-import eventWrapper from '@/core/event';
 import useModalState from '@/hooks/useModalState';
+import eventWrapper from '@/nostr/event';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 

@@ -6,8 +6,8 @@ import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
 import Config from '@/components/Config';
 import NotePostForm from '@/components/NotePostForm';
+import useConfig from '@/core/useConfig';
 import { useHandleCommand } from '@/hooks/useCommandBus';
-import useConfig from '@/nostr/useConfig';
 
 const SideBar: Component = () => {
   let textAreaRef: HTMLTextAreaElement | undefined;

@@ -15,11 +15,11 @@ import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionD
 import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import { useTimelineContext } from '@/components/TimelineContext';
-import eventWrapper from '@/core/event';
+import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
+import eventWrapper from '@/nostr/event';
 import useCommands from '@/nostr/useCommands';
-import useConfig from '@/nostr/useConfig';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
@@ -27,6 +27,7 @@ import useReposts from '@/nostr/useReposts';
 import useSubscription from '@/nostr/useSubscription';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import timeout from '@/utils/timeout';
 
 import ContextMenu, { MenuItem } from '../ContextMenu';
 
@@ -40,23 +41,6 @@ const { noteEncode } = nip19;
 
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   let contentRef: HTMLDivElement | undefined;
-
-  const menu: MenuItem[] = [
-    {
-      content: () => 'IDをコピー',
-      onSelect: () => {
-        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
-      },
-    },
-    {
-      content: () => 'JSONとしてコピー',
-      onSelect: () => {
-        navigator.clipboard
-          .writeText(JSON.stringify(props.event))
-          .catch((err) => window.alert(err));
-      },
-    },
-  ];
 
   const { config } = useConfig();
   const formatDate = useFormatDate();
@@ -115,6 +99,68 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       invalidateReposts().catch((err) => console.error('failed to refetch reposts', err));
     },
   });
+
+  const deleteMutation = createMutation({
+    mutationKey: ['delete', event().id],
+    mutationFn: (...params: Parameters<typeof commands.delete>) =>
+      commands
+        .delete(...params)
+        .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
+    onSuccess: (results) => {
+      // TODO タイムラインから削除する
+      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+      if (succeeded === results.length) {
+        window.alert('削除しました（画面の反映にはリロード）');
+      } else if (succeeded > 0) {
+        window.alert('一部のリレーで削除に失敗しました');
+      } else {
+        window.alert('すべてのリレーで削除に失敗しました');
+      }
+    },
+    onError: (err) => {
+      console.error('failed to delete', err);
+    },
+  });
+
+  const myPostMenu = (): MenuItem[] => {
+    if (event().pubkey !== pubkey()) return [];
+
+    return [
+      {
+        content: () => '削除',
+        onSelect: () => {
+          const p = pubkey();
+          if (p == null) return;
+
+          if (!window.confirm('本当に削除しますか？')) return;
+          deleteMutation.mutate({
+            relayUrls: config().relayUrls,
+            pubkey: p,
+            eventId: event().id,
+          });
+        },
+      },
+    ];
+  };
+
+  const menu: MenuItem[] = [
+    ...myPostMenu(),
+    {
+      content: () => 'IDをコピー',
+      onSelect: () => {
+        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
+      },
+    },
+    {
+      content: () => 'JSONとしてコピー',
+      onSelect: () => {
+        navigator.clipboard
+          .writeText(JSON.stringify(props.event))
+          .catch((err) => window.alert(err));
+      },
+    },
+  ];
 
   const isReactedByMe = createMemo(() => {
     const p = pubkey();
@@ -313,7 +359,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 >
                   <ArrowPathRoundedSquare />
                 </button>
-                <Show when={reposts().length > 0}>
+                <Show when={!config().hideCount && reposts().length > 0}>
                   <div class="text-sm text-zinc-400">{reposts().length}</div>
                 </Show>
               </div>
@@ -333,7 +379,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                     <HeartSolid />
                   </Show>
                 </button>
-                <Show when={reactions().length > 0}>
+                <Show when={!config().hideCount && reactions().length > 0}>
                   <div class="text-sm text-zinc-400">{reactions().length}</div>
                 </Show>
               </div>

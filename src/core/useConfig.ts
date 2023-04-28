@@ -15,6 +15,7 @@ export type Config = {
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   showImage: boolean;
+  hideCount: boolean;
   mutedPubkeys: string[];
   mutedKeywords: string[];
 };
@@ -64,6 +65,7 @@ const InitialConfig = (): Config => {
     dateFormat: 'relative',
     keepOpenPostForm: false,
     showImage: true,
+    hideCount: false,
     mutedPubkeys: [],
     mutedKeywords: [],
   };

@@ -2,10 +2,9 @@ import { createSignal, createEffect, onCleanup, on } from 'solid-js';
 
 import uniqBy from 'lodash/uniqBy';
 
+import useConfig from '@/core/useConfig';
 import usePool from '@/nostr/usePool';
-
-import useConfig from './useConfig';
-import useStats from './useStats';
+import useStats from '@/nostr/useStats';
 
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 

@@ -25,6 +25,7 @@ export type Bech32Entity = {
     | { type: 'npub' | 'note'; data: string }
     | { type: 'nprofile'; data: ProfilePointer }
     | { type: 'nevent'; data: EventPointer };
+  isNIP19: boolean;
 };
 
 export type HashTag = {
@@ -61,7 +62,8 @@ const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
 const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
 // raw NIP-19 codes, NIP-21 links (NIP-27)
 // nrelay and naddr is not supported by nostr-tools
-const mentionRegex = /(?:nostr:)?(?<mention>(npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+)/gi;
+const mentionRegex =
+  /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+))/gi;
 const urlRegex =
   /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(:\d{1,5})?(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
 
@@ -105,11 +107,12 @@ const parseTextNote = (textNoteContent: string) => {
     } else if (match.groups?.mention) {
       pushPlainText(index);
       try {
-        const decoded = decode(match[1]);
+        const decoded = decode(match.groups.bech32);
         const bech32Entity: Bech32Entity = {
           type: 'Bech32Entity',
           content: match[0],
           data: decoded as Bech32Entity['data'],
+          isNIP19: match.groups.nip19 === 'nostr:',
         };
         result.push(bech32Entity);
       } catch (e) {

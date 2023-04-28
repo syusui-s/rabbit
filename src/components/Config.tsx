@@ -3,7 +3,7 @@ import { createSignal, For, type JSX } from 'solid-js';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import Modal from '@/components/Modal';
-import useConfig, { type Config } from '@/nostr/useConfig';
+import useConfig, { type Config } from '@/core/useConfig';
 
 import UserNameDisplay from './UserDisplayName';
 
@@ -214,6 +214,13 @@ const OtherConfig = () => {
     }));
   };
 
+  const toggleHideCount = () => {
+    setConfig((current) => ({
+      ...current,
+      hideCount: !(current.hideCount ?? false),
+    }));
+  };
+
   return (
     <div class="py-2">
       <h3 class="font-bold">その他</h3>
@@ -228,6 +235,10 @@ const OtherConfig = () => {
         <div class="flex w-full">
           <div class="flex-1">画像をデフォルトで表示する</div>
           <ToggleButton value={config().showImage} onClick={() => toggleShowImage()} />
+        </div>
+        <div class="flex w-full">
+          <div class="flex-1">いいねやリポスト、フォロワーなどの数を隠す</div>
+          <ToggleButton value={config().hideCount} onClick={() => toggleHideCount()} />
         </div>
         {/*
         <div class="flex w-full">

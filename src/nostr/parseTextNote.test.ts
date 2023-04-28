@@ -162,6 +162,7 @@ describe('parseTextNote', () => {
       {
         type: 'Bech32Entity',
         content: 'npub1srf6g8v2qpnecqg9l2kzehmkg0ym5f5rtnlsj6lhl8r6pmhger7q5mtt3q',
+        isNIP19: false,
         data: {
           type: 'npub',
           data: '80d3a41d8a00679c0105faac2cdf7643c9ba26835cff096bf7f9c7a0eee8c8fc',

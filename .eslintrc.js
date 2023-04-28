@@ -25,6 +25,8 @@ module.exports = {
   },
   plugins: ['import', 'solid', 'jsx-a11y', 'prettier', '@typescript-eslint', 'tailwindcss'],
   rules: {
+    'no-alert': ['off'],
+    'no-console': ['off'],
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -33,9 +35,6 @@ module.exports = {
         tsx: 'never',
       },
     ],
-    'prettier/prettier': 'error',
-    'no-console': ['off'],
-    'no-alert': ['off'],
     'import/order': [
       'warn',
       {
@@ -49,6 +48,16 @@ module.exports = {
         ],
       },
     ],
+    'jsx-a11y/label-has-associated-control': [
+      'error',
+      {
+        labelComponents: ['label'],
+        labelAttributes: ['inputLabel'],
+        assert: 'both',
+        depth: 3,
+      },
+    ],
+    'prettier/prettier': 'error',
   },
   settings: {
     linkComponents: ['Link'],

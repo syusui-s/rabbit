@@ -5,8 +5,8 @@ import { Filter, Event as NostrEvent } from 'nostr-tools';
 
 import Timeline from '@/components/Timeline';
 import { type TimelineContent } from '@/components/TimelineContext';
-import eventWrapper from '@/core/event';
-import useConfig from '@/nostr/useConfig';
+import useConfig from '@/core/useConfig';
+import eventWrapper from '@/nostr/event';
 import useSubscription from '@/nostr/useSubscription';
 
 const relatedEvents = (rawEvent: NostrEvent) => {

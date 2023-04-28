@@ -192,6 +192,24 @@ const useCommands = () => {
       };
       return publishEvent(relayUrls, preSignedEvent);
     },
+    async delete({
+      relayUrls,
+      pubkey,
+      eventId,
+    }: {
+      relayUrls: string[];
+      pubkey: string;
+      eventId: string;
+    }): Promise<Promise<void>[]> {
+      const preSignedEvent: UnsignedEvent = {
+        kind: Kind.EventDeletion,
+        pubkey,
+        created_at: epoch(),
+        tags: [['e', eventId, '']],
+        content: '',
+      };
+      return publishEvent(relayUrls, preSignedEvent);
+    },
   };
 };
 

@@ -1,4 +1,4 @@
-import type { PlainText } from '@/core/parseTextNote';
+import type { PlainText } from '@/nostr/parseTextNote';
 
 export type PlainTextDisplayProps = {
   plainText: PlainText;

@@ -3,7 +3,7 @@ import { createMemo, createSignal } from 'solid-js';
 import uniq from 'lodash/uniq';
 import { Kind } from 'nostr-tools';
 
-import useConfig from '@/nostr/useConfig';
+import useConfig from '@/core/useConfig';
 import useSubscription from '@/nostr/useSubscription';
 
 export type UseFollowersProps = {

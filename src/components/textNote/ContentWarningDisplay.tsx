@@ -1,6 +1,6 @@
 import { createSignal, type Component, type JSX, Show } from 'solid-js';
 
-import { ContentWarning } from '@/core/event';
+import { ContentWarning } from '@/nostr/event';
 
 export type ContentWarningDisplayProps = {
   contentWarning: ContentWarning;

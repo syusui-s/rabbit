@@ -7,13 +7,14 @@ import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
+import uniq from 'lodash/uniq';
 
 import Modal from '@/components/Modal';
 import Timeline from '@/components/Timeline';
 import Copy from '@/components/utils/Copy';
 import SafeLink from '@/components/utils/SafeLink';
+import useConfig from '@/core/useConfig';
 import useCommands from '@/nostr/useCommands';
-import useConfig from '@/nostr/useConfig';
 import useFollowers from '@/nostr/useFollowers';
 import useFollowings from '@/nostr/useFollowings';
 import useProfile from '@/nostr/useProfile';
@@ -125,7 +126,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       relayUrls: config().relayUrls,
       pubkey: p,
       content: myFollowingQuery.data?.content ?? '',
-      followingPubkeys: [...myFollowingPubkeys(), props.pubkey],
+      followingPubkeys: uniq([...myFollowingPubkeys(), props.pubkey]),
     });
   };
 
@@ -325,25 +326,27 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                   </Show>
                 </div>
               </div>
-              <div class="flex flex-1 flex-col items-start">
-                <div class="text-sm">フォロワー</div>
-                <div class="text-xl">
-                  <Show
-                    when={showFollowers()}
-                    fallback={
-                      <button
-                        class="text-sm hover:text-stone-800 hover:underline"
-                        onClick={() => setShowFollowers(true)}
-                      >
-                        読み込む
-                      </button>
-                    }
-                    keyed
-                  >
-                    <FollowersCount pubkey={props.pubkey} />
-                  </Show>
+              <Show when={!config().hideCount}>
+                <div class="flex flex-1 flex-col items-start">
+                  <div class="text-sm">フォロワー</div>
+                  <div class="text-xl">
+                    <Show
+                      when={showFollowers()}
+                      fallback={
+                        <button
+                          class="text-sm hover:text-stone-800 hover:underline"
+                          onClick={() => setShowFollowers(true)}
+                        >
+                          読み込む
+                        </button>
+                      }
+                      keyed
+                    >
+                      <FollowersCount pubkey={props.pubkey} />
+                    </Show>
+                  </div>
                 </div>
-              </div>
+              </Show>
             </div>
             <Show when={(profile()?.website ?? '').length > 0}>
               <ul class="border-t px-5 py-2 text-xs">

@@ -6,9 +6,9 @@ import { Event as NostrEvent } from 'nostr-tools';
 
 import ColumnItem from '@/components/ColumnItem';
 import UserDisplayName from '@/components/UserDisplayName';
-import eventWrapper from '@/core/event';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
+import eventWrapper from '@/nostr/event';
 
 import TextNoteDisplayById from './textNote/TextNoteDisplayById';
 

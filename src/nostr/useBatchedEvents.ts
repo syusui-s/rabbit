@@ -10,9 +10,9 @@ import {
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 
-import eventWrapper from '@/core/event';
+import useConfig from '@/core/useConfig';
+import eventWrapper from '@/nostr/event';
 import useBatch, { type Task } from '@/nostr/useBatch';
-import useConfig from '@/nostr/useConfig';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
 import timeout from '@/utils/timeout';
