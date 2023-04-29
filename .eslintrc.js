@@ -48,15 +48,6 @@ module.exports = {
         ],
       },
     ],
-    'jsx-a11y/label-has-associated-control': [
-      'error',
-      {
-        labelComponents: ['label'],
-        labelAttributes: ['inputLabel'],
-        assert: 'both',
-        depth: 3,
-      },
-    ],
     'prettier/prettier': 'error',
   },
   settings: {
