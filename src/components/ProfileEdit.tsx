@@ -213,7 +213,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                     id="name"
                     name="name"
                     value={name()}
-                    pattern="^[a-zA-Z_][a-zA-Z0-9_]+$"
+                    // pattern="^[a-zA-Z_][a-zA-Z0-9_]+$"
                     maxlength="32"
                     required
                     disabled={disabled()}
