@@ -1,6 +1,7 @@
 import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
 
 // import '@/types/nostr.d';
+import { Profile } from '@/nostr/useBatchedEvents';
 import usePool from '@/nostr/usePool';
 import epoch from '@/utils/epoch';
 
@@ -103,7 +104,7 @@ const useCommands = () => {
   };
 
   // NIP-01
-  const publishTextNote = (params: PublishTextNoteParams): Promise<Promise<void>[]> => {
+  const publishTextNote = async (params: PublishTextNoteParams): Promise<Promise<void>[]> => {
     const { relayUrls, pubkey, content } = params;
     const tags = buildTags(params);
 
@@ -117,99 +118,133 @@ const useCommands = () => {
     return publishEvent(relayUrls, preSignedEvent);
   };
 
+  // NIP-25
+  const publishReaction = async ({
+    relayUrls,
+    pubkey,
+    eventId,
+    content,
+    notifyPubkey,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    eventId: string;
+    content: string;
+    notifyPubkey: string;
+  }): Promise<Promise<void>[]> => {
+    // TODO ensure that content is + or - or emoji.
+    const preSignedEvent: UnsignedEvent = {
+      kind: 7,
+      pubkey,
+      created_at: epoch(),
+      tags: [
+        ['e', eventId, ''],
+        ['p', notifyPubkey],
+      ],
+      content,
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
+
+  // NIP-18
+  const publishRepost = async ({
+    relayUrls,
+    pubkey,
+    eventId,
+    notifyPubkey,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    eventId: string;
+    notifyPubkey: string;
+  }): Promise<Promise<void>[]> => {
+    const preSignedEvent: UnsignedEvent = {
+      kind: 6 as Kind,
+      pubkey,
+      created_at: epoch(),
+      tags: [
+        ['e', eventId, ''],
+        ['p', notifyPubkey],
+      ],
+      content: '',
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
+
+  const updateProfile = async ({
+    relayUrls,
+    pubkey,
+    profile,
+    otherProperties,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    profile: Profile;
+    otherProperties: Record<string, any>;
+  }): Promise<Promise<void>[]> => {
+    const content = {
+      ...profile,
+      ...otherProperties,
+    };
+    const preSignedEvent: UnsignedEvent = {
+      kind: Kind.Metadata,
+      pubkey,
+      created_at: epoch(),
+      tags: [],
+      content: JSON.stringify(content),
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
+
+  const updateContacts = async ({
+    relayUrls,
+    pubkey,
+    followingPubkeys,
+    content,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    followingPubkeys: string[];
+    content: string;
+  }): Promise<Promise<void>[]> => {
+    const pTags = followingPubkeys.map((key) => ['p', key]);
+
+    const preSignedEvent: UnsignedEvent = {
+      kind: Kind.Contacts,
+      pubkey,
+      created_at: epoch(),
+      tags: pTags,
+      content,
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
+
+  const deleteEvent = async ({
+    relayUrls,
+    pubkey,
+    eventId,
+  }: {
+    relayUrls: string[];
+    pubkey: string;
+    eventId: string;
+  }): Promise<Promise<void>[]> => {
+    const preSignedEvent: UnsignedEvent = {
+      kind: Kind.EventDeletion,
+      pubkey,
+      created_at: epoch(),
+      tags: [['e', eventId, '']],
+      content: '',
+    };
+    return publishEvent(relayUrls, preSignedEvent);
+  };
+
   return {
     publishTextNote,
-    // NIP-25
-    publishReaction({
-      relayUrls,
-      pubkey,
-      eventId,
-      content,
-      notifyPubkey,
-    }: {
-      relayUrls: string[];
-      pubkey: string;
-      eventId: string;
-      content: string;
-      notifyPubkey: string;
-    }): Promise<Promise<void>[]> {
-      // TODO ensure that content is + or - or emoji.
-      const preSignedEvent: UnsignedEvent = {
-        kind: 7,
-        pubkey,
-        created_at: epoch(),
-        tags: [
-          ['e', eventId, ''],
-          ['p', notifyPubkey],
-        ],
-        content,
-      };
-      return publishEvent(relayUrls, preSignedEvent);
-    },
-    // NIP-18
-    async publishRepost({
-      relayUrls,
-      pubkey,
-      eventId,
-      notifyPubkey,
-    }: {
-      relayUrls: string[];
-      pubkey: string;
-      eventId: string;
-      notifyPubkey: string;
-    }): Promise<Promise<void>[]> {
-      const preSignedEvent: UnsignedEvent = {
-        kind: 6 as Kind,
-        pubkey,
-        created_at: epoch(),
-        tags: [
-          ['e', eventId, ''],
-          ['p', notifyPubkey],
-        ],
-        content: '',
-      };
-      return publishEvent(relayUrls, preSignedEvent);
-    },
-    updateContacts({
-      relayUrls,
-      pubkey,
-      followingPubkeys,
-      content,
-    }: {
-      relayUrls: string[];
-      pubkey: string;
-      followingPubkeys: string[];
-      content: string;
-    }): Promise<Promise<void>[]> {
-      const pTags = followingPubkeys.map((key) => ['p', key]);
-
-      const preSignedEvent: UnsignedEvent = {
-        kind: Kind.Contacts,
-        pubkey,
-        created_at: epoch(),
-        tags: pTags,
-        content,
-      };
-      return publishEvent(relayUrls, preSignedEvent);
-    },
-    async delete({
-      relayUrls,
-      pubkey,
-      eventId,
-    }: {
-      relayUrls: string[];
-      pubkey: string;
-      eventId: string;
-    }): Promise<Promise<void>[]> {
-      const preSignedEvent: UnsignedEvent = {
-        kind: Kind.EventDeletion,
-        pubkey,
-        created_at: epoch(),
-        tags: [['e', eventId, '']],
-        content: '',
-      };
-      return publishEvent(relayUrls, preSignedEvent);
-    },
+    publishReaction,
+    publishRepost,
+    updateProfile,
+    updateContacts,
+    deleteEvent,
   };
 };
 

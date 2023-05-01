@@ -101,10 +101,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   });
 
   const deleteMutation = createMutation({
-    mutationKey: ['delete', event().id],
-    mutationFn: (...params: Parameters<typeof commands.delete>) =>
+    mutationKey: ['deleteEvent', event().id],
+    mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
       commands
-        .delete(...params)
+        .deleteEvent(...params)
         .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
     onSuccess: (results) => {
       // TODO タイムラインから削除する
@@ -113,7 +113,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       if (succeeded === results.length) {
         window.alert('削除しました（画面の反映にはリロード）');
       } else if (succeeded > 0) {
-        window.alert('一部のリレーで削除に失敗しました');
+        window.alert(`${failed}個のリレーで削除に失敗しました`);
       } else {
         window.alert('すべてのリレーで削除に失敗しました');
       }
@@ -123,29 +123,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     },
   });
 
-  const myPostMenu = (): MenuItem[] => {
-    if (event().pubkey !== pubkey()) return [];
-
-    return [
-      {
-        content: () => '削除',
-        onSelect: () => {
-          const p = pubkey();
-          if (p == null) return;
-
-          if (!window.confirm('本当に削除しますか？')) return;
-          deleteMutation.mutate({
-            relayUrls: config().relayUrls,
-            pubkey: p,
-            eventId: event().id,
-          });
-        },
-      },
-    ];
-  };
-
   const menu: MenuItem[] = [
-    ...myPostMenu(),
     {
       content: () => 'IDをコピー',
       onSelect: () => {
@@ -158,6 +136,21 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         navigator.clipboard
           .writeText(JSON.stringify(props.event))
           .catch((err) => window.alert(err));
+      },
+    },
+    {
+      when: () => event().pubkey === pubkey(),
+      content: () => <span class="text-red-500">削除</span>,
+      onSelect: () => {
+        const p = pubkey();
+        if (p == null) return;
+
+        if (!window.confirm('本当に削除しますか？')) return;
+        deleteMutation.mutate({
+          relayUrls: config().relayUrls,
+          pubkey: p,
+          eventId: event().id,
+        });
       },
     },
   ];

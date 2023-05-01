@@ -51,12 +51,15 @@ export type NonStandardProfile = {
 
 export type Profile = StandardProfile & NonStandardProfile;
 
+export type ProfileWithOtherProperties = Profile & Record<string, any>;
+
 export type UseProfileProps = {
   pubkey: string;
 };
 
 type UseProfile = {
-  profile: () => Profile | null;
+  profile: () => ProfileWithOtherProperties | null;
+  invalidateProfile: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
 
@@ -274,11 +277,12 @@ const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
 };
 
 export const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
-  const props = createMemo(propsProvider);
   const queryClient = useQueryClient();
+  const props = createMemo(propsProvider);
+  const genQueryKey = createMemo(() => ['useProfile', props()] as const);
 
   const query = createQuery(
-    () => ['useProfile', props()] as const,
+    genQueryKey,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
@@ -324,7 +328,9 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
     }
   });
 
-  return { profile, query };
+  const invalidateProfile = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
+
+  return { profile, invalidateProfile, query };
 };
 
 export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTextNote => {

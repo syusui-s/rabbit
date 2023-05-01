@@ -42,7 +42,7 @@ const RelayConfig = () => {
       </ul>
       <form class="flex gap-2" onSubmit={handleClickAddRelay}>
         <input
-          class="flex-1"
+          class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
           type="text"
           name="relayUrl"
           value={relayUrlInput()}
@@ -182,7 +182,7 @@ const MuteConfig = () => {
         </ul>
         <form class="flex gap-2" onSubmit={handleClickAddKeyword}>
           <input
-            class="flex-1"
+            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
             name="keyword"
             value={keywordInput()}

@@ -48,6 +48,8 @@ module.exports = {
         ],
       },
     ],
+    // disabled because jsx-a11y doesn't recognize <label for=...>
+    'jsx-a11y/label-has-associated-control': ['off'],
     'prettier/prettier': 'error',
   },
   settings: {

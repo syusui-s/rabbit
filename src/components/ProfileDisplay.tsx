@@ -14,6 +14,7 @@ import Timeline from '@/components/Timeline';
 import Copy from '@/components/utils/Copy';
 import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
+import useModalState from '@/hooks/useModalState';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
 import useFollowings from '@/nostr/useFollowings';
@@ -45,6 +46,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted } = useConfig();
   const commands = useCommands();
   const myPubkey = usePubkey();
+  const { showProfileEdit } = useModalState();
 
   const npub = createMemo(() => npubEncodeFallback(props.pubkey));
 
@@ -162,6 +164,17 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         }
       },
     },
+    {
+      when: () => props.pubkey === myPubkey(),
+      content: () => (!following() ? '自分をフォロー' : '自分をフォロー解除'),
+      onSelect: () => {
+        if (!following()) {
+          follow();
+        } else {
+          unfollow();
+        }
+      },
+    },
   ];
 
   const { events } = useSubscription(() => ({
@@ -215,6 +228,15 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               <div class="flex shrink-0 flex-col items-center gap-1">
                 <div class="flex flex-row justify-start gap-1">
                   <Switch>
+                    <Match when={props.pubkey === myPubkey()}>
+                      <button
+                        class="rounded-full border border-primary px-4 py-2
+                        text-center font-bold text-primary hover:bg-primary hover:text-white sm:w-20"
+                        onClick={() => showProfileEdit()}
+                      >
+                        編集
+                      </button>
+                    </Match>
                     <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
                       <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                         読み込み中
@@ -225,13 +247,6 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                         更新中
                       </span>
                     </Match>
-                    {/*
-                    <Match when={props.pubkey === myPubkey()}>
-                      <span class="rounded-full border border-primary px-4 py-2 text-primary">
-                        あなたです
-                      </span>
-                    </Match>
-                    */}
                     <Match when={following()}>
                       <button
                         class="rounded-full border border-primary bg-primary px-4 py-2

@@ -307,7 +307,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             props.textAreaRef?.(el);
           }}
           name="text"
-          class="min-h-[40px] rounded border-none"
+          class="min-h-[40px] rounded-md border-none focus:ring-rose-300"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}

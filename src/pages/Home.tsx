@@ -16,6 +16,7 @@ import uniq from 'lodash/uniq';
 import Column from '@/components/Column';
 import Notification from '@/components/Notification';
 import ProfileDisplay from '@/components/ProfileDisplay';
+import ProfileEdit from '@/components/ProfileEdit';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import useConfig from '@/core/useConfig';
@@ -33,7 +34,7 @@ const Home: Component = () => {
   useMountShortcutKeys();
   const navigate = useNavigate();
   const { persistStatus } = usePersistStatus();
-  const { modalState, closeModal } = useModalState();
+  const { modalState, showProfile, closeModal } = useModalState();
 
   const pool = usePool();
   const { config } = useConfig();
@@ -161,6 +162,15 @@ const Home: Component = () => {
               {(pubkeyNonNull: string) => (
                 <ProfileDisplay pubkey={pubkeyNonNull} onClose={closeModal} />
               )}
+            </Match>
+            <Match when={state.type === 'ProfileEdit'} keyed>
+              <ProfileEdit
+                onClose={() =>
+                  ensureNonNull([pubkey()])(([pubkeyNonNull]) => {
+                    showProfile(pubkeyNonNull);
+                  })
+                }
+              />
             </Match>
           </Switch>
         )}

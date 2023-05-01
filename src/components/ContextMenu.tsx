@@ -2,19 +2,13 @@ import { createSignal, onCleanup, createEffect, For, type Component, type JSX } 
 
 export type MenuItem = {
   content: () => JSX.Element;
+  when?: () => boolean;
   onSelect?: () => void;
 };
 
 export type ContextMenuProps = {
   menu: MenuItem[];
   children: JSX.Element;
-};
-
-export type MenuDisplayProps = {
-  menuRef: (elem: HTMLUListElement) => void;
-  menu: MenuItem[];
-  isOpen: boolean;
-  onClose: () => void;
 };
 
 export type MenuItemDisplayProps = {
@@ -30,24 +24,10 @@ const MenuItemDisplay: Component<MenuItemDisplayProps> = (props) => {
 
   return (
     <li class="border-b hover:bg-stone-200">
-      <button class="px-4 py-1" onClick={handleClick}>
+      <button class="w-full px-4 py-1 text-start" onClick={handleClick}>
         {props.item.content()}
       </button>
     </li>
-  );
-};
-
-const MenuDisplay: Component<MenuDisplayProps> = (props) => {
-  return (
-    <ul
-      ref={props.menuRef}
-      class="absolute z-20 min-w-[48px] rounded border bg-white shadow-md"
-      classList={{ hidden: !props.isOpen, block: props.isOpen }}
-    >
-      <For each={props.menu}>
-        {(item) => <MenuItemDisplay item={item} onClose={props.onClose} />}
-      </For>
-    </ul>
   );
 };
 
@@ -69,15 +49,18 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
     document.removeEventListener('mousedown', handleClickOutside);
   };
 
+  const open = () => setIsOpen(true);
+  const close = () => setIsOpen(false);
+
   const handleClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     if (menuRef == null) return;
 
     const buttonRect = ev.currentTarget.getBoundingClientRect();
-    const menuRect = menuRef.getBoundingClientRect();
+    // const menuRect = menuRef.getBoundingClientRect();
     menuRef.style.left = `${buttonRect.left - buttonRect.width}px`;
     menuRef.style.top = `${buttonRect.top + buttonRect.height}px`;
 
-    setIsOpen(true);
+    open();
   };
 
   createEffect(() => {
@@ -93,14 +76,15 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
   return (
     <div>
       <button onClick={handleClick}>{props.children}</button>
-      <MenuDisplay
-        menuRef={(e) => {
-          menuRef = e;
-        }}
-        menu={props.menu}
-        isOpen={isOpen()}
-        onClose={() => setIsOpen(false)}
-      />
+      <ul
+        ref={menuRef}
+        class="absolute z-20 min-w-[48px] rounded border bg-white shadow-md"
+        classList={{ hidden: !isOpen(), block: isOpen() }}
+      >
+        <For each={props.menu.filter((e) => e.when == null || e.when())}>
+          {(item: MenuItem) => <MenuItemDisplay item={item} onClose={close} />}
+        </For>
+      </ul>
     </div>
   );
 };
