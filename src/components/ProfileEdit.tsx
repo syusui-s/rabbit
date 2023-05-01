@@ -3,6 +3,7 @@ import { createSignal, type Component, batch, onMount, For, JSX, Show } from 'so
 import { createMutation } from '@tanstack/solid-query';
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
 
 import Modal from '@/components/Modal';
 import useConfig from '@/core/useConfig';
@@ -15,6 +16,16 @@ import timeout from '@/utils/timeout';
 export type ProfileEditProps = {
   onClose: () => void;
 };
+
+const LNURLRegexString = 'LNURL1[AC-HJ-NP-Zac-hj-np-z02-9]+';
+const LightningAddressRegexString = '[-a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
+const LUDAddressRegexString = `^(${LNURLRegexString}|${LightningAddressRegexString})$`;
+
+const LNURLRegex = new RegExp(`^${LNURLRegexString}$`);
+const LightningAddressRegex = new RegExp(`${LightningAddressRegexString}`);
+
+const isLNURL = (s: string) => LNURLRegex.test(s);
+const isLightningAddress = (s: string) => LightningAddressRegex.test(s);
 
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const pubkey = usePubkey();
@@ -33,6 +44,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const [about, setAbout] = createSignal('');
   const [website, setWebsite] = createSignal('');
   const [nip05, setNIP05] = createSignal('');
+  const [lightningAddress, setLightningAddress] = createSignal('');
 
   const mutation = createMutation({
     mutationKey: ['updateProfile'],
@@ -61,7 +73,17 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
 
   const disabled = () => query.isLoading || query.isError || mutation.isLoading;
   const otherProperties = () =>
-    omit(profile(), ['picture', 'banner', 'name', 'display_name', 'about', 'website', 'nip05']);
+    omit(profile(), [
+      'picture',
+      'banner',
+      'name',
+      'display_name',
+      'about',
+      'website',
+      'nip05',
+      'lud06',
+      'lud16',
+    ]);
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
@@ -69,15 +91,20 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
     const p = pubkey();
     if (p == null) return;
 
-    const newProfile: Profile = {
-      picture: picture(),
-      banner: banner(),
-      name: name(),
-      display_name: displayName(),
-      about: about(),
-      website: website(),
-      nip05: nip05(),
-    };
+    const newProfile: Profile = omitBy(
+      {
+        picture: picture(),
+        banner: banner(),
+        name: name(),
+        display_name: displayName(),
+        about: about(),
+        website: website(),
+        nip05: nip05(),
+        lud06: isLNURL(lightningAddress()) ? lightningAddress() : null,
+        lud16: isLightningAddress(lightningAddress()) ? lightningAddress() : null,
+      },
+      (v) => v == null || v.length === 0,
+    );
 
     mutation.mutate({
       relayUrls: config().relayUrls,
@@ -103,6 +130,11 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       setAbout((current) => currentProfile.about ?? current);
       setWebsite((current) => currentProfile.website ?? current);
       setNIP05((current) => currentProfile.nip05 ?? current);
+      if (currentProfile.lud16 != null) {
+        setLightningAddress(currentProfile.lud16);
+      } else if (currentProfile.lud06 != null) {
+        setLightningAddress(currentProfile.lud06);
+      }
     });
   });
 
@@ -118,7 +150,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             <ArrowLeft />
           </span>
         </button>
-        <div class="flex h-full flex-col overflow-y-scroll rounded-xl border bg-white pb-16 text-stone-700 shadow-lg">
+        <div class="flex h-full flex-col overflow-y-scroll rounded-xl border bg-white pb-32 text-stone-700 shadow-lg">
           <div>
             <Show when={banner().length > 0} fallback={<div class="h-12 shrink-0" />} keyed>
               <div class="h-40 w-full shrink-0 sm:h-52">
@@ -210,7 +242,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                   自己紹介
                 </label>
                 <textarea
-                  class="w-full rounded-md"
+                  class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
                   name="about"
                   value={about()}
                   rows="5"
@@ -233,19 +265,38 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                   onKeyDown={ignoreEnter}
                 />
               </div>
-              <div>
-                <span class="font-bold">その他の項目</span>
-                <div>
-                  <For each={Object.entries(otherProperties())}>
-                    {([key, value]) => (
-                      <div class="flex flex-col items-start">
-                        <span class="text-sm font-bold">{key}</span>
-                        <span class="text-sm">{value}</span>
-                      </div>
-                    )}
-                  </For>
-                </div>
+              <div class="flex flex-col items-start gap-1">
+                <label class="font-bold" for="name">
+                  LNURLアドレス / ライトニングアドレス
+                </label>
+                <span class="text-xs">どちらか片方のみが保存されます。</span>
+                <input
+                  class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+                  type="text"
+                  name="website"
+                  value={lightningAddress()}
+                  pattern={LUDAddressRegexString}
+                  placeholder="LNURL1XXXXXX / abcdef@wallet.example.com"
+                  disabled={disabled()}
+                  onChange={(ev) => setLightningAddress(ev.currentTarget.value)}
+                  onKeyDown={ignoreEnter}
+                />
               </div>
+              <Show when={Object.entries(otherProperties()).length > 0}>
+                <div>
+                  <span class="font-bold">その他の項目</span>
+                  <div>
+                    <For each={Object.entries(otherProperties())}>
+                      {([key, value]) => (
+                        <div class="flex flex-col items-start ">
+                          <span class="text-sm font-bold">{key}</span>
+                          <span class="whitespace-pre-wrap break-all text-sm">{value}</span>
+                        </div>
+                      )}
+                    </For>
+                  </div>
+                </div>
+              </Show>
               <div class="flex gap-2">
                 <button
                   type="submit"
