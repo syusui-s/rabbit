@@ -18,14 +18,14 @@ export type ProfileEditProps = {
 };
 
 const LNURLRegexString = 'LNURL1[AC-HJ-NP-Zac-hj-np-z02-9]+';
-const LightningAddressRegexString = '[-a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
-const LUDAddressRegexString = `^(${LNURLRegexString}|${LightningAddressRegexString})$`;
+const InternetIdentiferRegexString = '[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
+const LUDAddressRegexString = `^(${LNURLRegexString}|${InternetIdentiferRegexString})$`;
 
 const LNURLRegex = new RegExp(`^${LNURLRegexString}$`);
-const LightningAddressRegex = new RegExp(`${LightningAddressRegexString}`);
+const InternetIdentiferRegex = new RegExp(`^${InternetIdentiferRegexString}$`);
 
 const isLNURL = (s: string) => LNURLRegex.test(s);
-const isLightningAddress = (s: string) => LightningAddressRegex.test(s);
+const isInternetIdentifier = (s: string) => InternetIdentiferRegex.test(s);
 
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const pubkey = usePubkey();
@@ -101,7 +101,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
         website: website(),
         nip05: nip05(),
         lud06: isLNURL(lightningAddress()) ? lightningAddress() : null,
-        lud16: isLightningAddress(lightningAddress()) ? lightningAddress() : null,
+        lud16: isInternetIdentifier(lightningAddress()) ? lightningAddress() : null,
       },
       (v) => v == null || v.length === 0,
     );
@@ -157,7 +157,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                 <img src={banner()} alt="header" class="h-full w-full object-cover" />
               </div>
             </Show>
-            <div class="mt-[-64px] ml-4 h-28 w-28 rounded-lg shadow-md">
+            <div class="ml-4 mt-[-64px] h-28 w-28 rounded-lg shadow-md">
               <Show when={picture().length > 0}>
                 <img
                   src={picture()}
@@ -267,6 +267,22 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               </div>
               <div class="flex flex-col items-start gap-1">
                 <label class="font-bold" for="name">
+                  ドメイン認証（NIP-05）
+                </label>
+                <input
+                  class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+                  type="text"
+                  name="nip05"
+                  value={nip05()}
+                  placeholder="yourname@domain.example.com"
+                  pattern={InternetIdentiferRegex.source}
+                  disabled={disabled()}
+                  onChange={(ev) => setNIP05(ev.currentTarget.value)}
+                  onKeyDown={ignoreEnter}
+                />
+              </div>
+              <div class="flex flex-col items-start gap-1">
+                <label class="font-bold" for="name">
                   LNURLアドレス / ライトニングアドレス
                 </label>
                 <span class="text-xs">どちらか片方のみが保存されます。</span>
@@ -301,6 +317,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                 <button
                   type="submit"
                   class="rounded bg-rose-300 p-2 font-bold text-white hover:bg-rose-400"
+                  disabled={mutation.isLoading}
                 >
                   保存
                 </button>
@@ -312,6 +329,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                   キャンセル
                 </button>
               </div>
+              <Show when={mutation.isLoading}>保存中...</Show>
             </form>
           </div>
         </div>
