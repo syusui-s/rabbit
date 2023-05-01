@@ -4,11 +4,43 @@ import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import Modal from '@/components/Modal';
 import useConfig, { type Config } from '@/core/useConfig';
+import useModalState from '@/hooks/useModalState';
+import usePubkey from '@/nostr/usePubkey';
+import ensureNonNull from '@/utils/ensureNonNull';
 
 import UserNameDisplay from './UserDisplayName';
 
 type ConfigProps = {
   onClose: () => void;
+};
+
+const ProfileSection = () => {
+  const pubkey = usePubkey();
+  const { showProfile, showProfileEdit } = useModalState();
+
+  return (
+    <div class="py-2">
+      <h3 class="font-bold">プロフィール</h3>
+      <div class="flex gap-2">
+        <button
+          class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
+          onClick={() =>
+            ensureNonNull([pubkey()])(([pubkeyNonNull]) => {
+              showProfile(pubkeyNonNull);
+            })
+          }
+        >
+          開く
+        </button>
+        <button
+          class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
+          onClick={() => showProfileEdit()}
+        >
+          編集
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const RelayConfig = () => {
@@ -267,6 +299,7 @@ const ConfigUI = (props: ConfigProps) => {
             </button>
           </div>
         </div>
+        <ProfileSection />
         <RelayConfig />
         <DateFormatConfig />
         <OtherConfig />
