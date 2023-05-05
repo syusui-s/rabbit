@@ -174,13 +174,12 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
-  //
   it.each([
     'npub1namazu',
     'npub1a',
     'npub133vj8ycevdle0cq8mtgddq0xtn34kxkwxvak983dx0u5vhqnycyqj6tcz1',
     'npub133vj8ycevdle0cq8mtgddq0xtn34kxkwxvak983dx0u5vhqnycyqj6tczb',
-  ])('should parse text note which includes invalid npub string ($)', (invalidPubkey) => {
+  ])('should parse text note which includes invalid npub string (%s)', (invalidPubkey) => {
     const content = `this is pubkey\n${invalidPubkey}\nhello`;
     const parsed = parseTextNote(content);
 
