@@ -4,7 +4,7 @@ import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
-import Config from '@/components/Config';
+import Config from '@/components/modal/Config';
 import NotePostForm from '@/components/NotePostForm';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand } from '@/hooks/useCommandBus';

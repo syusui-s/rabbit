@@ -1,22 +1,13 @@
-import {
-  createSignal,
-  createEffect,
-  onMount,
-  onCleanup,
-  Show,
-  Switch,
-  Match,
-  type Component,
-} from 'solid-js';
+import { createEffect, onMount, Show, Switch, Match, type Component } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 import { createVirtualizer } from '@tanstack/solid-virtual';
 import uniq from 'lodash/uniq';
 
 import Column from '@/components/Column';
+import ProfileDisplay from '@/components/modal/ProfileDisplay';
+import ProfileEdit from '@/components/modal/ProfileEdit';
 import Notification from '@/components/Notification';
-import ProfileDisplay from '@/components/ProfileDisplay';
-import ProfileEdit from '@/components/ProfileEdit';
 import SideBar from '@/components/SideBar';
 import Timeline from '@/components/Timeline';
 import useConfig from '@/core/useConfig';
@@ -65,8 +56,8 @@ const Home: Component = () => {
         {
           kinds: [1, 6],
           authors,
-          limit: 25,
-          since: epoch() - 12 * 60 * 60,
+          limit: 10,
+          since: epoch() - 4 * 60 * 60,
         },
       ],
     };
@@ -79,7 +70,7 @@ const Home: Component = () => {
         {
           kinds: [1, 6],
           authors: [pubkeyNonNull],
-          limit: 25,
+          limit: 10,
         },
       ],
     })),
@@ -92,7 +83,7 @@ const Home: Component = () => {
         {
           kinds: [7],
           authors: [pubkeyNonNull],
-          limit: 25,
+          limit: 10,
         },
       ],
     })),
@@ -105,7 +96,7 @@ const Home: Component = () => {
         {
           kinds: [1, 6, 7],
           '#p': [pubkeyNonNull],
-          limit: 25,
+          limit: 10,
         },
       ],
     })),
@@ -121,7 +112,7 @@ const Home: Component = () => {
       {
         kinds: [1, 6],
         limit: 25,
-        since: epoch() - 12 * 60 * 60,
+        since: epoch() - 4 * 60 * 60,
       },
     ],
     clientEventFilter: (ev) => {

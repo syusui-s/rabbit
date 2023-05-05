@@ -2,13 +2,12 @@ import { createSignal, For, type JSX } from 'solid-js';
 
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
-import Modal from '@/components/Modal';
+import BasicModal from '@/components/modal/BasicModal';
+import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig, { type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
-
-import UserNameDisplay from './UserDisplayName';
 
 type ConfigProps = {
   onClose: () => void;
@@ -288,24 +287,18 @@ const OtherConfig = () => {
 };
 
 const ConfigUI = (props: ConfigProps) => {
+  // <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
   return (
-    <Modal onClose={props.onClose}>
-      <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
-        <div class="relative">
-          <div class="flex flex-col gap-1">
-            <h2 class="flex-1 text-center font-bold">設定</h2>
-            <button class="absolute top-1 right-0 z-0 h-4 w-4" onClick={() => props.onClose?.()}>
-              <XMark />
-            </button>
-          </div>
-        </div>
+    <BasicModal onClose={props.onClose}>
+      <div class="p-4">
+        <h2 class="flex-1 text-center text-lg font-bold">設定</h2>
         <ProfileSection />
         <RelayConfig />
         <DateFormatConfig />
         <OtherConfig />
         <MuteConfig />
       </div>
-    </Modal>
+    </BasicModal>
   );
 };
 

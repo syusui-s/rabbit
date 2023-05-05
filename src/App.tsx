@@ -27,9 +27,9 @@ const App: Component = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/hello" element={() => <Hello />} />
-        <Route path="/" element={() => <Home />} />
-        <Route path="/*" element={() => <NotFound />} />
+        <Route path="/hello" element={<Hello />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/*" element={<NotFound />} />
       </Routes>
     </QueryClientProvider>
   );

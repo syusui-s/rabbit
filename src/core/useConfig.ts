@@ -8,6 +8,7 @@ import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
+import generateId from '@/utils/generateId';
 
 export type Config = {
   relayUrls: string[];
@@ -29,6 +30,8 @@ type UseConfig = {
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
+  addColumn: (column: ColumnConfig) => void;
+  removeColumn: (columnId: string) => void;
   isPubkeyMuted: (pubkey: string) => boolean;
   shouldMuteEvent: (event: NostrEvent) => boolean;
   initializeColumns: (param: { pubkey: string }) => void;
@@ -53,23 +56,25 @@ const relaysInJP = [
   'wss://nostr-relay.nokotaro.com',
 ];
 
-const InitialConfig = (): Config => {
+const initialRelays = (): string[] => {
   const relayUrls = [...relaysGlobal];
   if (navigator.language === 'ja') {
     relayUrls.push(...relaysInJP);
   }
 
-  return {
-    relayUrls,
-    columns: [],
-    dateFormat: 'relative',
-    keepOpenPostForm: false,
-    showImage: true,
-    hideCount: false,
-    mutedPubkeys: [],
-    mutedKeywords: [],
-  };
+  return relayUrls;
 };
+
+const InitialConfig = (): Config => ({
+  relayUrls: initialRelays(),
+  columns: [],
+  dateFormat: 'relative',
+  keepOpenPostForm: false,
+  showImage: true,
+  hideCount: false,
+  mutedPubkeys: [],
+  mutedKeywords: [],
+});
 
 const serializer = (config: Config): string => JSON.stringify(config);
 // TODO zod使う
@@ -107,6 +112,14 @@ const useConfig = (): UseConfig => {
     setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
   };
 
+  const addColumn = (column: ColumnConfig) => {
+    setConfig('columns', (current) => [...current, column]);
+  };
+
+  const removeColumn = (columnId: string) => {
+    setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
+  };
+
   const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
 
   const hasMutedKeyword = (event: NostrEvent) => {
@@ -124,10 +137,16 @@ const useConfig = (): UseConfig => {
     if ((config.columns?.length ?? 0) > 0) return;
 
     const myColumns: ColumnConfig[] = [
-      { columnType: 'Following', title: 'ホーム', width: 'widest', pubkey },
-      { columnType: 'Notification', title: '通知', width: 'medium', pubkey },
-      { columnType: 'Posts', title: '自分の投稿', width: 'medium', pubkey },
-      { columnType: 'Reactions', title: '自分のリアクション', width: 'medium', pubkey },
+      { id: generateId(), columnType: 'Following', title: 'ホーム', width: 'widest', pubkey },
+      { id: generateId(), columnType: 'Notification', title: '通知', width: 'medium', pubkey },
+      { id: generateId(), columnType: 'Posts', title: '自分の投稿', width: 'medium', pubkey },
+      {
+        id: generateId(),
+        columnType: 'Reactions',
+        title: '自分のリアクション',
+        width: 'medium',
+        pubkey,
+      },
       // { columnType: 'Global', relays: [] },
     ];
 
@@ -143,6 +162,8 @@ const useConfig = (): UseConfig => {
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
+    addColumn,
+    removeColumn,
     isPubkeyMuted,
     shouldMuteEvent,
     initializeColumns,

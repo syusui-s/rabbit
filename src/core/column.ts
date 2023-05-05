@@ -43,6 +43,7 @@ type BulidOptions = {
 // export const buildFilter = (options: BuildOptions) => {};
 
 export type BaseColumn = {
+  id: string;
   title: string;
   width: ColumnProps['width'];
 };
