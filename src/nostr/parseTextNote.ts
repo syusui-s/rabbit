@@ -78,10 +78,19 @@ const parseTextNote = (textNoteContent: string) => {
   const result: ParsedTextNote = [];
 
   const pushPlainText = (index: number | undefined) => {
-    if (index != null && pos !== index) {
+    if (index != null && index > pos) {
       const content = textNoteContent.slice(pos, index);
-      const plainText: PlainText = { type: 'PlainText', content };
-      result.push(plainText);
+
+      // combine plaintext node when failed to decode (e.g. bech32)
+      const lastNode = result[result.length - 1];
+      if (lastNode?.type === 'PlainText') {
+        lastNode.content += content;
+      } else {
+        const plainText: PlainText = { type: 'PlainText', content };
+        result.push(plainText);
+      }
+
+      pos = index;
     }
   };
 
@@ -118,7 +127,6 @@ const parseTextNote = (textNoteContent: string) => {
       } catch (e) {
         console.warn(`failed to parse Bech32 entity (NIP-19): ${match[0]}`);
         pushPlainText(index + match[0].length);
-        return;
       }
     } else if (match.groups?.hashtag) {
       pushPlainText(index);
@@ -133,10 +141,8 @@ const parseTextNote = (textNoteContent: string) => {
     pos = index + match[0].length;
   });
 
-  if (pos !== textNoteContent.length) {
-    const content = textNoteContent.slice(pos);
-    const plainText: PlainText = { type: 'PlainText', content };
-    result.push(plainText);
+  if (pos < textNoteContent.length) {
+    pushPlainText(textNoteContent.length);
   }
 
   return result;

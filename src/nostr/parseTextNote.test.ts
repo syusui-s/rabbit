@@ -173,6 +173,16 @@ describe('parseTextNote', () => {
 
     assert.deepStrictEqual(parsed, expected);
   });
+
+  it('should parse text note which includes invalid npub string', () => {
+    const parsed = parseTextNote('this is pubkey\nnpub1srf6g8\nhello');
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'this is pubkey\nnpub1srf6g8\nhello' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
 });
 
 describe('resolveTagReference', () => {
