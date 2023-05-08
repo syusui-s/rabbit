@@ -29,7 +29,7 @@ const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => 
 
 const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   const { saveColumn, removeColumn, moveColumn } = useConfig();
-  const requestCommand = useRequestCommand();
+  const request = useRequestCommand();
 
   const setColumnWidth = (width: ColumnType['width']) => {
     saveColumn({ ...props.column, width });
@@ -37,9 +37,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
 
   const move = (index: number) => {
     moveColumn(props.column.id, index);
-    requestCommand({ command: 'moveToColumn', columnIndex: index }).catch((err) =>
-      console.error(err),
-    );
+    request({ command: 'moveToColumn', columnIndex: index }).catch((err) => console.error(err));
   };
 
   return (

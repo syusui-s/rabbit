@@ -1,8 +1,8 @@
-import { Component } from 'solid-js';
+import { Component, createSignal, Show, JSX, onMount } from 'solid-js';
 
+import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 
-import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import Timeline from '@/components/timeline/Timeline';
@@ -12,7 +12,60 @@ import { relaysForSearching } from '@/core/relayUrls';
 import useConfig from '@/core/useConfig';
 import useSubscription from '@/nostr/useSubscription';
 
-type SearchColumnDisplayProps = {
+export type SearchColumnHeaderProps = {
+  name: string;
+  column: SearchColumnType;
+  settings: () => JSX.Element;
+  onClose?: () => void;
+};
+
+const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
+  const [isSettingsOpened, setIsSettingOpened] = createSignal(false);
+  const [query, setQuery] = createSignal('');
+
+  const { saveColumn } = useConfig();
+
+  const toggleSettingsOpened = () => setIsSettingOpened((current) => !current);
+
+  const handleBlur: JSX.EventHandler<HTMLInputElement, Event> = () => {
+    if (query() === props.column.query) return;
+    saveColumn({ ...props.column, query: query() });
+  };
+
+  const handleChange: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
+    setQuery(ev.currentTarget.value);
+  };
+
+  onMount(() => {
+    setQuery(props.column.query);
+  });
+
+  return (
+    <div class="flex flex-col">
+      <div class="flex h-8 items-center gap-1 px-2">
+        <h2 class="flex items-center gap-1">
+          <span class="inline-block h-4 w-4 text-gray-700">
+            <MagnifyingGlass />
+          </span>
+        </h2>
+        <input
+          class="flex-1 rounded border border-stone-300 px-1 py-0 focus:border-rose-100 focus:ring-rose-300"
+          type="text"
+          name="query"
+          value={query()}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
+        <button class="h-4 w-4" onClick={() => toggleSettingsOpened()}>
+          <EllipsisVertical />
+        </button>
+      </div>
+      <Show when={isSettingsOpened()}>{props.settings()}</Show>
+    </div>
+  );
+};
+
+export type SearchColumnDisplayProps = {
   columnIndex: number;
   lastColumn: boolean;
   column: SearchColumnType;
@@ -21,27 +74,33 @@ type SearchColumnDisplayProps = {
 const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
   const { removeColumn } = useConfig();
 
-  const { events } = useSubscription(() => ({
-    relayUrls: relaysForSearching,
-    filters: [
-      {
-        kinds: [1, 6],
-        search: props.column.query,
-        limit: 25,
+  const { events } = useSubscription(() => {
+    const { query } = props.column;
+
+    if (query.length === 0) return null;
+
+    return {
+      relayUrls: relaysForSearching,
+      filters: [
+        {
+          kinds: [1, 6],
+          search: query,
+          limit: 25,
+        },
+      ],
+      clientEventFilter: (event) => {
+        if (props.column.contentFilter == null) return true;
+        return applyContentFilter(props.column.contentFilter)(event.content);
       },
-    ],
-    clientEventFilter: (event) => {
-      if (props.column.contentFilter == null) return true;
-      return applyContentFilter(props.column.contentFilter)(event.content);
-    },
-  }));
+    };
+  });
 
   return (
     <Column
       header={
-        <BasicColumnHeader
+        <SearchColumnHeader
           name={props.column.name ?? '検索'}
-          icon={<MagnifyingGlass />}
+          column={props.column}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
         />

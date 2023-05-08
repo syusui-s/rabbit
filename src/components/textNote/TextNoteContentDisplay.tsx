@@ -8,7 +8,9 @@ import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
 import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import SafeLink from '@/components/utils/SafeLink';
+import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
+import { useRequestCommand } from '@/hooks/useCommandBus';
 import eventWrapper from '@/nostr/event';
 import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 import { isImageUrl } from '@/utils/imageUrl';
@@ -21,8 +23,17 @@ export type TextNoteContentDisplayProps = {
 };
 
 const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
-  const { config } = useConfig();
+  const { config, saveColumn } = useConfig();
+
+  const request = useRequestCommand();
+
   const event = () => eventWrapper(props.event);
+
+  const addHashTagColumn = (query: string) => {
+    saveColumn(createSearchColumn({ query }));
+    request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+  };
+
   return (
     <For each={parseTextNote(props.event.content)}>
       {(item: ParsedTextNoteNode) => {
@@ -59,7 +70,11 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <span class="text-blue-500 underline">{item.content}</span>;
         }
         if (item.type === 'HashTag') {
-          return <span class="text-blue-500 underline">{item.content}</span>;
+          return (
+            <button class="text-blue-500 underline" onClick={() => addHashTagColumn(item.content)}>
+              {item.content}
+            </button>
+          );
         }
         if (item.type === 'URL') {
           if (isImageUrl(item.content)) {
