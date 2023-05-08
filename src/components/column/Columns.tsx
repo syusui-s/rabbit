@@ -5,6 +5,7 @@ import NotificationColumn from '@/components/column/NotificationColumn';
 import PostsColumn from '@/components/column/PostsColumn';
 import ReactionsColumn from '@/components/column/ReactionsColumn';
 import RelaysColumn from '@/components/column/RelaysColumn';
+import SearchColumn from '@/components/column/SearchColumn';
 import useConfig from '@/core/useConfig';
 
 const Columns = () => {
@@ -57,6 +58,15 @@ const Columns = () => {
               <Match when={column.columnType === 'Relays' && column} keyed>
                 {(reactionsColumn) => (
                   <RelaysColumn
+                    column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Search' && column} keyed>
+                {(reactionsColumn) => (
+                  <SearchColumn
                     column={reactionsColumn}
                     columnIndex={columnIndex()}
                     lastColumn={lastColumn()}

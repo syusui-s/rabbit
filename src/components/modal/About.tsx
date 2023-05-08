@@ -39,7 +39,7 @@ const About: Component<AboutProps> = (props) => {
     <BasicModal onClose={props.onClose}>
       <div class="p-8">
         <div class="flex flex-col items-center pt-8">
-          <img src={resolveAsset('/images/rabbit_app_256.png')} alt="Logo" width="64" height="64" />
+          <img src={resolveAsset('images/rabbit_app_256.png')} alt="Logo" width="64" height="64" />
 
           <h1 class="my-4">
             Rabbit <span id="app-version">v{packageInfo()?.self?.version}</span>

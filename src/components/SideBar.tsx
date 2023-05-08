@@ -71,7 +71,7 @@ const SideBar: Component = () => {
           <button class="pt-2" onClick={() => showAbout()}>
             <img
               class="h-8 w-8"
-              src={resolveAsset('/images/rabbit_app_256.png')}
+              src={resolveAsset('images/rabbit_app_256.png')}
               alt="About rabbit"
             />
           </button>
