@@ -7,16 +7,68 @@ import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
 import Config from '@/components/modal/Config';
 import NotePostForm from '@/components/NotePostForm';
+import Popup, { PopupRef } from '@/components/utils/Popup';
+import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
-import { useHandleCommand } from '@/hooks/useCommandBus';
+import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import resolveAsset from '@/utils/resolveAsset';
+
+const SearchButton = () => {
+  let popupRef: PopupRef | undefined;
+  let inputRef: HTMLInputElement | undefined;
+
+  const { saveColumn } = useConfig();
+  const request = useRequestCommand();
+
+  const [query, setQuery] = createSignal('');
+
+  const handleSearchSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
+    ev.preventDefault();
+
+    saveColumn(createSearchColumn({ query: query() }));
+    request({ command: 'moveToLastColumn' }).catch((err) => console.log(err));
+    popupRef?.close();
+  };
+
+  return (
+    <Popup
+      ref={(r) => {
+        popupRef = r;
+      }}
+      position="right"
+      button={
+        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary">
+          <MagnifyingGlass />
+        </span>
+      }
+      onOpen={() => inputRef?.focus()}
+    >
+      <form
+        class="flex w-72 items-center gap-1 rounded-md bg-white p-4 shadow-md"
+        onSubmit={handleSearchSubmit}
+      >
+        <input
+          ref={inputRef}
+          class="h-8 w-full rounded border border-stone-300 focus:border-rose-100 focus:ring-rose-300"
+          type="text"
+          value={query()}
+          onChange={(ev) => setQuery(ev.currentTarget.value)}
+        />
+        <button class="h-8 w-8 rounded bg-primary p-1 text-white" type="submit">
+          <MagnifyingGlass />
+        </button>
+      </form>
+    </Popup>
+  );
+};
 
 const SideBar: Component = () => {
   let textAreaRef: HTMLTextAreaElement | undefined;
 
   const { showAddColumn, showAbout } = useModalState();
   const { config } = useConfig();
+
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
 
@@ -48,11 +100,7 @@ const SideBar: Component = () => {
           >
             <PencilSquare />
           </button>
-          {/*
-          <button class="h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary">
-            <MagnifyingGlass />
-          </button>
-          */}
+          <SearchButton />
         </div>
         <div class="grow" />
         <div class="flex flex-col items-center pb-2">

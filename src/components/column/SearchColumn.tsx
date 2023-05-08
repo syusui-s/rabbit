@@ -13,7 +13,6 @@ import useConfig from '@/core/useConfig';
 import useSubscription from '@/nostr/useSubscription';
 
 export type SearchColumnHeaderProps = {
-  name: string;
   column: SearchColumnType;
   settings: () => JSX.Element;
   onClose?: () => void;
@@ -27,13 +26,22 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
 
   const toggleSettingsOpened = () => setIsSettingOpened((current) => !current);
 
-  const handleBlur: JSX.EventHandler<HTMLInputElement, Event> = () => {
+  const updateQuery = () => {
     if (query() === props.column.query) return;
     saveColumn({ ...props.column, query: query() });
   };
 
+  const handleBlur: JSX.EventHandler<HTMLInputElement, Event> = () => {
+    updateQuery();
+  };
+
   const handleChange: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
     setQuery(ev.currentTarget.value);
+  };
+
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
+    ev.preventDefault();
+    updateQuery();
   };
 
   onMount(() => {
@@ -48,14 +56,16 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
             <MagnifyingGlass />
           </span>
         </h2>
-        <input
-          class="flex-1 rounded border border-stone-300 px-1 py-0 focus:border-rose-100 focus:ring-rose-300"
-          type="text"
-          name="query"
-          value={query()}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        />
+        <form class="flex-1" onSubmit={handleSubmit}>
+          <input
+            class="w-full rounded border border-stone-300 px-1 py-0 focus:border-rose-100 focus:ring-rose-300"
+            type="text"
+            name="query"
+            value={query()}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+        </form>
         <button class="h-4 w-4" onClick={() => toggleSettingsOpened()}>
           <EllipsisVertical />
         </button>
@@ -99,7 +109,6 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
     <Column
       header={
         <SearchColumnHeader
-          name={props.column.name ?? '検索'}
           column={props.column}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
