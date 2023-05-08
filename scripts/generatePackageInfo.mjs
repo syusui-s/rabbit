@@ -2,7 +2,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import util from 'util';
 
-const readDepFile = (key, filename) => fs.readFile(path.resolve(key, filename), { encoding: 'utf8' });
+const readDepFile = (key, filename) =>
+  fs.readFile(path.resolve(key, filename), { encoding: 'utf8' });
 
 const getPackageInfo = async (key) => {
   try {

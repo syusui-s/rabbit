@@ -7,7 +7,7 @@ import parseTextNote, {
   resolveTagReference,
   type ParsedTextNoteNode,
   TagReference,
-} from './parseTextNote';
+} from '@/nostr/parseTextNote';
 
 describe('parseTextNote', () => {
   /*

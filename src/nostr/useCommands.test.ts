@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { describe, it } from 'vitest';
 
-import { buildTags } from './useCommands';
+import { buildTags } from '@/nostr/useCommands';
 
 describe('buildTags', () => {
   it('should place a reply tag as first one if it is an only element', () => {

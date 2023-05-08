@@ -11,10 +11,9 @@ import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
 import eventWrapper from '@/nostr/event';
 import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/nostr/parseTextNote';
+import { isImageUrl } from '@/utils/imageUrl';
 
 import type { Event as NostrEvent } from 'nostr-tools';
-
-import { isImageUrl } from '@/utils/imageUrl';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;
@@ -47,7 +46,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'note' && props.embedding) {
             return (
               <div class="my-1 rounded border p-1">
-                <TextNoteDisplayById eventId={item.data.data} actions={false} />
+                <TextNoteDisplayById eventId={item.data.data} actions={false} embedding={false} />
               </div>
             );
           }

@@ -1,12 +1,11 @@
 import { Switch, Match, type Component } from 'solid-js';
 
+import EventLink from '@/components/EventLink';
 // eslint-disable-next-line import/no-cycle
 import TextNoteDisplay, { type TextNoteDisplayProps } from '@/components/textNote/TextNoteDisplay';
 import useConfig from '@/core/useConfig';
 import useEvent from '@/nostr/useEvent';
 import ensureNonNull from '@/utils/ensureNonNull';
-
-import EventLink from '../EventLink';
 
 type TextNoteDisplayByIdProps = Omit<TextNoteDisplayProps, 'event'> & {
   eventId: string | undefined;

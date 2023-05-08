@@ -1,7 +1,10 @@
 // import { z } from 'zod';
 import { type Filter } from 'nostr-tools';
 
-import { type ColumnProps } from '@/components/Column';
+import { type ColumnProps } from '@/components/column/Column';
+import { ContentFilter } from '@/core/contentFilter';
+import { relaysOnlyAvailableInJP } from '@/core/relayUrls';
+import generateId from '@/utils/generateId';
 
 export type NotificationType =
   // The event which includes ["p", ...] tags.
@@ -44,51 +47,120 @@ type BulidOptions = {
 
 export type BaseColumn = {
   id: string;
-  title: string;
+  name?: string;
   width: ColumnProps['width'];
+  contentFilter?: ContentFilter;
 };
 
 /** A column which shows posts by following users */
-export type FollowingColumn = BaseColumn & {
+export type FollowingColumnType = BaseColumn & {
   columnType: 'Following';
   pubkey: string;
 };
 
 /** A column which shows replies, reactions, reposts to the specific user */
-export type NotificationColumn = BaseColumn & {
+export type NotificationColumnType = BaseColumn & {
   columnType: 'Notification';
   // notificationTypes: NotificationType[];
   pubkey: string;
 };
 
 /** A column which shows posts from the specific user */
-export type PostsColumn = BaseColumn & {
+export type PostsColumnType = BaseColumn & {
   columnType: 'Posts';
   pubkey: string;
 };
 
 /** A column which shows reactions published by the specific user */
-export type ReactionsColumn = BaseColumn & {
+export type ReactionsColumnType = BaseColumn & {
   columnType: 'Reactions';
   pubkey: string;
 };
 
 /** A column which shows text notes and reposts posted to the specific relays */
-export type GlobalColumn = BaseColumn & {
-  columnType: 'Global';
+export type RelaysColumnType = BaseColumn & {
+  columnType: 'Relays';
   relayUrls: string[];
 };
 
+/** A column which search text notes from relays which support NIP-50 */
+export type SearchColumnType = BaseColumn & {
+  columnType: 'Search';
+  query: string;
+};
+
 /** A column which shows text notes and reposts posted to the specific relays */
-export type CustomFilterColumn = BaseColumn & {
+export type CustomFilterColumnType = BaseColumn & {
   columnType: 'CustomFilter';
   filters: Filter[];
 };
 
-export type ColumnConfig =
-  | FollowingColumn
-  | NotificationColumn
-  | GlobalColumn
-  | PostsColumn
-  | ReactionsColumn
-  | CustomFilterColumn;
+export type ColumnType =
+  | FollowingColumnType
+  | NotificationColumnType
+  | RelaysColumnType
+  | PostsColumnType
+  | ReactionsColumnType
+  | SearchColumnType
+  | CustomFilterColumnType;
+
+type CreateParams<T extends BaseColumn> = Omit<T, keyof BaseColumn | 'columnType'> &
+  Partial<BaseColumn>;
+
+export const createBaseColumn = (): BaseColumn => ({
+  id: generateId(),
+  width: 'medium',
+});
+
+export const createFollowingColumn = (
+  params: CreateParams<FollowingColumnType>,
+): FollowingColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Following',
+  ...params,
+});
+
+export const createNotificationColumn = (
+  params: CreateParams<NotificationColumnType>,
+): NotificationColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Notification',
+  ...params,
+});
+
+export const createRelaysColumn = (params: CreateParams<RelaysColumnType>): RelaysColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Relays',
+  ...params,
+});
+
+export const createJapanRelaysColumn = () =>
+  createRelaysColumn({
+    name: '日本語',
+    relayUrls: relaysOnlyAvailableInJP,
+    contentFilter: {
+      filterType: 'Regex',
+      regex: '[\\p{scx=Hiragana}\\p{scx=Katakana}]',
+      flag: 'u',
+    },
+  });
+
+export const createPostsColumn = (params: CreateParams<PostsColumnType>): PostsColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Posts',
+  ...params,
+});
+
+export const createReactionsColumn = (
+  params: CreateParams<ReactionsColumnType>,
+): ReactionsColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Reactions',
+  ...params,
+});
+
+export const createSearchColumn = (params: CreateParams<SearchColumnType>): SearchColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Search',
+  ...params,
+});

@@ -3,6 +3,7 @@ import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 
 import usePersistStatus from '@/hooks/usePersistStatus';
+import resolveAsset from '@/utils/resolveAsset';
 
 type SignerStatus = 'checking' | 'available' | 'unavailable';
 
@@ -48,7 +49,7 @@ const Hello: Component = () => {
   return (
     <div class="mx-auto flex max-w-[640px] flex-col items-center p-4 text-stone-600">
       <div class="flex flex-col items-center gap-4 rounded bg-white p-4">
-        <img src="./images/rabbit_256.png" width="96" alt="logo" height="96" />
+        <img src={resolveAsset('/images/rabbit_256.png')} width="96" alt="logo" height="96" />
         <h1 class="text-5xl font-black text-rose-300">Rabbit</h1>
         <div>Rabbit is a Web client for Nostr.</div>
         <p class="text-center">

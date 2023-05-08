@@ -11,28 +11,27 @@ const acceptableLicenses = [
   '0BSD',
   'BSD-3-Clause',
   'CC-BY-4.0',
+  'Unlicense',
 ];
 
 const asyncLicenseChecker = (options) => {
   return new Promise((resolve, reject) => {
     licenseChecker.init(options, (err, data) => {
       if (err != null) reject(err);
-      else resolve(data)
+      else resolve(data);
     });
   });
 };
 
-export default async function() {
-  const packageInfo = await util.promisify(fs.readFile)('package.json', { encoding: 'utf8' })
+export default async function () {
+  const packageInfo = await util
+    .promisify(fs.readFile)('package.json', { encoding: 'utf8' })
     .then((data) => JSON.parse(data));
   const packages = await asyncLicenseChecker({ start: path.resolve(), production: true });
 
   let ok = true;
 
-  const ignorePackageNames = [
-    packageInfo.name,
-    'nostr-tools', // nostr-tools is licensed under public domain
-  ];
+  const ignorePackageNames = [packageInfo.name];
 
   for (const [name, info] of Object.entries(packages)) {
     const acceptable = acceptableLicenses.includes(info.licenses);

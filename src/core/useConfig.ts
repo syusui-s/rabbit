@@ -3,16 +3,23 @@ import { type Accessor, type Setter } from 'solid-js';
 import uniq from 'lodash/uniq';
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
-import { ColumnConfig } from '@/core/column';
+import {
+  ColumnType,
+  createFollowingColumn,
+  createJapanRelaysColumn,
+  createNotificationColumn,
+  createPostsColumn,
+  createReactionsColumn,
+} from '@/core/column';
+import { relaysGlobal, relaysInJP } from '@/core/relayUrls';
 import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
-import generateId from '@/utils/generateId';
 
 export type Config = {
   relayUrls: string[];
-  columns: ColumnConfig[];
+  columns: ColumnType[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   showImage: boolean;
@@ -24,44 +31,29 @@ export type Config = {
 type UseConfig = {
   config: Accessor<Config>;
   setConfig: Setter<Config>;
+  // relay
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
+  // mute
   addMutedPubkey: (pubkey: string) => void;
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
-  addColumn: (column: ColumnConfig) => void;
+  // column
+  saveColumn: (column: ColumnType) => void;
+  moveColumn: (columnId: string, index: number) => void;
   removeColumn: (columnId: string) => void;
+  // functions
   isPubkeyMuted: (pubkey: string) => boolean;
   shouldMuteEvent: (event: NostrEvent) => boolean;
   initializeColumns: (param: { pubkey: string }) => void;
 };
 
-const relaysGlobal = [
-  'wss://relay.damus.io',
-  'wss://nos.lol',
-  'wss://relay.snort.social',
-  'wss://relay.current.fyi',
-];
-
-const relaysOnlyAvailableInJP = [
-  'wss://relay-jp.nostr.wirednet.jp',
-  'wss://nostr.h3z.jp',
-  'wss://nostr.holybea.com',
-];
-
-const relaysInJP = [
-  ...relaysOnlyAvailableInJP,
-  'wss://nostr.holybea.com',
-  'wss://nostr-relay.nokotaro.com',
-];
-
 const initialRelays = (): string[] => {
   const relayUrls = [...relaysGlobal];
-  if (navigator.language === 'ja') {
+  if (window.navigator.language.includes('ja')) {
     relayUrls.push(...relaysInJP);
   }
-
   return relayUrls;
 };
 
@@ -112,8 +104,32 @@ const useConfig = (): UseConfig => {
     setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
   };
 
-  const addColumn = (column: ColumnConfig) => {
-    setConfig('columns', (current) => [...current, column]);
+  const saveColumn = (column: ColumnType) => {
+    setConfig('columns', (current) => {
+      const index = current.findIndex((e) => e.id === column.id);
+      if (index >= 0) {
+        const newColumns = [...current];
+        newColumns.splice(index, 1, column);
+        return newColumns;
+      }
+      return [...current, column];
+    });
+  };
+
+  const moveColumn = (columnId: string, index: number) => {
+    setConfig('columns', (current) => {
+      // index starts with 1
+      const idx = index - 1;
+      const toIndex = Math.max(Math.min(idx, current.length), 0);
+      const fromIndex = current.findIndex((e) => e.id === columnId);
+      if (fromIndex < 0 || toIndex === fromIndex) return current;
+
+      console.log(fromIndex, toIndex);
+      const modified = [...current];
+      const [column] = modified.splice(fromIndex, 1);
+      modified.splice(toIndex, 0, column);
+      return modified;
+    });
   };
 
   const removeColumn = (columnId: string) => {
@@ -136,21 +152,18 @@ const useConfig = (): UseConfig => {
     // すでに設定されている場合は終了
     if ((config.columns?.length ?? 0) > 0) return;
 
-    const myColumns: ColumnConfig[] = [
-      { id: generateId(), columnType: 'Following', title: 'ホーム', width: 'widest', pubkey },
-      { id: generateId(), columnType: 'Notification', title: '通知', width: 'medium', pubkey },
-      { id: generateId(), columnType: 'Posts', title: '自分の投稿', width: 'medium', pubkey },
-      {
-        id: generateId(),
-        columnType: 'Reactions',
-        title: '自分のリアクション',
-        width: 'medium',
-        pubkey,
-      },
-      // { columnType: 'Global', relays: [] },
+    const columns: ColumnType[] = [
+      createFollowingColumn({ width: 'widest', pubkey }),
+      createNotificationColumn({ pubkey }),
+      createPostsColumn({ name: '自分の投稿', pubkey }),
+      createReactionsColumn({ name: '自分のリアクション', pubkey }),
     ];
 
-    setConfig('columns', () => [...myColumns]);
+    if (navigator.language.includes('ja')) {
+      columns.splice(2, 0, createJapanRelaysColumn());
+    }
+
+    setConfig('columns', () => [...columns]);
   };
 
   return {
@@ -162,7 +175,8 @@ const useConfig = (): UseConfig => {
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
-    addColumn,
+    saveColumn,
+    moveColumn,
     removeColumn,
     isPubkeyMuted,
     shouldMuteEvent,

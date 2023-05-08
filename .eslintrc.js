@@ -23,10 +23,19 @@ module.exports = {
     ecmaFeatures: { jsx: true },
     ecmaVersion: 2021,
   },
-  plugins: ['import', 'solid', 'jsx-a11y', 'prettier', '@typescript-eslint', 'tailwindcss'],
+  plugins: [
+    'import',
+    'no-relative-import-paths',
+    'solid',
+    'jsx-a11y',
+    'prettier',
+    '@typescript-eslint',
+    'tailwindcss',
+  ],
   rules: {
     'no-alert': ['off'],
     'no-console': ['off'],
+    'no-relative-import-paths/no-relative-import-paths': ['error', { rootDir: 'src', prefix: '@' }],
     'import/extensions': [
       'error',
       'ignorePackages',

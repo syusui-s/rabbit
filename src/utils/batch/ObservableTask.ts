@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import nextId from './nextId';
+import nextId from '@/utils/batch/nextId';
 
 export default class ObservableTask<BatchRequest, BatchResponse> {
   id: number;

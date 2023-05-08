@@ -10,7 +10,7 @@ import uniq from 'lodash/uniq';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import BasicModal from '@/components/modal/BasicModal';
-import Timeline from '@/components/Timeline';
+import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
@@ -236,7 +236,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 <Match when={following()}>
                   <button
                     class="rounded-full border border-primary bg-primary px-4 py-2
-                    text-center font-bold text-white hover:bg-rose-500 sm:w-32"
+                    text-center font-bold text-white hover:bg-rose-500 sm:w-36"
                     onMouseEnter={() => setHoverFollowButton(true)}
                     onMouseLeave={() => setHoverFollowButton(false)}
                     onClick={() => unfollow()}
@@ -249,7 +249,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
                 <Match when={!following()}>
                   <button
-                    class="w-24 rounded-full border border-primary px-4 py-2 text-primary
+                    class="w-28 rounded-full border border-primary px-4 py-2 text-primary
                     hover:border-rose-400 hover:text-rose-400"
                     onClick={() => follow()}
                     disabled={updateContactsMutation.isLoading}

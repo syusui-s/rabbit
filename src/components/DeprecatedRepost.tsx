@@ -5,12 +5,11 @@ import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-squa
 import { Event as NostrEvent } from 'nostr-tools';
 
 import ColumnItem from '@/components/ColumnItem';
+import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
 import UserDisplayName from '@/components/UserDisplayName';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
 import eventWrapper from '@/nostr/event';
-
-import TextNoteDisplayById from './textNote/TextNoteDisplayById';
 
 export type DeprecatedRepostProps = {
   event: NostrEvent;

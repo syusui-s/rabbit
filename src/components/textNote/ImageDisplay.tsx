@@ -1,8 +1,7 @@
 import { Component, createSignal, Show } from 'solid-js';
 
+import SafeLink from '@/components/utils/SafeLink';
 import { fixUrl } from '@/utils/imageUrl';
-
-import SafeLink from '../utils/SafeLink';
 
 type ImageDisplayProps = {
   url: string;

@@ -13,7 +13,7 @@ export type BasicModalProps = {
 const BasicModal: Component<BasicModalProps> = (props) => {
   return (
     <Modal onClose={() => props.onClose?.()}>
-      <div class="h-screen w-[640px] max-w-full">
+      <div class="h-full w-[640px] max-w-full">
         <button
           class="w-full pt-1 text-start text-stone-800"
           aria-label="Close"

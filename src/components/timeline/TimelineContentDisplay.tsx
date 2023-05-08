@@ -3,8 +3,8 @@ import { Switch, Match, type Component } from 'solid-js';
 import uniq from 'lodash/uniq';
 import { Filter, Event as NostrEvent } from 'nostr-tools';
 
-import Timeline from '@/components/Timeline';
-import { type TimelineContent } from '@/components/TimelineContext';
+import Timeline from '@/components/timeline/Timeline';
+import { type TimelineContent } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import eventWrapper from '@/nostr/event';
 import useSubscription from '@/nostr/useSubscription';

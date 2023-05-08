@@ -1,6 +1,6 @@
 import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
-import eventWrapper from './event';
+import eventWrapper from '@/nostr/event';
 
 type ProfilePointer = nip19.ProfilePointer;
 type EventPointer = nip19.EventPointer;

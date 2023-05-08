@@ -8,13 +8,14 @@ import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
+import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import NotePostForm from '@/components/NotePostForm';
 import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
 // eslint-disable-next-line import/no-cycle
 import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
 import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
-import { useTimelineContext } from '@/components/TimelineContext';
+import { useTimelineContext } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
@@ -28,8 +29,6 @@ import useSubscription from '@/nostr/useSubscription';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
-
-import ContextMenu, { MenuItem } from '../ContextMenu';
 
 export type TextNoteDisplayProps = {
   event: NostrEvent;
