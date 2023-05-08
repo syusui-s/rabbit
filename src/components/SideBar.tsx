@@ -29,6 +29,7 @@ const SearchButton = () => {
     saveColumn(createSearchColumn({ query: query() }));
     request({ command: 'moveToLastColumn' }).catch((err) => console.log(err));
     popupRef?.close();
+    setQuery('');
   };
 
   return (
