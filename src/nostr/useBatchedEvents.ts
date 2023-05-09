@@ -298,7 +298,7 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error('updating profile error', err);
+            console.error('updating profile error: ', err);
           }
         });
         return latestEvent();
@@ -472,7 +472,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error('updating followings error', err);
+            console.error('updating followings error: ', err);
           }
         });
         return latestEvent();

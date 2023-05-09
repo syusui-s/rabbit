@@ -61,6 +61,17 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
               </div>
             );
           }
+          if (item.data.type === 'nevent' && props.embedding) {
+            return (
+              <div class="my-1 rounded border p-1">
+                <TextNoteDisplayById
+                  eventId={item.data.data.id}
+                  actions={false}
+                  embedding={false}
+                />
+              </div>
+            );
+          }
           if (item.data.type === 'npub') {
             return <MentionedUserDisplay pubkey={item.data.data} />;
           }

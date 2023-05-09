@@ -47,6 +47,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const { showProfile } = useModalState();
   const timelineContext = useTimelineContext();
 
+  const [reacted, setReacted] = createSignal(false);
+  const [reposted, setReposted] = createSignal(false);
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
   const [showOverflow, setShowOverflow] = createSignal(false);
@@ -61,11 +63,21 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     pubkey: props.event.pubkey,
   }));
 
-  const { reactions, isReactedBy, invalidateReactions } = useReactions(() => ({
+  const {
+    reactions,
+    isReactedBy,
+    invalidateReactions,
+    query: reactionsQuery,
+  } = useReactions(() => ({
     eventId: props.event.id,
   }));
 
-  const { reposts, isRepostedBy, invalidateReposts } = useReposts(() => ({
+  const {
+    reposts,
+    isRepostedBy,
+    invalidateReposts,
+    query: repostsQuery,
+  } = useReposts(() => ({
     eventId: props.event.id,
   }));
 
@@ -81,7 +93,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       console.error('failed to publish reaction: ', err);
     },
     onSettled: () => {
-      invalidateReactions().catch((err) => console.error('failed to refetch reactions', err));
+      invalidateReactions()
+        .then(() => reactionsQuery.refetch())
+        .catch((err) => console.error('failed to refetch reactions', err));
     },
   });
 
@@ -95,7 +109,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       console.error('failed to publish repost: ', err);
     },
     onSettled: () => {
-      invalidateReposts().catch((err) => console.error('failed to refetch reposts', err));
+      invalidateReposts()
+        .then(() => repostsQuery.refetch())
+        .catch((err) => console.error('failed to refetch reposts', err));
     },
   });
 
@@ -156,11 +172,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const isReactedByMe = createMemo(() => {
     const p = pubkey();
-    return p != null && isReactedBy(p);
+    return (p != null && isReactedBy(p)) || reacted();
   });
   const isRepostedByMe = createMemo(() => {
     const p = pubkey();
-    return p != null && isRepostedBy(p);
+    return (p != null && isRepostedBy(p)) || reposted();
   });
 
   const showReplyEvent = (): string | undefined => {
@@ -192,6 +208,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         eventId: eventIdNonNull,
         notifyPubkey: props.event.pubkey,
       });
+      setReposted(true);
     });
   };
 
@@ -211,6 +228,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
         eventId: eventIdNonNull,
         notifyPubkey: props.event.pubkey,
       });
+      setReacted(true);
     });
   };
 
