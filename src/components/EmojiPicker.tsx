@@ -24,7 +24,7 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data/i18n/ja.json');
         return response.json();
       },
-      autoFocus: true,
+      autoFocus: false,
       locale: 'ja',
       theme: 'light',
       onEmojiSelect: (emoji: { id: string; native: string }) => {
