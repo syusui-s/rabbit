@@ -267,9 +267,14 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </button>
               </ContextMenu>
             </div>
-            <Show when={followed()}>
-              <div class="shrink-0 text-xs">フォローされています</div>
-            </Show>
+            <Switch>
+              <Match when={userFollowingQuery.isLoading}>
+                <div class="shrink-0 text-xs">読み込み中</div>
+              </Match>
+              <Match when={followed()}>
+                <div class="shrink-0 text-xs">フォローされています</div>
+              </Match>
+            </Switch>
           </div>
         </div>
         <div class="flex items-start px-4 pt-2">

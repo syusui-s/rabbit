@@ -5,10 +5,12 @@ import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-squa
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
+import Plus from 'heroicons/24/outline/plus.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
+import EmojiPicker from '@/components/EmojiPicker';
 import NotePostForm from '@/components/NotePostForm';
 import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
 import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
@@ -25,7 +27,6 @@ import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
-import useSubscription from '@/nostr/useSubscription';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
@@ -65,6 +66,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const {
     reactions,
+    reactionsGroupedByContent,
     isReactedBy,
     invalidateReactions,
     query: reactionsQuery,
@@ -212,9 +214,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     });
   };
 
-  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
-    ev.stopPropagation();
-
+  const doReaction = (emoji?: string) => {
     if (isReactedByMe()) {
       // TODO remove reaction
       return;
@@ -224,12 +224,17 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       publishReactionMutation.mutate({
         relayUrls: config().relayUrls,
         pubkey: pubkeyNonNull,
-        content: '+',
+        content: emoji ?? '+',
         eventId: eventIdNonNull,
         notifyPubkey: props.event.pubkey,
       });
       setReacted(true);
     });
+  };
+
+  const handleReaction: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
+    ev.stopPropagation();
+    doReaction();
   };
 
   onMount(() => {
@@ -249,7 +254,6 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           }}
         >
           <Show when={author()?.picture}>
-            {/* TODO 画像は脆弱性回避のためにimgじゃない方法で読み込みたい */}
             <img src={author()?.picture} alt="icon" class="h-full w-full rounded object-cover" />
           </Show>
         </button>
@@ -262,7 +266,6 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 showProfile(event().pubkey);
               }}
             >
-              {/* TODO link to author */}
               <Show when={(author()?.display_name?.length ?? 0) > 0}>
                 <div class="author-name truncate pr-1 font-bold hover:underline">
                   {author()?.display_name}
@@ -345,6 +348,42 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             </button>
           </Show>
           <Show when={actions()}>
+            <Show when={config().showEmojiReaction && reactions().length > 0}>
+              <div class="flex gap-2 pt-1">
+                <For each={[...reactionsGroupedByContent().entries()]}>
+                  {([content, events]) => {
+                    const isReactedByMeWithThisContent =
+                      events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
+
+                    return (
+                      <button
+                        class="flex items-center rounded border px-1"
+                        classList={{
+                          'text-zinc-400': !isReactedByMeWithThisContent,
+                          'bg-rose-50': isReactedByMeWithThisContent,
+                          'border-rose-200': isReactedByMeWithThisContent,
+                          'text-rose-400': isReactedByMeWithThisContent,
+                        }}
+                        type="button"
+                        onClick={() => doReaction(content)}
+                      >
+                        <Show
+                          when={content === '+'}
+                          fallback={<span class="text-xs">{content}</span>}
+                        >
+                          <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
+                            <HeartSolid />
+                          </span>
+                        </Show>
+                        <Show when={!config().hideCount}>
+                          <span class="ml-1 text-sm">{events.length}</span>
+                        </Show>
+                      </button>
+                    );
+                  }}
+                </For>
+              </div>
+            </Show>
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
                 class="h-4 w-4 shrink-0 text-zinc-400"
@@ -380,16 +419,31 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   'text-rose-400': isReactedByMe() || publishReactionMutation.isLoading,
                 }}
               >
-                <button
-                  class="h-4 w-4"
-                  onClick={handleReaction}
-                  disabled={publishReactionMutation.isLoading}
+                <Show
+                  when={!config().useEmojiReaction}
+                  fallback={
+                    <EmojiPicker onEmojiSelect={(emoji) => doReaction(emoji)}>
+                      <span class="inline-block h-4 w-4">
+                        <Plus />
+                      </span>
+                    </EmojiPicker>
+                  }
                 >
-                  <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
-                    <HeartSolid />
-                  </Show>
-                </button>
-                <Show when={!config().hideCount && reactions().length > 0}>
+                  <button
+                    class="h-4 w-4"
+                    onClick={handleReaction}
+                    disabled={publishReactionMutation.isLoading}
+                  >
+                    <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
+                      <HeartSolid />
+                    </Show>
+                  </button>
+                </Show>
+                <Show
+                  when={
+                    !config().hideCount && !config().showEmojiReaction && reactions().length > 0
+                  }
+                >
                   <div class="text-sm text-zinc-400">{reactions().length}</div>
                 </Show>
               </div>

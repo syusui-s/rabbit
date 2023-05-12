@@ -17,7 +17,7 @@ export type ProfileEditProps = {
   onClose: () => void;
 };
 
-const LNURLRegexString = 'LNURL1[AC-HJ-NP-Zac-hj-np-z02-9]+';
+const LNURLRegexString = '(LNURL1[AC-HJ-NP-Z02-9]+|lnurl1[ac-hj-np-z02-9]+)';
 const InternetIdentiferRegexString = '[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
 const LUDAddressRegexString = `^(${LNURLRegexString}|${InternetIdentiferRegexString})$`;
 

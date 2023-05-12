@@ -323,7 +323,7 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
     try {
       return JSON.parse(content) as Profile;
     } catch (err) {
-      console.error('failed to parse profile (kind 0): ', err, content);
+      console.warn('failed to parse profile (kind 0): ', err, content);
       return null;
     }
   });

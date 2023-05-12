@@ -16,10 +16,27 @@ code {
     monospace;
 }
 
-.navigationButton {
-  @apply inline-block py-4 px-1 text-xl font-bold text-blue-500 hover:text-blue-600;
-}
-
 .link {
   @apply underline text-blue-500;
+}
+
+em-emoji-picker {
+  --background-rgb: 85, 170, 255;
+  --border-radius: 8px;
+  --color-border-over: rgba(0, 0, 0, 0.1);
+  --color-border: rgba(0, 0, 0, 0.05);
+  --category-icon-size: 20px;
+  --font-size: 16px;
+  --rgb-accent: 253, 164, 175;
+  --rgb-background: 255, 255, 255;
+  --rgb-color: 28, 25, 23;
+  --rgb-input: 255, 255, 255;
+  --shadow: 0 5px 8px -8px #222;
+
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  height: 50vh;
+  min-height: 400px;
+  max-height: 800px;
+  width: 360px;
+  max-width: 90vw;
 }

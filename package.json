@@ -54,6 +54,7 @@
     "@tanstack/solid-virtual": "^3.0.0-beta.6",
     "@thisbeyond/solid-dnd": "^0.7.4",
     "@types/lodash": "^4.14.194",
+    "emoji-mart": "^5.5.2",
     "heroicons": "^2.0.17",
     "lodash": "^4.17.21",
     "nostr-tools": "^1.10.1",

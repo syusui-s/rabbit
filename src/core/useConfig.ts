@@ -22,6 +22,8 @@ export type Config = {
   columns: ColumnType[];
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
+  useEmojiReaction: boolean;
+  showEmojiReaction: boolean;
   showImage: boolean;
   hideCount: boolean;
   mutedPubkeys: string[];
@@ -62,6 +64,8 @@ const InitialConfig = (): Config => ({
   columns: [],
   dateFormat: 'relative',
   keepOpenPostForm: false,
+  useEmojiReaction: false,
+  showEmojiReaction: false,
   showImage: true,
   hideCount: false,
   mutedPubkeys: [],

@@ -6,7 +6,7 @@ export const relaysGlobal: string[] = [
 
 export const relaysOnlyAvailableInJP: string[] = [
   'wss://relay-jp.nostr.wirednet.jp',
-  'wss://nostr.h3z.jp',
+  // 'wss://nostr.h3z.jp',
   'wss://nostr.holybea.com',
 ];
 

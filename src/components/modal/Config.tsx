@@ -166,6 +166,46 @@ const ToggleButton = (props: {
   );
 };
 
+const EmojiConfig = () => {
+  const { config, setConfig } = useConfig();
+
+  const toggleUseEmojiReaction = () => {
+    setConfig((current) => ({
+      ...current,
+      useEmojiReaction: !(current.useEmojiReaction ?? false),
+    }));
+  };
+
+  const toggleShowEmojiReaction = () => {
+    setConfig((current) => ({
+      ...current,
+      showEmojiReaction: !(current.showEmojiReaction ?? false),
+    }));
+  };
+
+  return (
+    <div class="py-2">
+      <h3 class="font-bold">リアクション</h3>
+      <div class="flex flex-col justify-evenly gap-2">
+        <div class="flex w-full">
+          <div class="flex-1">絵文字を選べるようにする</div>
+          <ToggleButton
+            value={config().useEmojiReaction}
+            onClick={() => toggleUseEmojiReaction()}
+          />
+        </div>
+        <div class="flex w-full">
+          <div class="flex-1">投稿にリアクションされた絵文字を表示する</div>
+          <ToggleButton
+            value={config().showEmojiReaction}
+            onClick={() => toggleShowEmojiReaction()}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MuteConfig = () => {
   const { config, removeMutedPubkey, addMutedKeyword, removeMutedKeyword } = useConfig();
 
@@ -295,6 +335,7 @@ const ConfigUI = (props: ConfigProps) => {
         <ProfileSection />
         <RelayConfig />
         <DateFormatConfig />
+        <EmojiConfig />
         <OtherConfig />
         <MuteConfig />
       </div>

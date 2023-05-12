@@ -72,7 +72,7 @@ const extract = (parsed: ParsedTextNote) => {
 };
 
 const format = (parsed: ParsedTextNote) => {
-  const content = [];
+  const content: string[] = [];
   parsed.forEach((node) => {
     if (node.type === 'Bech32Entity' && !node.isNIP19) {
       content.push(`nostr:${node.content}`);
@@ -205,6 +205,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       };
     }
     publishTextNoteMutation.mutate(textNote);
+    close();
   };
 
   const handleInput: JSX.EventHandler<HTMLTextAreaElement, InputEvent> = (ev) => {
