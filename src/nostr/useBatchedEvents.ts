@@ -237,24 +237,23 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
         const registeredTasks = textNoteTasks.get(event.id) ?? [];
         resolveTasks(registeredTasks, event);
       } else if (event.kind === Kind.Reaction) {
-        const eventTags = eventWrapper(event).taggedEvents();
-        eventTags.forEach((eventTag) => {
-          const taggedEventId = eventTag.id;
-          const registeredTasks = reactionsTasks.get(taggedEventId) ?? [];
+        // Use the last event id
+        const id = eventWrapper(event).lastTaggedEventId();
+        if (id != null) {
+          const registeredTasks = reactionsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
-        });
+        }
       } else if ((event.kind as number) === 6) {
-        const eventTags = eventWrapper(event).taggedEvents();
-        eventTags.forEach((eventTag) => {
-          const taggedEventId = eventTag.id;
-          const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
+        // Use the last event id
+        const id = eventWrapper(event).lastTaggedEventId();
+        if (id != null) {
+          const registeredTasks = repostsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
-        });
+        }
       } else if (event.kind === Kind.Zap) {
-        const eventTags = eventWrapper(event).taggedEvents();
-        eventTags.forEach((eventTag) => {
-          const taggedEventId = eventTag.id;
-          const registeredTasks = repostsTasks.get(taggedEventId) ?? [];
+        const eTags = eventWrapper(event).eTags();
+        eTags.forEach(([, id]) => {
+          const registeredTasks = repostsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
         });
       } else if (event.kind === Kind.Contacts) {
@@ -298,7 +297,7 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error('updating profile error: ', err);
+            console.error('error occurred while updating profile cache: ', err);
           }
         });
         return latestEvent();
@@ -472,7 +471,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
           try {
             queryClient.setQueryData(queryKey, latestEvent());
           } catch (err) {
-            console.error('updating followings error: ', err);
+            console.error('error occurred while updating followings cache: ', err);
           }
         });
         return latestEvent();
@@ -491,14 +490,12 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
   const followings = () => {
     if (query.data == null) return [];
 
-    const event = query.data;
-
     const result: Following[] = [];
-    event.tags.forEach((tag) => {
-      // TODO zodにする
-      const [tagName, followingPubkey, mainRelayUrl, petname] = tag;
-      if (!tag.every((e) => typeof e === 'string')) return;
-      if (tagName !== 'p') return;
+
+    // TODO zodにする
+    const event = eventWrapper(query.data);
+    event.pTags().forEach((tag) => {
+      const [, followingPubkey, mainRelayUrl, petname] = tag;
 
       const following: Following = { pubkey: followingPubkey, petname };
       if (mainRelayUrl != null && mainRelayUrl.length > 0) {

@@ -37,7 +37,51 @@ export type TextNoteDisplayProps = {
   actions?: boolean;
 };
 
+type EmojiReactionsProps = {
+  reactionsGroupedByContent: Map<string, NostrEvent[]>;
+  onReaction: (emoji: string) => void;
+};
+
 const { noteEncode } = nip19;
+
+const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
+  const { config } = useConfig();
+  const pubkey = usePubkey();
+
+  return (
+    <div class="flex gap-2 pt-1">
+      <For each={[...props.reactionsGroupedByContent.entries()]}>
+        {([content, events]) => {
+          const isReactedByMeWithThisContent =
+            events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
+
+          return (
+            <button
+              class="flex items-center rounded border px-1"
+              classList={{
+                'text-zinc-400': !isReactedByMeWithThisContent,
+                'bg-rose-50': isReactedByMeWithThisContent,
+                'border-rose-200': isReactedByMeWithThisContent,
+                'text-rose-400': isReactedByMeWithThisContent,
+              }}
+              type="button"
+              onClick={() => props.onReaction(content)}
+            >
+              <Show when={content === '+'} fallback={<span class="text-xs">{content}</span>}>
+                <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
+                  <HeartSolid />
+                </span>
+              </Show>
+              <Show when={!config().hideCount}>
+                <span class="ml-1 text-sm">{events.length}</span>
+              </Show>
+            </button>
+          );
+        }}
+      </For>
+    </div>
+  );
+};
 
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   let contentRef: HTMLDivElement | undefined;
@@ -349,40 +393,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           </Show>
           <Show when={actions()}>
             <Show when={config().showEmojiReaction && reactions().length > 0}>
-              <div class="flex gap-2 pt-1">
-                <For each={[...reactionsGroupedByContent().entries()]}>
-                  {([content, events]) => {
-                    const isReactedByMeWithThisContent =
-                      events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
-
-                    return (
-                      <button
-                        class="flex items-center rounded border px-1"
-                        classList={{
-                          'text-zinc-400': !isReactedByMeWithThisContent,
-                          'bg-rose-50': isReactedByMeWithThisContent,
-                          'border-rose-200': isReactedByMeWithThisContent,
-                          'text-rose-400': isReactedByMeWithThisContent,
-                        }}
-                        type="button"
-                        onClick={() => doReaction(content)}
-                      >
-                        <Show
-                          when={content === '+'}
-                          fallback={<span class="text-xs">{content}</span>}
-                        >
-                          <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
-                            <HeartSolid />
-                          </span>
-                        </Show>
-                        <Show when={!config().hideCount}>
-                          <span class="ml-1 text-sm">{events.length}</span>
-                        </Show>
-                      </button>
-                    );
-                  }}
-                </For>
-              </div>
+              <EmojiReactions
+                reactionsGroupedByContent={reactionsGroupedByContent()}
+                onReaction={doReaction}
+              />
             </Show>
             <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
               <button
@@ -419,26 +433,15 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   'text-rose-400': isReactedByMe() || publishReactionMutation.isLoading,
                 }}
               >
-                <Show
-                  when={!config().useEmojiReaction}
-                  fallback={
-                    <EmojiPicker onEmojiSelect={(emoji) => doReaction(emoji)}>
-                      <span class="inline-block h-4 w-4">
-                        <Plus />
-                      </span>
-                    </EmojiPicker>
-                  }
+                <button
+                  class="h-4 w-4"
+                  onClick={handleReaction}
+                  disabled={publishReactionMutation.isLoading}
                 >
-                  <button
-                    class="h-4 w-4"
-                    onClick={handleReaction}
-                    disabled={publishReactionMutation.isLoading}
-                  >
-                    <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
-                      <HeartSolid />
-                    </Show>
-                  </button>
-                </Show>
+                  <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
+                    <HeartSolid />
+                  </Show>
+                </button>
                 <Show
                   when={
                     !config().hideCount && !config().showEmojiReaction && reactions().length > 0
@@ -447,6 +450,15 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   <div class="text-sm text-zinc-400">{reactions().length}</div>
                 </Show>
               </div>
+              <Show when={config().useEmojiReaction}>
+                <div class="shrink-0">
+                  <EmojiPicker onEmojiSelect={(emoji) => doReaction(emoji)}>
+                    <span class="inline-block h-4 w-4">
+                      <Plus />
+                    </span>
+                  </EmojiPicker>
+                </div>
+              </Show>
               <div>
                 <ContextMenu menu={menu}>
                   <span class="inline-block h-4 w-4 text-zinc-400">

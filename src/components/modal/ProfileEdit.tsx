@@ -18,14 +18,14 @@ export type ProfileEditProps = {
 };
 
 const LNURLRegexString = '(LNURL1[AC-HJ-NP-Z02-9]+|lnurl1[ac-hj-np-z02-9]+)';
-const InternetIdentiferRegexString = '[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
-const LUDAddressRegexString = `^(${LNURLRegexString}|${InternetIdentiferRegexString})$`;
+const InternetIdentifierRegexString = '[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+';
+const LUDAddressRegexString = `^(${LNURLRegexString}|${InternetIdentifierRegexString})$`;
 
 const LNURLRegex = new RegExp(`^${LNURLRegexString}$`);
-const InternetIdentiferRegex = new RegExp(`^${InternetIdentiferRegexString}$`);
+const InternetIdentifierRegex = new RegExp(`^${InternetIdentifierRegexString}$`);
 
 const isLNURL = (s: string) => LNURLRegex.test(s);
-const isInternetIdentifier = (s: string) => InternetIdentiferRegex.test(s);
+const isInternetIdentifier = (s: string) => InternetIdentifierRegex.test(s);
 
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const pubkey = usePubkey();
@@ -260,7 +260,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               name="nip05"
               value={nip05()}
               placeholder="yourname@domain.example.com"
-              pattern={InternetIdentiferRegex.source}
+              pattern={InternetIdentifierRegex.source}
               disabled={disabled()}
               onChange={(ev) => setNIP05(ev.currentTarget.value)}
               onKeyDown={ignoreEnter}

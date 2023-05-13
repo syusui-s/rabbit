@@ -1,4 +1,4 @@
-import { createEffect, onMount, type Component } from 'solid-js';
+import { createEffect, onMount, type Component, onError } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
@@ -42,6 +42,10 @@ const Home: Component = () => {
     if (!persistStatus().loggedIn) {
       navigate('/hello');
     }
+  });
+
+  onError((err) => {
+    console.error('uncaught error: ', err);
   });
 
   return (

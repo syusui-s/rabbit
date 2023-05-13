@@ -27,12 +27,16 @@ const Popup: Component<PopupProps> = (props) => {
   let popupRef: HTMLDivElement | undefined;
 
   const [isOpen, setIsOpen] = createSignal(false);
+  const [style, setStyle] = createSignal<JSX.CSSProperties>({});
   const resolvedChildren = children(() => props.children);
+
+  const close = () => setIsOpen(false);
+  const toggleOpened = () => setIsOpen((current) => !current);
 
   const handleClickOutside = (ev: MouseEvent) => {
     const target = ev.target as HTMLElement;
     if (target != null && !popupRef?.contains(target)) {
-      setIsOpen(false);
+      close();
     }
   };
 
@@ -43,10 +47,31 @@ const Popup: Component<PopupProps> = (props) => {
     document.removeEventListener('mousedown', handleClickOutside);
   };
 
-  const close = () => setIsOpen(false);
-  const toggle = () => setIsOpen((current) => !current);
+  const adjustPosition = () => {
+    if (buttonRef == null || popupRef == null) return;
 
-  const handleClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => toggle();
+    const buttonRect = buttonRef?.getBoundingClientRect();
+    const popupRect = popupRef?.getBoundingClientRect();
+
+    let { top, left } = buttonRect;
+
+    if (props.position === 'left') {
+      left -= buttonRect.width;
+    } else if (props.position === 'right') {
+      left += buttonRect.width;
+    } else if (props.position === 'top') {
+      top -= buttonRect.height;
+      left -= buttonRect.left + buttonRect.width / 2;
+    } else {
+      top += buttonRect.height;
+      left += buttonRect.width / 2;
+    }
+
+    top = Math.min(top, window.innerHeight - popupRect.height);
+    left = Math.min(left, window.innerWidth - popupRect.width);
+
+    setStyle({ left: `${left}px`, top: `${top}px` });
+  };
 
   createEffect(() => {
     if (isOpen()) {
@@ -60,33 +85,15 @@ const Popup: Component<PopupProps> = (props) => {
 
   createEffect(
     on(resolvedChildren, () => {
-      if (buttonRef == null || popupRef == null) return;
-
-      const buttonRect = buttonRef?.getBoundingClientRect();
-      const popupRect = popupRef?.getBoundingClientRect();
-
-      let { top, left } = buttonRect;
-
-      if (props.position === 'left') {
-        left -= buttonRect.width;
-      } else if (props.position === 'right') {
-        left += buttonRect.width;
-      } else if (props.position === 'top') {
-        top -= buttonRect.height;
-        left -= buttonRect.left + buttonRect.width / 2;
-      } else {
-        top += buttonRect.height;
-        left += buttonRect.width / 2;
-      }
-
-      top = Math.min(top, window.innerHeight - popupRect.height);
-      left = Math.min(left, window.innerWidth - popupRect.width);
-      console.log(popupRect);
-
-      popupRef.style.left = `${left}px`;
-      popupRef.style.top = `${top}px`;
+      adjustPosition();
     }),
   );
+
+  createEffect(() => {
+    if (isOpen()) {
+      adjustPosition();
+    }
+  });
 
   onMount(() => {
     props.ref?.({ close });
@@ -96,10 +103,22 @@ const Popup: Component<PopupProps> = (props) => {
 
   return (
     <div>
-      <button ref={buttonRef} class="flex items-center" onClick={handleClick}>
+      <button
+        ref={buttonRef}
+        class="flex items-center"
+        onClick={() => {
+          toggleOpened();
+          adjustPosition();
+        }}
+      >
         {props.button}
       </button>
-      <div ref={popupRef} class="absolute z-20" classList={{ hidden: !isOpen(), block: isOpen() }}>
+      <div
+        ref={popupRef}
+        class="absolute z-20"
+        classList={{ hidden: !isOpen(), block: isOpen() }}
+        style={style()}
+      >
         {resolvedChildren()}
       </div>
     </div>

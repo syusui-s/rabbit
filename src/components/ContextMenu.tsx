@@ -1,4 +1,6 @@
-import { createSignal, onCleanup, createEffect, For, type Component, type JSX } from 'solid-js';
+import { For, type Component, type JSX } from 'solid-js';
+
+import Popup, { PopupRef } from '@/components/utils/Popup';
 
 export type MenuItem = {
   content: () => JSX.Element;
@@ -32,60 +34,24 @@ const MenuItemDisplay: Component<MenuItemDisplayProps> = (props) => {
 };
 
 const ContextMenu: Component<ContextMenuProps> = (props) => {
-  let menuRef: HTMLUListElement | undefined;
+  let popupRef: PopupRef | undefined;
 
-  const [isOpen, setIsOpen] = createSignal(false);
-
-  const handleClickOutside = (ev: MouseEvent) => {
-    const target = ev.target as HTMLElement;
-    if (target != null && !menuRef?.contains(target)) {
-      setIsOpen(false);
-    }
-  };
-  const addClickOutsideHandler = () => {
-    document.addEventListener('mousedown', handleClickOutside);
-  };
-  const removeClickOutsideHandler = () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
-
-  const handleClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
-    if (menuRef == null) return;
-
-    const buttonRect = ev.currentTarget.getBoundingClientRect();
-    // const menuRect = menuRef.getBoundingClientRect();
-    menuRef.style.left = `${buttonRect.left - buttonRect.width}px`;
-    menuRef.style.top = `${buttonRect.top + buttonRect.height}px`;
-
-    open();
-  };
-
-  createEffect(() => {
-    if (isOpen()) {
-      addClickOutsideHandler();
-    } else {
-      removeClickOutsideHandler();
-    }
-  });
-
-  onCleanup(() => removeClickOutsideHandler());
+  const close = () => popupRef?.close();
 
   return (
-    <div>
-      <button onClick={handleClick}>{props.children}</button>
-      <ul
-        ref={menuRef}
-        class="absolute z-20 min-w-[48px] rounded border bg-white shadow-md"
-        classList={{ hidden: !isOpen(), block: isOpen() }}
-      >
+    <Popup
+      ref={(e) => {
+        popupRef = e;
+      }}
+      button={props.children}
+      position="bottom"
+    >
+      <ul class="min-w-[96px] rounded border bg-white shadow-md">
         <For each={props.menu.filter((e) => e.when == null || e.when())}>
           {(item: MenuItem) => <MenuItemDisplay item={item} onClose={close} />}
         </For>
       </ul>
-    </div>
+    </Popup>
   );
 };
 

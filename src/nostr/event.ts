@@ -1,14 +1,20 @@
 import uniq from 'lodash/uniq';
-
-import type { Event as NostrEvent } from 'nostr-tools';
+import { Kind, Event as NostrEvent } from 'nostr-tools';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 
-export type TaggedEvent = {
+// NIP-10
+export type MarkedEventTag = {
   id: string;
   relayUrl?: string;
   index: number;
   marker?: EventMarker;
+};
+
+export type ContactPubkeyTag = {
+  pubkey: string;
+  relayUrl?: string;
+  petname?: string;
 };
 
 export type ContentWarning = {
@@ -16,7 +22,16 @@ export type ContentWarning = {
   reason?: string;
 };
 
+const IdRegex = /^[0-9a-fA-f]{64}$/;
+export const isValidId = (s: string): boolean => {
+  const result = typeof s === 'string' && s.length === 64 && IdRegex.test(s);
+  if (!result) console.warn('invalid id is ignored: ', s);
+  return result;
+};
+
 const eventWrapper = (event: NostrEvent) => {
+  let memoizedMarkedEventTags: MarkedEventTag[] | undefined;
+
   return {
     get rawEvent(): NostrEvent {
       return event;
@@ -33,22 +48,36 @@ const eventWrapper = (event: NostrEvent) => {
     get content(): string {
       return event.content;
     },
+    get tags(): string[][] {
+      return event.tags;
+    },
     createdAtAsDate(): Date {
       return new Date(event.created_at * 1000);
     },
-    taggedUsers(): string[] {
-      const pubkeys = new Set<string>();
-      event.tags.forEach(([tagName, pubkey]) => {
-        if (tagName === 'p') {
-          pubkeys.add(pubkey);
-        }
-      });
-      return Array.from(pubkeys);
+    pTags(): string[][] {
+      return event.tags.filter(([tagName, pubkey]) => tagName === 'p' && isValidId(pubkey));
     },
-    taggedEvents(): TaggedEvent[] {
+    eTags(): string[][] {
+      return event.tags.filter(([tagName, eventId]) => tagName === 'e' && isValidId(eventId));
+    },
+    taggedEventIds(): string[] {
+      return this.eTags().map(([, eventId]) => eventId);
+    },
+    lastTaggedEventId(): string | undefined {
+      // for compatibility. some clients include additional event ids for reaction (kind:7).
+      const ids = this.taggedEventIds();
+      if (ids.length === 0) return undefined;
+      return ids[ids.length - 1];
+    },
+    markedEventTags(): MarkedEventTag[] {
+      if (event.kind !== Kind.Text) throw new Error('kind should be 1');
+
+      if (memoizedMarkedEventTags != null) return memoizedMarkedEventTags;
+
+      // 'eTags' cannot be used here because it does not preserve originalIndex.
       const events = event.tags
         .map((tag, originalIndex) => [tag, originalIndex] as const)
-        .filter(([[tagName]]) => tagName === 'e');
+        .filter(([[tagName, eventId]]) => tagName === 'e' && isValidId(eventId));
 
       // NIP-10: Positional "e" tags (DEPRECATED)
       const positionToMarker = (marker: string, index: number): EventMarker | undefined => {
@@ -68,24 +97,28 @@ const eventWrapper = (event: NostrEvent) => {
         return 'mention';
       };
 
-      return events.map(([[, eventId, relayUrl, marker], originalIndex], eTagIndex) => ({
-        id: eventId,
-        relayUrl,
-        marker: positionToMarker(marker, eTagIndex),
-        index: originalIndex,
-      }));
+      memoizedMarkedEventTags = events.map(
+        ([[, eventId, relayUrl, marker], originalIndex], eTagIndex) => ({
+          id: eventId,
+          relayUrl,
+          marker: positionToMarker(marker, eTagIndex),
+          index: originalIndex,
+        }),
+      );
+
+      return memoizedMarkedEventTags;
     },
-    replyingToEvent(): TaggedEvent | undefined {
-      return this.taggedEvents().find(({ marker }) => marker === 'reply');
+    replyingToEvent(): MarkedEventTag | undefined {
+      return this.markedEventTags().find(({ marker }) => marker === 'reply');
     },
-    rootEvent(): TaggedEvent | undefined {
-      return this.taggedEvents().find(({ marker }) => marker === 'root');
+    rootEvent(): MarkedEventTag | undefined {
+      return this.markedEventTags().find(({ marker }) => marker === 'root');
     },
-    mentionedEvents(): TaggedEvent[] {
-      return this.taggedEvents().filter(({ marker }) => marker === 'mention');
+    mentionedEvents(): MarkedEventTag[] {
+      return this.markedEventTags().filter(({ marker }) => marker === 'mention');
     },
     mentionedPubkeys(): string[] {
-      return uniq(event.tags.filter(([tagName]) => tagName === 'p').map((e) => e[1]));
+      return uniq(this.pTags().map(([, pubkey]) => pubkey));
     },
     mentionedPubkeysWithoutAuthor(): string[] {
       return this.mentionedPubkeys().filter((pubkey) => pubkey !== event.pubkey);

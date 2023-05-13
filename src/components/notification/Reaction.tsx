@@ -10,6 +10,7 @@ import useModalState from '@/hooks/useModalState';
 import eventWrapper from '@/nostr/event';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
+import ensureNonNull from '@/utils/ensureNonNull';
 
 type ReactionProps = {
   event: NostrEvent;
@@ -18,14 +19,18 @@ type ReactionProps = {
 const Reaction: Component<ReactionProps> = (props) => {
   const { showProfile } = useModalState();
   const event = () => eventWrapper(props.event);
-  const eventId = () => event().taggedEvents()[0].id;
+  const eventId = () => event().lastTaggedEventId();
 
   const { profile } = useProfile(() => ({
     pubkey: props.event.pubkey,
   }));
-  const { event: reactedEvent, query: reactedEventQuery } = useEvent(() => ({
-    eventId: eventId(),
-  }));
+
+  const { event: reactedEvent, query: reactedEventQuery } = useEvent(() =>
+    ensureNonNull([eventId()] as const)(([eventIdNonNull]) => ({
+      eventId: eventIdNonNull,
+    })),
+  );
+
   const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;
 
   return (
@@ -67,7 +72,7 @@ const Reaction: Component<ReactionProps> = (props) => {
         <div class="notification-event py-1">
           <Show
             when={reactedEvent()}
-            fallback={<div class="truncate">loading {eventId()}</div>}
+            fallback={<div class="truncate">読み込み中 {eventId()}</div>}
             keyed
           >
             {(ev) => <TextNoteDisplay event={ev} />}

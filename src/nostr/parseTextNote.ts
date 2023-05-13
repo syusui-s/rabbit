@@ -1,6 +1,6 @@
 import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
-import eventWrapper from '@/nostr/event';
+import eventWrapper, { isValidId } from '@/nostr/event';
 
 type ProfilePointer = nip19.ProfilePointer;
 type EventPointer = nip19.EventPointer;
@@ -125,7 +125,7 @@ const parseTextNote = (textNoteContent: string) => {
         };
         result.push(bech32Entity);
       } catch (e) {
-        console.warn(`failed to parse Bech32 entity (NIP-19): ${match[0]}`);
+        console.warn(`ignored invalid bech32 entity: ${match[0]}`);
         pushPlainText(index + match[0].length);
       }
     } else if (match.groups?.hashtag) {
@@ -157,7 +157,7 @@ export const resolveTagReference = (
 
   const tagName = tag[0];
 
-  if (tagName === 'p') {
+  if (tagName === 'p' && isValidId(tag[1])) {
     return {
       type: 'MentionedUser',
       tagIndex,
@@ -166,9 +166,9 @@ export const resolveTagReference = (
     } satisfies MentionedUser;
   }
 
-  if (tagName === 'e') {
+  if (tagName === 'e' && isValidId(tag[1])) {
     const mention = eventWrapper(event)
-      .taggedEvents()
+      .markedEventTags()
       .find((ev) => ev.index === tagIndex);
 
     return {
