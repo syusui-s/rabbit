@@ -1,11 +1,4 @@
-import {
-  createSignal,
-  createMemo,
-  createRoot,
-  observable,
-  type Accessor,
-  type Signal,
-} from 'solid-js';
+import { createSignal, createMemo, observable, type Accessor, type Signal } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
@@ -82,6 +75,7 @@ export type UseReactions = {
   reactions: () => NostrEvent[];
   reactionsGroupedByContent: () => Map<string, NostrEvent[]>;
   isReactedBy: (pubkey: string) => boolean;
+  isReactedByWithEmoji: (pubkey: string) => boolean;
   invalidateReactions: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
 };
@@ -115,6 +109,8 @@ export type UseFollowings = {
   invalidateFollowings: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
+
+const EmojiRegex = /\p{Emoji_Presentation}/u;
 
 let count = 0;
 
@@ -408,9 +404,20 @@ export const useReactions = (propsProvider: () => UseReactionsProps | null): Use
   const isReactedBy = (pubkey: string): boolean =>
     reactions().findIndex((event) => event.pubkey === pubkey) !== -1;
 
+  const isReactedByWithEmoji = (pubkey: string): boolean =>
+    reactions().findIndex((event) => event.pubkey === pubkey && EmojiRegex.test(event.content)) !==
+    -1;
+
   const invalidateReactions = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
 
-  return { reactions, reactionsGroupedByContent, isReactedBy, invalidateReactions, query };
+  return {
+    reactions,
+    reactionsGroupedByContent,
+    isReactedBy,
+    isReactedByWithEmoji,
+    invalidateReactions,
+    query,
+  };
 };
 
 export const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {

@@ -112,6 +112,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     reactions,
     reactionsGroupedByContent,
     isReactedBy,
+    isReactedByWithEmoji,
     invalidateReactions,
     query: reactionsQuery,
   } = useReactions(() => ({
@@ -219,6 +220,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const isReactedByMe = createMemo(() => {
     const p = pubkey();
     return (p != null && isReactedBy(p)) || reacted();
+  });
+  const isReactedByMeWithEmoji = createMemo(() => {
+    const p = pubkey();
+    return p != null && isReactedByWithEmoji(p);
   });
   const isRepostedByMe = createMemo(() => {
     const p = pubkey();
@@ -429,8 +434,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               <div
                 class="flex shrink-0 items-center gap-1"
                 classList={{
-                  'text-zinc-400': !isReactedByMe(),
-                  'text-rose-400': isReactedByMe() || publishReactionMutation.isLoading,
+                  'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
+                  'text-rose-400':
+                    (isReactedByMe() && !isReactedByMeWithEmoji()) ||
+                    publishReactionMutation.isLoading,
                 }}
               >
                 <button
@@ -438,7 +445,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   onClick={handleReaction}
                   disabled={publishReactionMutation.isLoading}
                 >
-                  <Show when={isReactedByMe()} fallback={<HeartOutlined />}>
+                  <Show
+                    when={isReactedByMe() && !isReactedByMeWithEmoji()}
+                    fallback={<HeartOutlined />}
+                  >
                     <HeartSolid />
                   </Show>
                 </button>
@@ -451,7 +461,15 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 </Show>
               </div>
               <Show when={config().useEmojiReaction}>
-                <div class="shrink-0">
+                <div
+                  class="flex shrink-0 items-center gap-1"
+                  classList={{
+                    'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
+                    'text-rose-400':
+                      (isReactedByMe() && isReactedByMeWithEmoji()) ||
+                      publishReactionMutation.isLoading,
+                  }}
+                >
                   <EmojiPicker onEmojiSelect={(emoji) => doReaction(emoji)}>
                     <span class="inline-block h-4 w-4">
                       <Plus />
