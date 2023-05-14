@@ -60,6 +60,9 @@ const extract = (parsed: ParsedTextNote) => {
       } else if (node.data.type === 'note') {
         eventReferences.push(node.data.data);
       }
+      // TODO nevent can contain an event not only textnote (kind:1).
+      // In my understanding, it is not allowed to include other kinds of events in `tags`.
+      // It is needed to verify that the kind of the event is 1.
     }
   });
 

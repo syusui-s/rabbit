@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, createEffect, onCleanup, onMount } from 'solid-js';
 
 import Home from 'heroicons/24/outline/home.svg';
 import { uniq } from 'lodash';
@@ -25,7 +25,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
 
   const { followingPubkeys } = useFollowings(() => ({ pubkey: props.column.pubkey }));
 
-  const { events: followingsPosts } = useSubscription(() => {
+  const { events } = useSubscription(() => {
     const authors = uniq([...followingPubkeys()]);
     if (authors.length === 0) return null;
     return {
@@ -45,6 +45,13 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
     };
   });
 
+  createEffect(() => {
+    console.log('home', events());
+  });
+
+  onMount(() => console.log('home timeline mounted'));
+  onCleanup(() => console.log('home timeline unmounted'));
+
   return (
     <Column
       header={
@@ -59,7 +66,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
     >
-      <Timeline events={followingsPosts()} />
+      <Timeline events={events()} />
     </Column>
   );
 };

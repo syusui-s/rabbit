@@ -1,5 +1,6 @@
 import uniq from 'lodash/uniq';
 import { Kind, Event as NostrEvent } from 'nostr-tools';
+import { z } from 'zod';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 
@@ -22,12 +23,24 @@ export type ContentWarning = {
   reason?: string;
 };
 
-const IdRegex = /^[0-9a-fA-f]{64}$/;
+const IdRegex = /^[0-9a-f]{64}$/;
 export const isValidId = (s: string): boolean => {
   const result = typeof s === 'string' && s.length === 64 && IdRegex.test(s);
   if (!result) console.warn('invalid id is ignored: ', s);
   return result;
 };
+
+/*
+// TODO event validation and normalization
+const eventSchema = z.object({
+  id: z.string().length(64).regex(IdRegex),
+  pubkey: z.string().length(64).regex(IdRegex),
+  created_at: z.number().int(),
+  kind: z.number(),
+  tags: z.array(z.array(z.string())),
+  content: z.string(),
+});
+*/
 
 const eventWrapper = (event: NostrEvent) => {
   let memoizedMarkedEventTags: MarkedEventTag[] | undefined;
