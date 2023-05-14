@@ -1,8 +1,8 @@
 import { Show } from 'solid-js';
 
-import EventLink from '@/components/EventLink';
 // eslint-disable-next-line import/no-cycle
-import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
+import EventDisplayById from '@/components/event/EventDisplayById';
+import EventLink from '@/components/EventLink';
 import { type MentionedEvent } from '@/nostr/parseTextNote';
 
 export type MentionedEventDisplayProps = {
@@ -16,7 +16,7 @@ const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
       fallback={<EventLink eventId={props.mentionedEvent.eventId} />}
     >
       <div class="my-1 rounded border p-1">
-        <TextNoteDisplayById
+        <EventDisplayById
           eventId={props.mentionedEvent.eventId}
           embedding={false}
           actions={false}

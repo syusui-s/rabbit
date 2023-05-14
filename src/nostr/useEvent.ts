@@ -1,3 +1,3 @@
-import { useTextNote } from '@/nostr/useBatchedEvents';
+import { useEvent } from '@/nostr/useBatchedEvents';
 
-export default useTextNote;
+export default useEvent;

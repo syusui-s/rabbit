@@ -1,12 +1,12 @@
 import { For } from 'solid-js';
 
-import EventLink from '@/components/EventLink';
-import ImageDisplay from '@/components/textNote/ImageDisplay';
 // eslint-disable-next-line import/no-cycle
-import MentionedEventDisplay from '@/components/textNote/MentionedEventDisplay';
-import MentionedUserDisplay from '@/components/textNote/MentionedUserDisplay';
-import PlainTextDisplay from '@/components/textNote/PlainTextDisplay';
-import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
+import EventDisplayById from '@/components/event/EventDisplayById';
+import ImageDisplay from '@/components/event/textNote/ImageDisplay';
+import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
+import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
+import PlainTextDisplay from '@/components/event/textNote/PlainTextDisplay';
+import EventLink from '@/components/EventLink';
 import SafeLink from '@/components/utils/SafeLink';
 import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
@@ -57,18 +57,14 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'note' && props.embedding) {
             return (
               <div class="my-1 rounded border p-1">
-                <TextNoteDisplayById eventId={item.data.data} actions={false} embedding={false} />
+                <EventDisplayById eventId={item.data.data} actions={false} embedding={false} />
               </div>
             );
           }
           if (item.data.type === 'nevent' && props.embedding) {
             return (
               <div class="my-1 rounded border p-1">
-                <TextNoteDisplayById
-                  eventId={item.data.data.id}
-                  actions={false}
-                  embedding={false}
-                />
+                <EventDisplayById eventId={item.data.data.id} actions={false} embedding={false} />
               </div>
             );
           }

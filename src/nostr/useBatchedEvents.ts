@@ -12,7 +12,7 @@ import timeout from '@/utils/timeout';
 
 type TaskArg =
   | { type: 'Profile'; pubkey: string }
-  | { type: 'TextNote'; eventId: string }
+  | { type: 'Event'; eventId: string }
   | { type: 'Reactions'; mentionedEventId: string }
   | { type: 'ZapReceipts'; mentionedEventId: string }
   | { type: 'Reposts'; mentionedEventId: string }
@@ -56,12 +56,12 @@ type UseProfile = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
-// Textnote
-export type UseTextNoteProps = {
+// Event
+export type UseEventProps = {
   eventId: string;
 };
 
-export type UseTextNote = {
+export type UseEvent = {
   event: () => NostrEvent | null;
   query: CreateQueryResult<NostrEvent | null>;
 };
@@ -128,19 +128,19 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
   batchSize: 150,
   executor: (tasks) => {
     const profileTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const textNoteTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
+    const eventTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const reactionsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const repostsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const zapReceiptsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
     const followingsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
 
     tasks.forEach((task) => {
-      if (task.args.type === 'Profile') {
+      if (task.args.type === 'Event') {
+        const current = eventTasks.get(task.args.eventId) ?? [];
+        eventTasks.set(task.args.eventId, [...current, task]);
+      } else if (task.args.type === 'Profile') {
         const current = profileTasks.get(task.args.pubkey) ?? [];
         profileTasks.set(task.args.pubkey, [...current, task]);
-      } else if (task.args.type === 'TextNote') {
-        const current = textNoteTasks.get(task.args.eventId) ?? [];
-        textNoteTasks.set(task.args.eventId, [...current, task]);
       } else if (task.args.type === 'Reactions') {
         const current = reactionsTasks.get(task.args.mentionedEventId) ?? [];
         reactionsTasks.set(task.args.mentionedEventId, [...current, task]);
@@ -156,8 +156,8 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
       }
     });
 
+    const eventIds = [...eventTasks.keys()];
     const profilePubkeys = [...profileTasks.keys()];
-    const textNoteIds = [...textNoteTasks.keys()];
     const reactionsIds = [...reactionsTasks.keys()];
     const repostsIds = [...repostsTasks.keys()];
     const zapReceiptsIds = [...zapReceiptsTasks.keys()];
@@ -165,11 +165,11 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
     const filters: Filter[] = [];
 
+    if (eventIds.length > 0) {
+      filters.push({ ids: eventIds });
+    }
     if (profilePubkeys.length > 0) {
       filters.push({ kinds: [Kind.Metadata], authors: profilePubkeys });
-    }
-    if (textNoteIds.length > 0) {
-      filters.push({ kinds: [Kind.Text], ids: textNoteIds });
     }
     if (reactionsIds.length > 0) {
       filters.push({ kinds: [Kind.Reaction], '#e': reactionsIds });
@@ -229,10 +229,7 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
       if (shouldMuteEvent(event)) return;
 
-      if (event.kind === Kind.Text) {
-        const registeredTasks = textNoteTasks.get(event.id) ?? [];
-        resolveTasks(registeredTasks, event);
-      } else if (event.kind === Kind.Reaction) {
+      if (event.kind === Kind.Reaction) {
         // Use the last event id
         const id = eventWrapper(event).lastTaggedEventId();
         if (id != null) {
@@ -255,6 +252,13 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
       } else if (event.kind === Kind.Contacts) {
         const registeredTasks = followingsTasks.get(event.pubkey) ?? [];
         resolveTasks(registeredTasks, event);
+      } else {
+        const registeredTasks = eventTasks.get(event.id) ?? [];
+        if (registeredTasks.length > 0) {
+          resolveTasks(registeredTasks, event);
+        } else {
+          console.warn('unknown event received');
+        }
       }
     });
 
@@ -328,21 +332,21 @@ export const useProfile = (propsProvider: () => UseProfileProps | null): UseProf
   return { profile, invalidateProfile, query };
 };
 
-export const useTextNote = (propsProvider: () => UseTextNoteProps | null): UseTextNote => {
+export const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
   const props = createMemo(propsProvider);
 
   const query = createQuery(
-    () => ['useTextNote', props()] as const,
+    () => ['useEvent', props()] as const,
     ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return null;
       const { eventId } = currentProps;
-      const promise = exec({ type: 'TextNote', eventId }, signal).then((batchedEvents) => {
+      const promise = exec({ type: 'Event', eventId }, signal).then((batchedEvents) => {
         const event = batchedEvents().events[0];
         if (event == null) throw new Error(`event not found: ${eventId}`);
         return event;
       });
-      return timeout(15000, `useTextNote: ${eventId}`)(promise);
+      return timeout(15000, `useEvent: ${eventId}`)(promise);
     },
     {
       // Text notes never change, so they can be stored for a long time.

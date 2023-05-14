@@ -1,4 +1,4 @@
-import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
+import GeneralUserMentionDisplay from '@/components/event/textNote/GeneralUserMentionDisplay';
 import useModalState from '@/hooks/useModalState';
 
 import type { MentionedUser } from '@/nostr/parseTextNote';

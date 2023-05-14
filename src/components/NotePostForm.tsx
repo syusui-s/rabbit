@@ -151,8 +151,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     },
   });
 
-  const mentionedPubkeys: Accessor<string[]> = createMemo(
-    () => replyTo()?.mentionedPubkeysWithoutAuthor() ?? [],
+  const mentionedPubkeys = createMemo(() => replyTo()?.mentionedPubkeysWithoutAuthor() ?? []);
+
+  const mentionedPubkeysWithoutMe = createMemo(() =>
+    mentionedPubkeys().filter((pubkey) => pubkey !== getPubkey()),
   );
 
   const notifyPubkeys = (pubkey: string, pubkeyReferences: string[]): string[] => {
@@ -160,10 +162,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     return uniq([
       // 返信先を先頭に
       props.replyTo.pubkey,
-      // 自分も通知欄に表示するために表示（他アプリとの互換性）
-      pubkey,
       // その他の返信先
-      ...mentionedPubkeys(),
+      ...mentionedPubkeysWithoutMe(),
       // 本文中の公開鍵（npub)
       ...pubkeyReferences,
     ]);

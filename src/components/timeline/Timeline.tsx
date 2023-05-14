@@ -1,26 +1,26 @@
-import { For, Switch, Match, type Component } from 'solid-js';
+import { For, type Component, Show } from 'solid-js';
 
-import { Kind, type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools';
 
-import DeprecatedRepost from '@/components/DeprecatedRepost';
-import TextNote from '@/components/TextNote';
+import ColumnItem from '@/components/ColumnItem';
+import EventDisplay from '@/components/event/EventDisplay';
+import useConfig from '@/core/useConfig';
 
 export type TimelineProps = {
   events: NostrEvent[];
 };
 
 const Timeline: Component<TimelineProps> = (props) => {
+  const { shouldMuteEvent } = useConfig();
+
   return (
     <For each={props.events}>
       {(event) => (
-        <Switch fallback={<div>未対応のイベント種別（{event.kind}）</div>}>
-          <Match when={event.kind === Kind.Text}>
-            <TextNote event={event} />
-          </Match>
-          <Match when={(event.kind as number) === 6}>
-            <DeprecatedRepost event={event} />
-          </Match>
-        </Switch>
+        <Show when={!shouldMuteEvent(event)}>
+          <ColumnItem>
+            <EventDisplay event={event} />
+          </ColumnItem>
+        </Show>
       )}
     </For>
   );

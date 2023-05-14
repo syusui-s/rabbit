@@ -1,7 +1,8 @@
 import { Show, type Component } from 'solid-js';
 
 import ColumnItem from '@/components/ColumnItem';
-import TextNoteDisplay, { TextNoteDisplayProps } from '@/components/textNote/TextNoteDisplay';
+// eslint-disable-next-line import/no-cycle
+import TextNoteDisplay, { TextNoteDisplayProps } from '@/components/event/textNote/TextNoteDisplay';
 import useConfig from '@/core/useConfig';
 
 export type TextNoteProps = TextNoteDisplayProps;
@@ -11,9 +12,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
 
   return (
     <Show when={!shouldMuteEvent(props.event)}>
-      <ColumnItem>
-        <TextNoteDisplay {...props} />
-      </ColumnItem>
+      <TextNoteDisplay {...props} />
     </Show>
   );
 };

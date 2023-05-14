@@ -2,9 +2,9 @@ import { For, Switch, Match, type Component } from 'solid-js';
 
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
-import DeprecatedRepost from '@/components/DeprecatedRepost';
-import Reaction from '@/components/notification/Reaction';
-import TextNote from '@/components/TextNote';
+import Reaction from '@/components/event/Reaction';
+import Repost from '@/components/event/Repost';
+import TextNote from '@/components/event/TextNote';
 
 export type NotificationProps = {
   events: NostrEvent[];
@@ -23,7 +23,7 @@ const Notification: Component<NotificationProps> = (props) => {
           </Match>
           {/* TODO ちゃんとnotification用のコンポーネント使う */}
           <Match when={(event.kind as number) === 6}>
-            <DeprecatedRepost event={event} />
+            <Repost event={event} />
           </Match>
         </Switch>
       )}

@@ -1,22 +1,23 @@
-import { Switch, Match, type Component, Show } from 'solid-js';
+import { Switch, Match, type Component, splitProps } from 'solid-js';
 
-import { Kind } from 'nostr-tools';
-
-import EventLink from '@/components/EventLink';
 // eslint-disable-next-line import/no-cycle
-import TextNoteDisplay, { type TextNoteDisplayProps } from '@/components/textNote/TextNoteDisplay';
+import EventDisplay from '@/components/event/EventDisplay';
+import { type EventDisplayProps } from '@/components/event/EventDisplay';
+import EventLink from '@/components/EventLink';
 import useConfig from '@/core/useConfig';
 import useEvent from '@/nostr/useEvent';
 import ensureNonNull from '@/utils/ensureNonNull';
 
-type TextNoteDisplayByIdProps = Omit<TextNoteDisplayProps, 'event'> & {
+type EventDisplayByIdProps = Omit<EventDisplayProps, 'event'> & {
   eventId: string | undefined;
 };
 
-const TextNoteDisplayById: Component<TextNoteDisplayByIdProps> = (props) => {
+const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
+  const [localProps, restProps] = splitProps(props, ['eventId']);
   const { shouldMuteEvent } = useConfig();
+
   const { event: fetchedEvent, query: eventQuery } = useEvent(() =>
-    ensureNonNull([props.eventId] as const)(([eventIdNonNull]) => ({
+    ensureNonNull([localProps.eventId] as const)(([eventIdNonNull]) => ({
       eventId: eventIdNonNull,
     })),
   );
@@ -30,16 +31,9 @@ const TextNoteDisplayById: Component<TextNoteDisplayByIdProps> = (props) => {
     <Switch fallback="投稿が見つかりません">
       <Match when={hidden()}>{null}</Match>
       <Match when={fetchedEvent()} keyed>
-        {(event) => (
-          <Show
-            when={event.kind === Kind.Text}
-            fallback={<div>未対応のイベント種別（{event.kind}）</div>}
-          >
-            <TextNoteDisplay event={event} {...props} />
-          </Show>
-        )}
+        {(event) => <EventDisplay event={event} {...restProps} />}
       </Match>
-      <Match when={eventQuery.isLoading && props.eventId} keyed>
+      <Match when={eventQuery.isLoading && localProps.eventId} keyed>
         {(id) => (
           <div class="truncate">
             {'読み込み中 '}
@@ -51,4 +45,4 @@ const TextNoteDisplayById: Component<TextNoteDisplayByIdProps> = (props) => {
   );
 };
 
-export default TextNoteDisplayById;
+export default EventDisplayById;

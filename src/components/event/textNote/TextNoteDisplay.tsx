@@ -11,12 +11,12 @@ import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import EmojiPicker from '@/components/EmojiPicker';
-import NotePostForm from '@/components/NotePostForm';
-import ContentWarningDisplay from '@/components/textNote/ContentWarningDisplay';
-import GeneralUserMentionDisplay from '@/components/textNote/GeneralUserMentionDisplay';
 // eslint-disable-next-line import/no-cycle
-import TextNoteContentDisplay from '@/components/textNote/TextNoteContentDisplay';
-import TextNoteDisplayById from '@/components/textNote/TextNoteDisplayById';
+import EventDisplayById from '@/components/event/EventDisplayById';
+import ContentWarningDisplay from '@/components/event/textNote/ContentWarningDisplay';
+import GeneralUserMentionDisplay from '@/components/event/textNote/GeneralUserMentionDisplay';
+import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
+import NotePostForm from '@/components/NotePostForm';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
@@ -355,7 +355,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             <Show when={showReplyEvent()} keyed>
               {(id) => (
                 <div class="mt-1 rounded border p-1">
-                  <TextNoteDisplayById eventId={id} actions={false} embedding={false} />
+                  <EventDisplayById eventId={id} actions={false} embedding={false} />
                 </div>
               )}
             </Show>

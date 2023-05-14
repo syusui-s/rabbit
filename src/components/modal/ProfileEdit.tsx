@@ -30,12 +30,6 @@ const isInternetIdentifier = (s: string) => InternetIdentifierRegex.test(s);
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const pubkey = usePubkey();
   const { config } = useConfig();
-  const { profile, invalidateProfile, query } = useProfile(() =>
-    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
-      pubkey: pubkeyNonNull,
-    })),
-  );
-  const { updateProfile } = useCommands();
 
   const [picture, setPicture] = createSignal('');
   const [banner, setBanner] = createSignal('');
@@ -45,6 +39,13 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const [website, setWebsite] = createSignal('');
   const [nip05, setNIP05] = createSignal('');
   const [lightningAddress, setLightningAddress] = createSignal('');
+
+  const { profile, invalidateProfile, query } = useProfile(() =>
+    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
+      pubkey: pubkeyNonNull,
+    })),
+  );
+  const { updateProfile } = useCommands();
 
   const mutation = createMutation({
     mutationKey: ['updateProfile'],
@@ -71,7 +72,9 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
     },
   });
 
-  const disabled = () => query.isLoading || query.isError || mutation.isLoading;
+  const loading = () => query.isLoading || mutation.isLoading;
+  const disabled = () => loading();
+
   const otherProperties = () =>
     omit(profile(), [
       'picture',
@@ -141,7 +144,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   return (
     <BasicModal closeButton={() => <ArrowLeft />} onClose={props.onClose}>
       <div>
-        <Show when={banner().length > 0} fallback={<div class="h-12 shrink-0" />} keyed>
+        <Show when={banner().length > 0} fallback={<div class="h-24 shrink-0" />} keyed>
           <div class="h-40 w-full shrink-0 sm:h-52">
             <img src={banner()} alt="header" class="h-full w-full object-cover" />
           </div>
@@ -152,6 +155,9 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </Show>
         </div>
       </div>
+      <Show when={loading()}>
+        <div class="px-4 pt-4">読み込み中...</div>
+      </Show>
       <div>
         <form class="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
           <div class="flex flex-col items-start gap-1">
