@@ -186,6 +186,40 @@ describe('parseTextNote', () => {
     const expected: ParsedTextNoteNode[] = [{ type: 'PlainText', content }];
     assert.deepStrictEqual(parsed, expected);
   });
+
+  it.each([
+    {
+      given: ':bunhd:',
+      expected: [{ type: 'CustomEmoji', content: ':bunhd:', shortcode: 'bunhd' }],
+    },
+    {
+      given: 'Good morning! :pv:!',
+      expected: [
+        { type: 'PlainText', content: 'Good morning! ' },
+        { type: 'CustomEmoji', content: ':pv:', shortcode: 'pv' },
+        { type: 'PlainText', content: '!' },
+      ],
+    },
+    {
+      given: ':hello:world:',
+      expected: [
+        { type: 'CustomEmoji', content: ':hello:', shortcode: 'hello' },
+        { type: 'PlainText', content: 'world:' },
+      ],
+    },
+  ])('should parse text note which includes custom emoji ($emoji)', ({ given, expected }) => {
+    const parsed = parseTextNote(given);
+    assert.deepStrictEqual(parsed, expected);
+  });
+
+  it.each([':bunhd_hop:', ':hello', '::: NOSTR :::'])(
+    'should parse text note which includes invalid custom emoji ($emoji)',
+    (content) => {
+      const parsed = parseTextNote(content);
+      const expected: ParsedTextNoteNode[] = [{ type: 'PlainText', content }];
+      assert.deepStrictEqual(parsed, expected);
+    },
+  );
 });
 
 describe('resolveTagReference', () => {

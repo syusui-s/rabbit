@@ -12,10 +12,15 @@ export type PlainText = {
   content: string;
 };
 
+export type UrlText = {
+  type: 'URL';
+  content: string;
+};
+
 export type TagReference = {
   type: 'TagReference';
-  tagIndex: number;
   content: string;
+  tagIndex: number;
 };
 
 export type Bech32Entity = {
@@ -34,12 +39,20 @@ export type HashTag = {
   tagName: string;
 };
 
-export type UrlText = {
-  type: 'URL';
+// NIP-30
+export type CustomEmoji = {
+  type: 'CustomEmoji';
   content: string;
+  shortcode: string;
 };
 
-export type ParsedTextNoteNode = PlainText | TagReference | Bech32Entity | HashTag | UrlText;
+export type ParsedTextNoteNode =
+  | PlainText
+  | UrlText
+  | TagReference
+  | Bech32Entity
+  | HashTag
+  | CustomEmoji;
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
@@ -58,21 +71,23 @@ export type MentionedUser = {
   pubkey: string;
 };
 
+const urlRegex =
+  /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(:\d{1,5})?(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
 const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
-const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
 // raw NIP-19 codes, NIP-21 links (NIP-27)
 // nrelay and naddr is not supported by nostr-tools
 const mentionRegex =
   /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+))/gi;
-const urlRegex =
-  /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(:\d{1,5})?(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
+const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
+const customEmojiRegex = /:(?<emoji>[a-zA-Z0-9]+):/gu;
 
 const parseTextNote = (textNoteContent: string) => {
   const matches = [
-    ...textNoteContent.matchAll(tagRefRegex),
-    ...textNoteContent.matchAll(hashTagRegex),
-    ...textNoteContent.matchAll(mentionRegex),
     ...textNoteContent.matchAll(urlRegex),
+    ...textNoteContent.matchAll(tagRefRegex),
+    ...textNoteContent.matchAll(mentionRegex),
+    ...textNoteContent.matchAll(hashTagRegex),
+    ...textNoteContent.matchAll(customEmojiRegex),
   ].sort((a, b) => (a.index as number) - (b.index as number));
   let pos = 0;
   const result: ParsedTextNote = [];
@@ -137,6 +152,15 @@ const parseTextNote = (textNoteContent: string) => {
         tagName,
       };
       result.push(hashtag);
+    } else if (match.groups?.emoji) {
+      pushPlainText(index);
+      const shortcode = match.groups?.emoji;
+      const customEmoji: CustomEmoji = {
+        type: 'CustomEmoji',
+        content: match[0],
+        shortcode,
+      };
+      result.push(customEmoji);
     }
     pos = index + match[0].length;
   });

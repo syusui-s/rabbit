@@ -40,6 +40,19 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'PlainText') {
           return <PlainTextDisplay plainText={item} />;
         }
+        if (item.type === 'URL') {
+          if (isImageUrl(item.content)) {
+            return (
+              <ImageDisplay
+                url={item.content}
+                initialHidden={
+                  !config().showImage || event().contentWarning().contentWarning || !props.embedding
+                }
+              />
+            );
+          }
+          return <SafeLink class="text-blue-500 underline" href={item.content} />;
+        }
         if (item.type === 'TagReference') {
           const resolved = resolveTagReference(item, props.event);
           if (resolved == null) return null;
@@ -88,18 +101,16 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
             </button>
           );
         }
-        if (item.type === 'URL') {
-          if (isImageUrl(item.content)) {
-            return (
-              <ImageDisplay
-                url={item.content}
-                initialHidden={
-                  !config().showImage || event().contentWarning().contentWarning || !props.embedding
-                }
-              />
-            );
-          }
-          return <SafeLink class="text-blue-500 underline" href={item.content} />;
+        if (item.type === 'CustomEmoji') {
+          const emojiUrl = event().getEmojiUrl(item.shortcode);
+          if (emojiUrl == null) return item.content;
+          return (
+            <img
+              class="inline-block h-6 max-w-[64px] align-middle"
+              src={emojiUrl}
+              alt={item.shortcode}
+            />
+          );
         }
         console.error('Not all ParsedTextNoteNodes are covered', item);
         return null;

@@ -2,6 +2,8 @@ import uniq from 'lodash/uniq';
 import { Kind, Event as NostrEvent } from 'nostr-tools';
 import { z } from 'zod';
 
+import { isImageUrl } from '@/utils/imageUrl';
+
 export type EventMarker = 'reply' | 'root' | 'mention';
 
 // NIP-10
@@ -42,6 +44,24 @@ const eventSchema = z.object({
 });
 */
 
+const EmojiTagSchema = z.tuple([
+  z.literal('emoji'),
+  z.string().regex(/^[a-zA-Z0-9]+$/, { message: 'shortcode should be alpahnumeric' }),
+  z.string().url().refine(isImageUrl),
+]);
+
+export type EmojiTag = z.infer<typeof EmojiTagSchema>;
+
+const ensureSchema =
+  <T>(schema: z.Schema<T>) =>
+  (value: any): value is T => {
+    const result = schema.safeParse(value);
+    if (!result.success) {
+      console.warn('failed to parse value', value, schema);
+    }
+    return result.success;
+  };
+
 const eventWrapper = (event: NostrEvent) => {
   let memoizedMarkedEventTags: MarkedEventTag[] | undefined;
 
@@ -72,6 +92,9 @@ const eventWrapper = (event: NostrEvent) => {
     },
     eTags(): string[][] {
       return event.tags.filter(([tagName, eventId]) => tagName === 'e' && isValidId(eventId));
+    },
+    emojiTags(): EmojiTag[] {
+      return event.tags.filter(ensureSchema(EmojiTagSchema));
     },
     taggedEventIds(): string[] {
       return this.eTags().map(([, eventId]) => eventId);
@@ -151,6 +174,12 @@ const eventWrapper = (event: NostrEvent) => {
     containsEventMentionIndex(index: number): boolean {
       if (index < 0 || index >= event.tags.length) return false;
       return event.content.includes(`#[${index}]`);
+    },
+    getEmojiUrl(shortcode: string): string | null {
+      const emojiTag = this.emojiTags().find(([, code]) => code === shortcode);
+      if (emojiTag == null) return null;
+      const [, , url] = emojiTag;
+      return url;
     },
   };
 };
