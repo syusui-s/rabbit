@@ -16,6 +16,7 @@ import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
+import eventWrapper from '@/nostr/event';
 
 export type Config = {
   relayUrls: string[];
@@ -149,8 +150,14 @@ const useConfig = (): UseConfig => {
     return false;
   };
 
-  const shouldMuteEvent = (event: NostrEvent) =>
-    isPubkeyMuted(event.pubkey) || hasMutedKeyword(event);
+  const shouldMuteEvent = (event: NostrEvent) => {
+    const ev = eventWrapper(event);
+    return (
+      isPubkeyMuted(event.pubkey) ||
+      ev.mentionedPubkeys().some(isPubkeyMuted) ||
+      hasMutedKeyword(event)
+    );
+  };
 
   const initializeColumns = ({ pubkey }: { pubkey: string }) => {
     // すでに設定されている場合は終了

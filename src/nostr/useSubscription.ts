@@ -71,9 +71,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
       if (onEvent != null) {
         onEvent(event as NostrEvent & { id: string });
       }
-      if (shouldMuteEvent(event)) {
-        return;
-      }
       if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
         return;
       }

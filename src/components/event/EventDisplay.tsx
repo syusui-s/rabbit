@@ -2,6 +2,7 @@ import { Switch, Match, Component } from 'solid-js';
 
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
+import ChannelInfo from '@/components/event/ChannelInfo';
 // eslint-disable-next-line import/no-cycle
 import Repost from '@/components/event/Repost';
 // eslint-disable-next-line import/no-cycle
@@ -12,12 +13,16 @@ export type EventDisplayProps = {
   event: NostrEvent;
   embedding?: boolean;
   actions?: boolean;
-  kinds?: Kind[];
+  ensureKinds?: Kind[];
 };
 
 const EventDisplay: Component<EventDisplayProps> = (props) => {
+  // noteの場合は kind:1 であることを保証するために利用できる
+  // タイムラインで表示されるべきでないイベントが表示されてしまうのを防ぐ
   const isAllowedKind = () =>
-    props.kinds == null || props.kinds.length === 0 || props.kinds.includes(props.event.kind);
+    props.ensureKinds == null ||
+    props.ensureKinds.length === 0 ||
+    props.ensureKinds.includes(props.event.kind);
 
   return (
     <Switch
@@ -28,7 +33,12 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
         </span>
       }
     >
-      <Match when={!isAllowedKind()}>{null}</Match>
+      <Match when={!isAllowedKind()} keyed>
+        <span>
+          予期しないイベント種別（{props.event.kind}）
+          <EventLink eventId={props.event.id} kind={props.event.kind} />
+        </span>
+      </Match>
       <Match when={props.event.kind === Kind.Text}>
         <TextNote event={props.event} embedding={props.actions} actions={props.actions} />
       </Match>
@@ -37,6 +47,11 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
       </Match>
     </Switch>
   );
+  /*
+      <Match when={props.event.kind === Kind.ChannelCreation}>
+        <ChannelInfo event={props.event} />
+      </Match>
+   */
 };
 
 export default EventDisplay;

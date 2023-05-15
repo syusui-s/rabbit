@@ -1,5 +1,7 @@
 import { For } from 'solid-js';
 
+import { Kind, Event as NostrEvent } from 'nostr-tools';
+
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
@@ -14,8 +16,6 @@ import { useRequestCommand } from '@/hooks/useCommandBus';
 import eventWrapper from '@/nostr/event';
 import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 import { isImageUrl } from '@/utils/imageUrl';
-
-import type { Event as NostrEvent } from 'nostr-tools';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;
@@ -57,7 +57,12 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'note' && props.embedding) {
             return (
               <div class="my-1 rounded border p-1">
-                <EventDisplayById eventId={item.data.data} actions={false} embedding={false} />
+                <EventDisplayById
+                  eventId={item.data.data}
+                  actions={false}
+                  embedding={false}
+                  ensureKinds={[Kind.Text]}
+                />
               </div>
             );
           }

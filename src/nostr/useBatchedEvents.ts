@@ -227,8 +227,6 @@ const { exec } = useBatch<TaskArg, TaskRes>(() => ({
         return;
       }
 
-      if (shouldMuteEvent(event)) return;
-
       if (event.kind === Kind.Reaction) {
         // Use the last event id
         const id = eventWrapper(event).lastTaggedEventId();

@@ -49,7 +49,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
   const pubkey = usePubkey();
 
   return (
-    <div class="flex gap-2 pt-1">
+    <div class="flex gap-2 py-1">
       <For each={[...props.reactionsGroupedByContent.entries()]}>
         {([content, events]) => {
           const isReactedByMeWithThisContent =
@@ -57,9 +57,10 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
 
           return (
             <button
-              class="flex items-center rounded border px-1"
+              class="flex h-6 items-center rounded border px-1"
               classList={{
                 'text-zinc-400': !isReactedByMeWithThisContent,
+                'hover:bg-zinc-50': !isReactedByMeWithThisContent,
                 'bg-rose-50': isReactedByMeWithThisContent,
                 'border-rose-200': isReactedByMeWithThisContent,
                 'text-rose-400': isReactedByMeWithThisContent,
@@ -67,7 +68,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
               type="button"
               onClick={() => props.onReaction(content)}
             >
-              <Show when={content === '+'} fallback={<span class="text-xs">{content}</span>}>
+              <Show when={content === '+'} fallback={<span class="text-base">{content}</span>}>
                 <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
                   <HeartSolid />
                 </span>
@@ -403,9 +404,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 onReaction={doReaction}
               />
             </Show>
-            <div class="actions flex w-48 items-center justify-between gap-8 pt-1">
+            <div class="actions flex w-52 items-center justify-between gap-8 pt-1">
               <button
-                class="h-4 w-4 shrink-0 text-zinc-400"
+                class="h-4 w-4 shrink-0 text-zinc-400 hover:text-zinc-500"
                 onClick={(ev) => {
                   ev.stopPropagation();
                   setShowReplyForm((current) => !current);
@@ -417,6 +418,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isRepostedByMe(),
+                  'hover:text-green-400': !isRepostedByMe(),
                   'text-green-400': isRepostedByMe() || publishRepostMutation.isLoading,
                 }}
               >
@@ -435,6 +437,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 class="flex shrink-0 items-center gap-1"
                 classList={{
                   'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
+                  'hover:text-rose-400': !isReactedByMe() || isReactedByMeWithEmoji(),
                   'text-rose-400':
                     (isReactedByMe() && !isReactedByMeWithEmoji()) ||
                     publishReactionMutation.isLoading,
@@ -465,6 +468,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                   class="flex shrink-0 items-center gap-1"
                   classList={{
                     'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
+                    'hover:text-rose-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
                     'text-rose-400':
                       (isReactedByMe() && isReactedByMeWithEmoji()) ||
                       publishReactionMutation.isLoading,
@@ -479,7 +483,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               </Show>
               <div>
                 <ContextMenu menu={menu}>
-                  <span class="inline-block h-4 w-4 text-zinc-400">
+                  <span class="inline-block h-4 w-4 text-zinc-400 hover:text-zinc-500">
                     <EllipsisHorizontal />
                   </span>
                 </ContextMenu>
