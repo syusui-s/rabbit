@@ -7,7 +7,6 @@ import EventDisplayById from '@/components/event/EventDisplayById';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
 import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
-import PlainTextDisplay from '@/components/event/textNote/PlainTextDisplay';
 import EventLink from '@/components/EventLink';
 import SafeLink from '@/components/utils/SafeLink';
 import { createSearchColumn } from '@/core/column';
@@ -38,7 +37,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
     <For each={parseTextNote(props.event.content)}>
       {(item: ParsedTextNoteNode) => {
         if (item.type === 'PlainText') {
-          return <PlainTextDisplay plainText={item} />;
+          return <span>{item.content}</span>;
         }
         if (item.type === 'URL') {
           if (isImageUrl(item.content)) {
@@ -55,7 +54,9 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         }
         if (item.type === 'TagReference') {
           const resolved = resolveTagReference(item, props.event);
-          if (resolved == null) return null;
+          if (resolved == null) {
+            return <span>{item.content}</span>;
+          }
           if (resolved.type === 'MentionedUser') {
             return <MentionedUserDisplay pubkey={resolved.pubkey} />;
           }
@@ -103,10 +104,10 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         }
         if (item.type === 'CustomEmoji') {
           const emojiUrl = event().getEmojiUrl(item.shortcode);
-          if (emojiUrl == null) return item.content;
+          if (emojiUrl == null) return <span>{item.content}</span>;
           return (
             <img
-              class="inline-block h-6 max-w-[64px] align-middle"
+              class="inline-block h-7 max-w-[64px] align-middle"
               src={emojiUrl}
               alt={item.shortcode}
             />
