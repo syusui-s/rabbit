@@ -1,6 +1,7 @@
 import { type Accessor, type Setter } from 'solid-js';
 
 import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
 import {
@@ -18,9 +19,15 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import eventWrapper from '@/nostr/event';
 
+export type CustomEmojiConfig = {
+  shortcode: string;
+  url: string;
+};
+
 export type Config = {
   relayUrls: string[];
   columns: ColumnType[];
+  customEmojis: Record<string, CustomEmojiConfig>;
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   useEmojiReaction: boolean;
@@ -37,19 +44,22 @@ type UseConfig = {
   // relay
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
+  // column
+  saveColumn: (column: ColumnType) => void;
+  moveColumn: (columnId: string, index: number) => void;
+  removeColumn: (columnId: string) => void;
+  initializeColumns: (param: { pubkey: string }) => void;
+  // emoji
+  saveEmoji: (emoji: CustomEmojiConfig) => void;
+  removeEmoji: (shortcode: string) => void;
+  getEmoji: (shortcode: string) => CustomEmojiConfig | undefined;
   // mute
   addMutedPubkey: (pubkey: string) => void;
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
-  // column
-  saveColumn: (column: ColumnType) => void;
-  moveColumn: (columnId: string, index: number) => void;
-  removeColumn: (columnId: string) => void;
-  // functions
   isPubkeyMuted: (pubkey: string) => boolean;
   shouldMuteEvent: (event: NostrEvent) => boolean;
-  initializeColumns: (param: { pubkey: string }) => void;
 };
 
 const initialRelays = (): string[] => {
@@ -63,6 +73,7 @@ const initialRelays = (): string[] => {
 const InitialConfig = (): Config => ({
   relayUrls: initialRelays(),
   columns: [],
+  customEmojis: {},
   dateFormat: 'relative',
   keepOpenPostForm: false,
   useEmojiReaction: false,
@@ -141,6 +152,17 @@ const useConfig = (): UseConfig => {
     setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
   };
 
+  const saveEmoji = (emoji: CustomEmojiConfig) => {
+    setConfig('customEmojis', (current) => ({ ...current, [emoji.shortcode]: emoji }));
+  };
+
+  const removeEmoji = (shortcode: string) => {
+    setConfig('customEmojis', (current) => ({ ...current, [shortcode]: undefined }));
+  };
+
+  const getEmoji = (shortcode: string): CustomEmojiConfig | undefined =>
+    config.customEmojis[shortcode];
+
   const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
 
   const hasMutedKeyword = (event: NostrEvent) => {
@@ -180,18 +202,25 @@ const useConfig = (): UseConfig => {
   return {
     config: () => config,
     setConfig,
+    // relay
     addRelay,
     removeRelay,
+    // column
+    saveColumn,
+    moveColumn,
+    removeColumn,
+    initializeColumns,
+    // emoji
+    saveEmoji,
+    removeEmoji,
+    getEmoji,
+    // mute
     addMutedPubkey,
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
-    saveColumn,
-    moveColumn,
-    removeColumn,
     isPubkeyMuted,
     shouldMuteEvent,
-    initializeColumns,
   };
 };
 

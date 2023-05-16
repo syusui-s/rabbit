@@ -1,21 +1,14 @@
-import {
-  createSignal,
-  createMemo,
-  onMount,
-  Show,
-  For,
-  type Component,
-  type JSX,
-  type Accessor,
-} from 'solid-js';
+import { createSignal, createMemo, onMount, Show, For, type Component, type JSX } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
+import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
 import { Event as NostrEvent } from 'nostr-tools';
 
+import EmojiPicker from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand } from '@/hooks/useCommandBus';
@@ -48,12 +41,13 @@ const extract = (parsed: ParsedTextNote) => {
   const pubkeyReferences: string[] = [];
   const eventReferences: string[] = [];
   const urlReferences: string[] = [];
+  const emojis: string[] = [];
 
   parsed.forEach((node) => {
-    if (node.type === 'HashTag') {
-      hashtags.push(node.tagName);
-    } else if (node.type === 'URL') {
+    if (node.type === 'URL') {
       urlReferences.push(node.content);
+    } else if (node.type === 'HashTag') {
+      hashtags.push(node.tagName);
     } else if (node.type === 'Bech32Entity') {
       if (node.data.type === 'npub') {
         pubkeyReferences.push(node.data.data);
@@ -63,14 +57,17 @@ const extract = (parsed: ParsedTextNote) => {
       // TODO nevent can contain an event not only textnote (kind:1).
       // In my understanding, it is not allowed to include other kinds of events in `tags`.
       // It is needed to verify that the kind of the event is 1.
+    } else if (node.type === 'CustomEmoji' && !emojis.includes(node.shortcode)) {
+      emojis.push(node.shortcode);
     }
   });
 
   return {
     hashtags,
+    urlReferences,
     pubkeyReferences,
     eventReferences,
-    urlReferences,
+    emojis,
   };
 };
 
@@ -94,6 +91,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
 
+  const appendText = (s: string) => setText((current) => `${current} ${s}`);
+
   const clearText = () => {
     setText('');
     setContentWarningReason('');
@@ -106,7 +105,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     props.onClose();
   };
 
-  const { config } = useConfig();
+  const { config, getEmoji } = useConfig();
   const getPubkey = usePubkey();
   const commands = useCommands();
 
@@ -140,7 +139,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           uploadResults.forEach((result) => {
             if (result.status === 'fulfilled') {
               console.log('succeeded to upload', result);
-              setText((current) => `${current} ${result.value.imageUrl}`);
+              appendText(result.value.imageUrl);
               resizeTextArea();
             } else {
               console.error('failed to upload', result);
@@ -169,6 +168,19 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ]);
   };
 
+  const buildEmojiTags = (emojis: string[]): string[][] => {
+    const emojiTags: string[][] = [];
+
+    emojis.forEach((shortcode) => {
+      const emoji = getEmoji(shortcode);
+      if (emoji != null) {
+        emojiTags.push(['emoji', shortcode, emoji.url]);
+      }
+    });
+
+    return emojiTags;
+  };
+
   const submit = () => {
     if (text().length === 0) return;
     if (publishTextNoteMutation.isLoading) return;
@@ -180,8 +192,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
 
     const parsed = parseTextNote(text());
-    const { hashtags, pubkeyReferences, eventReferences, urlReferences } = extract(parsed);
+    const { hashtags, urlReferences, pubkeyReferences, eventReferences, emojis } = extract(parsed);
     const formattedContent = format(parsed);
+    const emojiTags = buildEmojiTags(emojis);
 
     let textNote: PublishTextNoteParams = {
       relayUrls: config().relayUrls,
@@ -191,6 +204,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       mentionEventIds: eventReferences,
       hashtags,
       urls: urlReferences,
+      tags: emojiTags,
     };
 
     if (replyTo() != null) {
@@ -329,6 +343,13 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </button>
             </div>
           </Show>
+          {/*
+          <EmojiPicker customEmojis={true} onEmojiSelect={(emoji) => appendText(emoji)}>
+            <span class="inline-block h-8 w-8 rounded bg-primary p-2 font-bold text-white">
+              <FaceSmile />
+            </span>
+          </EmojiPicker>
+          */}
           <button
             class="flex items-center justify-center rounded p-2 text-xs font-bold text-white"
             classList={{

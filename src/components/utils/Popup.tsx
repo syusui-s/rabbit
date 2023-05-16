@@ -104,6 +104,7 @@ const Popup: Component<PopupProps> = (props) => {
   return (
     <div>
       <button
+        type="button"
         ref={buttonRef}
         class="flex items-center"
         onClick={() => {

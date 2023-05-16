@@ -47,20 +47,15 @@ const eventSchema = z.object({
 const EmojiTagSchema = z.tuple([
   z.literal('emoji'),
   z.string().regex(/^[a-zA-Z0-9]+$/, { message: 'shortcode should be alpahnumeric' }),
-  z.string().url().refine(isImageUrl),
+  z.string().url(), // .refine(isImageUrl)
 ]);
 
 export type EmojiTag = z.infer<typeof EmojiTagSchema>;
 
 const ensureSchema =
   <T>(schema: z.Schema<T>) =>
-  (value: any): value is T => {
-    const result = schema.safeParse(value);
-    if (!result.success) {
-      console.warn('failed to parse value', value, schema);
-    }
-    return result.success;
-  };
+  (value: any): value is T =>
+    schema.safeParse(value).success;
 
 const eventWrapper = (event: NostrEvent) => {
   let memoizedMarkedEventTags: MarkedEventTag[] | undefined;

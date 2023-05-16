@@ -13,6 +13,11 @@ type ConfigProps = {
   onClose: () => void;
 };
 
+const BaseUrlRegex = (schemaRegex: string) =>
+  `^(?:${schemaRegex})://[-a-zA-Z0-9.]+(:\\d{1,5})?(?:/[-[\\]~!$&'()*+.,:;@&=%\\w]+|/)*(?:\\?[-[\\]~!$&'()*+.,/:;%@&=\\w?]+)?(?:#[-[\\]~!$&'()*+.,/:;%@\\w&=?#]+)?$`;
+const HttpUrlRegex = BaseUrlRegex('https?');
+const RelayUrlRegex = BaseUrlRegex('wss?');
+
 const ProfileSection = () => {
   const pubkey = usePubkey();
   const { showProfile, showProfileEdit } = useModalState();
@@ -77,6 +82,7 @@ const RelayConfig = () => {
           type="text"
           name="relayUrl"
           value={relayUrlInput()}
+          pattern={RelayUrlRegex}
           onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
         />
         <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
@@ -166,7 +172,7 @@ const ToggleButton = (props: {
   );
 };
 
-const EmojiConfig = () => {
+const ReactionConfig = () => {
   const { config, setConfig } = useConfig();
 
   const toggleUseEmojiReaction = () => {
@@ -202,6 +208,68 @@ const EmojiConfig = () => {
           />
         </div>
       </div>
+    </div>
+  );
+};
+
+const EmojiConfig = () => {
+  const { config, saveEmoji, removeEmoji } = useConfig();
+
+  const [shortcodeInput, setShortcodeInput] = createSignal('');
+  const [urlInput, setUrlInput] = createSignal('');
+
+  const handleClickSaveEmoji: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
+    ev.preventDefault();
+    if (shortcodeInput().length === 0 || urlInput().length === 0) return;
+    saveEmoji({ shortcode: shortcodeInput(), url: urlInput() });
+  };
+
+  return (
+    <div class="py-2">
+      <h3 class="font-bold">カスタム絵文字</h3>
+      <ul class="flex flex-col gap-1 py-2">
+        <For each={Object.values(config().customEmojis)}>
+          {({ shortcode, url }) => (
+            <li class="flex items-center gap-2">
+              <img class="h-7 max-w-[128px]" src={url} alt={shortcode} />
+              <div class="flex-1 truncate">{shortcode}</div>
+              <button class="h-3 w-3 shrink-0" onClick={() => removeEmoji(shortcode)}>
+                <XMark />
+              </button>
+            </li>
+          )}
+        </For>
+      </ul>
+      <form class="flex gap-2" onSubmit={handleClickSaveEmoji}>
+        <label class="flex flex-1 items-center gap-1">
+          <div>名前</div>
+          <input
+            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            type="text"
+            name="shortcode"
+            value={shortcodeInput()}
+            pattern="^[a-zA-Z0-9]+$"
+            required
+            onChange={(ev) => setShortcodeInput(ev.currentTarget.value)}
+          />
+        </label>
+        <label class="flex flex-1 items-center gap-1">
+          <div>URL</div>
+          <input
+            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            type="text"
+            name="url"
+            value={urlInput()}
+            placeholder="https://.../emoji.png"
+            pattern={HttpUrlRegex}
+            required
+            onChange={(ev) => setUrlInput(ev.currentTarget.value)}
+          />
+        </label>
+        <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
+          保存
+        </button>
+      </form>
     </div>
   );
 };
@@ -335,6 +403,7 @@ const ConfigUI = (props: ConfigProps) => {
         <ProfileSection />
         <RelayConfig />
         <DateFormatConfig />
+        <ReactionConfig />
         <EmojiConfig />
         <OtherConfig />
         <MuteConfig />
