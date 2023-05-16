@@ -1,5 +1,7 @@
 import { Show } from 'solid-js';
 
+import { Kind } from 'nostr-tools';
+
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import EventLink from '@/components/EventLink';
@@ -20,6 +22,7 @@ const MentionedEventDisplay = (props: MentionedEventDisplayProps) => {
           eventId={props.mentionedEvent.eventId}
           embedding={false}
           actions={false}
+          ensureKinds={[Kind.Text]}
         />
       </div>
     </Show>

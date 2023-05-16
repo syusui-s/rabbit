@@ -107,9 +107,9 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (emojiUrl == null) return <span>{item.content}</span>;
           return (
             <img
-              class="inline-block h-7 max-w-[64px] align-middle"
+              class="inline-block h-8 max-w-[128px] align-middle"
               src={emojiUrl}
-              alt={item.shortcode}
+              alt={item.content}
             />
           );
         }
