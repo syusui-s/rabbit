@@ -1,6 +1,7 @@
 import { Component, createResource, For, Show } from 'solid-js';
 
 import BasicModal from '@/components/modal/BasicModal';
+import SafeLink from '@/components/utils/SafeLink';
 import resolveAsset from '@/utils/resolveAsset';
 
 type AboutProps = {
@@ -45,6 +46,31 @@ const About: Component<AboutProps> = (props) => {
             Rabbit <span id="app-version">v{packageInfo()?.self?.version}</span>
           </h1>
         </div>
+
+        <h2 class="my-4 text-xl font-bold">バグ報告について</h2>
+
+        <p class="my-4">
+          おかしな動作を見つけたら
+          <a
+            class="text-blue-500 underline"
+            href="https://github.com/syusui-s/rabbit/issues/new/choose"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHubのIssues
+          </a>
+          までご報告ください。
+        </p>
+
+        <h2 class="my-4 text-xl font-bold">ソースコード</h2>
+
+        <p class="my-4">
+          ソースコードは
+          <SafeLink class="text-blue-400 underline" href="https://github.com/syusui-s/rabbit">
+            GitHub
+          </SafeLink>
+          で入手できます。
+        </p>
 
         <h2 class="my-4 text-xl font-bold">利用規約</h2>
 

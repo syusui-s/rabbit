@@ -1,5 +1,11 @@
-import { createSignal, For, type JSX } from 'solid-js';
+import { createSignal, Show, For, type JSX } from 'solid-js';
 
+import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
+import EyeSlash from 'heroicons/24/outline/eye-slash.svg';
+import FaceSmile from 'heroicons/24/outline/face-smile.svg';
+import PaintBrush from 'heroicons/24/outline/paint-brush.svg';
+import ServerStack from 'heroicons/24/outline/server-stack.svg';
+import User from 'heroicons/24/outline/user.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
@@ -231,7 +237,7 @@ const EmojiConfig = () => {
         <For each={Object.values(config().customEmojis)}>
           {({ shortcode, url }) => (
             <li class="flex items-center gap-2">
-              <img class="h-7 max-w-[128px]" src={url} alt={shortcode} />
+              <img class="min-w-7 h-7 max-w-[128px]" src={url} alt={shortcode} />
               <div class="flex-1 truncate">{shortcode}</div>
               <button class="h-3 w-3 shrink-0" onClick={() => removeEmoji(shortcode)}>
                 <XMark />
@@ -240,9 +246,9 @@ const EmojiConfig = () => {
           )}
         </For>
       </ul>
-      <form class="flex gap-2" onSubmit={handleClickSaveEmoji}>
+      <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <label class="flex flex-1 items-center gap-1">
-          <div>名前</div>
+          <div class="w-9">名前</div>
           <input
             class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
@@ -254,7 +260,7 @@ const EmojiConfig = () => {
           />
         </label>
         <label class="flex flex-1 items-center gap-1">
-          <div>URL</div>
+          <div class="w-9">URL</div>
           <input
             class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
@@ -266,8 +272,8 @@ const EmojiConfig = () => {
             onChange={(ev) => setUrlInput(ev.currentTarget.value)}
           />
         </label>
-        <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
-          保存
+        <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
+          追加
         </button>
       </form>
     </div>
@@ -395,18 +401,84 @@ const OtherConfig = () => {
 };
 
 const ConfigUI = (props: ConfigProps) => {
-  // <div class="max-h-[90vh] w-[640px] max-w-[100vw] overflow-y-scroll rounded bg-white p-4 shadow">
+  const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
+
+  const menu = [
+    {
+      name: () => 'プロフィール',
+      icon: () => <User />,
+      render: () => <ProfileSection />,
+    },
+    {
+      name: () => 'リレー',
+      icon: () => <ServerStack />,
+      render: () => <RelayConfig />,
+    },
+    {
+      name: () => '表示',
+      icon: () => <PaintBrush />,
+      render: () => (
+        <>
+          <DateFormatConfig />
+          <ReactionConfig />
+          <OtherConfig />
+        </>
+      ),
+    },
+    {
+      name: () => 'カスタム絵文字',
+      icon: () => <FaceSmile />,
+      render: () => <EmojiConfig />,
+    },
+    {
+      name: () => 'ミュート',
+      icon: () => <EyeSlash />,
+      render: () => <MuteConfig />,
+    },
+  ];
+
+  const getMenuItem = () => {
+    const index = menuIndex();
+    if (index == null) return null;
+    return menu[index];
+  };
+
   return (
     <BasicModal onClose={props.onClose}>
       <div class="p-4">
-        <h2 class="flex-1 text-center text-lg font-bold">設定</h2>
-        <ProfileSection />
-        <RelayConfig />
-        <DateFormatConfig />
-        <ReactionConfig />
-        <EmojiConfig />
-        <OtherConfig />
-        <MuteConfig />
+        <Show
+          when={getMenuItem()}
+          fallback={
+            <>
+              <h2 class="flex-1 text-center text-lg font-bold">設定</h2>
+              <ul class="flex flex-col">
+                <For each={menu}>
+                  {(menuItem, i) => (
+                    <li class="w-full">
+                      <button
+                        class="flex w-full gap-2 py-3 hover:text-rose-400"
+                        onClick={() => setMenuIndex(i)}
+                      >
+                        <span class="inline-block h-6 w-6">{menuItem.icon()}</span>
+                        {menuItem.name()}
+                      </button>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </>
+          }
+          keyed
+        >
+          {(menuItem) => (
+            <div class="flex flex-col">
+              <button class="inline-block h-6 w-6" onClick={() => setMenuIndex(null)}>
+                <ArrowLeft />
+              </button>
+              <div class="w-full flex-1 pt-4">{menuItem.render()}</div>
+            </div>
+          )}
+        </Show>
       </div>
     </BasicModal>
   );

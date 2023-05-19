@@ -105,6 +105,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'CustomEmoji') {
           const emojiUrl = event().getEmojiUrl(item.shortcode);
           if (emojiUrl == null) return <span>{item.content}</span>;
+          // const { imageRef, canvas } = useImageAnimation({ initialPlaying: false });
           return (
             <img
               class="inline-block h-8 max-w-[128px] align-middle"

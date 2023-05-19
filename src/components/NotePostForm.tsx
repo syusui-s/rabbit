@@ -343,13 +343,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </button>
             </div>
           </Show>
-          {/*
           <EmojiPicker customEmojis={true} onEmojiSelect={(emoji) => appendText(emoji)}>
             <span class="inline-block h-8 w-8 rounded bg-primary p-2 font-bold text-white">
               <FaceSmile />
             </span>
           </EmojiPicker>
-          */}
           <button
             class="flex items-center justify-center rounded p-2 text-xs font-bold text-white"
             classList={{
