@@ -248,7 +248,7 @@ const EmojiConfig = () => {
             type="text"
             name="shortcode"
             value={shortcodeInput()}
-            pattern="^[a-zA-Z0-9]+$"
+            pattern="^\\w+$"
             required
             onChange={(ev) => setShortcodeInput(ev.currentTarget.value)}
           />

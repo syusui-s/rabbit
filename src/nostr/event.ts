@@ -46,7 +46,9 @@ const eventSchema = z.object({
 
 const EmojiTagSchema = z.tuple([
   z.literal('emoji'),
-  z.string().regex(/^[a-zA-Z0-9]+$/, { message: 'shortcode should be alpahnumeric' }),
+  z.string().regex(/^\w+$/, {
+    message: 'shortcode can includes only alpahnumeric characters and underscore',
+  }),
   z.string().url(), // .refine(isImageUrl)
 ]);
 
