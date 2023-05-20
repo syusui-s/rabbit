@@ -1,3 +1,13 @@
+export type UploadResult = {
+  imageUrl: string;
+};
+
+export type Uploader = {
+  name: string;
+  tos: string;
+  upload: (file: File) => Promise<UploadResult>;
+};
+
 const toHexString = (buff: ArrayBuffer): string => {
   const arr = new Array(buff.byteLength);
   const view = new Int8Array(buff);
@@ -7,10 +17,6 @@ const toHexString = (buff: ArrayBuffer): string => {
   }
 
   return arr.join();
-};
-
-export type UploadResult = {
-  imageUrl: string;
 };
 
 export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
@@ -55,6 +61,16 @@ export const uploadVoidCat = async (blob: Blob): Promise<any> => {
 
   return res.json();
 };
+
+export const uploaders = {
+  nostrBuild: {
+    name: 'nostr.build',
+    tos: 'https://nostr.build/tos/',
+    upload: uploadNostrBuild,
+  } satisfies Uploader,
+} as const;
+
+export type UploaderIds = keyof typeof uploaders;
 
 export const uploadFiles =
   <T>(uploadFn: (file: Blob) => Promise<T>) =>

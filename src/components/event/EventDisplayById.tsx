@@ -28,7 +28,14 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
   };
 
   return (
-    <Switch fallback="投稿が見つかりません">
+    <Switch
+      fallback={
+        <span>
+          投稿が見つかりません
+          {props.eventId}
+        </span>
+      }
+    >
       <Match when={hidden()}>{null}</Match>
       <Match when={fetchedEvent()} keyed>
         {(event) => <EventDisplay event={event} {...restProps} />}

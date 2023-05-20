@@ -12,11 +12,13 @@ import EmojiPicker from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import usePersistStatus from '@/hooks/usePersistStatus';
 import eventWrapper from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { uploadNostrBuild, uploadFiles } from '@/utils/imageUpload';
+import { uploadNostrBuild, uploadFiles, uploaders } from '@/utils/imageUpload';
+import openLink from '@/utils/openLink';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;
@@ -106,6 +108,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   };
 
   const { config, getEmoji } = useConfig();
+  const { persistStatus, didAgreeToToS, agreeToToS } = usePersistStatus();
   const getPubkey = usePubkey();
   const commands = useCommands();
 
@@ -150,23 +153,24 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     },
   });
 
-  const mentionedPubkeys = createMemo(() => replyTo()?.mentionedPubkeysWithoutAuthor() ?? []);
+  const mentionedPubkeysWithoutMe = createMemo(() => {
+    const p = getPubkey();
+    return (
+      replyTo()
+        ?.mentionedPubkeys()
+        ?.filter((pubkey) => pubkey !== p) ?? []
+    );
+  });
 
-  const mentionedPubkeysWithoutMe = createMemo(() =>
-    mentionedPubkeys().filter((pubkey) => pubkey !== getPubkey()),
-  );
-
-  const notifyPubkeys = (pubkey: string, pubkeyReferences: string[]): string[] => {
-    if (props.replyTo == null) return pubkeyReferences;
+  const notifyPubkeys = createMemo(() => {
+    if (props.replyTo == null) return [];
     return uniq([
       // 返信先を先頭に
       props.replyTo.pubkey,
       // その他の返信先
       ...mentionedPubkeysWithoutMe(),
-      // 本文中の公開鍵（npub)
-      ...pubkeyReferences,
     ]);
-  };
+  });
 
   const buildEmojiTags = (emojis: string[]): string[][] => {
     const emojiTags: string[][] = [];
@@ -210,7 +214,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (replyTo() != null) {
       textNote = {
         ...textNote,
-        notifyPubkeys: notifyPubkeys(pubkey, pubkeyReferences),
+        notifyPubkeys: uniq([
+          ...notifyPubkeys(),
+          ...pubkeyReferences, // 本文中の公開鍵（npub)
+        ]),
         rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
         replyEventId: replyTo()?.id,
       };
@@ -223,6 +230,22 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
     publishTextNoteMutation.mutate(textNote);
     close();
+  };
+
+  const ensureUploaderAgreement = (): boolean => {
+    if (didAgreeToToS('nostrBuild')) return true;
+
+    window.alert(
+      '画像アップローダーの利用規約をお読みください。\n（新しいタブで利用規約を開きます）',
+    );
+    openLink(uploaders.nostrBuild.tos);
+    const didAgree = window.confirm('同意する場合はOKをクリックしてください。');
+
+    if (didAgree) {
+      agreeToToS('nostrBuild');
+    }
+
+    return didAgree;
   };
 
   const handleInput: JSX.EventHandler<HTMLTextAreaElement, InputEvent> = (ev) => {
@@ -246,6 +269,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
     ev.preventDefault();
+    if (uploadFilesMutation.isLoading) return;
+    if (!ensureUploaderAgreement()) return;
+
     const files = [...(ev.currentTarget.files ?? [])];
     uploadFilesMutation.mutate(files);
     // eslint-disable-next-line no-param-reassign
@@ -255,12 +281,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const handleDrop: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
     if (uploadFilesMutation.isLoading) return;
+    if (!ensureUploaderAgreement()) return;
     const files = [...(ev?.dataTransfer?.files ?? [])];
     uploadFilesMutation.mutate(files);
   };
 
   const handlePaste: JSX.EventHandler<HTMLTextAreaElement, ClipboardEvent> = (ev) => {
     if (uploadFilesMutation.isLoading) return;
+
     const items = [...(ev?.clipboardData?.items ?? [])];
 
     const files: File[] = [];
@@ -273,6 +301,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       }
     });
     if (files.length === 0) return;
+    if (!ensureUploaderAgreement()) return;
+
     uploadFilesMutation.mutate(files);
   };
 
@@ -296,12 +326,13 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   return (
     <div class="p-1">
-      <Show when={mentionedPubkeys().length > 0}>
+      <Show when={props.replyTo != null}>
         <div>
-          <For each={mentionedPubkeys()}>
-            {(pubkey) => (
+          <For each={notifyPubkeys()}>
+            {(pubkey, index) => (
               <>
-                <UserNameDisplay pubkey={pubkey} />{' '}
+                <UserNameDisplay pubkey={pubkey} />
+                <Show when={index() !== notifyPubkeys().length - 1}> と </Show>
               </>
             )}
           </For>

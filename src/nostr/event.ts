@@ -153,9 +153,6 @@ const eventWrapper = (event: NostrEvent) => {
     mentionedPubkeys(): string[] {
       return uniq(this.pTags().map(([, pubkey]) => pubkey));
     },
-    mentionedPubkeysWithoutAuthor(): string[] {
-      return this.mentionedPubkeys().filter((pubkey) => pubkey !== event.pubkey);
-    },
     contentWarning(): ContentWarning {
       const tag = event.tags.find(([tagName]) => tagName === 'content-warning');
       if (tag == null) return { contentWarning: false };

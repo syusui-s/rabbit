@@ -1,23 +1,28 @@
 import { Accessor } from 'solid-js';
 
 import {
-  createSignalWithStorage,
+  createStoreWithStorage,
   createStorageWithSerializer,
 } from '@/hooks/createSignalWithStorage';
+import { UploaderIds } from '@/utils/imageUpload';
 
 type PersistStatus = {
   loggedIn: boolean;
-  agreeWithNostrBuild: boolean;
+  agreements: Record<UploaderIds, boolean>;
 };
 
 type UsePersistStatus = {
   persistStatus: Accessor<PersistStatus>;
   loggedIn: () => void;
+  agreeToToS: (uploaderId: UploaderIds) => void;
+  didAgreeToToS: (uploaderId: UploaderIds) => boolean;
 };
 
-const InitialPersistStatus = {
+const InitialPersistStatus: PersistStatus = {
   loggedIn: false,
-  agreeWithNostrBuild: false,
+  agreements: {
+    nostrBuild: false,
+  },
 };
 
 const serializer = (persistStatus: PersistStatus): string => JSON.stringify(persistStatus);
@@ -26,7 +31,7 @@ const deserializer = (json: string): PersistStatus => JSON.parse(json) as Persis
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
 
-const [persistStatus, setPersistStatus] = createSignalWithStorage(
+const [persistStatus, setPersistStatus] = createStoreWithStorage(
   'RabbitPersistStatus',
   InitialPersistStatus,
   storage,
@@ -37,12 +42,20 @@ const usePersistStatus = (): UsePersistStatus => {
     setPersistStatus((current) => ({ ...current, loggedIn: true }));
   };
 
+  const agreeToToS = (key: UploaderIds) => {
+    setPersistStatus('agreements', (current) => ({ ...current, [key]: true }));
+  };
+
+  const didAgreeToToS = (key: UploaderIds): boolean => persistStatus.agreements[key] ?? false;
+
   return {
     persistStatus: () => ({
       ...InitialPersistStatus,
-      ...persistStatus(),
+      ...persistStatus,
     }),
     loggedIn,
+    agreeToToS,
+    didAgreeToToS,
   };
 };
 
