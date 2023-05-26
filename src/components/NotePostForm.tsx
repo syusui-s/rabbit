@@ -136,20 +136,23 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const uploadFilesMutation = createMutation({
     mutationKey: ['uploadFiles'],
-    mutationFn: (files: File[]) => {
-      return uploadFiles(uploadNostrBuild)(files)
-        .then((uploadResults) => {
-          uploadResults.forEach((result) => {
-            if (result.status === 'fulfilled') {
-              console.log('succeeded to upload', result);
-              appendText(result.value.imageUrl);
-              resizeTextArea();
-            } else {
-              console.error('failed to upload', result);
-            }
-          });
-        })
-        .catch((err) => console.error(err));
+    mutationFn: async (files: File[]) => {
+      const uploadResults = await uploadFiles(uploadNostrBuild)(files);
+      const failed: File[] = [];
+
+      uploadResults.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          appendText(result.value.imageUrl);
+          resizeTextArea();
+        } else {
+          failed.push(files[i]);
+        }
+      });
+
+      if (failed.length > 0) {
+        const filenames = failed.map((f) => f.name).join(', ');
+        window.alert(`ファイルのアップロードに失敗しました: ${filenames}`);
+      }
     },
   });
 
@@ -218,7 +221,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           ...notifyPubkeys(),
           ...pubkeyReferences, // 本文中の公開鍵（npub)
         ]),
-        rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.id,
+        rootEventId: replyTo()?.rootEvent()?.id,
         replyEventId: replyTo()?.id,
       };
     }
@@ -230,22 +233,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
     publishTextNoteMutation.mutate(textNote);
     close();
-  };
-
-  const ensureUploaderAgreement = (): boolean => {
-    if (didAgreeToToS('nostrBuild')) return true;
-
-    window.alert(
-      '画像アップローダーの利用規約をお読みください。\n（新しいタブで利用規約を開きます）',
-    );
-    openLink(uploaders.nostrBuild.tos);
-    const didAgree = window.confirm('同意する場合はOKをクリックしてください。');
-
-    if (didAgree) {
-      agreeToToS('nostrBuild');
-    }
-
-    return didAgree;
   };
 
   const handleInput: JSX.EventHandler<HTMLTextAreaElement, InputEvent> = (ev) => {
@@ -267,10 +254,29 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
+  const ensureUploaderAgreement = (): boolean => {
+    return true;
+    /*
+    if (didAgreeToToS('nostrBuild')) return true;
+
+    window.alert(
+      '画像アップローダーの利用規約をお読みください。\n（新しいタブで利用規約を開きます）',
+    );
+    openLink(uploaders.nostrBuild.tos);
+    const didAgree = window.confirm('同意する場合はOKをクリックしてください。');
+
+    if (didAgree) {
+      agreeToToS('nostrBuild');
+    }
+
+    return didAgree;
+     */
+  };
+
   const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
     ev.preventDefault();
     if (uploadFilesMutation.isLoading) return;
-    if (!ensureUploaderAgreement()) return;
+    // if (!ensureUploaderAgreement()) return;
 
     const files = [...(ev.currentTarget.files ?? [])];
     uploadFilesMutation.mutate(files);
@@ -281,7 +287,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const handleDrop: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
     if (uploadFilesMutation.isLoading) return;
-    if (!ensureUploaderAgreement()) return;
+    // if (!ensureUploaderAgreement()) return;
     const files = [...(ev?.dataTransfer?.files ?? [])];
     uploadFilesMutation.mutate(files);
   };
@@ -301,7 +307,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       }
     });
     if (files.length === 0) return;
-    if (!ensureUploaderAgreement()) return;
+    // if (!ensureUploaderAgreement()) return;
 
     uploadFilesMutation.mutate(files);
   };

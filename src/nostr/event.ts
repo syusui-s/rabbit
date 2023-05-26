@@ -93,6 +93,9 @@ const eventWrapper = (event: NostrEvent) => {
     emojiTags(): EmojiTag[] {
       return event.tags.filter(ensureSchema(EmojiTagSchema));
     },
+    findTagsByName(name: string): string[][] {
+      return event.tags.filter(([tagName]) => tagName === name);
+    },
     taggedEventIds(): string[] {
       return this.eTags().map(([, eventId]) => eventId);
     },

@@ -4,16 +4,14 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .link {
@@ -39,4 +37,21 @@ em-emoji-picker {
   max-height: 800px;
   width: 360px;
   max-width: 90vw;
+}
+
+.scrollbar::-webkit-scrollbar:vertical {
+  width: 8px;
+}
+.scrollbar::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+.scrollbar::-webkit-scrollbar {
+  background-color: #fbf9f9;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #fce9ec;
+  border-radius: 8px;
+}
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #fcd9dc;
 }

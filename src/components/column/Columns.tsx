@@ -12,7 +12,7 @@ const Columns = () => {
   const { config } = useConfig();
 
   return (
-    <div class="flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll">
+    <div class="scrollbar flex h-full snap-x snap-mandatory flex-row overflow-y-hidden overflow-x-scroll">
       <For each={config().columns}>
         {(column, index) => {
           const columnIndex = () => index() + 1;

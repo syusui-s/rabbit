@@ -140,7 +140,7 @@ export const createJapanRelaysColumn = () =>
     relayUrls: relaysOnlyAvailableInJP,
     contentFilter: {
       filterType: 'Regex',
-      regex: '[\\p{scx=Hiragana}\\p{scx=Katakana}]',
+      regex: '[\\p{sc=Hiragana}\\p{sc=Katakana}ー]',
       flag: 'u',
     },
   });

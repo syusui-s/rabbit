@@ -27,6 +27,8 @@
 import uniqBy from 'lodash/uniqBy';
 import { z } from 'zod';
 
+import { CustomEmojiConfig } from '@/core/useConfig';
+
 export const pubkeySchema = z
   .string()
   .length(64)
@@ -75,3 +77,6 @@ export const getEmojiPack = async (urlString: string): Promise<AllEmojiPack> => 
   const res = await fetch(url);
   return allEmojiPackSchema.parseAsync(await res.json());
 };
+
+export const convertToEmojiConfig = (emojipack: SimpleEmojiPack): CustomEmojiConfig[] =>
+  Object.entries(emojipack).map(([shortcode, url]) => ({ shortcode, url }));

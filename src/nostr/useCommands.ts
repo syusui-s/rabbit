@@ -55,10 +55,14 @@ export const buildTags = ({
   if (rootEventId != null) {
     eTags.push(['e', rootEventId, '', 'root']);
   }
+  // For top level replies, only the "root" marker should be used.
+  if (rootEventId == null && replyEventId != null) {
+    eTags.push(['e', replyEventId, '', 'root']);
+  }
   if (mentionEventIds != null) {
     mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
   }
-  if (replyEventId != null) {
+  if (rootEventId != null && replyEventId != null && rootEventId !== replyEventId) {
     eTags.push(['e', replyEventId, '', 'reply']);
   }
 

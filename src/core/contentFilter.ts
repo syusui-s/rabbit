@@ -21,12 +21,14 @@
  */
 export type ContentFilterAnd = { filterType: 'AND'; children: ContentFilter[] };
 export type ContentFilterOr = { filterType: 'OR'; children: ContentFilter[] };
+export type ContentFilterNot = { filterType: 'NOT'; child: ContentFilter };
 export type ContentFilterTextInclude = { filterType: 'Text'; text: string };
 export type ContentFilterRegex = { filterType: 'Regex'; regex: string; flag: string };
 
 export type ContentFilter =
   | ContentFilterAnd
   | ContentFilterOr
+  | ContentFilterNot
   | ContentFilterTextInclude
   | ContentFilterRegex;
 
@@ -38,6 +40,8 @@ export const applyContentFilter =
         return filter.children.every((child) => applyContentFilter(child)(content));
       case 'OR':
         return filter.children.some((child) => applyContentFilter(child)(content));
+      case 'NOT':
+        return !applyContentFilter(filter.child)(content);
       case 'Text':
         return content.includes(filter.text);
       case 'Regex':

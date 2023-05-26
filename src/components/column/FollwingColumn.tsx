@@ -29,6 +29,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
     const authors = uniq([...followingPubkeys()]);
     if (authors.length === 0) return null;
     return {
+      debugId: 'following',
       relayUrls: config().relayUrls,
       filters: [
         {

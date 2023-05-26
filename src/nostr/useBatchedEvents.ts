@@ -467,6 +467,7 @@ export const useFollowings = (propsProvider: () => UseFollowingsProps | null): U
   const query = createQuery(
     genQueryKey,
     ({ queryKey, signal }) => {
+      console.debug('useFollowings');
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
       const { pubkey } = currentProps;

@@ -13,6 +13,7 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig, { type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import usePubkey from '@/nostr/usePubkey';
+import { simpleEmojiPackSchema, convertToEmojiConfig } from '@/utils/emojipack';
 import ensureNonNull from '@/utils/ensureNonNull';
 
 type ConfigProps = {
@@ -228,6 +229,8 @@ const EmojiConfig = () => {
     ev.preventDefault();
     if (shortcodeInput().length === 0 || urlInput().length === 0) return;
     saveEmoji({ shortcode: shortcodeInput(), url: urlInput() });
+    setShortcodeInput('');
+    setUrlInput('');
   };
 
   return (
@@ -253,6 +256,7 @@ const EmojiConfig = () => {
             class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
             name="shortcode"
+            placeholder="smiley"
             value={shortcodeInput()}
             pattern="^\\w+$"
             required
@@ -266,7 +270,7 @@ const EmojiConfig = () => {
             type="text"
             name="url"
             value={urlInput()}
-            placeholder="https://.../emoji.png"
+            placeholder="https://example.com/smiley.png"
             pattern={HttpUrlRegex}
             required
             onChange={(ev) => setUrlInput(ev.currentTarget.value)}
@@ -274,6 +278,46 @@ const EmojiConfig = () => {
         </label>
         <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
           追加
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const EmojiImport = () => {
+  const { saveEmojis } = useConfig();
+
+  const [jsonInput, setJSONInput] = createSignal('');
+
+  const handleClickSaveEmoji: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
+    ev.preventDefault();
+    if (jsonInput().length === 0) return;
+
+    try {
+      const data = simpleEmojiPackSchema.parse(JSON.parse(jsonInput()));
+      const emojis = convertToEmojiConfig(data);
+      saveEmojis(emojis);
+      setJSONInput('');
+    } catch (err) {
+      const message = err instanceof Error ? `:${err.message}` : '';
+      window.alert(`JSONの読み込みに失敗しました${message}`);
+    }
+  };
+
+  return (
+    <div class="py-2">
+      <h3 class="font-bold">絵文字のインポート</h3>
+      <p>絵文字の名前をキー、画像のURLを値とするJSONを読み込むことができます。</p>
+      <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
+        <textarea
+          class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+          name="json"
+          value={jsonInput()}
+          placeholder='{ "smiley": "https://example.com/smiley.png" }'
+          onChange={(ev) => setJSONInput(ev.currentTarget.value)}
+        />
+        <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
+          インポート
         </button>
       </form>
     </div>
@@ -428,7 +472,12 @@ const ConfigUI = (props: ConfigProps) => {
     {
       name: () => 'カスタム絵文字',
       icon: () => <FaceSmile />,
-      render: () => <EmojiConfig />,
+      render: () => (
+        <>
+          <EmojiConfig />
+          <EmojiImport />
+        </>
+      ),
     },
     {
       name: () => 'ミュート',

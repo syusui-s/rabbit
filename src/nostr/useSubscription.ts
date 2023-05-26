@@ -1,10 +1,11 @@
-import { createSignal, createEffect, onCleanup, on } from 'solid-js';
+import { createSignal, createMemo, createEffect, onMount, onCleanup, on } from 'solid-js';
 
 import uniqBy from 'lodash/uniqBy';
 
 import useConfig from '@/core/useConfig';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
+import epoch from '@/utils/epoch';
 
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 
@@ -25,6 +26,7 @@ export type UseSubscriptionProps = {
   onEvent?: (event: NostrEvent & { id: string }) => void;
   onEOSE?: () => void;
   signal?: AbortSignal;
+  debugId?: string;
 };
 
 const sortEvents = (events: NostrEvent[]) =>
@@ -52,12 +54,32 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     ),
   );
 
+  onMount(() => {
+    console.debug('subscription mounted', propsProvider()?.debugId, propsProvider());
+    onCleanup(() => {
+      console.debug('subscription unmount', propsProvider()?.debugId, propsProvider());
+    });
+  });
+
+  const addEvent = (event: NostrEvent) => {
+    const limit = propsProvider()?.limit ?? 50;
+
+    setEvents((current) => {
+      const sorted = sortEvents([event, ...current].slice(0, limit));
+      // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
+      // https://github.com/syusui-s/rabbit/issues/5
+      const deduped = uniqBy(sorted, (e) => e.id);
+      if (deduped.length !== sorted.length) {
+        console.warn('duplicated event', event);
+      }
+      return deduped;
+    });
+  };
+
   const startSubscription = () => {
     const props = propsProvider();
     if (props == null) return;
-
     const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
-    const limit = props.limit ?? 50;
 
     const sub = pool().sub(relayUrls, filters, options);
     let subscribing = true;
@@ -74,20 +96,12 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
       if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
         return;
       }
+
       if (!eose) {
         pushed = true;
         storedEvents.push(event);
       } else {
-        setEvents((current) => {
-          const sorted = sortEvents([event, ...current].slice(0, limit));
-          // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
-          // https://github.com/syusui-s/rabbit/issues/5
-          const deduped = uniqBy(sorted, (e) => e.id);
-          if (deduped.length !== sorted.length) {
-            console.warn('duplicated event', event);
-          }
-          return deduped;
-        });
+        addEvent(event);
       }
     });
 
@@ -109,15 +123,20 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     });
 
     // avoid updating an array too rapidly while this is fetching stored events
+    let updating = false;
     const intervalId = setInterval(() => {
+      if (updating) return;
+      updating = true;
       if (eose) {
         clearInterval(intervalId);
+        updating = false;
         return;
       }
       if (pushed) {
         pushed = false;
         setEvents(sortEvents(storedEvents));
       }
+      updating = false;
     }, 100);
 
     onCleanup(() => {

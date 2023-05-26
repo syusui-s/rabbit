@@ -51,6 +51,7 @@ type UseConfig = {
   initializeColumns: (param: { pubkey: string }) => void;
   // emoji
   saveEmoji: (emoji: CustomEmojiConfig) => void;
+  saveEmojis: (emojis: CustomEmojiConfig[]) => void;
   removeEmoji: (shortcode: string) => void;
   getEmoji: (shortcode: string) => CustomEmojiConfig | undefined;
   // mute
@@ -156,6 +157,13 @@ const useConfig = (): UseConfig => {
     setConfig('customEmojis', (current) => ({ ...current, [emoji.shortcode]: emoji }));
   };
 
+  const saveEmojis = (emojis: CustomEmojiConfig[]) => {
+    setConfig('customEmojis', (current) => {
+      const newEmojis = Object.fromEntries(emojis.map((emoji) => [emoji.shortcode, emoji]));
+      return { ...current, ...newEmojis };
+    });
+  };
+
   const removeEmoji = (shortcode: string) => {
     setConfig('customEmojis', (current) => ({ ...current, [shortcode]: undefined }));
   };
@@ -177,7 +185,7 @@ const useConfig = (): UseConfig => {
     return (
       isPubkeyMuted(event.pubkey) ||
       ev.mentionedPubkeys().some(isPubkeyMuted) ||
-      hasMutedKeyword(event)
+      (event.kind === Kind.Text && hasMutedKeyword(event))
     );
   };
 
@@ -212,6 +220,7 @@ const useConfig = (): UseConfig => {
     initializeColumns,
     // emoji
     saveEmoji,
+    saveEmojis,
     removeEmoji,
     getEmoji,
     // mute

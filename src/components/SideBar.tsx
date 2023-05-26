@@ -27,7 +27,7 @@ const SearchButton = () => {
     ev.preventDefault();
 
     saveColumn(createSearchColumn({ query: query() }));
-    request({ command: 'moveToLastColumn' }).catch((err) => console.log(err));
+    request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
     popupRef?.close();
     setQuery('');
   };

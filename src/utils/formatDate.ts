@@ -42,7 +42,7 @@ const defaultAbsoluteDateLongFormatter = (parsedDate: AbsoluteDate): string => {
     case 'yesterday':
     case 'abs':
     default:
-      return parsedDate.value.toLocaleDateString();
+      return parsedDate.value.toLocaleString();
   }
 };
 
