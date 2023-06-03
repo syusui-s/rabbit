@@ -4,6 +4,7 @@ import { Kind, Event as NostrEvent } from 'nostr-tools';
 
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
+// import ParameterizedReplaceableEventDisplayById from '@/components/event/ParameterizedReplaceableEventDisplayById';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
 import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
@@ -12,8 +13,8 @@ import SafeLink from '@/components/utils/SafeLink';
 import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
-import eventWrapper from '@/nostr/event';
-import parseTextNote, { resolveTagReference, type ParsedTextNoteNode } from '@/nostr/parseTextNote';
+import { textNote } from '@/nostr/event';
+import parseTextNote, { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 import { isImageUrl } from '@/utils/imageUrl';
 
 export type TextNoteContentDisplayProps = {
@@ -26,7 +27,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
 
   const request = useRequestCommand();
 
-  const event = () => eventWrapper(props.event);
+  const event = () => textNote(props.event);
 
   const addHashTagColumn = (query: string) => {
     saveColumn(createSearchColumn({ query }));
@@ -34,7 +35,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
   };
 
   return (
-    <For each={parseTextNote(props.event.content)}>
+    <For each={event().parsed()}>
       {(item: ParsedTextNoteNode) => {
         if (item.type === 'PlainText') {
           return <span>{item.content}</span>;
@@ -53,7 +54,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <SafeLink class="text-blue-500 underline" href={item.content} />;
         }
         if (item.type === 'TagReference') {
-          const resolved = resolveTagReference(item, props.event);
+          const resolved = event().resolveTagReference(item);
           if (resolved == null) {
             return <span>{item.content}</span>;
           }

@@ -10,7 +10,7 @@ import Timeline from '@/components/timeline/Timeline';
 import { FollowingColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
-import { useFollowings } from '@/nostr/useBatchedEvents';
+import useFollowings from '@/nostr/useFollowings';
 import useSubscription from '@/nostr/useSubscription';
 import epoch from '@/utils/epoch';
 

@@ -2,7 +2,7 @@ import { Switch, Match, Component } from 'solid-js';
 
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
-import ChannelInfo from '@/components/event/ChannelInfo';
+// import ChannelInfo from '@/components/event/ChannelInfo';
 // eslint-disable-next-line import/no-cycle
 import Repost from '@/components/event/Repost';
 // eslint-disable-next-line import/no-cycle

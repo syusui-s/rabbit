@@ -17,7 +17,7 @@ import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
-import eventWrapper from '@/nostr/event';
+import { genericEvent } from '@/nostr/event';
 
 export type CustomEmojiConfig = {
   shortcode: string;
@@ -181,10 +181,10 @@ const useConfig = (): UseConfig => {
   };
 
   const shouldMuteEvent = (event: NostrEvent) => {
-    const ev = eventWrapper(event);
+    const ev = genericEvent(event);
     return (
       isPubkeyMuted(event.pubkey) ||
-      ev.mentionedPubkeys().some(isPubkeyMuted) ||
+      ev.taggedPubkeys().some(isPubkeyMuted) ||
       (event.kind === Kind.Text && hasMutedKeyword(event))
     );
   };

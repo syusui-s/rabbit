@@ -6,17 +6,17 @@ import { Filter, Event as NostrEvent } from 'nostr-tools';
 import Timeline from '@/components/timeline/Timeline';
 import { type TimelineContent } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
-import eventWrapper from '@/nostr/event';
+import { textNote } from '@/nostr/event';
+import TextNote from '@/nostr/event/TextNote';
 import useSubscription from '@/nostr/useSubscription';
 
-const relatedEvents = (rawEvent: NostrEvent) => {
-  const event = () => eventWrapper(rawEvent);
-  const ids = [rawEvent.id];
+const relatedEvents = (event: TextNote) => {
+  const ids = [event.id];
 
-  const rootId = event().rootEvent()?.id;
+  const rootId = event.rootEvent()?.id;
   if (rootId != null) ids.push(rootId);
 
-  const replyId = event().replyingToEvent()?.id;
+  const replyId = event.replyingToEvent()?.id;
   if (replyId != null) ids.push(replyId);
 
   return uniq(ids);
@@ -25,10 +25,12 @@ const relatedEvents = (rawEvent: NostrEvent) => {
 const RepliesDisplay: Component<{ event: NostrEvent }> = (props) => {
   const { config } = useConfig();
 
+  const event = () => textNote(props.event);
+
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
     filters: [
-      { kinds: [1], ids: relatedEvents(props.event), limit: 25 },
+      { kinds: [1], ids: relatedEvents(event()), limit: 25 },
       { kinds: [1], '#e': [props.event.id], limit: 25 } as Filter,
     ],
     limit: 200,

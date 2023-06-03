@@ -21,7 +21,7 @@ import { useTimelineContext } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
-import eventWrapper from '@/nostr/event';
+import { textNote } from '@/nostr/event';
 import useCommands from '@/nostr/useCommands';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
@@ -100,7 +100,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const [showOverflow, setShowOverflow] = createSignal(false);
   const [overflow, setOverflow] = createSignal(false);
 
-  const event = createMemo(() => eventWrapper(props.event));
+  const event = createMemo(() => textNote(props.event));
 
   const embedding = () => props.embedding ?? true;
   const actions = () => props.actions ?? true;
@@ -197,7 +197,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       content: () => 'JSONとしてコピー',
       onSelect: () => {
         navigator.clipboard
-          .writeText(JSON.stringify(props.event))
+          .writeText(JSON.stringify(props.event, null, 2))
           .catch((err) => window.alert(err));
       },
     },
@@ -232,13 +232,22 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   });
 
   const showReplyEvent = (): string | undefined => {
-    const replyingToEvent = event().replyingToEvent();
-    if (
-      embedding() &&
-      replyingToEvent != null &&
-      !event().containsEventMentionIndex(replyingToEvent.index)
-    ) {
-      return replyingToEvent.id;
+    if (embedding()) {
+      const replyingToEvent = event().replyingToEvent();
+
+      if (replyingToEvent != null && !event().containsEventMention(replyingToEvent.id)) {
+        return replyingToEvent.id;
+      }
+
+      const rootEvent = event().rootEvent();
+
+      if (
+        replyingToEvent == null &&
+        rootEvent != null &&
+        !event().containsEventMention(rootEvent.id)
+      ) {
+        return rootEvent.id;
+      }
     }
     return undefined;
   };
@@ -360,9 +369,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 </div>
               )}
             </Show>
-            <Show when={event().mentionedPubkeys().length > 0}>
+            <Show when={event().taggedPubkeys().length > 0}>
               <div class="text-xs">
-                <For each={event().mentionedPubkeys()}>
+                <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
                       class="pr-1 text-blue-500 hover:underline"

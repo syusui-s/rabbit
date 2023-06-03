@@ -9,7 +9,7 @@ import EventDisplayById from '@/components/event/EventDisplayById';
 import UserDisplayName from '@/components/UserDisplayName';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
-import eventWrapper from '@/nostr/event';
+import { genericEvent } from '@/nostr/event';
 
 export type RepostProps = {
   event: NostrEvent;
@@ -18,7 +18,7 @@ export type RepostProps = {
 const Repost: Component<RepostProps> = (props) => {
   const { showProfile } = useModalState();
   const formatDate = useFormatDate();
-  const event = createMemo(() => eventWrapper(props.event));
+  const event = createMemo(() => genericEvent(props.event));
   const eventId = () => event().lastTaggedEventId();
 
   return (

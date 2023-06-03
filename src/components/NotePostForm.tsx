@@ -11,9 +11,8 @@ import { Event as NostrEvent } from 'nostr-tools';
 import EmojiPicker from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
-import { useHandleCommand } from '@/hooks/useCommandBus';
 import usePersistStatus from '@/hooks/usePersistStatus';
-import eventWrapper from '@/nostr/event';
+import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
@@ -112,7 +111,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const getPubkey = usePubkey();
   const commands = useCommands();
 
-  const replyTo = () => props.replyTo && eventWrapper(props.replyTo);
+  const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
   const publishTextNoteMutation = createMutation({
@@ -156,11 +155,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     },
   });
 
-  const mentionedPubkeysWithoutMe = createMemo(() => {
+  const taggedPubkeysWithoutMe = createMemo(() => {
     const p = getPubkey();
     return (
       replyTo()
-        ?.mentionedPubkeys()
+        ?.taggedPubkeys()
         ?.filter((pubkey) => pubkey !== p) ?? []
     );
   });
@@ -171,7 +170,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       // 返信先を先頭に
       props.replyTo.pubkey,
       // その他の返信先
-      ...mentionedPubkeysWithoutMe(),
+      ...taggedPubkeysWithoutMe(),
     ]);
   });
 
@@ -203,7 +202,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     const formattedContent = format(parsed);
     const emojiTags = buildEmojiTags(emojis);
 
-    let textNote: PublishTextNoteParams = {
+    let textNoteParams: PublishTextNoteParams = {
       relayUrls: config().relayUrls,
       pubkey,
       content: formattedContent,
@@ -215,8 +214,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     };
 
     if (replyTo() != null) {
-      textNote = {
-        ...textNote,
+      textNoteParams = {
+        ...textNoteParams,
         notifyPubkeys: uniq([
           ...notifyPubkeys(),
           ...pubkeyReferences, // 本文中の公開鍵（npub)
@@ -226,12 +225,12 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       };
     }
     if (contentWarning()) {
-      textNote = {
-        ...textNote,
+      textNoteParams = {
+        ...textNoteParams,
         contentWarning: contentWarningReason(),
       };
     }
-    publishTextNoteMutation.mutate(textNote);
+    publishTextNoteMutation.mutate(textNoteParams);
     close();
   };
 

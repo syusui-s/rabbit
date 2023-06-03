@@ -1,9 +1,5 @@
 import { nip19, type Event as NostrEvent } from 'nostr-tools';
-
-import eventWrapper, { isValidId } from '@/nostr/event';
-
-type ProfilePointer = nip19.ProfilePointer;
-type EventPointer = nip19.EventPointer;
+import { DecodeResult } from 'nostr-tools/lib/nip19';
 
 const { decode } = nip19;
 
@@ -26,10 +22,7 @@ export type TagReference = {
 export type Bech32Entity = {
   type: 'Bech32Entity';
   content: string;
-  data:
-    | { type: 'npub' | 'note'; data: string }
-    | { type: 'nprofile'; data: ProfilePointer }
-    | { type: 'nevent'; data: EventPointer };
+  data: DecodeResult;
   isNIP19: boolean;
 };
 
@@ -75,9 +68,8 @@ const urlRegex =
   /(?<url>(?:https?|wss?):\/\/[-a-zA-Z0-9.]+(:\d{1,5})?(?:\/[-[\]~!$&'()*+.,:;@&=%\w]+|\/)*(?:\?[-[\]~!$&'()*+.,/:;%@&=\w?]+)?(?:#[-[\]~!$&'()*+.,/:;%@\w&=?#]+)?)/g;
 const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
 // raw NIP-19 codes, NIP-21 links (NIP-27)
-// nrelay and naddr is not supported by nostr-tools
 const mentionRegex =
-  /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent)1[ac-hj-np-z02-9]+))/gi;
+  /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent|naddr|nrelay)1[ac-hj-np-z02-9]+))/gi;
 const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
 const customEmojiRegex = /:(?<emoji>\w+):/gu;
 
@@ -135,7 +127,7 @@ const parseTextNote = (textNoteContent: string) => {
         const bech32Entity: Bech32Entity = {
           type: 'Bech32Entity',
           content: match[0],
-          data: decoded as Bech32Entity['data'],
+          data: decoded,
           isNIP19: match.groups.nip19 === 'nostr:',
         };
         result.push(bech32Entity);
@@ -170,41 +162,6 @@ const parseTextNote = (textNoteContent: string) => {
   }
 
   return result;
-};
-
-export const resolveTagReference = (
-  { tagIndex, content }: TagReference,
-  event: NostrEvent,
-): MentionedUser | MentionedEvent | null => {
-  const tag = event.tags[tagIndex];
-  if (tag == null) return null;
-
-  const tagName = tag[0];
-
-  if (tagName === 'p' && isValidId(tag[1])) {
-    return {
-      type: 'MentionedUser',
-      tagIndex,
-      content,
-      pubkey: tag[1],
-    } satisfies MentionedUser;
-  }
-
-  if (tagName === 'e' && isValidId(tag[1])) {
-    const mention = eventWrapper(event)
-      .markedEventTags()
-      .find((ev) => ev.index === tagIndex);
-
-    return {
-      type: 'MentionedEvent',
-      tagIndex,
-      content,
-      eventId: tag[1],
-      marker: mention?.marker,
-    } satisfies MentionedEvent;
-  }
-
-  return null;
 };
 
 export default parseTextNote;

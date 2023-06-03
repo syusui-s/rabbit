@@ -7,7 +7,7 @@ import TextNoteDisplay from '@/components/event/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
-import eventWrapper from '@/nostr/event';
+import { genericEvent } from '@/nostr/event';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 import ensureNonNull from '@/utils/ensureNonNull';
@@ -19,7 +19,7 @@ type ReactionProps = {
 const Reaction: Component<ReactionProps> = (props) => {
   const { shouldMuteEvent } = useConfig();
   const { showProfile } = useModalState();
-  const event = () => eventWrapper(props.event);
+  const event = () => genericEvent(props.event);
   const eventId = () => event().lastTaggedEventId();
 
   const { profile } = useProfile(() => ({

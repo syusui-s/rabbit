@@ -1,7 +1,7 @@
 import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
 
 // import '@/types/nostr.d';
-import { Profile } from '@/nostr/useBatchedEvents';
+import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
 import usePool from '@/nostr/usePool';
 import epoch from '@/utils/epoch';
 
@@ -186,7 +186,7 @@ const useCommands = () => {
     profile: Profile;
     otherProperties: Record<string, any>;
   }): Promise<Promise<void>[]> => {
-    const content = {
+    const content: ProfileWithOtherProperties = {
       ...profile,
       ...otherProperties,
     };

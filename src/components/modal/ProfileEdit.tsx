@@ -7,8 +7,9 @@ import omitBy from 'lodash/omitBy';
 
 import BasicModal from '@/components/modal/BasicModal';
 import useConfig from '@/core/useConfig';
-import { Profile, useProfile } from '@/nostr/useBatchedEvents';
+import { Profile } from '@/nostr/event/Profile';
 import useCommands from '@/nostr/useCommands';
+import { useProfile } from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
 import timeout from '@/utils/timeout';

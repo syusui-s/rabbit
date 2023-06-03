@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { describe, it } from 'vitest';
 
-import { isValidId } from '@/nostr/event';
+import isValidId from '@/nostr/event/isValidId';
 
 describe('isValidId', () => {
   it.each([

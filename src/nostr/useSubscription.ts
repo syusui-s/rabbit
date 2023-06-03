@@ -1,11 +1,10 @@
-import { createSignal, createMemo, createEffect, onMount, onCleanup, on } from 'solid-js';
+import { createSignal, createEffect, onMount, onCleanup, on } from 'solid-js';
 
 import uniqBy from 'lodash/uniqBy';
 
 import useConfig from '@/core/useConfig';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
-import epoch from '@/utils/epoch';
 
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 
@@ -77,6 +76,8 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   };
 
   const startSubscription = () => {
+    console.debug('startSubscription: start');
+
     const props = propsProvider();
     if (props == null) return;
     const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
@@ -140,6 +141,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     }, 100);
 
     onCleanup(() => {
+      console.debug('startSubscription: end');
       sub.unsub();
       if (subscribing) {
         subscribing = false;
