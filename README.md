@@ -1,4 +1,4 @@
-# Rabbit 🐰made with SolidJS.made with SolidJS.
+# Rabbit 🐰
 
 A nostr client like TweetDeck made with SolidJS.
 
