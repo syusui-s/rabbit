@@ -1,6 +1,6 @@
 # Rabbit 🐰
 
-A nostr client like TweetDeck powered by SolidJS.
+A nostr client like TweetDeck.
 
 ## 使い方
 
