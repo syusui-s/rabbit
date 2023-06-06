@@ -1,4 +1,4 @@
-import { createSignal, Show, For, type JSX } from 'solid-js';
+import { createSignal, Show, For, type JSX, batch } from 'solid-js';
 
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 import EyeSlash from 'heroicons/24/outline/eye-slash.svg';
@@ -66,37 +66,81 @@ const RelayConfig = () => {
     setRelayUrlInput('');
   };
 
+  const importFromNIP07 = async () => {
+    if (window.nostr == null) return;
+
+    const importedRelays = Object.entries((await window.nostr?.getRelays?.()) ?? []);
+    const relayUrls = importedRelays.map(([relayUrl]) => relayUrl).join('\n');
+
+    if (importedRelays.length === 0) {
+      window.alert('リレーが設定されていません');
+      return;
+    }
+
+    if (!window.confirm(`これらのリレーをインポートしますか:\n${relayUrls}`)) {
+      return;
+    }
+
+    const lastCount = config().relayUrls.length;
+    batch(() => {
+      importedRelays.forEach(([relayUrl]) => {
+        addRelay(relayUrl);
+      });
+    });
+    const currentCount = config().relayUrls.length;
+    const importedCount = currentCount - lastCount;
+    window.alert(`${importedCount} 個のリレーをインポートしました`);
+  };
+
   return (
-    <div class="py-2">
-      <h3 class="font-bold">リレー</h3>
-      <ul>
-        <For each={config().relayUrls}>
-          {(relayUrl: string) => {
-            return (
-              <li class="flex items-center">
-                <div class="flex-1 truncate">{relayUrl}</div>
-                <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
-                  <XMark />
-                </button>
-              </li>
-            );
+    <>
+      <div class="py-2">
+        <h3 class="font-bold">リレー</h3>
+        <p class="py-1">{config().relayUrls.length} 個のリレーが設定されています</p>
+        <ul>
+          <For each={config().relayUrls}>
+            {(relayUrl: string) => {
+              return (
+                <li class="flex items-center">
+                  <div class="flex-1 truncate">{relayUrl}</div>
+                  <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
+                    <XMark />
+                  </button>
+                </li>
+              );
+            }}
+          </For>
+        </ul>
+        <form class="flex gap-2" onSubmit={handleClickAddRelay}>
+          <input
+            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            type="text"
+            name="relayUrl"
+            value={relayUrlInput()}
+            pattern={RelayUrlRegex}
+            onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
+          />
+          <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
+            追加
+          </button>
+        </form>
+      </div>
+      <div class="py-2">
+        <h3 class="pb-1 font-bold">インポート</h3>
+        <button
+          type="button"
+          class="rounded bg-rose-300 p-2 font-bold text-white"
+          onClick={() => {
+            importFromNIP07().catch((err) => {
+              console.error('failed to import relays', err);
+              window.alert('インポートに失敗しました');
+            });
           }}
-        </For>
-      </ul>
-      <form class="flex gap-2" onSubmit={handleClickAddRelay}>
-        <input
-          class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
-          type="text"
-          name="relayUrl"
-          value={relayUrlInput()}
-          pattern={RelayUrlRegex}
-          onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
-        />
-        <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
-          追加
+        >
+          拡張機能からインポート
         </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -74,7 +74,7 @@ const getProfile = ({
   return timeout(15000, `useProfile: ${pubkey}`)(promise);
 };
 
-export const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
+const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const genQueryKey = createMemo((): UseProfileQueryKey => ['useProfile', props()] as const);

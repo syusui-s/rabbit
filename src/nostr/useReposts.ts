@@ -17,7 +17,7 @@ export type UseReposts = {
   query: CreateQueryResult<NostrEvent[]>;
 };
 
-export const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
+const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const genQueryKey = createMemo(() => ['useReposts', props()] as const);

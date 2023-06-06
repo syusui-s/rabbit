@@ -1,6 +1,7 @@
 import { Component } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
+import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import Heart from 'heroicons/24/outline/heart.svg';
 import Home from 'heroicons/24/outline/home.svg';
@@ -103,6 +104,17 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           </span>
           日本リレー
         </button>
+        {/*
+        <button
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          onClick={() => window.alert()}
+        >
+          <span class="inline-block h-8 w-8">
+            <ChatBubbleLeftRight />
+          </span>
+          チャンネル
+        </button>
+        */}
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
           onClick={() => addSearchColumn()}

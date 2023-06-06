@@ -1,4 +1,4 @@
-import { Show, For, createSignal, createMemo, onMount, type JSX, type Component } from 'solid-js';
+import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
@@ -17,9 +17,9 @@ import ContentWarningDisplay from '@/components/event/textNote/ContentWarningDis
 import GeneralUserMentionDisplay from '@/components/event/textNote/GeneralUserMentionDisplay';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import NotePostForm from '@/components/NotePostForm';
+import Post from '@/components/Post';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
-import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
 import { textNote } from '@/nostr/event';
 import useCommands from '@/nostr/useCommands';
@@ -85,10 +85,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
 };
 
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
-  let contentRef: HTMLDivElement | undefined;
-
   const { config } = useConfig();
-  const formatDate = useFormatDate();
   const pubkey = usePubkey();
   const { showProfile } = useModalState();
   const timelineContext = useTimelineContext();
@@ -97,8 +94,6 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const [reposted, setReposted] = createSignal(false);
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
-  const [showOverflow, setShowOverflow] = createSignal(false);
-  const [overflow, setOverflow] = createSignal(false);
 
   const event = createMemo(() => textNote(props.event));
 
@@ -252,8 +247,6 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     return undefined;
   };
 
-  const createdAt = () => formatDate(event().createdAtAsDate());
-
   const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     ev.stopPropagation();
 
@@ -296,72 +289,31 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     doReaction();
   };
 
-  onMount(() => {
-    if (contentRef != null) {
-      setOverflow(contentRef.scrollHeight > contentRef.clientHeight);
-    }
-  });
-
   return (
-    <div class="nostr-textnote flex flex-col">
-      <div class="flex w-full gap-1">
-        <button
-          class="author-icon h-10 w-10 shrink-0 overflow-hidden"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            showProfile(event().pubkey);
-          }}
-        >
-          <Show when={author()?.picture}>
-            <img src={author()?.picture} alt="icon" class="h-full w-full rounded object-cover" />
-          </Show>
-        </button>
-        <div class="min-w-0 flex-auto">
-          <div class="flex justify-between gap-1 text-xs">
-            <button
-              class="author flex min-w-0 truncate hover:text-blue-500"
-              onClick={(ev) => {
-                ev.stopPropagation();
-                showProfile(event().pubkey);
-              }}
-            >
-              <Show when={(author()?.display_name?.length ?? 0) > 0}>
-                <div class="author-name truncate pr-1 font-bold hover:underline">
-                  {author()?.display_name}
-                </div>
-              </Show>
-              <div class="author-username truncate text-zinc-600">
-                <Show
-                  when={author()?.name != null}
-                  fallback={`@${npubEncodeFallback(event().pubkey)}`}
-                >
-                  @{author()?.name}
-                </Show>
-                {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
+    <div class="nostr-textnote">
+      <Post
+        author={
+          <span class="author flex min-w-0 truncate hover:text-blue-500">
+            <Show when={(author()?.display_name?.length ?? 0) > 0}>
+              <div class="author-name truncate pr-1 font-bold hover:underline">
+                {author()?.display_name}
               </div>
-            </button>
-            <div class="created-at shrink-0">
-              <a
-                href={`nostr:${noteEncode(event().id)}`}
-                type="button"
-                class="hover:underline"
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  timelineContext?.setTimeline({
-                    type: 'Replies',
-                    event: props.event,
-                  });
-                }}
+            </Show>
+            <div class="author-username truncate text-zinc-600">
+              <Show
+                when={author()?.name != null}
+                fallback={`@${npubEncodeFallback(event().pubkey)}`}
               >
-                {createdAt()}
-              </a>
+                @{author()?.name}
+              </Show>
+              {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
             </div>
-          </div>
-          <div
-            ref={contentRef}
-            class="overflow-hidden"
-            classList={{ 'max-h-screen': !showOverflow() }}
-          >
+          </span>
+        }
+        authorPictureUrl={author()?.picture}
+        createdAt={event().createdAtAsDate()}
+        content={
+          <div class="textnote-content">
             <Show when={showReplyEvent()} keyed>
               {(id) => (
                 <div class="mt-1 rounded border p-1">
@@ -393,19 +345,8 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               </div>
             </ContentWarningDisplay>
           </div>
-          <Show when={overflow()}>
-            <button
-              class="mt-2 w-full rounded border p-2 text-center text-xs text-stone-600 shadow-sm hover:shadow"
-              onClick={(ev) => {
-                ev.stopPropagation();
-                setShowOverflow((current) => !current);
-              }}
-            >
-              <Show when={!showOverflow()} fallback="隠す">
-                続きを読む
-              </Show>
-            </button>
-          </Show>
+        }
+        actions={
           <Show when={actions()}>
             <Show when={config().showEmojiReaction && reactions().length > 0}>
               <EmojiReactions
@@ -499,16 +440,24 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
               </div>
             </div>
           </Show>
-        </div>
-      </div>
-      <Show when={showReplyForm()}>
-        <NotePostForm
-          mode="reply"
-          replyTo={props.event}
-          onClose={closeReplyForm}
-          onPost={closeReplyForm}
-        />
-      </Show>
+        }
+        footer={
+          <Show when={showReplyForm()}>
+            <NotePostForm
+              mode="reply"
+              replyTo={props.event}
+              onClose={closeReplyForm}
+              onPost={closeReplyForm}
+            />
+          </Show>
+        }
+        onShowProfile={() => {
+          showProfile(event().pubkey);
+        }}
+        onShowEvent={() => {
+          timelineContext?.setTimeline({ type: 'Replies', event: props.event });
+        }}
+      />
     </div>
   );
 };

@@ -23,10 +23,14 @@ const Home: Component = () => {
 
   createEffect(() => {
     config().relayUrls.map(async (relayUrl) => {
-      const relay = await pool().ensureRelay(relayUrl);
-      relay.on('notice', (msg: string) => {
-        console.error(`NOTICE: ${relayUrl}: ${msg}`);
-      });
+      try {
+        const relay = await pool().ensureRelay(relayUrl);
+        relay.on('notice', (msg: string) => {
+          console.error(`NOTICE: ${relayUrl}: ${msg}`);
+        });
+      } catch (err) {
+        console.error('ensureRelay failed', err);
+      }
     });
   });
 

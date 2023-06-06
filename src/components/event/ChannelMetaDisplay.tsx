@@ -12,6 +12,8 @@ export type ChannelInfoProps = {
 const ChannelInfo: Component<ChannelInfoProps> = (props) => {
   const parsedContent = () => parseChannelMeta(props.event.content);
 
+  // useChannelMeta
+
   return (
     <Show when={parsedContent()} keyed>
       {(meta) => (

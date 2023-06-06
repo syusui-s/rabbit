@@ -77,6 +77,12 @@ export type ReactionsColumnType = BaseColumn & {
   pubkey: string;
 };
 
+/** A column which shows reactions published by the specific user */
+export type ChannelColumnType = BaseColumn & {
+  columnType: 'Channel';
+  rootEventId: string;
+};
+
 /** A column which shows text notes and reposts posted to the specific relays */
 export type RelaysColumnType = BaseColumn & {
   columnType: 'Relays';
@@ -98,9 +104,10 @@ export type CustomFilterColumnType = BaseColumn & {
 export type ColumnType =
   | FollowingColumnType
   | NotificationColumnType
-  | RelaysColumnType
   | PostsColumnType
   | ReactionsColumnType
+  | ChannelColumnType
+  | RelaysColumnType
   | SearchColumnType
   | CustomFilterColumnType;
 
@@ -156,6 +163,14 @@ export const createReactionsColumn = (
 ): ReactionsColumnType => ({
   ...createBaseColumn(),
   columnType: 'Reactions',
+  ...params,
+});
+
+export const createChannelColumn = (
+  params: CreateParams<ChannelColumnType>,
+): ChannelColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'Channel',
   ...params,
 });
 
