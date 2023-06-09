@@ -225,7 +225,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           ...notifyPubkeys(),
           ...pubkeyReferences, // 本文中の公開鍵（npub)
         ]),
-        rootEventId: replyTo()?.rootEvent()?.id,
+        rootEventId: replyTo()?.rootEvent()?.id ?? replyTo()?.replyingToEvent()?.id,
         replyEventId: replyTo()?.id,
       };
     }
