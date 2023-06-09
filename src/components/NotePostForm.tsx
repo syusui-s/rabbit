@@ -191,6 +191,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (text().length === 0) return;
     if (publishTextNoteMutation.isLoading) return;
 
+    if (/nsec1[0-9a-zA-Z]+/.test(text())) {
+      window.alert('投稿に秘密鍵(nsec)を含めることはできません。');
+      return;
+    }
+
     const pubkey = getPubkey();
     if (pubkey == null) {
       console.error('pubkey is not available');
