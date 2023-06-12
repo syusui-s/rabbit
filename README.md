@@ -16,6 +16,10 @@ Copyright (C) 2023 Shusui Moyatani
 
 AGPL-3.0-or-later
 
+Please note that some files are licensed in other FLOSS licenses.
+Those files contain the license text in the first lines.
+If the file does not have such text, it must be considered licensed in AGPL.
+
 ### English
 
 This program is free software: you can redistribute it and/or modify
