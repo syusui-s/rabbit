@@ -1,5 +1,6 @@
 import { For, Switch, Match } from 'solid-js';
 
+import BookmarkColumn from '@/components/column/BookmarkColumn';
 import FollowingColumn from '@/components/column/FollwingColumn';
 import NotificationColumn from '@/components/column/NotificationColumn';
 import PostsColumn from '@/components/column/PostsColumn';
@@ -59,6 +60,15 @@ const Columns = () => {
                 {(reactionsColumn) => (
                   <RelaysColumn
                     column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Bookmark' && column} keyed>
+                {(bookmarkColumn) => (
+                  <BookmarkColumn
+                    column={bookmarkColumn}
                     columnIndex={columnIndex()}
                     lastColumn={lastColumn()}
                   />

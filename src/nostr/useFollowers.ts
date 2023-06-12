@@ -17,7 +17,7 @@ export default function useFollowers(propsProvider: () => UseFollowersProps) {
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
     filters: [{ kinds: [Kind.Contacts], '#p': [props().pubkey] }],
-    limit: Infinity,
+    limit: Number.MAX_SAFE_INTEGER,
     continuous: true,
   }));
 

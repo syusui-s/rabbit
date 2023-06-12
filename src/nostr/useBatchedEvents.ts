@@ -125,7 +125,7 @@ export const { exec } = useBatch<TaskArg, TaskRes>(() => ({
         const {
           args: { kind, author, identifier },
         } = firstTask;
-        filters.push({ kinds: [Kind.Contacts], authors: [author], '#d': [identifier] });
+        filters.push({ kinds: [kind], authors: [author], '#d': [identifier] });
       });
     }
 

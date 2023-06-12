@@ -14,7 +14,7 @@ import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { textNote } from '@/nostr/event';
-import parseTextNote, { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
+import { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 import { isImageUrl } from '@/utils/imageUrl';
 
 export type TextNoteContentDisplayProps = {
@@ -112,6 +112,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
               class="inline-block h-8 max-w-[128px] align-middle"
               src={emojiUrl}
               alt={item.content}
+              title={item.shortcode}
             />
           );
         }

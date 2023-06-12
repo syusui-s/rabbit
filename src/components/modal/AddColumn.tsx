@@ -1,6 +1,7 @@
 import { Component } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
+import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import Heart from 'heroicons/24/outline/heart.svg';
@@ -113,6 +114,17 @@ const AddColumn: Component<AddColumnProps> = (props) => {
             <ChatBubbleLeftRight />
           </span>
           チャンネル
+        </button>
+        */}
+        {/*
+        <button
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          onClick={() => addBookmarkColumn()}
+        >
+          <span class="inline-block h-8 w-8">
+            <BookmarkIcon />
+          </span>
+          ブックマーク
         </button>
         */}
         <button

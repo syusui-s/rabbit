@@ -3,6 +3,7 @@ import { createMemo, observable } from 'solid-js';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
+import useConfig from '@/core/useConfig';
 import { exec } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
@@ -22,6 +23,7 @@ export type UseReactions = {
 const EmojiRegex = /\p{Emoji_Presentation}/u;
 
 const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactions => {
+  const { shouldMuteEvent } = useConfig();
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const genQueryKey = createMemo(() => ['useReactions', props()] as const);
@@ -51,7 +53,10 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
     },
   );
 
-  const reactions = () => query.data ?? [];
+  const reactions = () => {
+    const data = query.data ?? [];
+    return data.filter((ev) => !shouldMuteEvent(ev));
+  };
 
   const reactionsGroupedByContent = () => {
     const result = new Map<string, NostrEvent[]>();

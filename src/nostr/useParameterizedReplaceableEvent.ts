@@ -18,7 +18,7 @@ export type UseParameterizedReplaceableEvent = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
-export const useParameterizedReplaceableEvent = (
+const useParameterizedReplaceableEvent = (
   propsProvider: () => UseParameterizedReplaceableEventProps | null,
 ): UseParameterizedReplaceableEvent => {
   const queryClient = useQueryClient();

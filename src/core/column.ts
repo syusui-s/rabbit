@@ -95,6 +95,13 @@ export type SearchColumnType = BaseColumn & {
   query: string;
 };
 
+/** A column which shows events in the bookmark */
+export type BookmarkColumnType = BaseColumn & {
+  columnType: 'Bookmark';
+  pubkey: string;
+  identifier: string;
+};
+
 /** A column which shows text notes and reposts posted to the specific relays */
 export type CustomFilterColumnType = BaseColumn & {
   columnType: 'CustomFilter';
@@ -109,6 +116,7 @@ export type ColumnType =
   | ChannelColumnType
   | RelaysColumnType
   | SearchColumnType
+  | BookmarkColumnType
   | CustomFilterColumnType;
 
 type CreateParams<T extends BaseColumn> = Omit<T, keyof BaseColumn | 'columnType'> &

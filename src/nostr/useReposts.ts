@@ -3,6 +3,7 @@ import { createMemo, observable } from 'solid-js';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
+import useConfig from '@/core/useConfig';
 import { exec } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
@@ -18,6 +19,7 @@ export type UseReposts = {
 };
 
 const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
+  const { shouldMuteEvent } = useConfig();
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const genQueryKey = createMemo(() => ['useReposts', props()] as const);
@@ -44,7 +46,10 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
     },
   );
 
-  const reposts = () => query.data ?? [];
+  const reposts = () => {
+    const data = query.data ?? [];
+    return data.filter((ev) => !shouldMuteEvent(ev));
+  };
 
   const isRepostedBy = (pubkey: string): boolean =>
     reposts().findIndex((event) => event.pubkey === pubkey) !== -1;
