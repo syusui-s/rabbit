@@ -76,7 +76,7 @@ const Column: Component<ColumnProps> = (props) => {
                   <div>ホームに戻る</div>
                 </button>
               </div>
-              <ul class="scrollbar flex h-full flex-col overflow-y-scroll scroll-smooth">
+              <ul class="scrollbar flex h-full flex-col overflow-y-scroll scroll-smooth pb-8">
                 <TimelineContentDisplay timelineContent={timeline} />
               </ul>
             </div>

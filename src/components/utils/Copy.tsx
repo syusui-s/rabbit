@@ -1,4 +1,4 @@
-import { createSignal, Show, type Component } from 'solid-js';
+import { createSignal, Show, type Component, type JSX } from 'solid-js';
 
 import ClipboardDocument from 'heroicons/24/outline/clipboard-document.svg';
 

@@ -16,6 +16,7 @@ import EventDisplayById from '@/components/event/EventDisplayById';
 import ContentWarningDisplay from '@/components/event/textNote/ContentWarningDisplay';
 import GeneralUserMentionDisplay from '@/components/event/textNote/GeneralUserMentionDisplay';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
+import EventDebugModal from '@/components/modal/EventDebugModal';
 import NotePostForm from '@/components/NotePostForm';
 import Post from '@/components/Post';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
@@ -23,12 +24,10 @@ import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { textNote } from '@/nostr/event';
 import useCommands from '@/nostr/useCommands';
-import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
-import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
 
 export type TextNoteDisplayProps = {
@@ -49,7 +48,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
   const pubkey = usePubkey();
 
   return (
-    <div class="flex gap-2 py-1">
+    <div class="flex gap-2 overflow-x-auto py-1">
       <For each={[...props.reactionsGroupedByContent.entries()]}>
         {([content, events]) => {
           const isReactedByMeWithThisContent =
@@ -57,7 +56,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
 
           return (
             <button
-              class="flex h-6 items-center rounded border px-1"
+              class="flex h-6 max-w-[128px] items-center rounded border px-1"
               classList={{
                 'text-zinc-400': !isReactedByMeWithThisContent,
                 'hover:bg-zinc-50': !isReactedByMeWithThisContent,
@@ -68,7 +67,10 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
               type="button"
               onClick={() => props.onReaction(content)}
             >
-              <Show when={content === '+'} fallback={<span class="text-base">{content}</span>}>
+              <Show
+                when={content === '+'}
+                fallback={<span class="truncate text-base">{content}</span>}
+              >
                 <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
                   <HeartSolid />
                 </span>
@@ -93,16 +95,13 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const [reacted, setReacted] = createSignal(false);
   const [reposted, setReposted] = createSignal(false);
   const [showReplyForm, setShowReplyForm] = createSignal(false);
+  const [showEventDebug, setShowEventDebug] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
 
   const event = createMemo(() => textNote(props.event));
 
   const embedding = () => props.embedding ?? true;
   const actions = () => props.actions ?? true;
-
-  const { profile: author } = useProfile(() => ({
-    pubkey: props.event.pubkey,
-  }));
 
   const {
     reactions,
@@ -189,11 +188,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       },
     },
     {
-      content: () => 'JSONとしてコピー',
+      content: () => 'JSONを確認',
       onSelect: () => {
-        navigator.clipboard
-          .writeText(JSON.stringify(props.event, null, 2))
-          .catch((err) => window.alert(err));
+        setShowEventDebug(true);
       },
     },
     {
@@ -292,25 +289,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   return (
     <div class="nostr-textnote">
       <Post
-        author={
-          <span class="author flex min-w-0 truncate hover:text-blue-500">
-            <Show when={(author()?.display_name?.length ?? 0) > 0}>
-              <div class="author-name truncate pr-1 font-bold hover:underline">
-                {author()?.display_name}
-              </div>
-            </Show>
-            <div class="author-username truncate text-zinc-600">
-              <Show
-                when={author()?.name != null}
-                fallback={`@${npubEncodeFallback(event().pubkey)}`}
-              >
-                @{author()?.name}
-              </Show>
-              {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
-            </div>
-          </span>
-        }
-        authorPictureUrl={author()?.picture}
+        authorPubkey={event().pubkey}
         createdAt={event().createdAtAsDate()}
         content={
           <div class="textnote-content">
@@ -458,6 +437,9 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           timelineContext?.setTimeline({ type: 'Replies', event: props.event });
         }}
       />
+      <Show when={showEventDebug()}>
+        <EventDebugModal event={props.event} onClose={() => setShowEventDebug(false)} />
+      </Show>
     </div>
   );
 };

@@ -2,14 +2,15 @@ import { Component, JSX, Show, createSignal } from 'solid-js';
 
 import useDetectOverflow from '@/hooks/useDetectOverflow';
 import useFormatDate from '@/hooks/useFormatDate';
+import useProfile from '@/nostr/useProfile';
+import npubEncodeFallback from '@/utils/npubEncodeFallback';
 
 export type PostProps = {
-  author: JSX.Element;
+  authorPubkey: string;
   createdAt: Date;
   content: JSX.Element;
   actions?: JSX.Element;
   footer?: JSX.Element;
-  authorPictureUrl?: string;
   onShowProfile?: () => void;
   onShowEvent?: () => void;
 };
@@ -20,6 +21,10 @@ const Post: Component<PostProps> = (props) => {
 
   const [showOverflow, setShowOverflow] = createSignal();
   const createdAt = () => formatDate(props.createdAt);
+
+  const { profile: author } = useProfile(() => ({
+    pubkey: props.authorPubkey,
+  }));
 
   return (
     <div class="post flex flex-col">
@@ -32,7 +37,7 @@ const Post: Component<PostProps> = (props) => {
             props.onShowProfile?.();
           }}
         >
-          <Show when={props.authorPictureUrl} keyed>
+          <Show when={author()?.picture} keyed>
             {(url) => <img src={url} alt="icon" class="h-full w-full rounded object-cover" />}
           </Show>
         </button>
@@ -46,7 +51,22 @@ const Post: Component<PostProps> = (props) => {
                 props?.onShowProfile?.();
               }}
             >
-              {props.author}
+              <span class="author flex min-w-0 truncate hover:text-blue-500">
+                <Show when={(author()?.display_name?.length ?? 0) > 0}>
+                  <div class="author-name truncate pr-1 font-bold hover:underline">
+                    {author()?.display_name}
+                  </div>
+                </Show>
+                <div class="author-username truncate text-zinc-600">
+                  <Show
+                    when={author()?.name != null}
+                    fallback={`@${npubEncodeFallback(props.authorPubkey)}`}
+                  >
+                    @{author()?.name}
+                  </Show>
+                  {/* TODO <Match when={author()?.nip05 != null}>@{author()?.nip05}</Match> */}
+                </div>
+              </span>
             </button>
             <div class="created-at shrink-0">
               <button

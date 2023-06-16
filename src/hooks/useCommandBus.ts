@@ -7,7 +7,7 @@ type UseHandleCommandProps = {
 
 type CommandBase<T> = { command: T };
 
-export type OpenPostForm = CommandBase<'openPostForm'>;
+export type OpenPostForm = CommandBase<'openPostForm'> & { content?: string };
 export type ClosePostForm = CommandBase<'closePostForm'>;
 export type MoveToNextItem = CommandBase<'moveToNextItem'>;
 export type MoveToPrevItem = CommandBase<'moveToPrevItem'>;

@@ -76,6 +76,8 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const loading = () => query.isLoading || mutation.isLoading;
   const disabled = () => loading();
 
+  setInterval(() => console.log(query.isLoading, mutation.isLoading), 1000);
+
   const otherProperties = () =>
     omit(profile(), [
       'picture',

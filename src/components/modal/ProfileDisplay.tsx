@@ -77,6 +77,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     })),
   );
   const following = () => myFollowingPubkeys().includes(props.pubkey);
+  const refetchMyFollowing = () => myFollowingQuery.refetch();
 
   const { followingPubkeys: userFollowingPubkeys, query: userFollowingQuery } = useFollowings(
     () => ({ pubkey: props.pubkey }),
@@ -116,35 +117,58 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     },
   });
 
-  const follow = () => {
+  const handlePromise =
+    <Params extends any[], T>(f: (...params: Params) => Promise<T>) =>
+    (onError: (err: any) => void) =>
+    (...params: Params) => {
+      f(...params).catch((err) => {
+        onError(err);
+      });
+    };
+
+  const follow = handlePromise(async () => {
     const p = myPubkey();
     if (p == null) return;
     if (!myFollowingQuery.isFetched) return;
 
+    await refetchMyFollowing();
     updateContactsMutation.mutate({
       relayUrls: config().relayUrls,
       pubkey: p,
       content: myFollowingQuery.data?.content ?? '',
       followingPubkeys: uniq([...myFollowingPubkeys(), props.pubkey]),
     });
-  };
+  })((err) => {
+    console.log('failed to follow', err);
+  });
 
-  const unfollow = () => {
+  const unfollow = handlePromise(async () => {
     const p = myPubkey();
     if (p == null) return;
     if (!myFollowingQuery.isFetched) return;
 
     if (!window.confirm('本当にフォロー解除しますか？')) return;
 
+    await refetchMyFollowing();
     updateContactsMutation.mutate({
       relayUrls: config().relayUrls,
       pubkey: p,
       content: myFollowingQuery.data?.content ?? '',
       followingPubkeys: myFollowingPubkeys().filter((k) => k !== props.pubkey),
     });
-  };
+  })((err) => {
+    console.log('failed to unfollow', err);
+  });
 
   const menu: MenuItem[] = [
+    /*
+    {
+      content: () => 'ユーザ宛に投稿',
+      onSelect: () => {
+        navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+      },
+    },
+     */
     {
       content: () => 'IDをコピー',
       onSelect: () => {

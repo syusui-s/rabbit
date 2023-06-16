@@ -24,7 +24,7 @@ export type UseFollowings = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
-export const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
+const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
   const genQueryKey = () => ['useFollowings', props()] as const;

@@ -38,8 +38,8 @@ const Reaction: Component<ReactionProps> = (props) => {
     // if the reacted event is not found, it should be a removed event
     <Show when={!isRemoved() || shouldMuteEvent(props.event)}>
       <div class="flex gap-1 px-1 text-sm">
-        <div class="notification-icon flex place-items-center">
-          <Switch fallback={props.event.content}>
+        <div class="notification-icon flex max-w-[64px] place-items-center">
+          <Switch fallback={<span class="truncate">{props.event.content}</span>}>
             <Match when={props.event.content === '+'}>
               <span class="h-4 w-4 pt-[1px] text-rose-400">
                 <HeartSolid />
