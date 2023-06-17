@@ -24,6 +24,7 @@ import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import sleep from '@/utils/sleep';
 import timeout from '@/utils/timeout';
 
 export type ProfileDisplayProps = {
@@ -47,6 +48,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
 
   const npub = createMemo(() => npubEncodeFallback(props.pubkey));
 
+  const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
 
@@ -117,48 +119,42 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     },
   });
 
-  const handlePromise =
-    <Params extends any[], T>(f: (...params: Params) => Promise<T>) =>
-    (onError: (err: any) => void) =>
-    (...params: Params) => {
-      f(...params).catch((err) => {
-        onError(err);
+  const updateContacts = async (update: (current: string[]) => string[]) => {
+    try {
+      const p = myPubkey();
+      if (p == null) return;
+      setUpdatingContacts(true);
+
+      await refetchMyFollowing();
+      await sleep(3000);
+
+      const current = myFollowingPubkeys();
+      console.debug('current pubkeys', current);
+
+      await updateContactsMutation.mutateAsync({
+        relayUrls: config().relayUrls,
+        pubkey: p,
+        content: myFollowingQuery.data?.content ?? '',
+        followingPubkeys: uniq(update(current)),
       });
-    };
+    } finally {
+      setUpdatingContacts(false);
+    }
+  };
 
-  const follow = handlePromise(async () => {
-    const p = myPubkey();
-    if (p == null) return;
-    if (!myFollowingQuery.isFetched) return;
-
-    await refetchMyFollowing();
-    updateContactsMutation.mutate({
-      relayUrls: config().relayUrls,
-      pubkey: p,
-      content: myFollowingQuery.data?.content ?? '',
-      followingPubkeys: uniq([...myFollowingPubkeys(), props.pubkey]),
+  const follow = () => {
+    updateContacts((current) => [...current, props.pubkey]).catch((err) => {
+      console.log('failed to follow', err);
     });
-  })((err) => {
-    console.log('failed to follow', err);
-  });
+  };
 
-  const unfollow = handlePromise(async () => {
-    const p = myPubkey();
-    if (p == null) return;
-    if (!myFollowingQuery.isFetched) return;
-
+  const unfollow = () => {
     if (!window.confirm('本当にフォロー解除しますか？')) return;
 
-    await refetchMyFollowing();
-    updateContactsMutation.mutate({
-      relayUrls: config().relayUrls,
-      pubkey: p,
-      content: myFollowingQuery.data?.content ?? '',
-      followingPubkeys: myFollowingPubkeys().filter((k) => k !== props.pubkey),
+    updateContacts((current) => current.filter((k) => k !== props.pubkey)).catch((err) => {
+      console.log('failed to unfollow', err);
     });
-  })((err) => {
-    console.log('failed to unfollow', err);
-  });
+  };
 
   const menu: MenuItem[] = [
     /*
@@ -247,14 +243,14 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     編集
                   </button>
                 </Match>
+                <Match when={updateContactsMutation.isLoading || updatingContacts()}>
+                  <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
+                    更新中
+                  </span>
+                </Match>
                 <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     読み込み中
-                  </span>
-                </Match>
-                <Match when={updateContactsMutation.isLoading}>
-                  <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    更新中
                   </span>
                 </Match>
                 <Match when={following()}>

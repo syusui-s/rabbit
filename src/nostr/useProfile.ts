@@ -33,14 +33,6 @@ export type UseProfiles = {
 
 type UseProfileQueryKey = readonly ['useProfile', UseProfileProps | null];
 
-const queryOptions = {
-  // Profiles are updated occasionally, so a short staleTime is used here.
-  // cacheTime is long so that the user see profiles instantly.
-  staleTime: 5 * 60 * 1000, // 5 min
-  cacheTime: 24 * 60 * 60 * 1000, // 1 day
-  refetchInterval: 5 * 60 * 1000, // 5 min
-};
-
 const getProfile = ({
   queryKey,
   signal,
@@ -71,7 +63,7 @@ const getProfile = ({
     return latestEvent();
   });
   // TODO timeoutと同時にsignalでキャンセルするようにしたい
-  return timeout(15000, `useProfile: ${pubkey}`)(promise);
+  return timeout(3000, `useProfile: ${pubkey}`)(promise);
 };
 
 const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
@@ -82,7 +74,14 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
   const query = createQuery(
     genQueryKey,
     ({ queryKey, signal }) => getProfile({ queryKey, signal, queryClient }),
-    queryOptions,
+    {
+      // Profiles are updated occasionally, so a short staleTime is used here.
+      // cacheTime is long so that the user see profiles instantly.
+      staleTime: 5 * 60 * 1000, // 5 min
+      cacheTime: 24 * 60 * 60 * 1000, // 1 day
+      refetchInterval: 5 * 60 * 1000, // 5 min
+      refetchOnWindowFocus: false,
+    },
   );
 
   const profile = createMemo((): Profile | null => {
