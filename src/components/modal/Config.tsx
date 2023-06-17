@@ -12,6 +12,7 @@ import BasicModal from '@/components/modal/BasicModal';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig, { type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import usePubkey from '@/nostr/usePubkey';
 import { simpleEmojiPackSchema, convertToEmojiConfig } from '@/utils/emojipack';
 import ensureNonNull from '@/utils/ensureNonNull';
@@ -26,12 +27,13 @@ const HttpUrlRegex = BaseUrlRegex('https?');
 const RelayUrlRegex = BaseUrlRegex('wss?');
 
 const ProfileSection = () => {
+  const i18n = useTranslation();
   const pubkey = usePubkey();
   const { showProfile, showProfileEdit } = useModalState();
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">プロフィール</h3>
+      <h3 class="font-bold">{i18n()('config.profile.profile')}</h3>
       <div class="flex gap-2">
         <button
           class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
@@ -41,13 +43,13 @@ const ProfileSection = () => {
             })
           }
         >
-          開く
+          {i18n()('config.profile.openProfile')}
         </button>
         <button
           class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
           onClick={() => showProfileEdit()}
         >
-          編集
+          {i18n()('config.profile.editProfile')}
         </button>
       </div>
     </div>
@@ -55,6 +57,7 @@ const ProfileSection = () => {
 };
 
 const RelayConfig = () => {
+  const i18n = useTranslation();
   const { config, addRelay, removeRelay } = useConfig();
 
   const [relayUrlInput, setRelayUrlInput] = createSignal<string>('');
@@ -73,11 +76,11 @@ const RelayConfig = () => {
     const relayUrls = importedRelays.map(([relayUrl]) => relayUrl).join('\n');
 
     if (importedRelays.length === 0) {
-      window.alert('リレーが設定されていません');
+      window.alert(i18n()('config.relays.notConfigured'));
       return;
     }
 
-    if (!window.confirm(`これらのリレーをインポートしますか:\n${relayUrls}`)) {
+    if (!window.confirm(`${i18n()('config.relays.askImport')}\n\n${relayUrls}`)) {
       return;
     }
 
@@ -89,14 +92,16 @@ const RelayConfig = () => {
     });
     const currentCount = config().relayUrls.length;
     const importedCount = currentCount - lastCount;
-    window.alert(`${importedCount} 個のリレーをインポートしました`);
+    window.alert(i18n()('config.relays.imported', { count: importedCount }));
   };
 
   return (
     <>
       <div class="py-2">
-        <h3 class="font-bold">リレー</h3>
-        <p class="py-1">{config().relayUrls.length} 個のリレーが設定されています</p>
+        <h3 class="font-bold">{i18n()('config.relays.relays')}</h3>
+        <p class="py-1">
+          {i18n()('config.relays.numOfRelays', { count: config().relayUrls.length })}
+        </p>
         <ul>
           <For each={config().relayUrls}>
             {(relayUrl: string) => {
@@ -121,53 +126,54 @@ const RelayConfig = () => {
             onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
           />
           <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
-            追加
+            {i18n()('config.relays.addRelay')}
           </button>
         </form>
       </div>
       <div class="py-2">
-        <h3 class="pb-1 font-bold">インポート</h3>
+        <h3 class="pb-1 font-bold">{i18n()('config.relays.importRelays')}</h3>
         <button
           type="button"
           class="rounded bg-rose-300 p-2 font-bold text-white"
           onClick={() => {
             importFromNIP07().catch((err) => {
               console.error('failed to import relays', err);
-              window.alert('インポートに失敗しました');
+              window.alert(i18n()('config.relays.failedToImport'));
             });
           }}
         >
-          拡張機能からインポート
+          {i18n()('config.relays.importFromExtension')}
         </button>
       </div>
     </>
   );
 };
 
-const dateFormats: {
-  id: Config['dateFormat'];
-  name: string;
-  example: string;
-}[] = [
-  {
-    id: 'relative',
-    name: '相対表記',
-    example: '7秒前',
-  },
-  {
-    id: 'absolute-short',
-    name: '絶対表記 (短形式)',
-    example: '昨日 23:55',
-  },
-  {
-    id: 'absolute-long',
-    name: '絶対表記 (長形式)',
-    example: '2020/11/8 21:02:53',
-  },
-];
-
 const DateFormatConfig = () => {
+  const i18n = useTranslation();
   const { config, setConfig } = useConfig();
+
+  const dateFormats: {
+    id: Config['dateFormat'];
+    name: string;
+    example: string;
+  }[] = [
+    {
+      id: 'relative',
+      name: i18n()('config.display.relativeTimeNotation'),
+      example: i18n()('config.display.relativeTimeNotationExample'),
+    },
+    {
+      id: 'absolute-short',
+      name: i18n()('config.display.absoluteTimeNotationShort'),
+      example: i18n()('config.display.absoluteTimeNotationShortExample'),
+    },
+    {
+      id: 'absolute-long',
+      name: i18n()('config.display.absoluteTimeNotationLong'),
+      example: i18n()('config.display.absoluteTimeNotationLongExample'),
+    },
+  ];
 
   const updateDateFormat = (dateFormat: Config['dateFormat']) => {
     setConfig((current) => ({ ...current, dateFormat }));
@@ -175,7 +181,7 @@ const DateFormatConfig = () => {
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">時刻の表記</h3>
+      <h3 class="font-bold">{i18n()('config.display.timeNotation')}</h3>
       <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
         <For each={dateFormats}>
           {({ id, name, example }) => (
@@ -224,6 +230,7 @@ const ToggleButton = (props: {
 };
 
 const ReactionConfig = () => {
+  const i18n = useTranslation();
   const { config, setConfig } = useConfig();
 
   const toggleUseEmojiReaction = () => {
@@ -242,17 +249,17 @@ const ReactionConfig = () => {
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">リアクション</h3>
+      <h3 class="font-bold">{i18n()('config.display.reaction')}</h3>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
-          <div class="flex-1">絵文字を選べるようにする</div>
+          <div class="flex-1">{i18n()('config.display.enableEmojiReaction')}</div>
           <ToggleButton
             value={config().useEmojiReaction}
             onClick={() => toggleUseEmojiReaction()}
           />
         </div>
         <div class="flex w-full">
-          <div class="flex-1">投稿にリアクションされた絵文字を表示する</div>
+          <div class="flex-1">{i18n()('config.display.showEmojiReaction')}</div>
           <ToggleButton
             value={config().showEmojiReaction}
             onClick={() => toggleShowEmojiReaction()}
@@ -264,6 +271,7 @@ const ReactionConfig = () => {
 };
 
 const EmojiConfig = () => {
+  const i18n = useTranslation();
   const { config, saveEmoji, removeEmoji } = useConfig();
 
   const [shortcodeInput, setShortcodeInput] = createSignal('');
@@ -279,7 +287,7 @@ const EmojiConfig = () => {
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">カスタム絵文字</h3>
+      <h3 class="font-bold">{i18n()('config.customEmoji.customEmoji')}</h3>
       <ul class="flex flex-col gap-1 py-2">
         <For each={Object.values(config().customEmojis)}>
           {({ shortcode, url }) => (
@@ -295,7 +303,7 @@ const EmojiConfig = () => {
       </ul>
       <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <label class="flex flex-1 items-center gap-1">
-          <div class="w-9">名前</div>
+          <div class="w-9">{i18n()('config.customEmoji.shortcode')}</div>
           <input
             class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
@@ -308,7 +316,7 @@ const EmojiConfig = () => {
           />
         </label>
         <label class="flex flex-1 items-center gap-1">
-          <div class="w-9">URL</div>
+          <div class="w-9">{i18n()('config.customEmoji.url')}</div>
           <input
             class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
             type="text"
@@ -321,7 +329,7 @@ const EmojiConfig = () => {
           />
         </label>
         <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
-          追加
+          {i18n()('config.customEmoji.addEmoji')}
         </button>
       </form>
     </div>
@@ -329,6 +337,7 @@ const EmojiConfig = () => {
 };
 
 const EmojiImport = () => {
+  const i18n = useTranslation();
   const { saveEmojis } = useConfig();
 
   const [jsonInput, setJSONInput] = createSignal('');
@@ -350,8 +359,8 @@ const EmojiImport = () => {
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">絵文字のインポート</h3>
-      <p>絵文字の名前をキー、画像のURLを値とするJSONを読み込むことができます。</p>
+      <h3 class="font-bold">{i18n()('config.customEmoji.emojiImport')}</h3>
+      <p>{i18n()('config.customEmoji.emojiImportDescription')}</p>
       <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <textarea
           class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -361,7 +370,7 @@ const EmojiImport = () => {
           onChange={(ev) => setJSONInput(ev.currentTarget.value)}
         />
         <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
-          インポート
+          {i18n()('config.customEmoji.importEmoji')}
         </button>
       </form>
     </div>
@@ -369,6 +378,7 @@ const EmojiImport = () => {
 };
 
 const MuteConfig = () => {
+  const i18n = useTranslation();
   const { config, removeMutedPubkey, addMutedKeyword, removeMutedKeyword } = useConfig();
 
   const [keywordInput, setKeywordInput] = createSignal('');
@@ -383,7 +393,7 @@ const MuteConfig = () => {
   return (
     <>
       <div class="py-2">
-        <h3 class="font-bold">ミュートしたユーザ</h3>
+        <h3 class="font-bold">{i18n()('config.mute.mutedUsers')}</h3>
         <ul class="flex flex-col">
           <For each={config().mutedPubkeys}>
             {(pubkey) => (
@@ -400,7 +410,7 @@ const MuteConfig = () => {
         </ul>
       </div>
       <div class="py-2">
-        <h3 class="font-bold">ミュートした単語</h3>
+        <h3 class="font-bold">{i18n()('config.mute.mutedKeywords')}</h3>
         <ul class="flex flex-col">
           <For each={config().mutedKeywords}>
             {(keyword) => (
@@ -422,7 +432,7 @@ const MuteConfig = () => {
             onChange={(ev) => setKeywordInput(ev.currentTarget.value)}
           />
           <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
-            追加
+            {i18n()('config.mute.add')}
           </button>
         </form>
       </div>
@@ -431,6 +441,7 @@ const MuteConfig = () => {
 };
 
 const OtherConfig = () => {
+  const i18n = useTranslation();
   const { config, setConfig } = useConfig();
 
   const toggleKeepOpenPostForm = () => {
@@ -456,21 +467,21 @@ const OtherConfig = () => {
 
   return (
     <div class="py-2">
-      <h3 class="font-bold">その他</h3>
+      <h3 class="font-bold">{i18n()('config.display.others')}</h3>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
-          <div class="flex-1">投稿欄を開いたままにする</div>
+          <div class="flex-1">{i18n()('config.display.keepOpenPostForm')}</div>
           <ToggleButton
             value={config().keepOpenPostForm}
             onClick={() => toggleKeepOpenPostForm()}
           />
         </div>
         <div class="flex w-full">
-          <div class="flex-1">画像をデフォルトで表示する</div>
+          <div class="flex-1">{i18n()('config.display.showImagesByDefault')}</div>
           <ToggleButton value={config().showImage} onClick={() => toggleShowImage()} />
         </div>
         <div class="flex w-full">
-          <div class="flex-1">いいねやリポスト、フォロワーなどの数を隠す</div>
+          <div class="flex-1">{i18n()('config.display.hideNumbers')}</div>
           <ToggleButton value={config().hideCount} onClick={() => toggleHideCount()} />
         </div>
         {/*
@@ -489,21 +500,22 @@ const OtherConfig = () => {
 };
 
 const ConfigUI = (props: ConfigProps) => {
+  const i18n = useTranslation();
   const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
 
   const menu = [
     {
-      name: () => 'プロフィール',
+      name: () => i18n()('config.profile.profile'),
       icon: () => <User />,
       render: () => <ProfileSection />,
     },
     {
-      name: () => 'リレー',
+      name: () => i18n()('config.relays.relays'),
       icon: () => <ServerStack />,
       render: () => <RelayConfig />,
     },
     {
-      name: () => '表示',
+      name: () => i18n()('config.display.display'),
       icon: () => <PaintBrush />,
       render: () => (
         <>
@@ -514,7 +526,7 @@ const ConfigUI = (props: ConfigProps) => {
       ),
     },
     {
-      name: () => 'カスタム絵文字',
+      name: () => i18n()('config.customEmoji.customEmoji'),
       icon: () => <FaceSmile />,
       render: () => (
         <>
@@ -524,7 +536,7 @@ const ConfigUI = (props: ConfigProps) => {
       ),
     },
     {
-      name: () => 'ミュート',
+      name: () => i18n()('config.mute.mute'),
       icon: () => <EyeSlash />,
       render: () => <MuteConfig />,
     },
@@ -543,7 +555,7 @@ const ConfigUI = (props: ConfigProps) => {
           when={getMenuItem()}
           fallback={
             <>
-              <h2 class="flex-1 text-center text-lg font-bold">設定</h2>
+              <h2 class="flex-1 text-center text-lg font-bold">{i18n()('config.config')}</h2>
               <ul class="flex flex-col">
                 <For each={menu}>
                   {(menuItem, i) => (

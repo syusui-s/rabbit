@@ -8,6 +8,7 @@ import ColumnSettings from '@/components/column/ColumnSettings';
 import Bookmark from '@/components/timeline/Bookmark';
 import { BookmarkColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useDecrypt from '@/nostr/useDecrypt';
 import useParameterizedReplaceableEvent from '@/nostr/useParameterizedReplaceableEvent';
 
@@ -18,6 +19,7 @@ type BookmarkColumnDisplayProps = {
 };
 
 const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { removeColumn } = useConfig();
 
   const { event } = useParameterizedReplaceableEvent(() => ({
@@ -30,7 +32,7 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? 'ブックマーク'}
+          name={props.column.name ?? i18n()('column.bookmark')}
           icon={<BookmarkIcon />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

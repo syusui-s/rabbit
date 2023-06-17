@@ -9,6 +9,7 @@ import Timeline from '@/components/timeline/Timeline';
 import { RelaysColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 import epoch from '@/utils/epoch';
 
@@ -19,6 +20,7 @@ type RelaysColumnDisplayProps = {
 };
 
 const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { removeColumn } = useConfig();
 
   const { events } = useSubscription(() => ({
@@ -40,7 +42,7 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? 'リレー'}
+          name={props.column.name ?? i18n()('column.relay')}
           icon={<GlobeAlt />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

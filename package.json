@@ -57,6 +57,8 @@
     "@types/lodash": "^4.14.195",
     "emoji-mart": "^5.5.2",
     "heroicons": "^2.0.18",
+    "i18next": "^23.1.0",
+    "i18next-browser-languagedetector": "^7.0.2",
     "lodash": "^4.17.21",
     "nostr-tools": "^1.11.2",
     "solid-js": "^1.7.5",

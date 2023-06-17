@@ -4,7 +4,7 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { Event as NostrEvent } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
-import { BatchedEventsTask, exec, registerTask } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseRepostsProps = {

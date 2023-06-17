@@ -9,6 +9,7 @@ import Notification from '@/components/timeline/Notification';
 import { ReactionsColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 
 type ReactionsColumnDisplayProps = {
@@ -18,6 +19,7 @@ type ReactionsColumnDisplayProps = {
 };
 
 const ReactionsColumn: Component<ReactionsColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
   const { events: reactions } = useSubscription(() => ({
@@ -39,7 +41,7 @@ const ReactionsColumn: Component<ReactionsColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? 'リアクション'}
+          name={props.column.name ?? i18n()('column.reactions')}
           icon={<Heart />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

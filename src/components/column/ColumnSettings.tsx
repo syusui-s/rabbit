@@ -7,6 +7,7 @@ import Trash from 'heroicons/24/outline/trash.svg';
 import { ColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
+import { useTranslation } from '@/i18n/useTranslation';
 
 type ColumnSettingsProps = {
   column: ColumnType;
@@ -28,6 +29,7 @@ const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => 
 };
 
 const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
+  const i18n = useTranslation();
   const { saveColumn, removeColumn, moveColumn } = useConfig();
   const request = useRequestCommand();
 
@@ -42,41 +44,49 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
 
   return (
     <div class="flex flex-col border-t">
-      <ColumnSettingsSection title="カラム幅">
-        <div class="flex h-9 gap-2">
+      <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
+        <div class="scrollbar flex h-9 gap-2 overflow-x-scroll">
           <button
             class="rounded-md border px-4 hover:bg-stone-100"
             onClick={() => setColumnWidth('widest')}
           >
-            特大
+            {i18n()('column.config.widest')}
           </button>
           <button
             class="rounded-md border px-4 hover:bg-stone-100"
             onClick={() => setColumnWidth('wide')}
           >
-            大
+            {i18n()('column.config.wide')}
           </button>
           <button
             class="rounded-md border px-4 hover:bg-stone-100"
             onClick={() => setColumnWidth('medium')}
           >
-            中
+            {i18n()('column.config.medium')}
           </button>
           <button
             class="rounded-md border px-4 hover:bg-stone-100"
             onClick={() => setColumnWidth('narrow')}
           >
-            小
+            {i18n()('column.config.narrow')}
           </button>
         </div>
       </ColumnSettingsSection>
       <div class="flex h-10 items-center gap-2">
-        <button class="py-4 pl-2" title="左に移動" onClick={() => move(props.columnIndex - 1)}>
+        <button
+          class="py-4 pl-2"
+          title={i18n()('column.config.moveLeft')}
+          onClick={() => move(props.columnIndex - 1)}
+        >
           <span class="inline-block h-4 w-4">
             <ChevronLeft />
           </span>
         </button>
-        <button class="py-4 pr-2" title="右に移動" onClick={() => move(props.columnIndex + 1)}>
+        <button
+          class="py-4 pr-2"
+          title={i18n()('column.config.moveRight')}
+          onClick={() => move(props.columnIndex + 1)}
+        >
           <span class="inline-block h-4 w-4">
             <ChevronRight />
           </span>
@@ -84,10 +94,10 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
         <div class="flex-1" />
         <button
           class="px-2 py-4 text-rose-500 hover:text-rose-600"
-          title="削除"
+          title={i18n()('column.config.removeColumn')}
           onClick={() => removeColumn(props.column.id)}
         >
-          <span class="inline-block h-4 w-4" aria-label="削除">
+          <span class="inline-block h-4 w-4" aria-label={i18n()('column.config.removeColumn')}>
             <Trash />
           </span>
         </button>

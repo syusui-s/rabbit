@@ -9,6 +9,7 @@ import Timeline from '@/components/timeline/Timeline';
 import { PostsColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 
 type PostsColumnDisplayProps = {
@@ -18,6 +19,7 @@ type PostsColumnDisplayProps = {
 };
 
 const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
   const { events } = useSubscription(() => ({
@@ -39,7 +41,7 @@ const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? '投稿'}
+          name={props.column.name ?? i18n()('column.posts')}
           icon={<User />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

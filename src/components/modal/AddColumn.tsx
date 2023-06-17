@@ -20,6 +20,7 @@ import {
 } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
+import { useTranslation } from '@/i18n/useTranslation';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
 
@@ -28,6 +29,7 @@ type AddColumnProps = {
 };
 
 const AddColumn: Component<AddColumnProps> = (props) => {
+  const i18n = useTranslation();
   const pubkey = usePubkey();
   const { saveColumn } = useConfig();
   const request = useRequestCommand();
@@ -85,7 +87,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <Home />
           </span>
-          ホーム
+          {i18n()('column.home')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
@@ -94,7 +96,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <Bell />
           </span>
-          通知
+          {i18n()('column.notification')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
@@ -103,7 +105,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <GlobeAlt />
           </span>
-          日本リレー
+          {i18n()('column.japanese')}
         </button>
         {/*
         <button
@@ -134,7 +136,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <MagnifyingGlass />
           </span>
-          検索
+          {i18n()('column.search')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
@@ -143,7 +145,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <User />
           </span>
-          自分の投稿
+          {i18n()('column.myPosts')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
@@ -152,7 +154,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           <span class="inline-block h-8 w-8">
             <Heart />
           </span>
-          自分のリアクション
+          {i18n()('column.myReactions')}
         </button>
       </div>
     </BasicModal>

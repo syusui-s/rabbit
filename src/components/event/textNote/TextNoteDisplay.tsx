@@ -32,6 +32,7 @@ import Post from '@/components/Post';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import { textNote } from '@/nostr/event';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
@@ -97,6 +98,7 @@ const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
 };
 
 const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config } = useConfig();
   const pubkey = usePubkey();
   const { showProfile } = useModalState();
@@ -180,11 +182,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        window.alert('削除しました（画面の反映にはリロード）');
+        window.alert(i18n()('post.deletedSuccessfully'));
       } else if (succeeded > 0) {
-        window.alert(`${failed}個のリレーで削除に失敗しました`);
+        window.alert(i18n()('post.failedToDeletePartially', { count: failed }));
       } else {
-        window.alert('すべてのリレーで削除に失敗しました');
+        window.alert(i18n()('post.failedToDelete'));
       }
     },
     onError: (err) => {
@@ -194,37 +196,37 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const menu: MenuItem[] = [
     {
-      content: () => 'IDをコピー',
+      content: () => i18n()('post.copyEventId'),
       onSelect: () => {
         navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
       },
     },
     {
-      content: () => 'JSONを確認',
+      content: () => i18n()('post.showJSON'),
       onSelect: () => {
         setModal('EventDebugModal');
       },
     },
     {
-      content: () => 'リポスト一覧',
+      content: () => i18n()('post.showReposts'),
       onSelect: () => {
         setModal('Reposts');
       },
     },
     {
-      content: () => 'リアクション一覧',
+      content: () => i18n()('post.showReactions'),
       onSelect: () => {
         setModal('Reactions');
       },
     },
     {
       when: () => event().pubkey === pubkey(),
-      content: () => <span class="text-red-500">削除</span>,
+      content: () => <span class="text-red-500">{i18n()('post.deletePost')}</span>,
       onSelect: () => {
         const p = pubkey();
         if (p == null) return;
 
-        if (!window.confirm('本当に削除しますか？')) return;
+        if (!window.confirm(i18n()('post.confirmDelete'))) return;
         deleteMutation.mutate({
           relayUrls: config().relayUrls,
           pubkey: p,
@@ -326,6 +328,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
             </Show>
             <Show when={event().taggedPubkeys().length > 0}>
               <div class="text-xs">
+                {i18n()('post.replyToPre')}
                 <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
@@ -339,7 +342,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                     </button>
                   )}
                 </For>
-                {'への返信'}
+                {i18n()('post.replyToPost')}
               </div>
             </Show>
             <ContentWarningDisplay contentWarning={event().contentWarning()}>

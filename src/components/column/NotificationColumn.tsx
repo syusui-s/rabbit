@@ -9,6 +9,7 @@ import Notification from '@/components/timeline/Notification';
 import { NotificationColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 
 type NotificationColumnDisplayProps = {
@@ -18,6 +19,7 @@ type NotificationColumnDisplayProps = {
 };
 
 const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
   const { events: notifications } = useSubscription(() => ({
@@ -39,7 +41,7 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? '通知'}
+          name={props.column.name ?? i18n()('column.notification')}
           icon={<Bell />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

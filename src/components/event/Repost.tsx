@@ -9,6 +9,7 @@ import EventDisplayById from '@/components/event/EventDisplayById';
 import UserDisplayName from '@/components/UserDisplayName';
 import useFormatDate from '@/hooks/useFormatDate';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
 
 export type RepostProps = {
@@ -16,6 +17,7 @@ export type RepostProps = {
 };
 
 const Repost: Component<RepostProps> = (props) => {
+  const i18n = useTranslation();
   const { showProfile } = useModalState();
   const formatDate = useFormatDate();
   const event = createMemo(() => genericEvent(props.event));
@@ -34,7 +36,7 @@ const Repost: Component<RepostProps> = (props) => {
           >
             <UserDisplayName pubkey={props.event.pubkey} />
           </button>
-          {' がリポスト'}
+          {i18n()('notification.reposted')}
         </div>
         <div>{formatDate(event().createdAtAsDate())}</div>
       </div>

@@ -35,8 +35,7 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
 
   return (
     <Show when={!shouldMuteEvent(props.event)}>
-      ⚡
-      <UserNameDisplay pubkey={zapRequest().pubkey} />
+      ⚡{/* <UserNameDisplay pubkey={zapRequest().pubkey} /> */}
       <pre>{JSON.stringify(props.event, null, 2)}</pre>
     </Show>
   );

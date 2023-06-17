@@ -11,7 +11,7 @@ import Timeline from '@/components/timeline/Timeline';
 import { ChannelColumnType, FollowingColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
-import useFollowings from '@/nostr/useFollowings';
+import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 import epoch from '@/utils/epoch';
 
@@ -22,6 +22,7 @@ export type ChannelColumnProps = {
 };
 
 const ChannelColumn: Component<ChannelColumnProps> = (props) => {
+  const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
   const { events } = useSubscription(() => ({
@@ -44,7 +45,7 @@ const ChannelColumn: Component<ChannelColumnProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? 'チャンネル'}
+          name={props.column.name ?? i18n()('column.channel')}
           icon={<ChatBubbleLeftRight />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

@@ -3,6 +3,7 @@ import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 
 import usePersistStatus from '@/hooks/usePersistStatus';
+import { useTranslation } from '@/i18n/useTranslation';
 import resolveAsset from '@/utils/resolveAsset';
 
 type SignerStatus = 'checking' | 'available' | 'unavailable';
@@ -31,6 +32,7 @@ const useSignerStatus = () => {
 };
 
 const Hello: Component = () => {
+  const i18n = useTranslation();
   const signerStatus = useSignerStatus();
   const navigate = useNavigate();
   const { persistStatus, loggedIn } = usePersistStatus();
@@ -61,10 +63,10 @@ const Hello: Component = () => {
       <div class="rounded-md p-8 shadow-md">
         <Switch>
           <Match when={signerStatus() === 'checking'}>
-            <p>拡張機能のインストール状況を確認中です...</p>
+            <p>{i18n()('hello.signerChecking')}</p>
           </Match>
           <Match when={signerStatus() === 'unavailable'}>
-            <h2 class="font-bold">利用にはNIP-07に対応した拡張機能が必要です。</h2>
+            <h2 class="font-bold">{i18n()('hello.signerUnavailable')}</h2>
             <p>
               <br />
               初めて利用する方も、他のクライアントをつかっている方も
@@ -87,7 +89,7 @@ const Hello: Component = () => {
               class="rounded bg-rose-400 p-4 text-lg font-bold text-white hover:shadow-md"
               onClick={handleLogin}
             >
-              NIP-07 拡張機能でログイン
+              {i18n()('hello.loginWithSigner')}
             </button>
           </Match>
         </Switch>

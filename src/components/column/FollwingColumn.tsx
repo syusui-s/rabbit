@@ -10,6 +10,7 @@ import Timeline from '@/components/timeline/Timeline';
 import { FollowingColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useFollowings from '@/nostr/useFollowings';
 import useSubscription from '@/nostr/useSubscription';
 import epoch from '@/utils/epoch';
@@ -21,6 +22,7 @@ type FollowingColumnDisplayProps = {
 };
 
 const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
   const { followingPubkeys } = useFollowings(() => ({ pubkey: props.column.pubkey }));
@@ -57,7 +59,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? 'ホーム'}
+          name={props.column.name ?? i18n()('column.home')}
           icon={<Home />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

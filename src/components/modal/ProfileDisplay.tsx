@@ -15,6 +15,7 @@ import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
 import useFollowings from '@/nostr/useFollowings';
@@ -42,6 +43,7 @@ const FollowersCount: Component<{ pubkey: string }> = (props) => {
 };
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted } = useConfig();
   const commands = useCommands();
   const myPubkey = usePubkey();
@@ -52,7 +54,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
-  const [modal, setModal] = createSignal<'Following' | null>(false);
+  const [modal, setModal] = createSignal<'Following' | null>(null);
   const closeModal = () => setModal(null);
 
   const { profile, query: profileQuery } = useProfile(() => ({
@@ -169,13 +171,13 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     },
      */
     {
-      content: () => 'IDをコピー',
+      content: () => i18n()('profile.copyPubkey'),
       onSelect: () => {
         navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
       },
     },
     {
-      content: () => (!isMuted() ? 'ミュート' : 'ミュート解除'),
+      content: () => (!isMuted() ? i18n()('profile.mute') : i18n()('profile.unmute')),
       onSelect: () => {
         if (!isMuted()) {
           addMutedPubkey(props.pubkey);
@@ -186,7 +188,8 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     },
     {
       when: () => props.pubkey === myPubkey(),
-      content: () => (!following() ? '自分をフォロー' : '自分をフォロー解除'),
+      content: () =>
+        !following() ? i18n()('profile.followMyself') : i18n()('profile.unfollowMyself'),
       onSelect: () => {
         if (!following()) {
           follow();
@@ -243,17 +246,17 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     text-center font-bold text-primary hover:bg-primary hover:text-white sm:w-20"
                     onClick={() => showProfileEdit()}
                   >
-                    編集
+                    {i18n()('profile.editProfile')}
                   </button>
                 </Match>
                 <Match when={updateContactsMutation.isLoading || updatingContacts()}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    更新中
+                    {i18n()('profile.updating')}
                   </span>
                 </Match>
                 <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    読み込み中
+                    {i18n()('profile.loading')}
                   </span>
                 </Match>
                 <Match when={following()}>
@@ -265,8 +268,8 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     onClick={() => unfollow()}
                     disabled={updateContactsMutation.isLoading}
                   >
-                    <Show when={!hoverFollowButton()} fallback="フォロー解除">
-                      フォロー中
+                    <Show when={!hoverFollowButton()} fallback={i18n()('profile.unfollow')}>
+                      {i18n()('profile.followingCurrently')}
                     </Show>
                   </button>
                 </Match>
@@ -277,7 +280,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     onClick={() => follow()}
                     disabled={updateContactsMutation.isLoading}
                   >
-                    フォロー
+                    {i18n()('profile.follow')}
                   </button>
                 </Match>
               </Switch>
@@ -292,10 +295,10 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
             </div>
             <Switch>
               <Match when={userFollowingQuery.isLoading}>
-                <div class="shrink-0 text-xs">読み込み中</div>
+                <div class="shrink-0 text-xs">{i18n()('profile.loading')}</div>
               </Match>
               <Match when={followed()}>
-                <div class="shrink-0 text-xs">フォローされています</div>
+                <div class="shrink-0 text-xs">{i18n()('profile.followsYou')}</div>
               </Match>
             </Switch>
           </div>
