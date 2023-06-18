@@ -21,6 +21,7 @@ const Post: Component<PostProps> = (props) => {
 
   const [showOverflow, setShowOverflow] = createSignal();
   const createdAt = () => formatDate(props.createdAt);
+  const createdAtFull = () => props.createdAt.toLocaleString();
 
   const { profile: author } = useProfile(() => ({
     pubkey: props.authorPubkey,
@@ -76,6 +77,7 @@ const Post: Component<PostProps> = (props) => {
                   ev.preventDefault();
                   props.onShowEvent?.();
                 }}
+                title={createdAtFull()}
               >
                 {createdAt()}
               </button>
