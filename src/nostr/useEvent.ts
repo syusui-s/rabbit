@@ -3,7 +3,7 @@ import { createMemo } from 'solid-js';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
-import { exec } from '@/nostr/useBatchedEvents';
+import { registerTask, BatchedEventsTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseEventProps = {
@@ -24,11 +24,11 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return null;
       const { eventId } = currentProps;
-      const promise = exec({ type: 'Event', eventId }, signal).then((batchedEvents) => {
-        const event = batchedEvents().events[0];
-        if (event == null) throw new Error(`event not found: ${eventId}`);
-        return event;
+      const task = new BatchedEventsTask({ type: 'Event', eventId });
+      const promise = task.firstEventPromise().catch(() => {
+        throw new Error(`event not found: ${eventId}`);
       });
+      registerTask({ task, signal });
       return timeout(15000, `useEvent: ${eventId}`)(promise);
     },
     {

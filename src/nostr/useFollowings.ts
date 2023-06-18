@@ -4,7 +4,7 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { Event as NostrEvent } from 'nostr-tools';
 
 import { genericEvent } from '@/nostr/event';
-import { exec, pickLatestEvent } from '@/nostr/useBatchedEvents';
+import { registerTask, BatchedEventsTask, pickLatestEvent } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 type Following = {
@@ -36,21 +36,15 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
       const { pubkey } = currentProps;
-      const promise = exec({ type: 'Followings', pubkey }, signal).then((batchedEvents) => {
-        const latestEvent = () => {
-          const latest = pickLatestEvent(batchedEvents().events);
-          if (latest == null) throw new Error(`followings not found: ${pubkey}`);
-          return latest;
-        };
-        observable(batchedEvents).subscribe(() => {
-          try {
-            queryClient.setQueryData(queryKey, latestEvent());
-          } catch (err) {
-            console.error('error occurred while updating followings cache: ', err);
-          }
-        });
-        return latestEvent();
+      const task = new BatchedEventsTask({ type: 'Followings', pubkey });
+      const promise = task.firstEventPromise().catch(() => {
+        throw new Error(`followings not found: ${pubkey}`);
       });
+      task.onUpdate((events) => {
+        const latest = pickLatestEvent(events);
+        queryClient.setQueryData(queryKey, latest);
+      });
+      registerTask({ task, signal });
       return timeout(15000, `useFollowings: ${pubkey}`)(promise);
     },
     {

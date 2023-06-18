@@ -4,7 +4,7 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { Event as NostrEvent } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
-import { exec } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, exec, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseRepostsProps = {
@@ -30,13 +30,12 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return [];
       const { eventId: mentionedEventId } = currentProps;
-      const promise = exec({ type: 'Reposts', mentionedEventId }, signal).then((batchedEvents) => {
-        const events = () => batchedEvents().events;
-        observable(batchedEvents).subscribe(() => {
-          queryClient.setQueryData(queryKey, events());
-        });
-        return events();
+      const task = new BatchedEventsTask({ type: 'Reposts', mentionedEventId });
+      const promise = task.toUpdatePromise().catch(() => []);
+      task.onUpdate((events) => {
+        queryClient.setQueryData(queryKey, events);
       });
+      registerTask({ task, signal });
       return timeout(15000, `useReposts: ${mentionedEventId}`)(promise);
     },
     {

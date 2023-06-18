@@ -36,46 +36,41 @@ export default class ObservableTask<BatchRequest, BatchResponse> {
 
   #completeListeners: (() => void)[] = [];
 
-  #promise: Promise<BatchResponse>;
-
   constructor(req: BatchRequest) {
     this.id = nextId();
     this.req = req;
-    this.#promise = new Promise((resolve, reject) => {
-      this.onComplete(() => {
-        if (this.res != null) {
-          resolve(this.res);
-        } else {
-          reject();
-        }
-      });
+  }
+
+  #executeUpdateListeners(res: BatchResponse) {
+    this.#updateListeners.forEach((listener) => {
+      listener(res);
     });
   }
 
-  #executeUpdateListeners() {
-    const { res } = this;
-    if (res != null) {
-      this.#updateListeners.forEach((listener) => {
-        listener(res);
-      });
-    }
+  #executeCompleteListeners() {
+    this.#completeListeners.forEach((listener) => {
+      listener();
+    });
   }
 
   update(res: BatchResponse) {
+    if (this.isCompleted) {
+      throw new Error('completed task cannot be updated');
+    }
     this.res = res;
-    this.#executeUpdateListeners();
+    this.#executeUpdateListeners(res);
   }
 
   updateWith(f: (current: BatchResponse | undefined) => BatchResponse) {
-    this.res = f(this.res);
-    this.#executeUpdateListeners();
+    if (this.isCompleted) {
+      throw new Error('completed task cannot be updated');
+    }
+    this.update(f(this.res));
   }
 
   complete() {
     this.isCompleted = true;
-    this.#completeListeners.forEach((listener) => {
-      listener();
-    });
+    this.#executeCompleteListeners();
   }
 
   onUpdate(f: (res: BatchResponse) => void) {
@@ -91,7 +86,30 @@ export default class ObservableTask<BatchRequest, BatchResponse> {
     this.#completeListeners.push(f);
   }
 
-  toPromise(): Promise<BatchResponse> {
-    return this.#promise;
+  toUpdatePromise(): Promise<BatchResponse> {
+    if (this.isCompleted && this.res != null) {
+      return Promise.resolve(this.res);
+    }
+
+    const promise = new Promise<BatchResponse>((resolve) => {
+      this.onUpdate((res) => resolve(res));
+    });
+    return Promise.race([promise, this.toCompletePromise()]);
+  }
+
+  toCompletePromise(): Promise<BatchResponse> {
+    if (this.isCompleted && this.res != null) {
+      return Promise.resolve(this.res);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.onComplete(() => {
+        if (this.res != null) {
+          resolve(this.res);
+        } else {
+          reject(new Error('result was not set'));
+        }
+      });
+    });
   }
 }

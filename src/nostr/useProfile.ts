@@ -9,7 +9,7 @@ import {
 import { Event as NostrEvent } from 'nostr-tools';
 
 import { Profile, ProfileWithOtherProperties, safeParseProfile } from '@/nostr/event/Profile';
-import { exec, pickLatestEvent } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, pickLatestEvent, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseProfileProps = {
@@ -33,39 +33,6 @@ export type UseProfiles = {
 
 type UseProfileQueryKey = readonly ['useProfile', UseProfileProps | null];
 
-const getProfile = ({
-  queryKey,
-  signal,
-  queryClient,
-}: {
-  queryKey: UseProfileQueryKey;
-  signal?: AbortSignal;
-  queryClient: QueryClient;
-}): Promise<NostrEvent | null> => {
-  const [, currentProps] = queryKey;
-  if (currentProps == null) return Promise.resolve(null);
-
-  const { pubkey } = currentProps;
-
-  const promise = exec({ type: 'Profile', pubkey }, signal).then((batchedEvents) => {
-    const latestEvent = () => {
-      const latest = pickLatestEvent(batchedEvents().events);
-      if (latest == null) throw new Error(`profile not found: ${pubkey}`);
-      return latest;
-    };
-    observable(batchedEvents).subscribe(() => {
-      try {
-        queryClient.setQueryData(queryKey, latestEvent());
-      } catch (err) {
-        console.error('error occurred while updating profile cache: ', err);
-      }
-    });
-    return latestEvent();
-  });
-  // TODO timeoutと同時にsignalでキャンセルするようにしたい
-  return timeout(3000, `useProfile: ${pubkey}`)(promise);
-};
-
 const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
@@ -73,7 +40,21 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
 
   const query = createQuery(
     genQueryKey,
-    ({ queryKey, signal }) => getProfile({ queryKey, signal, queryClient }),
+    ({ queryKey, signal }) => {
+      const [, currentProps] = queryKey;
+      if (currentProps == null) return null;
+      const { pubkey } = currentProps;
+      const task = new BatchedEventsTask({ type: 'Profile', pubkey });
+      const promise = task.firstEventPromise().catch(() => {
+        throw new Error(`profile not found: ${pubkey}`);
+      });
+      task.onUpdate((events) => {
+        const latest = pickLatestEvent(events);
+        queryClient.setQueryData(queryKey, latest);
+      });
+      registerTask({ task, signal });
+      return timeout(3000, `useProfile: ${pubkey}`)(promise);
+    },
     {
       // Profiles are updated occasionally, so a short staleTime is used here.
       // cacheTime is long so that the user see profiles instantly.

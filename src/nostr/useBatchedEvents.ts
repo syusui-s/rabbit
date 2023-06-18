@@ -4,9 +4,10 @@ import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
 import { genericEvent } from '@/nostr/event';
-import useBatch, { type Task } from '@/nostr/useBatch';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
+import ObservableTask from '@/utils/batch/ObservableTask';
+import useBatch from '@/utils/batch/useBatch';
 
 type ProfileTask = { type: 'Profile'; pubkey: string };
 type EventTask = { type: 'Event'; eventId: string };
@@ -24,15 +25,21 @@ type ParameterizedReplaceableEventTask = {
 type TaskArg =
   | ProfileTask
   | EventTask
+  | FollowingsTask
   | ReactionsTask
   | ZapReceiptsTask
   | RepostsTask
-  | FollowingsTask
   | ParameterizedReplaceableEventTask;
 
-type BatchedEvents = { completed: boolean; events: NostrEvent[] };
+export class BatchedEventsTask extends ObservableTask<TaskArg, NostrEvent[]> {
+  addEvent(event: NostrEvent) {
+    this.updateWith((current) => [...(current ?? []), event]);
+  }
 
-type TaskRes = Accessor<BatchedEvents>;
+  firstEventPromise(): Promise<NostrEvent> {
+    return this.toUpdatePromise().then((events) => events[0]);
+  }
+}
 
 let count = 0;
 
@@ -41,9 +48,6 @@ const { setActiveBatchSubscriptions } = useStats();
 setInterval(() => {
   setActiveBatchSubscriptions(count);
 }, 1000);
-
-const EmptyBatchedEvents = { events: [], completed: true };
-const emptyBatchedEvents = () => EmptyBatchedEvents;
 
 const isParameterizedReplaceableEvent = (event: NostrEvent) =>
   event.kind >= 30000 && event.kind < 40000;
@@ -54,41 +58,41 @@ const keyForParameterizedReplaceableEvent = ({
   identifier,
 }: ParameterizedReplaceableEventTask) => `${kind}:${author}:${identifier}`;
 
-export const { exec } = useBatch<TaskArg, TaskRes>(() => ({
+const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
   interval: 2000,
   batchSize: 150,
   executor: (tasks) => {
-    const profileTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const eventTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const reactionsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const repostsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const zapReceiptsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const parameterizedReplaceableEventsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
-    const followingsTasks = new Map<string, Task<TaskArg, TaskRes>[]>();
+    const profileTasks = new Map<string, BatchedEventsTask[]>();
+    const eventTasks = new Map<string, BatchedEventsTask[]>();
+    const reactionsTasks = new Map<string, BatchedEventsTask[]>();
+    const repostsTasks = new Map<string, BatchedEventsTask[]>();
+    const zapReceiptsTasks = new Map<string, BatchedEventsTask[]>();
+    const parameterizedReplaceableEventsTasks = new Map<string, BatchedEventsTask[]>();
+    const followingsTasks = new Map<string, BatchedEventsTask[]>();
 
     tasks.forEach((task) => {
-      if (task.args.type === 'Event') {
-        const current = eventTasks.get(task.args.eventId) ?? [];
-        eventTasks.set(task.args.eventId, [...current, task]);
-      } else if (task.args.type === 'Profile') {
-        const current = profileTasks.get(task.args.pubkey) ?? [];
-        profileTasks.set(task.args.pubkey, [...current, task]);
-      } else if (task.args.type === 'Reactions') {
-        const current = reactionsTasks.get(task.args.mentionedEventId) ?? [];
-        reactionsTasks.set(task.args.mentionedEventId, [...current, task]);
-      } else if (task.args.type === 'Reposts') {
-        const current = repostsTasks.get(task.args.mentionedEventId) ?? [];
-        repostsTasks.set(task.args.mentionedEventId, [...current, task]);
-      } else if (task.args.type === 'ZapReceipts') {
-        const current = zapReceiptsTasks.get(task.args.mentionedEventId) ?? [];
-        repostsTasks.set(task.args.mentionedEventId, [...current, task]);
-      } else if (task.args.type === 'ParameterizedReplaceableEvent') {
-        const key = keyForParameterizedReplaceableEvent(task.args);
+      if (task.req.type === 'Event') {
+        const current = eventTasks.get(task.req.eventId) ?? [];
+        eventTasks.set(task.req.eventId, [...current, task]);
+      } else if (task.req.type === 'Profile') {
+        const current = profileTasks.get(task.req.pubkey) ?? [];
+        profileTasks.set(task.req.pubkey, [...current, task]);
+      } else if (task.req.type === 'Reactions') {
+        const current = reactionsTasks.get(task.req.mentionedEventId) ?? [];
+        reactionsTasks.set(task.req.mentionedEventId, [...current, task]);
+      } else if (task.req.type === 'Reposts') {
+        const current = repostsTasks.get(task.req.mentionedEventId) ?? [];
+        repostsTasks.set(task.req.mentionedEventId, [...current, task]);
+      } else if (task.req.type === 'ZapReceipts') {
+        const current = zapReceiptsTasks.get(task.req.mentionedEventId) ?? [];
+        repostsTasks.set(task.req.mentionedEventId, [...current, task]);
+      } else if (task.req.type === 'ParameterizedReplaceableEvent') {
+        const key = keyForParameterizedReplaceableEvent(task.req);
         const current = parameterizedReplaceableEventsTasks.get(key) ?? [];
         parameterizedReplaceableEventsTasks.set(key, [...current, task]);
-      } else if (task.args.type === 'Followings') {
-        const current = followingsTasks.get(task.args.pubkey) ?? [];
-        followingsTasks.set(task.args.pubkey, [...current, task]);
+      } else if (task.req.type === 'Followings') {
+        const current = followingsTasks.get(task.req.pubkey) ?? [];
+        followingsTasks.set(task.req.pubkey, [...current, task]);
       }
     });
 
@@ -121,9 +125,9 @@ export const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     }
     if (parameterizedReplaceableEventsTasks.size > 0) {
       Array.from(parameterizedReplaceableEventsTasks.values()).forEach(([firstTask]) => {
-        if (firstTask.args.type !== 'ParameterizedReplaceableEvent') return;
+        if (firstTask.req.type !== 'ParameterizedReplaceableEvent') return;
         const {
-          args: { kind, author, identifier },
+          req: { kind, author, identifier },
         } = firstTask;
         filters.push({ kinds: [kind], authors: [author], '#d': [identifier] });
       });
@@ -131,30 +135,15 @@ export const { exec } = useBatch<TaskArg, TaskRes>(() => ({
 
     if (filters.length === 0) return;
 
-    const signals = new Map<number, Signal<BatchedEvents>>();
-
-    const resolveTasks = (registeredTasks: Task<TaskArg, TaskRes>[], event: NostrEvent) => {
+    const resolveTasks = (registeredTasks: BatchedEventsTask[], event: NostrEvent) => {
       registeredTasks.forEach((task) => {
-        const signal = signals.get(task.id) ?? createSignal({ events: [], completed: false });
-        signals.set(task.id, signal);
-        const [batchedEvents, setBatchedEvents] = signal;
-        setBatchedEvents((current) => ({
-          ...current,
-          events: [...current.events, event],
-        }));
-        task.resolve(batchedEvents);
+        task.updateWith((current) => [...(current ?? []), event]);
       });
     };
 
     const finalizeTasks = () => {
       tasks.forEach((task) => {
-        const signal = signals.get(task.id);
-        if (signal != null) {
-          const setEvents = signal[1];
-          setEvents((current) => ({ ...current, completed: true }));
-        } else {
-          task.resolve(emptyBatchedEvents);
-        }
+        task.complete();
       });
     };
 
@@ -221,6 +210,17 @@ export const { exec } = useBatch<TaskArg, TaskRes>(() => ({
     });
   },
 }));
+
+export const registerTask = ({
+  task,
+  signal,
+}: {
+  task: BatchedEventsTask;
+  signal?: AbortSignal;
+}) => {
+  addTask(task);
+  signal?.addEventListener('abort', () => removeTask(task));
+};
 
 export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
   if (events.length === 0) return null;
