@@ -1,6 +1,7 @@
 import { createSignal, createEffect, onMount, onCleanup, on } from 'solid-js';
 
 import uniqBy from 'lodash/uniqBy';
+import { utils } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
 import usePool from '@/nostr/usePool';
@@ -64,7 +65,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     const limit = propsProvider()?.limit ?? 50;
 
     setEvents((current) => {
-      const sorted = sortEvents([event, ...current].slice(0, limit));
+      const sorted = utils.insertEventIntoDescendingList(current, event).slice(0, limit);
       // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
       // https://github.com/syusui-s/rabbit/issues/5
       const deduped = uniqBy(sorted, (e) => e.id);
