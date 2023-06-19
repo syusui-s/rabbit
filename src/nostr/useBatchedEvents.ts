@@ -137,7 +137,7 @@ const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
 
     const resolveTasks = (registeredTasks: BatchedEventsTask[], event: NostrEvent) => {
       registeredTasks.forEach((task) => {
-        task.updateWith((current) => [...(current ?? []), event]);
+        task.addEvent(event);
       });
     };
 
