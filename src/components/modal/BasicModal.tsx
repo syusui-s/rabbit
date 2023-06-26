@@ -13,7 +13,7 @@ export type BasicModalProps = {
 const BasicModal: Component<BasicModalProps> = (props) => {
   return (
     <Modal onClose={() => props.onClose?.()}>
-      <div class="max-h-[100vh] w-[640px] max-w-full">
+      <div class="w-[640px] max-w-full">
         <button
           class="w-full pt-1 text-start text-stone-800"
           aria-label="Close"
@@ -25,7 +25,7 @@ const BasicModal: Component<BasicModalProps> = (props) => {
             </Show>
           </span>
         </button>
-        <div class="flex max-h-full flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
+        <div class="flex max-h-[90vh] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
           {props.children}
         </div>
       </div>
