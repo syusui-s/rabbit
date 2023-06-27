@@ -10,6 +10,7 @@ import uniq from 'lodash/uniq';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import BasicModal from '@/components/modal/BasicModal';
+import UserList from '@/components/modal/UserList';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
@@ -51,6 +52,8 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
+  const [modal, setModal] = createSignal<'Following' | null>(false);
+  const closeModal = () => setModal(null);
 
   const { profile, query: profileQuery } = useProfile(() => ({
     pubkey: props.pubkey,
@@ -341,7 +344,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           </div>
         </Show>
         <div class="flex border-t px-4 py-2">
-          <div class="flex flex-1 flex-col items-start">
+          <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
             <div class="text-sm">フォロー</div>
             <div class="text-xl">
               <Show
@@ -351,7 +354,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 {userFollowingPubkeys().length}
               </Show>
             </div>
-          </div>
+          </button>
           <Show when={!config().hideCount}>
             <div class="flex flex-1 flex-col items-start">
               <div class="text-sm">フォロワー</div>
@@ -389,6 +392,11 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           </ul>
         </Show>
       </Show>
+      <Switch>
+        <Match when={modal() === 'Following'}>
+          <UserList data={userFollowingPubkeys()} pubkeyExtractor={(e) => e} onClose={closeModal} />
+        </Match>
+      </Switch>
       <ul class="border-t p-1">
         <Timeline events={events()} />
       </ul>

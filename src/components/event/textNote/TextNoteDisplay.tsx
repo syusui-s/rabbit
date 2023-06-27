@@ -1,4 +1,13 @@
-import { Show, For, createSignal, createMemo, type JSX, type Component } from 'solid-js';
+import {
+  Show,
+  For,
+  createSignal,
+  createMemo,
+  type JSX,
+  type Component,
+  Switch,
+  Match,
+} from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
@@ -17,6 +26,7 @@ import ContentWarningDisplay from '@/components/event/textNote/ContentWarningDis
 import GeneralUserMentionDisplay from '@/components/event/textNote/GeneralUserMentionDisplay';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import EventDebugModal from '@/components/modal/EventDebugModal';
+import UserList from '@/components/modal/UserList';
 import NotePostForm from '@/components/NotePostForm';
 import Post from '@/components/Post';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
@@ -95,8 +105,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
   const [reacted, setReacted] = createSignal(false);
   const [reposted, setReposted] = createSignal(false);
   const [showReplyForm, setShowReplyForm] = createSignal(false);
-  const [showEventDebug, setShowEventDebug] = createSignal(false);
+  const [modal, setModal] = createSignal<'EventDebugModal' | 'Reactions' | 'Reposts' | null>(null);
+
   const closeReplyForm = () => setShowReplyForm(false);
+  const closeModal = () => setModal(null);
 
   const event = createMemo(() => textNote(props.event));
 
@@ -190,7 +202,19 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     {
       content: () => 'JSONを確認',
       onSelect: () => {
-        setShowEventDebug(true);
+        setModal('EventDebugModal');
+      },
+    },
+    {
+      content: () => 'リポスト一覧',
+      onSelect: () => {
+        setModal('Reposts');
+      },
+    },
+    {
+      content: () => 'リアクション一覧',
+      onSelect: () => {
+        setModal('Reactions');
       },
     },
     {
@@ -437,9 +461,33 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
           timelineContext?.setTimeline({ type: 'Replies', event: props.event });
         }}
       />
-      <Show when={showEventDebug()}>
-        <EventDebugModal event={props.event} onClose={() => setShowEventDebug(false)} />
-      </Show>
+      <Switch>
+        <Match when={modal() === 'EventDebugModal'}>
+          <EventDebugModal event={props.event} onClose={closeModal} />
+        </Match>
+        <Match when={modal() === 'Reactions'}>
+          <UserList
+            data={reactions()}
+            pubkeyExtractor={(ev) => ev.pubkey}
+            renderInfo={({ content }) => (
+              <div class="w-6">
+                <Show
+                  when={content === '+'}
+                  fallback={<span class="truncate text-base">{content}</span>}
+                >
+                  <span class="inline-block h-3 w-3 pt-[1px] text-rose-400">
+                    <HeartSolid />
+                  </span>
+                </Show>
+              </div>
+            )}
+            onClose={closeModal}
+          />
+        </Match>
+        <Match when={modal() === 'Reposts'}>
+          <UserList data={reposts()} pubkeyExtractor={(ev) => ev.pubkey} onClose={closeModal} />
+        </Match>
+      </Switch>
     </div>
   );
 };
