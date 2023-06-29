@@ -82,7 +82,7 @@ export default {
       askImport: 'Do you want to import these relays?',
       failedToImport: 'Failed to import.',
       imported_one: 'Imported {{count}} relay.',
-      imported_other: 'Imported {{count}} relyas',
+      imported_other: 'Imported {{count}} relays',
     },
     display: {
       display: 'Display',
@@ -122,4 +122,4 @@ export default {
     signerUnavailable: 'Please install NIP-07 browser extension.',
     loginWithSigner: 'Login with NIP-07 browser extension',
   },
-};
+} satisfies typeof ja;
