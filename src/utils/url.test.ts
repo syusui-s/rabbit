@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { describe, it } from 'vitest';
 
-import { fixUrl } from '@/utils/imageUrl';
+import { fixUrl } from '@/utils/url';
 
 describe('fixUrl', () => {
   it('should return an image url for a given imgur.com URL with additional path', () => {

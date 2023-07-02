@@ -8,6 +8,7 @@ import EventDisplayById from '@/components/event/EventDisplayById';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
 import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
+import VideoDisplay from '@/components/event/textNote/VideoDisplay';
 import EventLink from '@/components/EventLink';
 import SafeLink from '@/components/utils/SafeLink';
 import { createSearchColumn } from '@/core/column';
@@ -15,7 +16,7 @@ import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { textNote } from '@/nostr/event';
 import { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
-import { isImageUrl } from '@/utils/imageUrl';
+import { isImageUrl, isVideoUrl } from '@/utils/url';
 
 export type TextNoteContentDisplayProps = {
   event: NostrEvent;
@@ -41,15 +42,14 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           return <span>{item.content}</span>;
         }
         if (item.type === 'URL') {
+          const initialHidden = () =>
+            !config().showMedia || event().contentWarning().contentWarning || !props.embedding;
+
           if (isImageUrl(item.content)) {
-            return (
-              <ImageDisplay
-                url={item.content}
-                initialHidden={
-                  !config().showImage || event().contentWarning().contentWarning || !props.embedding
-                }
-              />
-            );
+            return <ImageDisplay url={item.content} initialHidden={initialHidden()} />;
+          }
+          if (isVideoUrl(item.content)) {
+            return <VideoDisplay url={item.content} initialHidden={initialHidden()} />;
           }
           return <SafeLink class="text-blue-500 underline" href={item.content} />;
         }

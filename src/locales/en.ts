@@ -98,7 +98,7 @@ export default {
       showEmojiReaction: 'Show emoji reactions on posts',
       others: 'Others',
       keepOpenPostForm: 'Remain the input field open after posting',
-      showImagesByDefault: 'Load images by default',
+      showMediaByDefault: 'Load media by default',
       hideNumbers: 'Hide the numbers of reactions, reposts and followers',
     },
     customEmoji: {

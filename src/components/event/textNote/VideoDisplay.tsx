@@ -1,15 +1,14 @@
 import { Component, createSignal, Show } from 'solid-js';
 
 import SafeLink from '@/components/utils/SafeLink';
-import { fixUrl } from '@/utils/url';
 
-type ImageDisplayProps = {
+type VideoDisplayProps = {
   url: string;
   initialHidden: boolean;
 };
 
-const ImageDisplay: Component<ImageDisplayProps> = (props) => {
-  let imageRef: HTMLImageElement | undefined;
+const VideoDisplay: Component<VideoDisplayProps> = (props) => {
+  let videoRef: HTMLVideoElement | undefined;
   const [hidden, setHidden] = createSignal(props.initialHidden);
 
   return (
@@ -20,20 +19,23 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
           class="rounded bg-stone-300 p-3 text-xs text-stone-600 hover:shadow"
           onClick={() => setHidden(false)}
         >
-          画像を展開する
+          動画を表示する
         </button>
       }
     >
       <SafeLink class="my-2 block" href={props.url}>
-        <img
-          ref={imageRef}
-          class="max-h-64 max-w-full rounded object-contain shadow hover:shadow-md"
-          src={fixUrl(props.url)}
-          alt={props.url}
-        />
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          ref={videoRef}
+          class="max-h-64 max-w-full rounded-sm object-contain shadow"
+          src={props.url}
+          controls
+        >
+          <a href={props.url}>ダウンロード</a>
+        </video>
       </SafeLink>
     </Show>
   );
 };
 
-export default ImageDisplay;
+export default VideoDisplay;

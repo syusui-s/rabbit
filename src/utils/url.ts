@@ -7,6 +7,15 @@ export const isImageUrl = (urlString: string): boolean => {
   }
 };
 
+export const isVideoUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return /\.(mpg|mpeg|mp4|avi|mov|webm|ogv)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+};
+
 export const fixUrl = (urlString: string): string => {
   try {
     const url = new URL(urlString);

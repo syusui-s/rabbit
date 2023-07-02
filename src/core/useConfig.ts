@@ -32,7 +32,7 @@ export type Config = {
   keepOpenPostForm: boolean;
   useEmojiReaction: boolean;
   showEmojiReaction: boolean;
-  showImage: boolean;
+  showMedia: boolean; // TODO 'always' | 'only-followings' | 'never'
   hideCount: boolean;
   mutedPubkeys: string[];
   mutedKeywords: string[];
@@ -80,7 +80,7 @@ const InitialConfig = (): Config => ({
   keepOpenPostForm: false,
   useEmojiReaction: false,
   showEmojiReaction: false,
-  showImage: true,
+  showMedia: true,
   hideCount: false,
   mutedPubkeys: [],
   mutedKeywords: [],

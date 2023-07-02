@@ -96,7 +96,7 @@ export default {
       showEmojiReaction: '投稿にリアクションされた絵文字を表示する',
       others: 'その他',
       keepOpenPostForm: '投稿後も投稿欄を開いたままにする',
-      showImagesByDefault: 'デフォルトで画像を読み込む',
+      showMediaByDefault: 'デフォルトで画像や動画を読み込む',
       hideNumbers: 'いいねやリポスト、フォロワーなどの数を隠す',
     },
     customEmoji: {

@@ -451,10 +451,10 @@ const OtherConfig = () => {
     }));
   };
 
-  const toggleShowImage = () => {
+  const toggleShowMedia = () => {
     setConfig((current) => ({
       ...current,
-      showImage: !(current.showImage ?? true),
+      showMedia: !(current.showMedia ?? true),
     }));
   };
 
@@ -477,8 +477,8 @@ const OtherConfig = () => {
           />
         </div>
         <div class="flex w-full">
-          <div class="flex-1">{i18n()('config.display.showImagesByDefault')}</div>
-          <ToggleButton value={config().showImage} onClick={() => toggleShowImage()} />
+          <div class="flex-1">{i18n()('config.display.showMediaByDefault')}</div>
+          <ToggleButton value={config().showMedia} onClick={() => toggleShowMedia()} />
         </div>
         <div class="flex w-full">
           <div class="flex-1">{i18n()('config.display.hideNumbers')}</div>
