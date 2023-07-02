@@ -3,7 +3,7 @@ import { type Filter } from 'nostr-tools';
 
 import { type ColumnProps } from '@/components/column/Column';
 import { ContentFilter } from '@/core/contentFilter';
-import { relaysOnlyAvailableInJP } from '@/core/relayUrls';
+import { relaysForJapaneseTL } from '@/core/relayUrls';
 import generateId from '@/utils/generateId';
 
 export type NotificationType =
@@ -152,7 +152,7 @@ export const createRelaysColumn = (params: CreateParams<RelaysColumnType>): Rela
 export const createJapanRelaysColumn = () =>
   createRelaysColumn({
     name: '日本語',
-    relayUrls: relaysOnlyAvailableInJP,
+    relayUrls: relaysForJapaneseTL,
     contentFilter: {
       filterType: 'Regex',
       regex: '[\\p{sc=Hiragana}\\p{sc=Katakana}ー]',
