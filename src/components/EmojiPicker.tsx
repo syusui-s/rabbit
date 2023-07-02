@@ -17,20 +17,6 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
   const { config } = useConfig();
   const [pickerElement, setPickerElement] = createSignal<HTMLElement | undefined>(undefined);
 
-  /*
-  const buildCustom = () => {
-    const emojis = Object.values(config().customEmojis).map(({ shortcode, url }) => ({
-      id: shortcode,
-      name: shortcode,
-      keywords: [shortcode],
-      skins: [{ src: url }],
-    }));
-
-    console.log(emojis);
-    return [{ id: 'custom_rabbit', name: 'カスタム絵文字', emojis }];
-  };
-   */
-
   const handleOpen = () => {
     const picker = new Picker({
       data: async () => {
@@ -41,7 +27,6 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data/i18n/ja.json');
         return response.json();
       },
-      // custom: props.customEmojis ? buildCustom() : [],
       autoFocus: false,
       locale: 'ja',
       theme: 'light',

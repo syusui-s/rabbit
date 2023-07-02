@@ -53,6 +53,8 @@
     "@tanstack/query-sync-storage-persister": "^4.29.19",
     "@tanstack/solid-query": "^4.29.19",
     "@tanstack/solid-virtual": "^3.0.0-beta.6",
+    "@textcomplete/core": "^0.1.12",
+    "@textcomplete/textarea": "^0.1.12",
     "@thisbeyond/solid-dnd": "^0.7.4",
     "@types/lodash": "^4.14.195",
     "emoji-mart": "^5.5.2",

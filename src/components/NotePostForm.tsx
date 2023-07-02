@@ -11,6 +11,7 @@ import { Event as NostrEvent } from 'nostr-tools';
 import EmojiPicker from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
+import useEmojiComplete from '@/hooks/useEmojiComplete';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
@@ -88,6 +89,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   let textAreaRef: HTMLTextAreaElement | undefined;
   let fileInputRef: HTMLInputElement | undefined;
 
+  const { elementRef: emojiTextAreaRef } = useEmojiComplete();
   const [text, setText] = createSignal<string>('');
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
@@ -364,6 +366,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           ref={(el) => {
             textAreaRef = el;
             props.textAreaRef?.(el);
+            emojiTextAreaRef(el);
           }}
           name="text"
           class="min-h-[40px] rounded-md border-none focus:ring-rose-300"

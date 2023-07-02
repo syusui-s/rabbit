@@ -1,7 +1,7 @@
 import { type Accessor, type Setter } from 'solid-js';
 
+import { sortBy } from 'lodash';
 import uniq from 'lodash/uniq';
-import uniqBy from 'lodash/uniqBy';
 import { Kind, type Event as NostrEvent } from 'nostr-tools';
 
 import {
@@ -54,6 +54,7 @@ type UseConfig = {
   saveEmojis: (emojis: CustomEmojiConfig[]) => void;
   removeEmoji: (shortcode: string) => void;
   getEmoji: (shortcode: string) => CustomEmojiConfig | undefined;
+  searchEmojis: (term: string) => CustomEmojiConfig[];
   // mute
   addMutedPubkey: (pubkey: string) => void;
   removeMutedPubkey: (pubkey: string) => void;
@@ -171,6 +172,12 @@ const useConfig = (): UseConfig => {
   const getEmoji = (shortcode: string): CustomEmojiConfig | undefined =>
     config.customEmojis[shortcode];
 
+  const searchEmojis = (term: string): CustomEmojiConfig[] =>
+    sortBy(
+      Object.values(config.customEmojis).filter(({ shortcode }) => shortcode.includes(term)),
+      [(e) => e.shortcode.length],
+    );
+
   const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
 
   const hasMutedKeyword = (event: NostrEvent) => {
@@ -223,6 +230,7 @@ const useConfig = (): UseConfig => {
     saveEmojis,
     removeEmoji,
     getEmoji,
+    searchEmojis,
     // mute
     addMutedPubkey,
     removeMutedPubkey,
