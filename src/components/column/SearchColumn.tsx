@@ -99,6 +99,7 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
         },
       ],
       clientEventFilter: (event) => {
+        if (event.tags.findIndex(([tagName]) => tagName === 'mostr') >= 0) return false;
         if (props.column.contentFilter == null) return true;
         return applyContentFilter(props.column.contentFilter)(event.content);
       },
