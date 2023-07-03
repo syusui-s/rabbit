@@ -1,5 +1,3 @@
-import { createSignal, type Accessor, type Signal } from 'solid-js';
-
 import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
@@ -147,7 +145,7 @@ const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
       });
     };
 
-    const { config, shouldMuteEvent } = useConfig();
+    const { config } = useConfig();
     const pool = usePool();
 
     const sub = pool().sub(config().relayUrls, filters, {});
@@ -224,5 +222,10 @@ export const registerTask = ({
 
 export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
   if (events.length === 0) return null;
-  return events.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+  return events.reduce((a, b) => {
+    const diff = a.created_at - b.created_at;
+    if (diff > 0) return a;
+    if (diff < 0) return b;
+    return a.id < b.id ? a : b;
+  });
 };
