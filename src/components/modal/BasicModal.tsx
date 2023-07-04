@@ -25,7 +25,7 @@ const BasicModal: Component<BasicModalProps> = (props) => {
             </Show>
           </span>
         </button>
-        <div class="flex max-h-[90vh] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
+        <div class="flex max-h-[calc(100vh-4em)] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
           {props.children}
         </div>
       </div>
