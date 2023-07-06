@@ -1,9 +1,10 @@
 import { createEffect, onCleanup, lazy, type Component } from 'solid-js';
 
 import { Routes, Route } from '@solidjs/router';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { persistQueryClient } from '@tanstack/query-persist-client-core';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import { get as getItem, set as setItem, del as removeItem } from 'idb-keyval';
 
 import i18nextInstance from '@/i18n/i18n';
 import { I18NextProvider } from '@/i18n/useTranslation';
@@ -16,16 +17,32 @@ const queryClient = new QueryClient({});
 
 const i18next = i18nextInstance();
 
-const localStoragePersister = createSyncStoragePersister({
-  storage: window.localStorage,
+const indexedDBPersister = createAsyncStoragePersister({
+  storage: {
+    getItem(key: string) {
+      return getItem<string>(key).then((e) => e ?? null);
+    },
+    setItem(key: string, value: string) {
+      return setItem(key, value);
+    },
+    removeItem(key: string) {
+      return removeItem(key);
+    },
+  },
 });
 
 const App: Component = () => {
   createEffect(() => {
     const [unsubscribe] = persistQueryClient({
       queryClient,
-      persister: localStoragePersister,
+      persister: indexedDBPersister,
     });
+
+    // TODO remove this in the future
+    if (window.localStorage != null) {
+      window.localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+    }
+
     onCleanup(() => unsubscribe());
   });
 
