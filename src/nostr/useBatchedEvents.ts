@@ -29,6 +29,16 @@ type TaskArg =
   | RepostsTask
   | ParameterizedReplaceableEventTask;
 
+export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
+  if (events.length === 0) return null;
+  return events.reduce((a, b) => {
+    const diff = a.created_at - b.created_at;
+    if (diff > 0) return a;
+    if (diff < 0) return b;
+    return a.id < b.id ? a : b;
+  });
+};
+
 export class BatchedEventsTask extends ObservableTask<TaskArg, NostrEvent[]> {
   addEvent(event: NostrEvent) {
     this.updateWith((current) => [...(current ?? []), event]);
@@ -36,6 +46,14 @@ export class BatchedEventsTask extends ObservableTask<TaskArg, NostrEvent[]> {
 
   firstEventPromise(): Promise<NostrEvent> {
     return this.toUpdatePromise().then((events) => events[0]);
+  }
+
+  latestEventPromise(): Promise<NostrEvent> {
+    return this.toCompletePromise().then((events) => {
+      const latest = pickLatestEvent(events);
+      if (latest == null) throw new Error('event not found');
+      return latest;
+    });
   }
 }
 
@@ -218,14 +236,4 @@ export const registerTask = ({
 }) => {
   addTask(task);
   signal?.addEventListener('abort', () => removeTask(task));
-};
-
-export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
-  if (events.length === 0) return null;
-  return events.reduce((a, b) => {
-    const diff = a.created_at - b.created_at;
-    if (diff > 0) return a;
-    if (diff < 0) return b;
-    return a.id < b.id ? a : b;
-  });
 };

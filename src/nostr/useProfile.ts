@@ -1,16 +1,11 @@
-import { createMemo, observable } from 'solid-js';
+import { createMemo } from 'solid-js';
 
-import {
-  createQuery,
-  useQueryClient,
-  type CreateQueryResult,
-  QueryClient,
-} from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
 import { Profile, ProfileWithOtherProperties, safeParseProfile } from '@/nostr/event/Profile';
-import { BatchedEventsTask, pickLatestEvent, registerTask } from '@/nostr/useBatchedEvents';
-import timeout from '@/utils/timeout';
+import { latestEventQuery } from '@/nostr/query';
+import { BatchedEventsTask } from '@/nostr/useBatchedEvents';
 
 export type UseProfileProps = {
   pubkey: string;
@@ -40,21 +35,14 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
 
   const query = createQuery(
     genQueryKey,
-    ({ queryKey, signal }) => {
-      const [, currentProps] = queryKey;
-      if (currentProps == null) return null;
-      const { pubkey } = currentProps;
-      const task = new BatchedEventsTask({ type: 'Profile', pubkey });
-      const promise = task.firstEventPromise().catch(() => {
-        throw new Error(`profile not found: ${pubkey}`);
-      });
-      task.onUpdate((events) => {
-        const latest = pickLatestEvent(events);
-        queryClient.setQueryData(queryKey, latest);
-      });
-      registerTask({ task, signal });
-      return timeout(3000, `useProfile: ${pubkey}`)(promise);
-    },
+    latestEventQuery({
+      taskProvider: ([, currentProps]) => {
+        if (currentProps == null) return null;
+        const { pubkey } = currentProps;
+        return new BatchedEventsTask({ type: 'Profile', pubkey });
+      },
+      queryClient,
+    }),
     {
       // Profiles are updated occasionally, so a short staleTime is used here.
       // cacheTime is long so that the user see profiles instantly.

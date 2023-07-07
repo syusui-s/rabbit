@@ -1,11 +1,11 @@
-import { createMemo, observable } from 'solid-js';
+import { createMemo } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
-import { registerTask, BatchedEventsTask } from '@/nostr/useBatchedEvents';
-import timeout from '@/utils/timeout';
+import { eventsQuery } from '@/nostr/query';
+import { BatchedEventsTask } from '@/nostr/useBatchedEvents';
 
 export type UseReactionsProps = {
   eventId: string;
@@ -30,18 +30,14 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
 
   const query = createQuery(
     genQueryKey,
-    ({ queryKey, signal }) => {
-      const [, currentProps] = queryKey;
-      if (currentProps == null) return [];
-      const { eventId: mentionedEventId } = currentProps;
-      const task = new BatchedEventsTask({ type: 'Reactions', mentionedEventId });
-      const promise = task.toUpdatePromise().catch(() => []);
-      task.onUpdate((events) => {
-        queryClient.setQueryData(queryKey, events);
-      });
-      registerTask({ task, signal });
-      return timeout(15000, `useReactions: ${mentionedEventId}`)(promise);
-    },
+    eventsQuery({
+      taskProvider: ([, currentProps]) => {
+        if (currentProps == null) return null;
+        const { eventId: mentionedEventId } = currentProps;
+        return new BatchedEventsTask({ type: 'Reactions', mentionedEventId });
+      },
+      queryClient,
+    }),
     {
       staleTime: 1 * 60 * 1000, // 1 min
       cacheTime: 4 * 60 * 60 * 1000, // 4 hour

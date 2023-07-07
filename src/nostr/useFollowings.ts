@@ -1,11 +1,11 @@
-import { createMemo, observable } from 'solid-js';
+import { createMemo } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
 import { genericEvent } from '@/nostr/event';
-import { registerTask, BatchedEventsTask, pickLatestEvent } from '@/nostr/useBatchedEvents';
-import timeout from '@/utils/timeout';
+import { latestEventQuery } from '@/nostr/query';
+import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
 
 type Following = {
   pubkey: string;
@@ -24,6 +24,15 @@ export type UseFollowings = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
+export const fetchLatestFollowings = (
+  { pubkey }: UseFollowingsProps,
+  signal?: AbortSignal,
+): Promise<NostrEvent> => {
+  const task = new BatchedEventsTask({ type: 'Followings', pubkey });
+  registerTask({ task, signal });
+  return task.latestEventPromise();
+};
+
 const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
@@ -31,22 +40,14 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
 
   const query = createQuery(
     genQueryKey,
-    ({ queryKey, signal }) => {
-      console.debug('useFollowings');
-      const [, currentProps] = queryKey;
-      if (currentProps == null) return Promise.resolve(null);
-      const { pubkey } = currentProps;
-      const task = new BatchedEventsTask({ type: 'Followings', pubkey });
-      const promise = task.firstEventPromise().catch(() => {
-        throw new Error(`followings not found: ${pubkey}`);
-      });
-      task.onUpdate((events) => {
-        const latest = pickLatestEvent(events);
-        queryClient.setQueryData(queryKey, latest);
-      });
-      registerTask({ task, signal });
-      return timeout(15000, `useFollowings: ${pubkey}`)(promise);
-    },
+    latestEventQuery({
+      taskProvider: ([, currentProps]) => {
+        if (currentProps == null) return null;
+        const { pubkey } = currentProps;
+        return new BatchedEventsTask({ type: 'Followings', pubkey });
+      },
+      queryClient,
+    }),
     {
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 24 hour

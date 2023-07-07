@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from 'solid-js';
+import { createMemo } from 'solid-js';
 
 import uniq from 'lodash/uniq';
 import { Kind } from 'nostr-tools';
