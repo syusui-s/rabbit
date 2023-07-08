@@ -1,4 +1,13 @@
-import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
+import {
+  Component,
+  createSignal,
+  createMemo,
+  Show,
+  Switch,
+  Match,
+  createEffect,
+  onMount,
+} from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
@@ -18,7 +27,7 @@ import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
-import useFollowings from '@/nostr/useFollowings';
+import useFollowings, { fetchLatestFollowings } from '@/nostr/useFollowings';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import useSubscription from '@/nostr/useSubscription';
@@ -27,6 +36,7 @@ import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import sleep from '@/utils/sleep';
+import stripMargin from '@/utils/stripMargin';
 import timeout from '@/utils/timeout';
 
 export type ProfileDisplayProps = {
@@ -130,18 +140,36 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       if (p == null) return;
       setUpdatingContacts(true);
 
-      await refetchMyFollowing();
-      await sleep(3000);
-
       const current = myFollowingPubkeys();
-      console.debug('current pubkeys', current);
+      const latest = await fetchLatestFollowings({ pubkey: p });
+
+      const msg = stripMargin`
+        フォローリストが空のようです。初めてのフォローであれば問題ありません。
+        そうでなければ、リレーとの接続がうまくいっていない可能性があります。ページを再読み込みしてリレーと再接続してください。
+        また、他のクライアントと同じリレーを設定できているどうかご確認ください。
+
+        続行しますか？
+      `;
+
+      if ((latest.data() == null || latest.followingPubkeys().length === 0) && !window.confirm(msg))
+        return;
+
+      if ((latest?.data()?.created_at ?? 0) < (myFollowingQuery.data?.created_at ?? 0)) {
+        window.alert(
+          '最新のフォローリストを取得できませんでした。リレーの接続状況が悪い可能性があります。',
+        );
+        return;
+      }
 
       await updateContactsMutation.mutateAsync({
         relayUrls: config().relayUrls,
         pubkey: p,
-        content: myFollowingQuery.data?.content ?? '',
-        followingPubkeys: uniq(update(current)),
+        content: latest.data()?.content ?? '',
+        followingPubkeys: uniq(update(latest.followingPubkeys())),
       });
+    } catch (err) {
+      console.error('failed to update contact list', err);
+      window.alert('フォローリストの更新に失敗しました。');
     } finally {
       setUpdatingContacts(false);
     }

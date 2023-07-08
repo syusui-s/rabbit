@@ -24,13 +24,43 @@ export type UseFollowings = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
-export const fetchLatestFollowings = (
+const buildMethods = (dataProvider: () => NostrEvent | undefined | null) => {
+  const followings = () => {
+    const data = dataProvider();
+    if (data == null) return [];
+
+    const result: Following[] = [];
+
+    // TODO zodにする
+    const event = genericEvent(data);
+    event.pTags().forEach((tag) => {
+      const [, followingPubkey, mainRelayUrl, petname] = tag;
+
+      const following: Following = { pubkey: followingPubkey, petname };
+      if (mainRelayUrl != null && mainRelayUrl.length > 0) {
+        following.mainRelayUrl = mainRelayUrl;
+      }
+
+      result.push(following);
+    });
+
+    return result;
+  };
+
+  const followingPubkeys = (): string[] => followings().map((follow) => follow.pubkey);
+
+  return { followings, followingPubkeys, data: dataProvider };
+};
+
+export const fetchLatestFollowings = async (
   { pubkey }: UseFollowingsProps,
   signal?: AbortSignal,
-): Promise<NostrEvent> => {
+) => {
   const task = new BatchedEventsTask({ type: 'Followings', pubkey });
   registerTask({ task, signal });
-  return task.latestEventPromise();
+
+  const latestFollowings = await task.latestEventPromise();
+  return buildMethods(() => latestFollowings);
 };
 
 const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
@@ -51,39 +81,16 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
     {
       staleTime: 5 * 60 * 1000, // 5 min
       cacheTime: 24 * 60 * 60 * 1000, // 24 hour
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchInterval: 0,
     },
   );
 
-  const followings = () => {
-    if (query.data == null) return [];
-
-    const result: Following[] = [];
-
-    // TODO zodにする
-    const event = genericEvent(query.data);
-    event.pTags().forEach((tag) => {
-      const [, followingPubkey, mainRelayUrl, petname] = tag;
-
-      const following: Following = { pubkey: followingPubkey, petname };
-      if (mainRelayUrl != null && mainRelayUrl.length > 0) {
-        following.mainRelayUrl = mainRelayUrl;
-      }
-
-      result.push(following);
-    });
-
-    return result;
-  };
-
-  const followingPubkeys = (): string[] => followings().map((follow) => follow.pubkey);
-
   const invalidateFollowings = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
 
-  return { followings, followingPubkeys, invalidateFollowings, query };
+  return { ...buildMethods(() => query.data), invalidateFollowings, query };
 };
 
 export default useFollowings;
