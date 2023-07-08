@@ -10,7 +10,6 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:solid/typescript',
-    'plugin:prettier/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:tailwindcss/recommended',
     'plugin:@typescript-eslint/recommended',
@@ -28,7 +27,6 @@ module.exports = {
     'no-relative-import-paths',
     'solid',
     'jsx-a11y',
-    'prettier',
     '@typescript-eslint',
     'tailwindcss',
   ],
@@ -59,7 +57,6 @@ module.exports = {
     ],
     // disabled because jsx-a11y doesn't recognize <label for=...>
     'jsx-a11y/label-has-associated-control': ['off'],
-    'prettier/prettier': 'error',
   },
   settings: {
     linkComponents: ['Link'],

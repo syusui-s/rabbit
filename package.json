@@ -9,8 +9,10 @@
     "dev": "npm run generatePackageInfo && vite",
     "build": "npm run generatePackageInfo && vite build",
     "serve": "npm run generatePackageInfo && vite preview",
-    "lint": "eslint --cache .",
-    "fix": "eslint --cache --fix .",
+    "eslint": "eslint --cache .",
+    "prettier": "prettier -c .",
+    "eslint-fix": "eslint --cache --fix .",
+    "prettier-fix": "prettier --write .",
     "tsc": "tsc --noEmit --skipLibCheck",
     "test": "vitest run --no-watch",
     "watch-test": "vitest --watch",
@@ -31,7 +33,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-no-relative-import-paths": "^1.5.2",
-    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-solid": "^0.12.1",
     "eslint-plugin-tailwindcss": "^3.13.0",
     "husky": "^8.0.3",
@@ -69,7 +70,7 @@
     "zod": "^3.21.4"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
+    "*.{js,jsx,ts,tsx}": "./scripts/fix.sh"
   },
   "nyc": {
     "include": [
