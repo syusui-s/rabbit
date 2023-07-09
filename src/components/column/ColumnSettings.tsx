@@ -19,14 +19,12 @@ type ColumnSettingsSectionProps = {
   children: JSX.Element;
 };
 
-const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => {
-  return (
+const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => (
     <div class="flex flex-col gap-2 border-b p-2">
       <div>{props.title}</div>
       <div>{props.children}</div>
     </div>
   );
-};
 
 const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   const i18n = useTranslation();
@@ -45,7 +43,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   return (
     <div class="flex flex-col border-t">
       <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
-        <div class="scrollbar flex h-9 gap-2 overflow-x-scroll">
+        <div class="flex h-9 gap-2 overflow-x-scroll">
           <button
             class="rounded-md border px-4 hover:bg-stone-100"
             onClick={() => setColumnWidth('widest')}
