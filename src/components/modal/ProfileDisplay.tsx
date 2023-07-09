@@ -283,7 +283,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
                 <Match when={updateContactsMutation.isLoading || updatingContacts()}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    {i18n()('profile.updating')}
+                    {i18n()('general.updating')}
                   </span>
                 </Match>
                 <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
