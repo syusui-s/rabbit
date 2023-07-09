@@ -243,28 +243,32 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
 
   return (
     <BasicModal onClose={() => props.onClose?.()}>
-      <Show when={profileQuery.isFetched} fallback={<>loading</>}>
-        <Show when={profile()?.banner} fallback={<div class="h-12 shrink-0" />} keyed>
-          {(bannerUrl) => (
-            <div class="h-40 w-full shrink-0 sm:h-52">
-              <img src={bannerUrl} alt="header" class="h-full w-full object-cover" />
-            </div>
-          )}
-        </Show>
-        <div class="mt-[-54px] flex items-end gap-4 px-4 pt-4">
-          <div class="flex-1 shrink-0">
-            <div class="h-28 w-28 rounded-lg shadow-md">
-              <Show when={profile()?.picture} keyed>
-                {(pictureUrl) => (
-                  <img
-                    src={pictureUrl}
-                    alt="user icon"
-                    class="h-full w-full rounded-lg object-cover"
-                  />
-                )}
-              </Show>
-            </div>
+      <Show
+        when={profileQuery.isFetched && profile()?.banner}
+        fallback={<div class="h-12 shrink-0" />}
+        keyed
+      >
+        {(bannerUrl) => (
+          <div class="h-40 w-full shrink-0 sm:h-52">
+            <img src={bannerUrl} alt="header" class="h-full w-full object-cover" />
           </div>
+        )}
+      </Show>
+      <div class="mt-[-54px] flex items-end gap-4 px-4 pt-4">
+        <div class="flex-1 shrink-0">
+          <div class="h-28 w-28 rounded-lg shadow-md">
+            <Show when={profileQuery.isFetched && profile()?.picture} keyed>
+              {(pictureUrl) => (
+                <img
+                  src={pictureUrl}
+                  alt="user icon"
+                  class="h-full w-full rounded-lg object-cover"
+                />
+              )}
+            </Show>
+          </div>
+        </div>
+        <Show when={myPubkey() != null}>
           <div class="flex shrink-0 flex-col items-center gap-1">
             <div class="flex flex-row justify-start gap-1">
               <Switch>
@@ -284,7 +288,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
                 <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    {i18n()('profile.loading')}
+                    {i18n()('general.loading')}
                   </span>
                 </Match>
                 <Match when={following()}>
@@ -323,105 +327,106 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
             </div>
             <Switch>
               <Match when={userFollowingQuery.isLoading}>
-                <div class="shrink-0 text-xs">{i18n()('profile.loading')}</div>
+                <div class="shrink-0 text-xs">{i18n()('general.loading')}</div>
               </Match>
               <Match when={followed()}>
                 <div class="shrink-0 text-xs">{i18n()('profile.followsYou')}</div>
               </Match>
             </Switch>
           </div>
-        </div>
-        <div class="flex items-start px-4 pt-2">
-          <div class="h-16 shrink overflow-hidden">
-            <Show when={(profile()?.display_name?.length ?? 0) > 0}>
-              <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
-            </Show>
-            <div class="flex items-center gap-2">
-              <Show when={(profile()?.name?.length ?? 0) > 0}>
-                <div class="truncate text-xs">@{profile()?.name}</div>
-              </Show>
-              <Show when={(profile()?.nip05?.length ?? 0) > 0}>
-                <div class="flex items-center text-xs">
-                  {nip05Identifier()?.ident}
-                  <Switch
-                    fallback={
-                      <span class="inline-block h-4 w-4 text-rose-500">
-                        <ExclamationCircle />
-                      </span>
-                    }
-                  >
-                    <Match when={verificationQuery.isLoading}>
-                      <span class="inline-block h-3 w-3">
-                        <ArrowPath />
-                      </span>
-                    </Match>
-                    <Match when={isVerified()}>
-                      <span class="inline-block h-4 w-4 text-blue-400">
-                        <CheckCircle />
-                      </span>
-                    </Match>
-                  </Switch>
-                </div>
-              </Show>
-            </div>
-            <div class="flex gap-1">
-              <div class="truncate text-xs">{npub()}</div>
-            </div>
-          </div>
-        </div>
-        <Show when={(profile()?.about ?? '').length > 0}>
-          <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
-            {profile()?.about}
-          </div>
         </Show>
-        <div class="flex border-t px-4 py-2">
-          <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
-            <div class="text-sm">フォロー</div>
+      </div>
+      <div class="flex items-start px-4 pt-2">
+        <div class="h-16 shrink overflow-hidden">
+          <Show when={profileQuery.isLoading}>{i18n()('general.loading')}</Show>
+          <Show when={(profile()?.display_name?.length ?? 0) > 0}>
+            <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
+          </Show>
+          <div class="flex items-center gap-2">
+            <Show when={(profile()?.name?.length ?? 0) > 0}>
+              <div class="truncate text-xs">@{profile()?.name}</div>
+            </Show>
+            <Show when={(profile()?.nip05?.length ?? 0) > 0}>
+              <div class="flex items-center text-xs">
+                {nip05Identifier()?.ident}
+                <Switch
+                  fallback={
+                    <span class="inline-block h-4 w-4 text-rose-500">
+                      <ExclamationCircle />
+                    </span>
+                  }
+                >
+                  <Match when={verificationQuery.isLoading}>
+                    <span class="inline-block h-3 w-3">
+                      <ArrowPath />
+                    </span>
+                  </Match>
+                  <Match when={isVerified()}>
+                    <span class="inline-block h-4 w-4 text-blue-400">
+                      <CheckCircle />
+                    </span>
+                  </Match>
+                </Switch>
+              </div>
+            </Show>
+          </div>
+          <div class="flex gap-1">
+            <div class="truncate text-xs">{npub()}</div>
+          </div>
+        </div>
+      </div>
+      <Show when={(profile()?.about ?? '').length > 0}>
+        <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
+          {profile()?.about}
+        </div>
+      </Show>
+      <div class="flex border-t px-4 py-2">
+        <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
+          <div class="text-sm">フォロー</div>
+          <div class="text-xl">
+            <Show
+              when={userFollowingQuery.isFetched}
+              fallback={<span class="text-sm">読み込み中</span>}
+            >
+              {userFollowingPubkeys().length}
+            </Show>
+          </div>
+        </button>
+        <Show when={!config().hideCount}>
+          <div class="flex flex-1 flex-col items-start">
+            <div class="text-sm">フォロワー</div>
             <div class="text-xl">
               <Show
-                when={userFollowingQuery.isFetched}
-                fallback={<span class="text-sm">読み込み中</span>}
+                when={showFollowers()}
+                fallback={
+                  <button
+                    class="text-sm hover:text-stone-800 hover:underline"
+                    onClick={() => setShowFollowers(true)}
+                  >
+                    読み込む
+                  </button>
+                }
+                keyed
               >
-                {userFollowingPubkeys().length}
+                <FollowersCount pubkey={props.pubkey} />
               </Show>
             </div>
-          </button>
-          <Show when={!config().hideCount}>
-            <div class="flex flex-1 flex-col items-start">
-              <div class="text-sm">フォロワー</div>
-              <div class="text-xl">
-                <Show
-                  when={showFollowers()}
-                  fallback={
-                    <button
-                      class="text-sm hover:text-stone-800 hover:underline"
-                      onClick={() => setShowFollowers(true)}
-                    >
-                      読み込む
-                    </button>
-                  }
-                  keyed
-                >
-                  <FollowersCount pubkey={props.pubkey} />
-                </Show>
-              </div>
-            </div>
-          </Show>
-        </div>
-        <Show when={(profile()?.website ?? '').length > 0}>
-          <ul class="border-t px-5 py-2 text-xs">
-            <Show when={profile()?.website} keyed>
-              {(website) => (
-                <li class="flex items-center gap-1">
-                  <span class="inline-block h-4 w-4" area-label="website" title="website">
-                    <GlobeAlt />
-                  </span>
-                  <SafeLink class="text-blue-500 underline" href={website} />
-                </li>
-              )}
-            </Show>
-          </ul>
+          </div>
         </Show>
+      </div>
+      <Show when={(profile()?.website ?? '').length > 0}>
+        <ul class="border-t px-5 py-2 text-xs">
+          <Show when={profile()?.website} keyed>
+            {(website) => (
+              <li class="flex items-center gap-1">
+                <span class="inline-block h-4 w-4" area-label="website" title="website">
+                  <GlobeAlt />
+                </span>
+                <SafeLink class="text-blue-500 underline" href={website} />
+              </li>
+            )}
+          </Show>
+        </ul>
       </Show>
       <Switch>
         <Match when={modal() === 'Following'}>

@@ -10,6 +10,7 @@ import i18nextInstance from '@/i18n/i18n';
 import { I18NextProvider } from '@/i18n/useTranslation';
 
 const Home = lazy(() => import('@/pages/Home'));
+const Permalink = lazy(() => import('@/pages/Permalink'));
 const Hello = lazy(() => import('@/pages/Hello'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
@@ -52,6 +53,7 @@ const App: Component = () => {
         <Routes>
           <Route path="/hello" element={<Hello />} />
           <Route path="/" element={<Home />} />
+          <Route path="/:id" element={<Permalink />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </QueryClientProvider>

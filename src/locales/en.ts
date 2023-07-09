@@ -1,6 +1,10 @@
 import ja from '@/locales/ja';
 
 export default {
+  general: {
+    loading: 'Loading',
+    updating: 'Updating',
+  },
   posting: {
     placeholder: "What's happening?",
     contentWarning: 'Content warning',
@@ -34,8 +38,6 @@ export default {
     following: 'Following',
     followers: 'Followers',
     loadFollowers: 'Load',
-    loading: 'Loading',
-    updating: 'Updating',
     editProfile: 'Edit',
     follow: 'Follow',
     unfollow: 'Unfollow',

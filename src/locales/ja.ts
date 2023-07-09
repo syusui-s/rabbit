@@ -1,4 +1,8 @@
 export default {
+  general: {
+    loading: '読み込み中',
+    updating: '更新中',
+  },
   posting: {
     placeholder: 'いまどうしてる？',
     contentWarning: 'コンテンツ警告を設定',
@@ -32,8 +36,6 @@ export default {
     following: 'フォロー',
     followers: 'フォロワー',
     loadFollowers: '読み込む',
-    loading: '読み込み中',
-    updating: '更新中',
     editProfile: '編集',
     follow: 'フォロー',
     unfollow: 'フォロー解除',

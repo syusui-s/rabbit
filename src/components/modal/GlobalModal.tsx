@@ -1,4 +1,4 @@
-import { Show, Switch, Match } from 'solid-js';
+import { Show, Switch, Match, Component } from 'solid-js';
 
 import About from '@/components/modal/About';
 import AddColumn from '@/components/modal/AddColumn';
@@ -8,7 +8,7 @@ import useModalState from '@/hooks/useModalState';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
 
-const GlobalModal = () => {
+const GlobalModal: Component = () => {
   const pubkey = usePubkey();
   const { modalState, showProfile, closeModal } = useModalState();
 

@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js';
 
 type ModalState =
+  | { type: 'Login' }
   | { type: 'Profile'; pubkey: string }
   | { type: 'ProfileEdit' }
   | { type: 'UserTimeline'; pubkey: string }
@@ -11,6 +12,9 @@ type ModalState =
 const [modalState, setModalState] = createSignal<ModalState>({ type: 'Closed' });
 
 const useModalState = () => {
+  const showLogin = () => {
+    setModalState({ type: 'Login' });
+  };
   const showProfile = (pubkey: string) => {
     setModalState({ type: 'Profile', pubkey });
   };
@@ -29,6 +33,7 @@ const useModalState = () => {
   return {
     modalState,
     setModalState,
+    showLogin,
     showProfile,
     showProfileEdit,
     showAddColumn,

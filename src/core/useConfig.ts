@@ -78,8 +78,8 @@ const InitialConfig = (): Config => ({
   customEmojis: {},
   dateFormat: 'relative',
   keepOpenPostForm: false,
-  useEmojiReaction: false,
-  showEmojiReaction: false,
+  useEmojiReaction: true,
+  showEmojiReaction: true,
   showMedia: true,
   hideCount: false,
   mutedPubkeys: [],
@@ -92,7 +92,7 @@ const deserializer = (json: string): Config =>
   ({
     ...InitialConfig(),
     ...JSON.parse(json),
-  } as Config);
+  }) as Config;
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
 const [config, setConfig] = createStoreWithStorage('RabbitConfig', InitialConfig(), storage);
