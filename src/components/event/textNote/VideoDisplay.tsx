@@ -1,6 +1,7 @@
 import { Component, createSignal, Show } from 'solid-js';
 
 import SafeLink from '@/components/utils/SafeLink';
+import { useTranslation } from '@/i18n/useTranslation';
 
 type VideoDisplayProps = {
   url: string;
@@ -9,6 +10,7 @@ type VideoDisplayProps = {
 
 const VideoDisplay: Component<VideoDisplayProps> = (props) => {
   let videoRef: HTMLVideoElement | undefined;
+  const i18n = useTranslation();
   const [hidden, setHidden] = createSignal(props.initialHidden);
 
   return (
@@ -19,7 +21,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
           class="rounded bg-stone-300 p-3 text-xs text-stone-600 hover:shadow"
           onClick={() => setHidden(false)}
         >
-          動画を表示する
+          {i18n()('post.showVideo')}
         </button>
       }
     >
@@ -31,7 +33,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
           src={props.url}
           controls
         >
-          <a href={props.url}>ダウンロード</a>
+          <a href={props.url}>{i18n()('post.download')}</a>
         </video>
       </SafeLink>
     </Show>

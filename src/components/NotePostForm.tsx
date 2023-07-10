@@ -260,9 +260,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const ensureUploaderAgreement = (): boolean => {
-    return true;
-    /*
+  const ensureUploaderAgreement = (): boolean => true;
+  /*
     if (didAgreeToToS('nostrBuild')) return true;
 
     window.alert(
@@ -277,8 +276,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
     return didAgree;
      */
-  };
-
   const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
     ev.preventDefault();
     if (uploadFilesMutation.isLoading) return;

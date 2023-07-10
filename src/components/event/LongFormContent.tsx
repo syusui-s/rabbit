@@ -9,19 +9,16 @@ export type LongFormContentProps = {
   event: NostrEvent;
 };
 
-const LongFormContent: Component<LongFormContentProps> = (props) => {
+const LongFormContent: Component<LongFormContentProps> = (props) => (
   // const event = () => genericEvent(props.event);
 
-  return (
-    <button class="flex flex-col gap-1 px-1">
-      <div class="flex items-center gap-1">
-        <span class="inline-block h-4 w-4 text-purple-400">
-          <DocumentText />
-        </span>
-        <span>TODO</span>
-      </div>
-    </button>
-  );
-};
-
+  <button class="flex flex-col gap-1 px-1">
+    <div class="flex items-center gap-1">
+      <span class="inline-block h-4 w-4 text-purple-400">
+        <DocumentText />
+      </span>
+      <span>TODO</span>
+    </div>
+  </button>
+);
 export default LongFormContent;

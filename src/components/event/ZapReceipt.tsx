@@ -29,9 +29,7 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
     }
   };
 
-  const amount = () => {
-    return event().findFirstTagByName('amount');
-  };
+  const amount = () => event().findFirstTagByName('amount');
 
   return (
     <Show when={!shouldMuteEvent(props.event)}>

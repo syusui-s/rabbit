@@ -21,6 +21,7 @@ export default {
     search: '検索',
     myPosts: '自分の投稿',
     myReactions: '自分のリアクション',
+    back: '戻る',
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',
@@ -59,6 +60,15 @@ export default {
     deletedSuccessfully: '削除しました（画面への反映にはリロード）',
     failedToDeletePartially: '{{count}}個のリレーで削除に失敗しました',
     failedToDelete: 'すべてのリレーで削除に失敗しました',
+    showImage: '画像を表示する',
+    showVideo: '動画を表示する',
+    showOverflow: '続きを読む',
+    hideOverflow: '隠す',
+    download: 'ダウンロード',
+    contentWarning: {
+      show: '表示するにはクリック',
+      reason: '理由',
+    },
   },
   notification: {
     reposted: 'がリポスト',

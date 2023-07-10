@@ -1,5 +1,6 @@
 import { createSignal, type Component, type JSX, Show } from 'solid-js';
 
+import { useTranslation } from '@/i18n/useTranslation';
 import { ContentWarning } from '@/nostr/event/TextNote';
 
 export type ContentWarningDisplayProps = {
@@ -8,6 +9,7 @@ export type ContentWarningDisplayProps = {
 };
 
 const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => {
+  const i18n = useTranslation();
   const [showContentWarning, setShowContentWarning] = createSignal(false);
 
   return (
@@ -18,10 +20,12 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
           class="mt-2 w-full rounded border p-2 text-center text-xs text-stone-600 shadow-sm hover:shadow"
           onClick={() => setShowContentWarning(true)}
         >
-          表示するにはクリック
+          {i18n()('post.contentWarning.show')}
           <Show when={props.contentWarning.reason != null}>
             <br />
-            <span>理由: {props.contentWarning.reason}</span>
+            <span>
+              {i18n()('post.contentWarning.reason')}: {props.contentWarning.reason}
+            </span>
           </Show>
         </button>
       }

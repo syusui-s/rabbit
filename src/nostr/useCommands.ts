@@ -23,8 +23,8 @@ export type PublishTextNoteParams = {
 } & TagParams;
 
 // NIP-20: Command Result
-const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
+const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> =>
+  new Promise((resolve, reject) => {
     pub.on('ok', () => {
       console.log(`${relayUrl} has accepted our event`);
       resolve();
@@ -34,7 +34,6 @@ const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> => {
       reject(reason);
     });
   });
-};
 
 export const buildTags = ({
   notifyPubkeys,

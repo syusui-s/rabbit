@@ -104,16 +104,14 @@ const RelayConfig = () => {
         </p>
         <ul>
           <For each={config().relayUrls}>
-            {(relayUrl: string) => {
-              return (
-                <li class="flex items-center">
-                  <div class="flex-1 truncate">{relayUrl}</div>
-                  <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
-                    <XMark />
-                  </button>
-                </li>
-              );
-            }}
+            {(relayUrl: string) => (
+              <li class="flex items-center">
+                <div class="flex-1 truncate">{relayUrl}</div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
+                  <XMark />
+                </button>
+              </li>
+            )}
           </For>
         </ul>
         <form class="flex gap-2" onSubmit={handleClickAddRelay}>
@@ -211,23 +209,21 @@ const DateFormatConfig = () => {
 const ToggleButton = (props: {
   value: boolean;
   onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent>;
-}) => {
-  return (
-    <button
-      class="flex h-[24px] w-[48px] items-center rounded-full border border-primary px-1"
-      classList={{
-        'bg-white': !props.value,
-        'justify-start': !props.value,
-        'bg-rose-300': props.value,
-        'justify-end': props.value,
-      }}
-      area-label={props.value}
-      onClick={(event) => props.onClick(event)}
-    >
-      <span class="m-[-2px] inline-block h-5 w-5 rounded-full border border-primary bg-white shadow" />
-    </button>
-  );
-};
+}) => (
+  <button
+    class="flex h-[24px] w-[48px] items-center rounded-full border border-primary px-1"
+    classList={{
+      'bg-white': !props.value,
+      'justify-start': !props.value,
+      'bg-rose-300': props.value,
+      'justify-end': props.value,
+    }}
+    area-label={props.value}
+    onClick={(event) => props.onClick(event)}
+  >
+    <span class="m-[-2px] inline-block h-5 w-5 rounded-full border border-primary bg-white shadow" />
+  </button>
+);
 
 const ReactionConfig = () => {
   const i18n = useTranslation();

@@ -74,6 +74,5 @@ export type UploaderIds = keyof typeof uploaders;
 
 export const uploadFiles =
   <T>(uploadFn: (file: Blob) => Promise<T>) =>
-  (files: File[]): Promise<PromiseSettledResult<Awaited<T>>[]> => {
-    return Promise.allSettled(files.map((file) => uploadFn(file)));
-  };
+  (files: File[]): Promise<PromiseSettledResult<Awaited<T>>[]> =>
+    Promise.allSettled(files.map((file) => uploadFn(file)));

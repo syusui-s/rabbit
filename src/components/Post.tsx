@@ -2,6 +2,7 @@ import { Component, JSX, Show, createSignal } from 'solid-js';
 
 import useDetectOverflow from '@/hooks/useDetectOverflow';
 import useFormatDate from '@/hooks/useFormatDate';
+import { useTranslation } from '@/i18n/useTranslation';
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 
@@ -16,6 +17,7 @@ export type PostProps = {
 };
 
 const Post: Component<PostProps> = (props) => {
+  const i18n = useTranslation();
   const { overflow, elementRef } = useDetectOverflow();
   const formatDate = useFormatDate();
 
@@ -98,8 +100,8 @@ const Post: Component<PostProps> = (props) => {
                 setShowOverflow((current) => !current);
               }}
             >
-              <Show when={!showOverflow()} fallback="隠す">
-                続きを読む
+              <Show when={!showOverflow()} fallback={i18n()('post.hideOverflow')}>
+                {i18n()('post.showOverflow')}
               </Show>
             </button>
           </Show>

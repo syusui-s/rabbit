@@ -5,6 +5,7 @@ import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 import TimelineContentDisplay from '@/components/timeline/TimelineContentDisplay';
 import { TimelineContext, useTimelineState } from '@/components/timeline/TimelineContext';
 import { useHandleCommand } from '@/hooks/useCommandBus';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export type ColumnProps = {
   columnIndex: number;
@@ -18,6 +19,7 @@ const Column: Component<ColumnProps> = (props) => {
   let columnDivRef: HTMLDivElement | undefined;
 
   const timelineState = useTimelineState();
+  const i18n = useTranslation();
 
   const width = () => props.width ?? 'medium';
 
@@ -71,7 +73,7 @@ const Column: Component<ColumnProps> = (props) => {
                   <div class="inline-block h-4 w-4">
                     <ArrowLeft />
                   </div>
-                  <div>ホームに戻る</div>
+                  <div>{i18n()('column.back')}</div>
                 </button>
               </div>
               <ul class="flex h-full flex-col overflow-y-scroll scroll-smooth pb-8">

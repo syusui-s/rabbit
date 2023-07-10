@@ -27,17 +27,15 @@ const tryEncodeNevent = (eventId: string) => {
   }
 };
 
-const EventLink: Component<EventLinkProps> = (props) => {
-  return (
-    <button class="text-blue-500 underline">
-      <Show
-        when={props.kind == null || props.kind === Kind.Text}
-        fallback={tryEncodeNevent(props.eventId)}
-      >
-        {tryEncodeNote(props.eventId)}
-      </Show>
-    </button>
-  );
-};
+const EventLink: Component<EventLinkProps> = (props) => (
+  <button class="text-blue-500 underline">
+    <Show
+      when={props.kind == null || props.kind === Kind.Text}
+      fallback={tryEncodeNevent(props.eventId)}
+    >
+      {tryEncodeNote(props.eventId)}
+    </Show>
+  </button>
+);
 
 export default EventLink;

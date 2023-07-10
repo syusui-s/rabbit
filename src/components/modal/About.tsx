@@ -109,18 +109,16 @@ const About: Component<AboutProps> = (props) => {
         <h2 class="my-4 text-xl font-bold">使用ライブラリ</h2>
 
         <For each={packageInfo()?.packages ?? []} fallback="取得中">
-          {(p) => {
-            return (
-              <>
-                <h3 class="mb-2 mt-4 font-mono">
-                  {p.name}@{p.version} ({p.licenseSpdx})
-                </h3>
-                <pre class="max-h-96 overflow-scroll rounded bg-zinc-100 p-4 text-xs">
-                  {p.licenseText}
-                </pre>
-              </>
-            );
-          }}
+          {(p) => (
+            <>
+              <h3 class="mb-2 mt-4 font-mono">
+                {p.name}@{p.version} ({p.licenseSpdx})
+              </h3>
+              <pre class="max-h-96 overflow-scroll rounded bg-zinc-100 p-4 text-xs">
+                {p.licenseText}
+              </pre>
+            </>
+          )}
         </For>
       </div>
     </BasicModal>

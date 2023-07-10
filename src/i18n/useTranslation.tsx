@@ -34,6 +34,6 @@ export const useTranslation = () => {
   return i18nextFn;
 };
 
-export const I18NextProvider: Component<I18NextProviderProps> = (props) => {
-  return <I18NextContext.Provider value={props.i18next}>{props.children}</I18NextContext.Provider>;
-};
+export const I18NextProvider: Component<I18NextProviderProps> = (props) => (
+  <I18NextContext.Provider value={props.i18next}>{props.children}</I18NextContext.Provider>
+);

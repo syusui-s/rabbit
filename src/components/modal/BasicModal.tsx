@@ -10,27 +10,25 @@ export type BasicModalProps = {
   children: JSX.Element;
 };
 
-const BasicModal: Component<BasicModalProps> = (props) => {
-  return (
-    <Modal onClose={() => props.onClose?.()}>
-      <div class="w-[640px] max-w-full">
-        <button
-          class="w-full pt-1 text-start text-stone-800"
-          aria-label="Close"
-          onClick={() => props.onClose?.()}
-        >
-          <span class="inline-block h-8 w-8">
-            <Show when={props?.closeButton} fallback={<XMark />} keyed>
-              {(button) => button()}
-            </Show>
-          </span>
-        </button>
-        <div class="flex max-h-[calc(100vh-4em)] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
-          {props.children}
-        </div>
+const BasicModal: Component<BasicModalProps> = (props) => (
+  <Modal onClose={() => props.onClose?.()}>
+    <div class="w-[640px] max-w-full">
+      <button
+        class="w-full pt-1 text-start text-stone-800"
+        aria-label="Close"
+        onClick={() => props.onClose?.()}
+      >
+        <span class="inline-block h-8 w-8">
+          <Show when={props?.closeButton} fallback={<XMark />} keyed>
+            {(button) => button()}
+          </Show>
+        </span>
+      </button>
+      <div class="flex max-h-[calc(100vh-4em)] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
+        {props.children}
       </div>
-    </Modal>
-  );
-};
+    </div>
+  </Modal>
+);
 
 export default BasicModal;

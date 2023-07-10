@@ -1,6 +1,7 @@
 import { Component, createSignal, Show } from 'solid-js';
 
 import SafeLink from '@/components/utils/SafeLink';
+import { useTranslation } from '@/i18n/useTranslation';
 import { fixUrl } from '@/utils/url';
 
 type ImageDisplayProps = {
@@ -10,6 +11,7 @@ type ImageDisplayProps = {
 
 const ImageDisplay: Component<ImageDisplayProps> = (props) => {
   let imageRef: HTMLImageElement | undefined;
+  const i18n = useTranslation();
   const [hidden, setHidden] = createSignal(props.initialHidden);
 
   return (
@@ -20,7 +22,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
           class="rounded bg-stone-300 p-3 text-xs text-stone-600 hover:shadow"
           onClick={() => setHidden(false)}
         >
-          画像を展開する
+          {i18n()('post.showImage')}
         </button>
       }
     >

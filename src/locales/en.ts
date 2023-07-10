@@ -23,6 +23,7 @@ export default {
     search: 'Search',
     myPosts: 'My posts',
     myReactions: 'My reactions',
+    back: 'Back',
     config: {
       columnWidth: 'Column width',
       widest: 'Widest',
@@ -61,6 +62,15 @@ export default {
     deletedSuccessfully: 'Deleted successfully (reload to reflect)',
     failedToDeletePartially: 'Failed to delete on {{count}} relays',
     failedToDelete: 'Failed to delete',
+    showImage: 'Show image',
+    showVideo: 'Show video',
+    showOverflow: 'Read more',
+    hideOverflow: 'Hide',
+    download: 'Download',
+    contentWarning: {
+      show: 'Click to display',
+      reason: 'Reason',
+    },
   },
   notification: {
     reposted: ' reposted',

@@ -39,14 +39,12 @@ const RepliesDisplay: Component<{ event: NostrEvent }> = (props) => {
   return <Timeline events={[...events()].reverse()} />;
 };
 
-const TimelineContentDisplay: Component<{ timelineContent: TimelineContent }> = (props) => {
-  return (
-    <Switch>
-      <Match when={props.timelineContent.type === 'Replies' && props.timelineContent} keyed>
-        {(replies) => <RepliesDisplay event={replies.event} />}
-      </Match>
-    </Switch>
-  );
-};
+const TimelineContentDisplay: Component<{ timelineContent: TimelineContent }> = (props) => (
+  <Switch>
+    <Match when={props.timelineContent.type === 'Replies' && props.timelineContent} keyed>
+      {(replies) => <RepliesDisplay event={replies.event} />}
+    </Match>
+  </Switch>
+);
 
 export default TimelineContentDisplay;
