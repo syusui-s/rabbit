@@ -38,3 +38,20 @@ em-emoji-picker {
   width: 360px;
   max-width: 90vw;
 }
+
+.scrollbar::-webkit-scrollbar:vertical {
+  width: 8px;
+}
+.scrollbar::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+.scrollbar::-webkit-scrollbar {
+  background-color: #fbf9f9;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #fce9ec;
+  border-radius: 8px;
+}
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #fcd9dc;
+}

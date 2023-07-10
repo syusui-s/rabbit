@@ -59,7 +59,9 @@ const Column: Component<ColumnProps> = (props) => {
           fallback={
             <>
               <div class="shrink-0 border-b">{props.header}</div>
-              <div class="flex flex-col overflow-y-scroll scroll-smooth">{props.children}</div>
+              <div class="scrollbar flex flex-col overflow-y-scroll scroll-smooth">
+                {props.children}
+              </div>
             </>
           }
         >
@@ -76,7 +78,7 @@ const Column: Component<ColumnProps> = (props) => {
                   <div>{i18n()('column.back')}</div>
                 </button>
               </div>
-              <ul class="flex h-full flex-col overflow-y-scroll scroll-smooth pb-8">
+              <ul class="scrollbar flex h-full flex-col overflow-y-scroll scroll-smooth pb-8">
                 <TimelineContentDisplay timelineContent={timeline} />
               </ul>
             </div>
