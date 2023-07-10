@@ -37,8 +37,10 @@ export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
   if (!res.ok) throw new Error('failed to post image: status code was not 2xx');
 
   const imageUrl = (await res.json()) as string;
+  const url = new URL(imageUrl);
+  url.protocol = 'https:';
 
-  return { imageUrl };
+  return { imageUrl: url.toString() };
 };
 
 export const uploadVoidCat = async (blob: Blob): Promise<any> => {
