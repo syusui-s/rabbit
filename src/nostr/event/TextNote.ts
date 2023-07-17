@@ -32,16 +32,6 @@ export type ContentWarning = {
   reason?: string;
 };
 
-const EmojiTagSchema = z.tuple([
-  z.literal('emoji'),
-  z.string().regex(/^\w+$/, {
-    message: 'shortcode can includes only alpahnumeric characters and underscore',
-  }),
-  z.string().url(), // .refine(isImageUrl)
-]);
-
-export type EmojiTag = z.infer<typeof EmojiTagSchema>;
-
 export const markedEventTags = (tags: string[][]): MarkedEventTag[] => {
   // 'eTags' cannot be used here because it does not preserve originalIndex.
   const events = tags
@@ -183,16 +173,5 @@ export default class TextNote extends GenericEvent {
         ((node.data.type === 'nevent' && node.data.data.id === eventId) ||
           (node.data.type === 'note' && node.data.data === eventId)),
     );
-  }
-
-  emojiTags(): EmojiTag[] {
-    return this.rawEvent.tags.filter(ensureSchema(EmojiTagSchema));
-  }
-
-  getEmojiUrl(shortcode: string): string | null {
-    const emojiTag = this.emojiTags().find(([, code]) => code === shortcode);
-    if (emojiTag == null) return null;
-    const [, , url] = emojiTag;
-    return url;
   }
 }

@@ -1,27 +1,27 @@
-import { Switch, Match, type Component, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 
-import HeartSolid from 'heroicons/24/solid/heart.svg';
 import { type Event as NostrEvent } from 'nostr-tools';
 
+import EmojiDisplay from '@/components/EmojiDisplay';
 import TextNoteDisplay from '@/components/event/textNote/TextNoteDisplay';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
-import { genericEvent } from '@/nostr/event';
+import { reaction } from '@/nostr/event';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 import ensureNonNull from '@/utils/ensureNonNull';
 
-type ReactionProps = {
+type ReactionDisplayProps = {
   event: NostrEvent;
 };
 
-const Reaction: Component<ReactionProps> = (props) => {
+const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
   const i18n = useTranslation();
   const { shouldMuteEvent } = useConfig();
   const { showProfile } = useModalState();
-  const event = () => genericEvent(props.event);
+  const event = () => reaction(props.event);
   const eventId = () => event().lastTaggedEventId();
 
   const { profile } = useProfile(() => ({
@@ -41,13 +41,7 @@ const Reaction: Component<ReactionProps> = (props) => {
     <Show when={!isRemoved() || shouldMuteEvent(props.event)}>
       <div class="flex gap-1 px-1 text-sm">
         <div class="notification-icon flex max-w-[64px] place-items-center">
-          <Switch fallback={<span class="truncate">{props.event.content}</span>}>
-            <Match when={props.event.content === '+'}>
-              <span class="h-4 w-4 pt-[1px] text-rose-400">
-                <HeartSolid />
-              </span>
-            </Match>
-          </Switch>
+          <EmojiDisplay reactionTypes={event().toReactionTypes()} />
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden object-cover">
@@ -84,4 +78,4 @@ const Reaction: Component<ReactionProps> = (props) => {
   );
 };
 
-export default Reaction;
+export default ReactionDisplay;

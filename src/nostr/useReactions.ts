@@ -4,6 +4,7 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { Event as NostrEvent } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
+import { reaction } from '@/nostr/event';
 import { eventsQuery } from '@/nostr/query';
 import { BatchedEventsTask } from '@/nostr/useBatchedEvents';
 
@@ -13,7 +14,7 @@ export type UseReactionsProps = {
 
 export type UseReactions = {
   reactions: () => NostrEvent[];
-  reactionsGroupedByContent: () => Map<string, NostrEvent[]>;
+  reactionsGrouped: () => Map<string, NostrEvent[]>;
   isReactedBy: (pubkey: string) => boolean;
   isReactedByWithEmoji: (pubkey: string) => boolean;
   invalidateReactions: () => Promise<void>;
@@ -50,12 +51,15 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
     return data.filter((ev) => !shouldMuteEvent(ev));
   };
 
-  const reactionsGroupedByContent = () => {
+  const reactionsGrouped = () => {
     const result = new Map<string, NostrEvent[]>();
     reactions().forEach((event) => {
-      const events = result.get(event.content) ?? [];
+      const key = reaction(event).isCustomEmoji()
+        ? `${event.content}${reaction(event).getUrl() ?? ''}`
+        : event.content;
+      const events = result.get(key) ?? [];
       events.push(event);
-      result.set(event.content, events);
+      result.set(key, events);
     });
     return result;
   };
@@ -71,7 +75,7 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
 
   return {
     reactions,
-    reactionsGroupedByContent,
+    reactionsGrouped,
     isReactedBy,
     isReactedByWithEmoji,
     invalidateReactions,

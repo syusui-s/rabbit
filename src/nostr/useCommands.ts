@@ -2,6 +2,7 @@ import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
 
 // import '@/types/nostr.d';
 import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
+import { ReactionTypes } from '@/nostr/event/Reaction';
 import usePool from '@/nostr/usePool';
 import epoch from '@/utils/epoch';
 
@@ -126,25 +127,30 @@ const useCommands = () => {
     relayUrls,
     pubkey,
     eventId,
-    content,
+    reactionTypes,
     notifyPubkey,
   }: {
     relayUrls: string[];
     pubkey: string;
     eventId: string;
-    content: string;
+    reactionTypes: ReactionTypes;
     notifyPubkey: string;
   }): Promise<Promise<void>[]> => {
-    // TODO ensure that content is + or - or emoji.
+    const tags = [
+      ['e', eventId, ''],
+      ['p', notifyPubkey],
+    ];
+
+    if (reactionTypes.type === 'CustomEmoji') {
+      tags.push(['emoji', reactionTypes.shortcode, reactionTypes.url]);
+    }
+
     const preSignedEvent: UnsignedEvent = {
       kind: 7,
       pubkey,
       created_at: epoch(),
-      tags: [
-        ['e', eventId, ''],
-        ['p', notifyPubkey],
-      ],
-      content,
+      tags,
+      content: reactionTypes.content,
     };
     return publishEvent(relayUrls, preSignedEvent);
   };
