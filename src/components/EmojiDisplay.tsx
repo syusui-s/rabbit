@@ -21,7 +21,7 @@ const EmojiDisplay: Component<EmojiDisplayProps> = (props) => (
       {({ content }) => <span class="truncate">{content}</span>}
     </Match>
     <Match when={props.reactionTypes.type === 'CustomEmoji' && props.reactionTypes} keyed>
-      {({ shortcode, url }) => <img class="h-4 max-w-[3rem]" src={url} alt={`:${shortcode}}:`} />}
+      {({ shortcode, url }) => <img class="h-4 max-w-[3rem]" src={url} alt={`:${shortcode}:`} />}
     </Match>
   </Switch>
 );
