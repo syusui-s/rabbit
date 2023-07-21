@@ -91,7 +91,7 @@ const useCommands = () => {
   const publishEvent = async (
     relayUrls: string[],
     event: UnsignedEvent,
-  ): Promise<Promise<void>[]> => {
+  ): Promise<void> => {
     const preSignedEvent: UnsignedEvent & { id?: string } = { ...event };
     preSignedEvent.id = getEventHash(preSignedEvent);
 
@@ -100,15 +100,15 @@ const useCommands = () => {
     }
     const signedEvent = await window.nostr.signEvent(preSignedEvent);
 
-    return relayUrls.map(async (relayUrl) => {
+    return Promise.any(relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
       const pub = relay.publish(signedEvent);
       return waitCommandResult(pub, relayUrl);
-    });
+    }));
   };
 
   // NIP-01
-  const publishTextNote = async (params: PublishTextNoteParams): Promise<Promise<void>[]> => {
+  const publishTextNote = async (params: PublishTextNoteParams): Promise<void>=> {
     const { relayUrls, pubkey, content } = params;
     const tags = buildTags(params);
 
@@ -135,7 +135,7 @@ const useCommands = () => {
     eventId: string;
     reactionTypes: ReactionTypes;
     notifyPubkey: string;
-  }): Promise<Promise<void>[]> => {
+  }): Promise<void>=> {
     const tags = [
       ['e', eventId, ''],
       ['p', notifyPubkey],
@@ -166,7 +166,7 @@ const useCommands = () => {
     pubkey: string;
     eventId: string;
     notifyPubkey: string;
-  }): Promise<Promise<void>[]> => {
+  }): Promise<void>=> {
     const preSignedEvent: UnsignedEvent = {
       kind: 6 as Kind,
       pubkey,
@@ -190,7 +190,7 @@ const useCommands = () => {
     pubkey: string;
     profile: Profile;
     otherProperties: Record<string, any>;
-  }): Promise<Promise<void>[]> => {
+  }): Promise<void>=> {
     const content: ProfileWithOtherProperties = {
       ...profile,
       ...otherProperties,
@@ -215,7 +215,7 @@ const useCommands = () => {
     pubkey: string;
     followingPubkeys: string[];
     content: string;
-  }): Promise<Promise<void>[]> => {
+  }): Promise<void>=> {
     const pTags = followingPubkeys.map((key) => ['p', key]);
 
     const preSignedEvent: UnsignedEvent = {
@@ -236,7 +236,7 @@ const useCommands = () => {
     relayUrls: string[];
     pubkey: string;
     eventId: string;
-  }): Promise<Promise<void>[]> => {
+  }): Promise<void>=> {
     const preSignedEvent: UnsignedEvent = {
       kind: Kind.EventDeletion,
       pubkey,
