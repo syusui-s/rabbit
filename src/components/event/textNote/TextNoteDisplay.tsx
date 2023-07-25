@@ -145,7 +145,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       if (succeeded === results.length) {
         console.log('succeeded to publish reaction');
       } else if (succeeded > 0) {
-        console.log('failed to publish reaction on ${failed} nodes');
+        console.log(`failed to publish reaction on ${failed} nodes`);
       } else {
         console.error('failed to publish reaction on all node');
       }
@@ -170,7 +170,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       if (succeeded === results.length) {
         console.log('succeeded to publish reposts');
       } else if (succeeded > 0) {
-        console.log('failed to publish reposts on ${failed} nodes');
+        console.log(`failed to publish reposts on ${failed} nodes`);
       } else {
         console.error('failed to publish reposts on all node');
       }
