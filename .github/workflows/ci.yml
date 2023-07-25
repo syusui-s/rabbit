@@ -13,11 +13,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 19
+          node-version: 20
       - name: Get npm cache directory
         id: npm-cache-dir
         run: |
-          echo "::set-output name=dir::$(npm config get cache)"
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v3
         id: npm-cache
         with:
@@ -26,12 +26,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --dev
       # TODO あとでちゃんと直す
       # - name: Lint / Format
-      #   run: npm run lint
-      # - name: Test
-      #   run: npm run test
+      #   run: npm run eslint
+      - name: Test
+        run: npm run test
       - name: Build
         run: npm run build -- --base="/rabbit/" # https://syusui-s.github.io/rabbit/
       - name: Check license
