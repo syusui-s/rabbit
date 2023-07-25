@@ -137,9 +137,18 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const publishReactionMutation = createMutation({
     mutationKey: ['publishReaction', event().id],
-    mutationFn: commands.publishReaction.bind(commands),
-    onSuccess: () => {
-      console.log('succeeded to publish reaction');
+    mutationFn: (...params: Parameters<typeof commands.publishReaction>) =>
+      commands.publishReaction(...params).then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
+    onSuccess: (results) => {
+      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+      if (succeeded === results.length) {
+        console.log('succeeded to publish reaction');
+      } else if (succeeded > 0) {
+        console.log('failed to publish reaction on ${failed} nodes');
+      } else {
+        console.error('failed to publish reaction on all node');
+      }
     },
     onError: (err) => {
       console.error('failed to publish reaction: ', err);
@@ -153,9 +162,18 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
 
   const publishRepostMutation = createMutation({
     mutationKey: ['publishRepost', event().id],
-    mutationFn: commands.publishRepost.bind(commands),
-    onSuccess: () => {
-      console.log('succeeded to publish reposts');
+    mutationFn: (...params: Parameters<typeof commands.publishRepost>) =>
+      commands.publishRepost(...params).then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
+    onSuccess: (results) => {
+      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+      if (succeeded === results.length) {
+        console.log('succeeded to publish reposts');
+      } else if (succeeded > 0) {
+        console.log('failed to publish reposts on ${failed} nodes');
+      } else {
+        console.error('failed to publish reposts on all node');
+      }
     },
     onError: (err) => {
       console.error('failed to publish repost: ', err);
