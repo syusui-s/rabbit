@@ -145,11 +145,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        console.log('succeeded to publish reaction');
+        console.log('Succeeded to publish a reaction');
       } else if (succeeded > 0) {
-        console.log(`failed to publish reaction on ${failed} nodes`);
+        console.warn(`failed to publish a reaction on ${failed} relays`);
       } else {
-        console.error('failed to publish reaction on all node');
+        console.error('failed to publish reaction on all relays');
       }
     },
     onError: (err) => {
