@@ -172,11 +172,11 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        console.log('succeeded to publish reposts');
+        console.log('Succeeded to publish a repost');
       } else if (succeeded > 0) {
-        console.log(`failed to publish reposts on ${failed} nodes`);
+        console.warn(`Failed to publish a repost on ${failed} relays`);
       } else {
-        console.error('failed to publish reposts on all node');
+        console.error('Failed to publish a repost on all relays');
       }
     },
     onError: (err) => {
