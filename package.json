@@ -18,9 +18,9 @@
     "watch-test": "vitest --watch",
     "cover": "vitest run --coverage",
     "prepare": "husky install",
-    "generatePackageInfo": "node -e 'import(\"./scripts/generatePackageInfo.mjs\").then((m) => m.default())'",
-    "checkLicense": "node -e 'import(\"./scripts/checkLicense.mjs\").then((m) => m.default())'",
-    "checkSecrets": "node -e 'import(\"./scripts/checkSecrets.mjs\").then((m) => m.default())'"
+    "generatePackageInfo": "node -e \"import('./scripts/generatePackageInfo.mjs').then((m) => m.default())\"",
+    "checkLicense": "node -e \"import('./scripts/checkLicense.mjs').then((m) => m.default())\"",
+    "checkSecrets": "node -e \"import('./scripts/checkSecrets.mjs').then((m) => m.default())\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.61.0",
