@@ -1,6 +1,7 @@
 export const relaysGlobal: string[] = [
   'wss://relay.damus.io',
   'wss://nos.lol',
+  'wss://soloco.nl',
   'wss://relay.snort.social',
 ];
 
