@@ -208,21 +208,19 @@ const useCommands = () => {
   const updateContacts = async ({
     relayUrls,
     pubkey,
-    followingPubkeys,
+    updatedTags,
     content,
   }: {
     relayUrls: string[];
     pubkey: string;
-    followingPubkeys: string[];
+    updatedTags: string[][];
     content: string;
   }): Promise<Promise<void>[]> => {
-    const pTags = followingPubkeys.map((key) => ['p', key]);
-
     const preSignedEvent: UnsignedEvent = {
       kind: Kind.Contacts,
       pubkey,
       created_at: epoch(),
-      tags: pTags,
+      tags: updatedTags,
       content,
     };
     return publishEvent(relayUrls, preSignedEvent);

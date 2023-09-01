@@ -1,13 +1,4 @@
-import {
-  Component,
-  createSignal,
-  createMemo,
-  Show,
-  Switch,
-  Match,
-  createEffect,
-  onMount,
-} from 'solid-js';
+import { Component, createSignal, createMemo, Show, Switch, Match } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
@@ -15,7 +6,6 @@ import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
-import uniq from 'lodash/uniq';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import BasicModal from '@/components/modal/BasicModal';
@@ -35,7 +25,6 @@ import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
-import sleep from '@/utils/sleep';
 import stripMargin from '@/utils/stripMargin';
 import timeout from '@/utils/timeout';
 
@@ -134,13 +123,12 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     },
   });
 
-  const updateContacts = async (update: (current: string[]) => string[]) => {
+  const updateContacts = async (op: 'follow' | 'unfollow', pubkey: string) => {
     try {
       const p = myPubkey();
       if (p == null) return;
       setUpdatingContacts(true);
 
-      const current = myFollowingPubkeys();
       const latest = await fetchLatestFollowings({ pubkey: p });
 
       const msg = stripMargin`
@@ -161,11 +149,25 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         return;
       }
 
+      const latestTags = latest.data()?.tags ?? [];
+      let updatedTags: string[][];
+      switch (op) {
+        case 'follow':
+          updatedTags = [...latestTags, ['p', pubkey]];
+          break;
+        case 'unfollow':
+          updatedTags = latestTags.filter(([name, value]) => !(name === 'p' && value === pubkey));
+          break;
+        default:
+          console.error('updateContacts: invalid operation', op);
+          return;
+      }
+
       await updateContactsMutation.mutateAsync({
         relayUrls: config().relayUrls,
         pubkey: p,
+        updatedTags,
         content: latest.data()?.content ?? '',
-        followingPubkeys: uniq(update(latest.followingPubkeys())),
       });
     } catch (err) {
       console.error('failed to update contact list', err);
@@ -176,7 +178,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   };
 
   const follow = () => {
-    updateContacts((current) => [...current, props.pubkey]).catch((err) => {
+    updateContacts('follow', props.pubkey).catch((err) => {
       console.log('failed to follow', err);
     });
   };
@@ -184,7 +186,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const unfollow = () => {
     if (!window.confirm('本当にフォロー解除しますか？')) return;
 
-    updateContacts((current) => current.filter((k) => k !== props.pubkey)).catch((err) => {
+    updateContacts('unfollow', props.pubkey).catch((err) => {
       console.log('failed to unfollow', err);
     });
   };
