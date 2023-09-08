@@ -68,7 +68,11 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
       <div class="notification-event py-1">
         <Show
           when={reactedEvent()}
-          fallback={<div class="truncate">読み込み中 {eventId()}</div>}
+          fallback={
+            <div class="truncate">
+              {i18n()('general.loading')} {eventId()}
+            </div>
+          }
           keyed
         >
           {(ev) => <TextNoteDisplay event={ev} />}

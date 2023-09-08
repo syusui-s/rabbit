@@ -1,4 +1,5 @@
 import ja from '@/locales/ja';
+import stripMargin from '@/utils/stripMargin';
 
 export default {
   general: {
@@ -7,9 +8,16 @@ export default {
   },
   posting: {
     placeholder: "What's happening?",
+    placeholderReply: 'Post a reply',
     contentWarning: 'Content warning',
+    contentWarningReason: 'Reason of warning',
     uploadImage: 'Upload image',
     submit: 'Submit',
+    forbiddenToIncludeNsec: 'You cannot include private key (nsec).',
+    failedToUploadFile: 'Failed to upload files: {{filenames}}',
+    replyToPre: 'Reply to',
+    replyToAnd: ' and ',
+    replyToPost: '',
   },
   column: {
     home: 'Home',
@@ -49,6 +57,38 @@ export default {
     unmute: 'Unmute',
     followMyself: 'Follow myself',
     unfollowMyself: 'Unfollow myself',
+    confirmUnfollow: 'Do you really want to unfollow?',
+    confirmUpdateEvenIfEmpty: stripMargin`
+      Your follow list appears to be empty.
+
+      There is no problem if you are trying to follow for the first time.
+      Otherwise, it may be caused by poor connections to relays.
+      You should reload this page to reconnect to relays.
+      You also should make sure you have configured the same relay list as the other clients.
+
+      Do you want to continue?
+    `,
+    failedToUpdateFollowList: 'Failed to update the follow list',
+    failedToFetchLatestFollowList:
+      'Failed to fetch the latest follow list. It may be disconnected from some relays.',
+    edit: {
+      icon: 'Icon',
+      banner: 'Banner image',
+      name: 'Username',
+      displayName: 'Display Name',
+      about: 'About',
+      website: 'Website',
+      nip05: 'Domain verification (NIP-05)',
+      lightningAddress: 'LNURL address / lightning address',
+      lightningAddressDescription: 'Only one side will be saved.',
+      otherProperties: 'Other properties',
+      save: 'Save',
+      cancel: 'Cancel',
+      updating: 'updating...',
+      updateSucceeded: 'Updated successfully',
+      failedToUpdatePartially: 'Failed to update on {{count}} relays',
+      failedToUpdate: 'Failed to update on all relays',
+    },
   },
   post: {
     replyToPre: 'Replying to ',
@@ -71,6 +111,7 @@ export default {
       show: 'Click to display',
       reason: 'Reason',
     },
+    failedToFetchEvent: 'Failed to fetch event',
   },
   notification: {
     reposted: ' reposted',

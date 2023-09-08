@@ -131,21 +131,14 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
 
       const latest = await fetchLatestFollowings({ pubkey: p });
 
-      const msg = stripMargin`
-        フォローリストが空のようです。初めてのフォローであれば問題ありません。
-        そうでなければ、リレーとの接続がうまくいっていない可能性があります。ページを再読み込みしてリレーと再接続してください。
-        また、他のクライアントと同じリレーを設定できているどうかご確認ください。
-
-        続行しますか？
-      `;
-
-      if ((latest.data() == null || latest.followingPubkeys().length === 0) && !window.confirm(msg))
+      if (
+        (latest.data() == null || latest.followingPubkeys().length === 0) &&
+        !window.confirm(i18n()('profile.confirmUpdateEvenIfEmpty'))
+      )
         return;
 
       if ((latest?.data()?.created_at ?? 0) < (myFollowingQuery.data?.created_at ?? 0)) {
-        window.alert(
-          '最新のフォローリストを取得できませんでした。リレーの接続状況が悪い可能性があります。',
-        );
+        window.alert(i18n()('profile.failedToFetchLatestFollowList'));
         return;
       }
 
@@ -171,7 +164,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       });
     } catch (err) {
       console.error('failed to update contact list', err);
-      window.alert('フォローリストの更新に失敗しました。');
+      window.alert(i18n()('profile.failedToUpdateFollowList'));
     } finally {
       setUpdatingContacts(false);
     }
@@ -184,7 +177,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   };
 
   const unfollow = () => {
-    if (!window.confirm('本当にフォロー解除しますか？')) return;
+    if (!window.confirm(i18n()('profile.confirmUnfollow'))) return;
 
     updateContacts('unfollow', props.pubkey).catch((err) => {
       console.log('failed to unfollow', err);
@@ -384,11 +377,11 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </Show>
       <div class="flex border-t px-4 py-2">
         <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
-          <div class="text-sm">フォロー</div>
+          <div class="text-sm">{i18n()('profile.following')}</div>
           <div class="text-xl">
             <Show
               when={userFollowingQuery.isFetched}
-              fallback={<span class="text-sm">読み込み中</span>}
+              fallback={<span class="text-sm">{i18n()('general.loading')}</span>}
             >
               {userFollowingPubkeys().length}
             </Show>
@@ -396,7 +389,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         </button>
         <Show when={!config().hideCount}>
           <div class="flex flex-1 flex-col items-start">
-            <div class="text-sm">フォロワー</div>
+            <div class="text-sm">{i18n()('profile.followers')}</div>
             <div class="text-xl">
               <Show
                 when={showFollowers()}
@@ -405,7 +398,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     class="text-sm hover:text-stone-800 hover:underline"
                     onClick={() => setShowFollowers(true)}
                   >
-                    読み込む
+                    {i18n()('profile.loadFollowers')}
                   </button>
                 }
                 keyed

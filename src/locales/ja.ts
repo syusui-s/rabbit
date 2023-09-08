@@ -1,3 +1,5 @@
+import stripMargin from '@/utils/stripMargin';
+
 export default {
   general: {
     loading: '読み込み中',
@@ -5,9 +7,16 @@ export default {
   },
   posting: {
     placeholder: 'いまどうしてる？',
+    placeholderReply: '返信を投稿',
     contentWarning: 'コンテンツ警告を設定',
+    contentWarningReason: '警告の理由',
     uploadImage: '画像を投稿',
     submit: '投稿',
+    forbiddenToIncludeNsec: '投稿に秘密鍵(nsec)を含めることはできません。',
+    failedToUploadFile: 'ファイルのアップロードにしました: {{filenames}}',
+    replyToPre: '',
+    replyToAnd: ' と ',
+    replyToPost: 'に返信',
   },
   column: {
     home: 'ホーム',
@@ -47,6 +56,35 @@ export default {
     unmute: 'ミュート解除',
     followMyself: '自分をフォロー',
     unfollowMyself: '自分をフォロー解除',
+    confirmUnfollow: '本当にフォロー解除しますか？',
+    confirmUpdateEvenIfEmpty: stripMargin`
+      フォローリストが空のようです。初めてのフォローであれば問題ありません。
+      そうでなければ、リレーとの接続がうまくいっていない可能性があります。ページを再読み込みしてリレーと再接続してください。
+      また、他のクライアントと同じリレーを設定できているどうかご確認ください。
+
+      続行しますか？
+    `,
+    failedToUpdateFollowList: 'フォローリストの更新に失敗しました',
+    failedToFetchLatestFollowList:
+      '最新のフォローリストを取得できませんでした。リレーの接続状況が悪い可能性があります。',
+    edit: {
+      icon: 'アイコン',
+      banner: 'バナー',
+      name: 'ユーザ名',
+      displayName: 'ユーザ名',
+      about: '自己紹介',
+      website: 'ウェブサイト',
+      nip05: 'ドメイン認証（NIP-05）',
+      lightningAddress: 'LNURLアドレス / ライトニングアドレス',
+      lightningAddressDescription: 'どちらか片方のみが保存されます。',
+      otherProperties: 'その他の項目',
+      save: '更新',
+      cancel: 'キャンセル',
+      updating: '更新中...',
+      updateSucceeded: '更新しました',
+      failedToUpdatePartially: '{{count}}個のリレーで更新に失敗しました',
+      failedToUpdate: 'すべてのリレーで更新に失敗しました',
+    },
   },
   post: {
     replyToPre: '',
@@ -69,6 +107,7 @@ export default {
       show: '表示するにはクリック',
       reason: '理由',
     },
+    failedToFetchEvent: '取得に失敗しました',
   },
   notification: {
     reposted: 'がリポスト',

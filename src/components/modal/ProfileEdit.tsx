@@ -7,6 +7,7 @@ import omitBy from 'lodash/omitBy';
 
 import BasicModal from '@/components/modal/BasicModal';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import { Profile } from '@/nostr/event/Profile';
 import useCommands from '@/nostr/useCommands';
 import useProfile from '@/nostr/useProfile';
@@ -29,6 +30,7 @@ const isLNURL = (s: string) => LNURLRegex.test(s);
 const isInternetIdentifier = (s: string) => InternetIdentifierRegex.test(s);
 
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
+  const i18n = useTranslation();
   const pubkey = usePubkey();
   const { config } = useConfig();
 
@@ -56,11 +58,11 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        window.alert('更新しました');
+        window.alert(i18n()('profile.edit.updateSucceeded'));
       } else if (succeeded > 0) {
-        window.alert(`${failed}個のリレーで更新に失敗しました`);
+        window.alert(i18n()('profile.edit.failedToUpdatePartially', { count: failed }));
       } else {
-        window.alert('すべてのリレーで更新に失敗しました');
+        window.alert(i18n()('profile.edit.failedToUpdate'));
       }
       invalidateProfile()
         .then(() => query.refetch())
@@ -159,13 +161,13 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
         </div>
       </div>
       <Show when={loading()}>
-        <div class="px-4 pt-4">読み込み中...</div>
+        <div class="px-4 pt-4">{i18n()('general.loading')}</div>
       </Show>
       <div>
         <form class="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="picture">
-              アイコン
+              {i18n()('profile.edit.icon')}
             </label>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -181,7 +183,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="picture">
-              バナー
+              {i18n()('profile.edit.banner')}
             </label>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -197,7 +199,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              ユーザ名
+              {i18n()('profile.edit.name')}
             </label>
             <div class="flex w-full items-center gap-2">
               <span>@</span>
@@ -218,7 +220,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              名前
+              {i18n()('profile.edit.displayName')}
             </label>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -233,7 +235,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              自己紹介
+              {i18n()('profile.edit.about')}
             </label>
             <textarea
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -246,7 +248,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              ウェブサイト
+              {i18n()('profile.edit.website')}
             </label>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -261,7 +263,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              ドメイン認証（NIP-05）
+              {i18n()('profile.edit.nip05')}
             </label>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
@@ -277,9 +279,9 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              LNURLアドレス / ライトニングアドレス
+              {i18n()('profile.edit.lightningAddress')}
             </label>
-            <span class="text-xs">どちらか片方のみが保存されます。</span>
+            <span class="text-xs">{i18n()('profile.edit.lightningAddressDescription')}</span>
             <input
               class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
               type="text"
@@ -294,7 +296,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <Show when={Object.entries(otherProperties()).length > 0}>
             <div>
-              <span class="font-bold">その他の項目</span>
+              <span class="font-bold">{i18n()('profile.edit.otherProperties')}</span>
               <div>
                 <For each={Object.entries(otherProperties())}>
                   {([key, value]) => (
@@ -313,17 +315,17 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               class="rounded bg-rose-300 p-2 font-bold text-white hover:bg-rose-400"
               disabled={mutation.isLoading}
             >
-              保存
+              {i18n()('profile.edit.save')}
             </button>
             <button
               type="button"
               class="rounded border border-rose-300 p-2 font-bold text-rose-300 hover:border-rose-400 hover:text-rose-400"
               onClick={() => props.onClose()}
             >
-              キャンセル
+              {i18n()('profile.edit.cancel')}
             </button>
           </div>
-          <Show when={mutation.isLoading}>保存中...</Show>
+          <Show when={mutation.isLoading}>{i18n()('profile.edit.updating')}</Show>
         </form>
       </div>
     </BasicModal>

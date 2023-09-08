@@ -5,6 +5,7 @@ import EventDisplay from '@/components/event/EventDisplay';
 import { type EventDisplayProps } from '@/components/event/EventDisplay';
 import EventLink from '@/components/EventLink';
 import useConfig from '@/core/useConfig';
+import { useTranslation } from '@/i18n/useTranslation';
 import useEvent from '@/nostr/useEvent';
 import ensureNonNull from '@/utils/ensureNonNull';
 
@@ -13,6 +14,7 @@ type EventDisplayByIdProps = Omit<EventDisplayProps, 'event'> & {
 };
 
 const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
+  const i18n = useTranslation();
   const [localProps, restProps] = splitProps(props, ['eventId']);
   const { shouldMuteEvent } = useConfig();
 
@@ -31,7 +33,7 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
     <Switch
       fallback={
         <span>
-          投稿が見つかりません
+          {i18n()('post.failedToFetchEvent')}
           {props.eventId}
         </span>
       }
@@ -43,8 +45,7 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
       <Match when={eventQuery.isLoading && localProps.eventId} keyed>
         {(id) => (
           <div class="truncate">
-            {'読み込み中 '}
-            <EventLink eventId={id} />
+            {i18n()('general.loading')} <EventLink eventId={id} />
           </div>
         )}
       </Match>

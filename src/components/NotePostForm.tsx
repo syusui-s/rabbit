@@ -13,6 +13,7 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
 import usePersistStatus from '@/hooks/usePersistStatus';
+import { useTranslation } from '@/i18n/useTranslation';
 import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
@@ -26,16 +27,6 @@ type NotePostFormProps = {
   onClose: () => void;
   onPost?: () => void;
   textAreaRef?: (textAreaRef: HTMLTextAreaElement) => void;
-};
-
-const placeholder = (mode: NotePostFormProps['mode']) => {
-  switch (mode) {
-    case 'reply':
-      return '返信を投稿';
-    case 'normal':
-    default:
-      return 'いまどうしてる？';
-  }
 };
 
 const extract = (parsed: ParsedTextNote) => {
@@ -86,6 +77,7 @@ const format = (parsed: ParsedTextNote) => {
 };
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
+  const i18n = useTranslation();
   let textAreaRef: HTMLTextAreaElement | undefined;
   let fileInputRef: HTMLInputElement | undefined;
 
@@ -106,6 +98,16 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     textAreaRef?.blur();
     clearText();
     props.onClose();
+  };
+
+  const placeholder = (mode: NotePostFormProps['mode']) => {
+    switch (mode) {
+      case 'reply':
+        return i18n()('posting.placeholderReply');
+      case 'normal':
+      default:
+        return i18n()('posting.placeholder');
+    }
   };
 
   const { config, getEmoji } = useConfig();
@@ -152,7 +154,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
       if (failed.length > 0) {
         const filenames = failed.map((f) => f.name).join(', ');
-        window.alert(`ファイルのアップロードに失敗しました: ${filenames}`);
+        window.alert(i18n()('posting.failedToUploadFile', { filenames }));
       }
     },
   });
@@ -194,7 +196,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (publishTextNoteMutation.isLoading) return;
 
     if (/nsec1[0-9a-zA-Z]+/.test(text())) {
-      window.alert('投稿に秘密鍵(nsec)を含めることはできません。');
+      window.alert(i18n()('posting.forbiddenToIncludeNsec'));
       return;
     }
 
@@ -337,6 +339,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     <div class="p-1">
       <Show when={props.replyTo != null}>
         <div>
+          {i18n()('posting.replyToPre')}
           <For each={notifyPubkeys()}>
             {(pubkey, index) => (
               <>
@@ -345,7 +348,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </>
             )}
           </For>
-          に返信
+          {i18n()('posting.replyToPost')}
         </div>
       </Show>
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
@@ -353,7 +356,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           <input
             type="text"
             class="rounded"
-            placeholder="警告の理由"
+            placeholder={i18n()('posting.contentWarningReason')}
             maxLength={32}
             onInput={(ev) => setContentWarningReason(ev.currentTarget.value)}
             value={contentWarningReason()}
@@ -400,8 +403,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="button"
-            aria-label="コンテンツ警告を設定"
-            title="コンテンツ警告を設定"
+            aria-label={i18n()('posting.contentWarning')}
+            title={i18n()('posting.contentWarning')}
             onClick={() => setContentWarning((e) => !e)}
           >
             <span>CW</span>
@@ -417,8 +420,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="button"
-            title="画像を投稿"
-            aria-label="画像を投稿"
+            title={i18n()('posting.uploadImage')}
+            aria-label={i18n()('posting.uploadImage')}
             disabled={fileUploadDisabled()}
             onClick={() => fileInputRef?.click()}
           >
@@ -435,8 +438,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="submit"
-            aria-label="投稿"
-            title="投稿"
+            aria-label={i18n()('posting.submit')}
+            title={i18n()('posting.submit')}
             disabled={submitDisabled()}
           >
             <PaperAirplane />
