@@ -36,6 +36,9 @@ jobs:
         run: npm run build
       - name: Check license
         run: npm run checkLicense
+      - name: Copy index.html for GitHub Pages
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: cp dist/index.html dist/404.html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
