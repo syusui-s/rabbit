@@ -33,7 +33,7 @@ jobs:
       - name: Test
         run: npm run test
       - name: Build
-        run: npm run build
+        run: npm run build -- --base="/rabbit/" # https://syusui-s.github.io/rabbit/
       - name: Check license
         run: npm run checkLicense
       - name: Copy index.html for GitHub Pages
