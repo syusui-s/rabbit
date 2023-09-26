@@ -9,12 +9,15 @@ import {
   children,
 } from 'solid-js';
 
+import { Portal } from 'solid-js/web';
+
 export type PopupRef = {
   close: () => void;
+  elem: HTMLElement | undefined;
 };
 
 export type PopupProps = {
-  children: JSX.Element;
+  children?: JSX.Element;
   button: JSX.Element;
   position?: 'left' | 'bottom' | 'right' | 'top';
   onOpen?: () => void;
@@ -96,7 +99,7 @@ const Popup: Component<PopupProps> = (props) => {
   });
 
   onMount(() => {
-    props.ref?.({ close });
+    props.ref?.({ close, elem: popupRef });
   });
 
   onCleanup(() => removeClickOutsideHandler());
@@ -114,14 +117,16 @@ const Popup: Component<PopupProps> = (props) => {
       >
         {props.button}
       </button>
-      <div
-        ref={popupRef}
-        class="absolute z-20"
-        classList={{ hidden: !isOpen(), block: isOpen() }}
-        style={style()}
-      >
-        {resolvedChildren()}
-      </div>
+      <Portal>
+        <div
+          ref={popupRef}
+          class="absolute z-20"
+          classList={{ hidden: !isOpen(), block: isOpen() }}
+          style={style()}
+        >
+          {resolvedChildren()}
+        </div>
+      </Portal>
     </div>
   );
 };
