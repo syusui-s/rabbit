@@ -1,7 +1,8 @@
-import { type Event as NostrEvent, type Filter, Kind } from 'nostr-tools';
+import { type Event as NostrEvent, type Filter, Kind, utils } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
 import { genericEvent } from '@/nostr/event';
+import { pickLatestEvent } from '@/nostr/event/comparator';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
 import ObservableTask from '@/utils/batch/ObservableTask';
@@ -29,19 +30,9 @@ type TaskArg =
   | RepostsTask
   | ParameterizedReplaceableEventTask;
 
-export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | null => {
-  if (events.length === 0) return null;
-  return events.reduce((a, b) => {
-    const diff = a.created_at - b.created_at;
-    if (diff > 0) return a;
-    if (diff < 0) return b;
-    return a.id < b.id ? a : b;
-  });
-};
-
 export class BatchedEventsTask extends ObservableTask<TaskArg, NostrEvent[]> {
   addEvent(event: NostrEvent) {
-    this.updateWith((current) => [...(current ?? []), event]);
+    this.updateWith((current) => utils.insertEventIntoDescendingList(current ?? [], event));
   }
 
   firstEventPromise(): Promise<NostrEvent> {

@@ -1,7 +1,9 @@
 import { QueryClient, QueryKey } from '@tanstack/solid-query';
+import { uniqBy } from 'lodash';
 import { Event as NostrEvent } from 'nostr-tools';
 
-import { BatchedEventsTask, pickLatestEvent, registerTask } from '@/nostr/useBatchedEvents';
+import { pickLatestEvent, sortEvents } from '@/nostr/event/comparator';
+import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export const latestEventQuery =
@@ -20,7 +22,11 @@ export const latestEventQuery =
     });
     task.onUpdate((events) => {
       const latest = pickLatestEvent(events);
-      queryClient.setQueryData(queryKey, latest);
+      queryClient.setQueryData(queryKey, (prev: NostrEvent | undefined) =>
+        prev == null || (latest != null && latest.created_at > prev.created_at)
+          ? latest
+          : undefined,
+      );
     });
     registerTask({ task, signal });
     return timeout(15000, `${JSON.stringify(queryKey)}`)(promise);
@@ -39,7 +45,12 @@ export const eventsQuery =
     if (task == null) return Promise.resolve([]);
     const promise = task.toUpdatePromise().catch(() => []);
     task.onUpdate((events) => {
-      queryClient.setQueryData(queryKey, events);
+      // TODO consider kind:5 deletion
+      queryClient.setQueryData(queryKey, (prev: NostrEvent[] | undefined) => {
+        if (prev == null) return events;
+        const deduped = uniqBy([...prev, ...events], (e) => e.id);
+        return sortEvents(deduped);
+      });
     });
     registerTask({ task, signal });
     return timeout(15000, `${JSON.stringify(queryKey)}`)(promise);

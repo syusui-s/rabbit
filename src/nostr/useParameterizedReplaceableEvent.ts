@@ -3,7 +3,8 @@ import { createMemo, observable } from 'solid-js';
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools';
 
-import { registerTask, BatchedEventsTask, pickLatestEvent } from '@/nostr/useBatchedEvents';
+import { pickLatestEvent } from '@/nostr/event/comparator';
+import { registerTask, BatchedEventsTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 // Parameterized Replaceable Event

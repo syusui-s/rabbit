@@ -4,6 +4,7 @@ import uniqBy from 'lodash/uniqBy';
 import { utils } from 'nostr-tools';
 
 import useConfig from '@/core/useConfig';
+import { sortEvents } from '@/nostr/event/comparator';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
 
@@ -28,9 +29,6 @@ export type UseSubscriptionProps = {
   signal?: AbortSignal;
   debugId?: string;
 };
-
-const sortEvents = (events: NostrEvent[]) =>
-  Array.from(events).sort((a, b) => b.created_at - a.created_at);
 
 let count = 0;
 
