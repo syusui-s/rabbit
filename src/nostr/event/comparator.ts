@@ -9,6 +9,7 @@ import { Event as NostrEvent } from 'nostr-tools';
 export const compareEvents = (a: NostrEvent, b: NostrEvent): number => {
   const diff = a.created_at - b.created_at;
   if (diff !== 0) return diff;
+  if (a.id === b.id) return 0;
   return a.id > b.id ? 1 : -1;
 };
 

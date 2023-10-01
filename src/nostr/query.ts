@@ -2,7 +2,7 @@ import { QueryClient, QueryKey } from '@tanstack/solid-query';
 import { uniqBy } from 'lodash';
 import { Event as NostrEvent } from 'nostr-tools';
 
-import { pickLatestEvent, sortEvents } from '@/nostr/event/comparator';
+import { compareEvents, pickLatestEvent, sortEvents } from '@/nostr/event/comparator';
 import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
@@ -23,9 +23,7 @@ export const latestEventQuery =
     task.onUpdate((events) => {
       const latest = pickLatestEvent(events);
       queryClient.setQueryData(queryKey, (prev: NostrEvent | undefined) =>
-        prev == null || (latest != null && latest.created_at > prev.created_at)
-          ? latest
-          : undefined,
+        prev == null || (latest != null && compareEvents(latest, prev) >= 0) ? latest : undefined,
       );
     });
     registerTask({ task, signal });
