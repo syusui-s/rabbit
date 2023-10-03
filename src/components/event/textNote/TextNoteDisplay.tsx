@@ -20,7 +20,7 @@ import { nip19, type Event as NostrEvent } from 'nostr-tools';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import EmojiDisplay from '@/components/EmojiDisplay';
-import EmojiPicker from '@/components/EmojiPicker';
+import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import ContentWarningDisplay from '@/components/event/textNote/ContentWarningDisplay';
@@ -55,6 +55,21 @@ type EmojiReactionsProps = {
 };
 
 const { noteEncode } = nip19;
+
+const emojiDataToReactionTypes = (emoji: EmojiData): ReactionTypes => {
+  if (emoji.native != null) {
+    return { type: 'Emoji', content: emoji.native };
+  }
+  if (emoji.src != null) {
+    return {
+      type: 'CustomEmoji',
+      content: `:${emoji.id}:`,
+      shortcode: emoji.id,
+      url: emoji.src,
+    };
+  }
+  throw new Error('unknown emoji');
+};
 
 const EmojiReactions: Component<EmojiReactionsProps> = (props) => {
   const { config } = useConfig();
@@ -308,6 +323,10 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
     doReaction();
   };
 
+  const handleEmojiSelect = (emoji: EmojiData) => {
+    doReaction(emojiDataToReactionTypes(emoji));
+  };
+
   return (
     <div class="nostr-textnote">
       <Post
@@ -423,9 +442,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                       publishReactionMutation.isLoading,
                   }}
                 >
-                  <EmojiPicker
-                    onEmojiSelect={(emoji) => doReaction({ type: 'Emoji', content: emoji })}
-                  >
+                  <EmojiPicker onEmojiSelect={handleEmojiSelect}>
                     <span class="inline-block h-4 w-4">
                       <Plus />
                     </span>

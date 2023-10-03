@@ -1,47 +1,88 @@
-import { Component, JSX, createSignal } from 'solid-js';
+import { Component, JSX, onCleanup } from 'solid-js';
 
 import { Picker } from 'emoji-mart';
 
 import Popup, { PopupRef } from '@/components/utils/Popup';
 import useConfig from '@/core/useConfig';
 
+// https://github.com/missive/emoji-mart/blob/main/packages/emoji-mart/src/utils.ts#L26
+export type EmojiData = {
+  id: string;
+  name: string;
+  native?: string;
+  src?: string;
+  unified: string;
+  keywords: string[];
+  shortcodes: string;
+};
+
 type EmojiPickerProps = {
-  onEmojiSelect?: (emoji: string) => void;
+  onEmojiSelect?: (emoji: EmojiData) => void;
   customEmojis?: boolean;
   children: JSX.Element;
 };
 
 const EmojiPicker: Component<EmojiPickerProps> = (props) => {
   let popupRef: PopupRef | undefined;
+  let pickerElement: HTMLElement | undefined;
 
   const { config } = useConfig();
-  const [pickerElement, setPickerElement] = createSignal<HTMLElement | undefined>(undefined);
+
+  const removePicker = () => {
+    if (pickerElement != null) {
+      pickerElement.remove();
+      pickerElement = undefined;
+    }
+  };
 
   const handleOpen = () => {
+    if (pickerElement != null) {
+      console.error('unexpected state');
+    }
+    removePicker();
+
+    const customEmojis = Object.entries(config().customEmojis).map(([name, { url }]) => ({
+      id: name,
+      name,
+      keywords: [name],
+      skins: [{ src: url }],
+    }));
     const picker = new Picker({
       data: async () => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data');
         return response.json();
       },
+      /*
+      // TODO uncomment if this is fixed: https://github.com/missive/emoji-mart/issues/794
       i18n: async () => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data/i18n/ja.json');
         return response.json();
       },
-      autoFocus: false,
       locale: 'ja',
+      */
+      custom: [
+        {
+          id: 'custom',
+          name: 'Custom Emojis',
+          emojis: customEmojis,
+        },
+      ],
+      autoFocus: false,
       theme: 'light',
-      onEmojiSelect: (emoji: { id: string; native?: string }) => {
-        props.onEmojiSelect?.(emoji.native ?? `:${emoji.id}:`);
+      onEmojiSelect: (emoji: EmojiData) => {
+        console.log(emoji);
+        props.onEmojiSelect?.(emoji);
         popupRef?.close();
       },
     });
 
-    setPickerElement(picker as any as HTMLElement);
+    pickerElement = picker as any as HTMLElement;
+    popupRef?.elem?.appendChild(pickerElement);
   };
 
-  const handleClose = () => {
-    setPickerElement(undefined);
-  };
+  onCleanup(() => {
+    removePicker();
+  });
 
   return (
     <Popup
@@ -51,10 +92,8 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
       position="bottom"
       button={props.children}
       onOpen={handleOpen}
-      onClose={handleClose}
-    >
-      {pickerElement()}
-    </Popup>
+      onClose={removePicker}
+    />
   );
 };
 
