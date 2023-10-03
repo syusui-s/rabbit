@@ -8,7 +8,7 @@ import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
 import { Event as NostrEvent } from 'nostr-tools';
 
-import EmojiPicker from '@/components/EmojiPicker';
+import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
@@ -248,6 +248,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     resizeTextArea();
   };
 
+  const handleEmojiSelect = (emoji: EmojiData) => {
+    appendText(emoji.native ?? `:${emoji.id}:`);
+  };
+
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
     submit();
@@ -387,7 +391,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </button>
             </div>
           </Show>
-          <EmojiPicker customEmojis={true} onEmojiSelect={(emoji) => appendText(emoji)}>
+          <EmojiPicker customEmojis={true} onEmojiSelect={handleEmojiSelect}>
             <span class="inline-block h-8 w-8 rounded bg-primary p-2 font-bold text-white">
               <FaceSmile />
             </span>

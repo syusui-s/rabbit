@@ -5,8 +5,19 @@ import { Picker } from 'emoji-mart';
 import Popup, { PopupRef } from '@/components/utils/Popup';
 import useConfig from '@/core/useConfig';
 
+// https://github.com/missive/emoji-mart/blob/main/packages/emoji-mart/src/utils.ts#L26
+export type EmojiData = {
+  id: string;
+  name: string;
+  native?: string;
+  src?: string;
+  unified: string;
+  keywords: string[];
+  shortcodes: string;
+};
+
 type EmojiPickerProps = {
-  onEmojiSelect?: (emoji: string) => void;
+  onEmojiSelect?: (emoji: EmojiData) => void;
   customEmojis?: boolean;
   children: JSX.Element;
 };
@@ -41,10 +52,14 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data');
         return response.json();
       },
+      /*
+      // TODO uncomment if this is fixed: https://github.com/missive/emoji-mart/issues/794
       i18n: async () => {
         const response = await fetch('https://cdn.jsdelivr.net/npm/@emoji-mart/data/i18n/ja.json');
         return response.json();
       },
+      locale: 'ja',
+      */
       custom: [
         {
           id: 'custom',
@@ -53,10 +68,10 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
         },
       ],
       autoFocus: false,
-      locale: 'ja',
       theme: 'light',
-      onEmojiSelect: (emoji: { id: string; native?: string }) => {
-        props.onEmojiSelect?.(emoji.native ?? `:${emoji.id}:`);
+      onEmojiSelect: (emoji: EmojiData) => {
+        console.log(emoji);
+        props.onEmojiSelect?.(emoji);
         popupRef?.close();
       },
     });
