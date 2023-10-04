@@ -1,3 +1,5 @@
+import { createEffect, createRoot } from 'solid-js';
+
 import { createStore } from 'solid-js/store';
 
 export type Stats = {
@@ -10,9 +12,11 @@ const [stats, setStats] = createStore<Stats>({
   activeBatchSubscriptions: 0,
 });
 
-setInterval(() => {
-  console.debug('stats', { ...stats });
-}, 1000);
+createRoot(() => {
+  createEffect(() => {
+    console.debug('stats', { ...stats });
+  });
+});
 
 const useStats = () => {
   const setActiveSubscriptions = (count: number) => setStats('activeSubscriptions', count);
