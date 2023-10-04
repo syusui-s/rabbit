@@ -8,6 +8,34 @@ export type Uploader = {
   upload: (file: File) => Promise<UploadResult>;
 };
 
+export type NostrBuildResult = {
+  status: 'success' | 'error';
+  message: string;
+  data: {
+    input_name: string;
+    name: string;
+    url: string;
+    thumbnail?: string;
+    blurhash?: string;
+    sha256: string;
+    type: 'image' | 'video' | 'profile' | 'other';
+    mime: string;
+    size: number;
+    metadata?: Record<string, string>;
+    dimensions?: {
+      width: number;
+      height: number;
+    };
+    responsive?: {
+      '240p': string;
+      '360p': string;
+      '480p': string;
+      '720p': string;
+      '1080p': string;
+    };
+  }[];
+};
+
 const toHexString = (buff: ArrayBuffer): string => {
   const arr = new Array(buff.byteLength);
   const view = new Int8Array(buff);
@@ -21,11 +49,9 @@ const toHexString = (buff: ArrayBuffer): string => {
 
 export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
   const form = new FormData();
-  form.set('fileToUpload', blob);
-  form.set('img_url', '');
-  form.set('submit', 'Upload');
+  form.set('file', blob);
 
-  const res = await fetch('https://nostr.build/api/upload/ios.php', {
+  const res = await fetch('https://nostr.build/api/v2/upload/files', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -36,11 +62,11 @@ export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
 
   if (!res.ok) throw new Error('failed to post image: status code was not 2xx');
 
-  const imageUrl = (await res.json()) as string;
-  const url = new URL(imageUrl);
-  url.protocol = 'https:';
+  const result = (await res.json()) as NostrBuildResult;
 
-  return { imageUrl: url.toString() };
+  if (result.status !== 'success') throw new Error(`failed to post image: ${result.message}`);
+
+  return { imageUrl: result.data[0].url };
 };
 
 export const uploadVoidCat = async (blob: Blob): Promise<any> => {
