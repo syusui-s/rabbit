@@ -1,4 +1,4 @@
-import { getEventHash, Kind, type UnsignedEvent, type Pub } from 'nostr-tools';
+import { getEventHash, Kind, type UnsignedEvent } from 'nostr-tools';
 
 // import '@/types/nostr.d';
 import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
@@ -22,19 +22,6 @@ export type PublishTextNoteParams = {
   pubkey: string;
   content: string;
 } & TagParams;
-
-// NIP-20: Command Result
-const waitCommandResult = (pub: Pub, relayUrl: string): Promise<void> =>
-  new Promise((resolve, reject) => {
-    pub.on('ok', () => {
-      console.log(`${relayUrl} has accepted our event`);
-      resolve();
-    });
-    pub.on('failed', (reason: string) => {
-      console.log(`failed to publish to ${relayUrl}: ${reason}`);
-      reject(reason);
-    });
-  });
 
 export const buildTags = ({
   notifyPubkeys,
@@ -102,8 +89,13 @@ const useCommands = () => {
 
     return relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
-      const pub = relay.publish(signedEvent);
-      return waitCommandResult(pub, relayUrl);
+      try {
+        await relay.publish(signedEvent);
+        console.log(`${relayUrl} has accepted our event`);
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : JSON.stringify(err);
+        console.warn(`failed to publish to ${relayUrl}: ${reason}`);
+      }
     });
   };
 
@@ -189,6 +181,7 @@ const useCommands = () => {
     relayUrls: string[];
     pubkey: string;
     profile: Profile;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     otherProperties: Record<string, any>;
   }): Promise<Promise<void>[]> => {
     const content: ProfileWithOtherProperties = {
