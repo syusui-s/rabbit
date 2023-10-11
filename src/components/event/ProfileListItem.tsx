@@ -1,4 +1,4 @@
-import { Component, Show, Switch, Match } from 'solid-js';
+import { Component, Show } from 'solid-js';
 
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
@@ -9,7 +9,7 @@ export type ProfileListItemProps = {
 };
 
 const ProfileListItem: Component<ProfileListItemProps> = (props) => {
-  const { profile, query } = useProfile(() => ({
+  const { profile } = useProfile(() => ({
     pubkey: props.pubkey,
   }));
 
@@ -31,7 +31,7 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
         <div class="flex justify-between gap-1 text-xs">
           <button
             type="button"
-            class="profile flex min-w-0 truncate hover:text-blue-500"
+            class="profile flex min-w-0 select-text truncate hover:text-blue-500"
             onClick={(ev) => {
               ev.preventDefault();
               props?.onShowProfile?.();

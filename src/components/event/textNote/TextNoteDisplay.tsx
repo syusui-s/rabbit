@@ -347,7 +347,7 @@ const TextNoteDisplay: Component<TextNoteDisplayProps> = (props) => {
                 <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
-                      class="pr-1 text-blue-500 hover:underline"
+                      class="select-text pr-1 text-blue-500 hover:underline"
                       onClick={(ev) => {
                         ev.stopPropagation();
                         showProfile(replyToPubkey);

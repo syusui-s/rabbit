@@ -31,7 +31,7 @@ const Repost: Component<RepostProps> = (props) => {
         </div>
         <div class="flex-1 truncate break-all">
           <button
-            class="hover:text-blue-500 hover:underline"
+            class="select-text hover:text-blue-500 hover:underline"
             onClick={() => showProfile(props.event.pubkey)}
           >
             <UserDisplayName pubkey={props.event.pubkey} />

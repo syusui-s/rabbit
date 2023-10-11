@@ -98,7 +98,10 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         }
         if (item.type === 'HashTag') {
           return (
-            <button class="text-blue-500 underline" onClick={() => addHashTagColumn(item.content)}>
+            <button
+              class="select-text text-blue-500 underline"
+              onClick={() => addHashTagColumn(item.content)}
+            >
               {item.content}
             </button>
           );

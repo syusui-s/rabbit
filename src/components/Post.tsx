@@ -48,7 +48,7 @@ const Post: Component<PostProps> = (props) => {
           <div class="flex justify-between gap-1 text-xs">
             <button
               type="button"
-              class="author flex min-w-0 truncate hover:text-blue-500"
+              class="author flex min-w-0 select-text truncate hover:text-blue-500"
               onClick={(ev) => {
                 ev.preventDefault();
                 props?.onShowProfile?.();
@@ -74,7 +74,7 @@ const Post: Component<PostProps> = (props) => {
             <div class="created-at shrink-0">
               <button
                 type="button"
-                class="hover:underline"
+                class="select-text hover:underline"
                 onClick={(ev) => {
                   ev.preventDefault();
                   props.onShowEvent?.();
