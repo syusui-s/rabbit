@@ -2,7 +2,7 @@ import { Component, createSignal, Show } from 'solid-js';
 
 import SafeLink from '@/components/utils/SafeLink';
 import { useTranslation } from '@/i18n/useTranslation';
-import { fixUrl } from '@/utils/url';
+import { thumbnailUrl } from '@/utils/url';
 
 type ImageDisplayProps = {
   url: string;
@@ -30,7 +30,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
         <img
           ref={imageRef}
           class="max-h-64 max-w-full rounded object-contain shadow hover:shadow-md"
-          src={fixUrl(props.url)}
+          src={thumbnailUrl(props.url)}
           alt={props.url}
         />
       </SafeLink>

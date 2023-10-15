@@ -1,7 +1,7 @@
 export const isImageUrl = (urlString: string): boolean => {
   try {
     const url = new URL(urlString);
-    return /\.(jpeg|jpg|png|gif|webp|apng|svg)$/i.test(url.pathname);
+    return /\.(jpeg|jpg|png|gif|webp|avif|apng|svg)$/i.test(url.pathname);
   } catch {
     return false;
   }
@@ -16,7 +16,10 @@ export const isVideoUrl = (urlString: string): boolean => {
   }
 };
 
-export const fixUrl = (urlString: string): string => {
+/**
+ * Generate a URL of thumbnail for a given URL.
+ */
+export const thumbnailUrl = (urlString: string): string => {
   try {
     const url = new URL(urlString);
     // Imgur
