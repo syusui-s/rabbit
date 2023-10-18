@@ -13,7 +13,7 @@ export default {
     uploadImage: '画像を投稿',
     submit: '投稿',
     forbiddenToIncludeNsec: '投稿に秘密鍵(nsec)を含めることはできません。',
-    failedToUploadFile: 'ファイルのアップロードにしました: {{filenames}}',
+    failedToUploadFile: 'ファイルのアップロードに失敗しました: {{filenames}}',
     replyToPre: '',
     replyToAnd: ' と ',
     replyToPost: 'に返信',
