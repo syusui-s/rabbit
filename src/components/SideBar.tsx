@@ -76,6 +76,7 @@ const SideBar: Component = () => {
   const focusTextArea = () => {
     textAreaRef?.focus();
     textAreaRef?.click();
+    textAreaRef?.setSelectionRange(0, 0);
   };
   const openForm = () => setFormOpened(true);
   const closeForm = () => setFormOpened(false);

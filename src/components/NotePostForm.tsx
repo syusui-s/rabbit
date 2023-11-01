@@ -12,14 +12,13 @@ import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
-import usePersistStatus from '@/hooks/usePersistStatus';
 import { useTranslation } from '@/i18n/useTranslation';
 import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { uploadNostrBuild, uploadFiles, uploaders } from '@/utils/imageUpload';
-import openLink from '@/utils/openLink';
+import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
+// import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
   replyTo?: NostrEvent;
@@ -85,18 +84,23 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [text, setText] = createSignal<string>('');
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
+  const [lastUsedHashTags, setLastUsedHashTags] = createSignal<string[]>([]);
 
   const appendText = (s: string) => setText((current) => `${current} ${s}`);
 
-  const clearText = () => {
-    setText('');
+  const resetText = () => {
+    setText(
+      lastUsedHashTags()
+        .map((e) => ` #${e}`)
+        .join(''),
+    );
     setContentWarningReason('');
     setContentWarning(false);
   };
 
   const close = () => {
     textAreaRef?.blur();
-    clearText();
+    resetText();
     props.onClose();
   };
 
@@ -111,7 +115,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   };
 
   const { config, getEmoji } = useConfig();
-  const { persistStatus, didAgreeToToS, agreeToToS } = usePersistStatus();
+  // const { persistStatus, didAgreeToToS, agreeToToS } = usePersistStatus();
   const getPubkey = usePubkey();
   const commands = useCommands();
 
@@ -123,7 +127,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     mutationFn: commands.publishTextNote.bind(commands),
     onSuccess: () => {
       console.log('succeeded to post');
-      clearText();
+      resetText();
       props.onPost?.();
     },
     onError: (err) => {
@@ -211,6 +215,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     const formattedContent = format(parsed);
     const emojiTags = buildEmojiTags(emojis);
 
+    setLastUsedHashTags(hashtags);
+
     let textNoteParams: PublishTextNoteParams = {
       relayUrls: config().relayUrls,
       pubkey,
@@ -266,8 +272,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const ensureUploaderAgreement = (): boolean => true;
   /*
+    const ensureUploaderAgreement = (): boolean => true;
     if (didAgreeToToS('nostrBuild')) return true;
 
     window.alert(
