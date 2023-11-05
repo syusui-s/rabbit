@@ -31,7 +31,7 @@ const fetchPackageInfo = async (): Promise<PackageInfo> => {
   return JSON.parse(body) as PackageInfo;
 };
 
-const commit = import.meta.env.COMMIT as string | null;
+const commit = import.meta.env.VITE_COMMIT as string | null;
 
 const About: Component<AboutProps> = (props) => {
   const [packageInfo] = createResource(fetchPackageInfo);
@@ -43,7 +43,11 @@ const About: Component<AboutProps> = (props) => {
           <img src={resolveAsset('images/rabbit_app_256.png')} alt="Logo" width="64" height="64" />
 
           <h1 class="my-4">
-            Rabbit <span id="app-version">v{packageInfo()?.self?.version}</span>
+            Rabbit{' '}
+            <span id="app-version">
+              v{packageInfo()?.self?.version}
+              <Show when={commit}> ({commit})</Show>
+            </span>
           </h1>
         </div>
 
@@ -74,7 +78,15 @@ const About: Component<AboutProps> = (props) => {
 
         <h2 class="my-4 text-xl font-bold">利用規約</h2>
 
-        <p class="my-4">Copyright (C) 2023 Shusui Moyatani</p>
+        <p class="my-4">
+          Copyright (C) 2023 Shusui Moyatani and{' '}
+          <SafeLink
+            class="text-blue-400 underline"
+            href="https://github.com/syusui-s/rabbit/graphs/contributors"
+          >
+            Rabbit contributors
+          </SafeLink>
+        </p>
 
         <p class="my-4">
           このプログラムは自由ソフトウェアです。フリーソフトウェア財団から発行された

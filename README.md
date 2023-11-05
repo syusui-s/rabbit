@@ -12,7 +12,7 @@ A nostr client like TweetDeck made with SolidJS.
 
 ## LICENSE
 
-Copyright (C) 2023 Shusui Moyatani
+Copyright (C) 2023 Shusui Moyatani and [Rabbit contributors](https://github.com/syusui-s/rabbit/graphs/contributors)
 
 AGPL-3.0-or-later
 
