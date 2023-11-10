@@ -27,7 +27,7 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
     relayUrls: props.column.relayUrls,
     filters: [
       {
-        kinds: [1, 6],
+        kinds: [1],
         limit: 25,
         since: epoch() - 4 * 60 * 60,
       },
