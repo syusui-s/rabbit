@@ -11,6 +11,7 @@ import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDispl
 import VideoDisplay from '@/components/event/textNote/VideoDisplay';
 import EventLink from '@/components/EventLink';
 import SafeLink from '@/components/utils/SafeLink';
+import PreviewedLink from '@/components/utils/PreviewedLink';
 import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
@@ -51,7 +52,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (isVideoUrl(item.content)) {
             return <VideoDisplay url={item.content} initialHidden={initialHidden()} />;
           }
-          return <SafeLink class="text-blue-500 underline" href={item.content} />;
+          return <PreviewedLink class="text-blue-500 underline" href={item.content} />;
         }
         if (item.type === 'TagReference') {
           const resolved = event().resolveTagReference(item);

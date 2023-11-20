@@ -88,6 +88,7 @@ module.exports = {
         'notification-icon',
         'notification-user',
         'notification-event',
+        'twitter-tweet',
       ],
     },
   },
