@@ -1,0 +1,10 @@
+name: "test"
+runs:
+  using: "composite"
+  steps:
+    - name: Lint / Format
+      run: npm run lint
+    - name: Test
+      run: npm run test
+    - name: Check license
+      run: npm run checkLicense
