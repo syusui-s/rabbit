@@ -14,11 +14,36 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-      - name: Restore npm cache
-        uses: ./.github/actions/cache/
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - name: Get hash
+        id: hash
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install dependencies
         run: npm ci
+      # TODO あとでちゃんと直す
+      # - name: Lint / Format
+      #   run: npm run eslint
       - name: Test
-        uses: ./.github/actions/test/
+        run: npm run test
       - name: Build
-        uses: ./.github/actions/build/
+        run: npm run build -- --base="/rabbit/"
+        env:
+          VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
+      - name: Check license
+        run: npm run checkLicense
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
