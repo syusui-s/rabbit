@@ -1,9 +1,8 @@
 import assert from 'assert';
 
-import { type Event as NostrEvent } from 'nostr-tools';
 import { describe, it } from 'vitest';
 
-import parseTextNote, { type ParsedTextNoteNode, TagReference } from '@/nostr/parseTextNote';
+import parseTextNote, { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
 
 describe('parseTextNote', () => {
   /*

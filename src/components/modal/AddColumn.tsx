@@ -1,13 +1,13 @@
 import { Component } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
-import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
-import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import Heart from 'heroicons/24/outline/heart.svg';
 import Home from 'heroicons/24/outline/home.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 import User from 'heroicons/24/outline/user.svg';
+// import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
+// import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
 import {

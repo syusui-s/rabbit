@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stripMargin = (strings: TemplateStringsArray, ...values: any[]) => {
   const s = String.raw(strings, values);
 

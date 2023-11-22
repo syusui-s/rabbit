@@ -19,6 +19,7 @@ export type NonStandardProfile = {
 
 export type Profile = StandardProfile & NonStandardProfile;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ProfileWithOtherProperties = Profile & Record<string, any>;
 
 export const parseProfile = (content: string | null): Profile => {

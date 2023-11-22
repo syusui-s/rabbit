@@ -25,7 +25,6 @@ import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
-import stripMargin from '@/utils/stripMargin';
 import timeout from '@/utils/timeout';
 
 export type ProfileDisplayProps = {
@@ -83,7 +82,6 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     })),
   );
   const following = () => myFollowingPubkeys().includes(props.pubkey);
-  const refetchMyFollowing = () => myFollowingQuery.refetch();
 
   const { followingPubkeys: userFollowingPubkeys, query: userFollowingQuery } = useFollowings(
     () => ({ pubkey: props.pubkey }),

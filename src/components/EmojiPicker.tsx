@@ -76,6 +76,7 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
       },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     pickerElement = picker as any as HTMLElement;
     popupRef?.elem?.appendChild(pickerElement);
   };

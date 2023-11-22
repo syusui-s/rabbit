@@ -3,7 +3,6 @@ name: Pull request
 about: Suggest changes
 title: ''
 labels:
-
 ---
 
 **Describe the changes**

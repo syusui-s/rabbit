@@ -1,4 +1,4 @@
-import { nip19, type Event as NostrEvent } from 'nostr-tools';
+import { nip19 } from 'nostr-tools';
 import { DecodeResult } from 'nostr-tools/lib/nip19';
 
 const { decode } = nip19;

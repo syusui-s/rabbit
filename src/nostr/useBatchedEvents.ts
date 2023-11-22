@@ -162,33 +162,33 @@ const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
     count += 1;
 
     sub.on('event', (event: NostrEvent & { id: string }) => {
-      if (event.kind === Kind.Metadata) {
+      if (event.kind === (Kind.Metadata as number)) {
         const registeredTasks = profileTasks.get(event.pubkey) ?? [];
         resolveTasks(registeredTasks, event);
         return;
       }
 
-      if (event.kind === Kind.Reaction) {
+      if (event.kind === (Kind.Reaction as number)) {
         // Use the last event id
         const id = genericEvent(event).lastTaggedEventId();
         if (id != null) {
           const registeredTasks = reactionsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
         }
-      } else if ((event.kind as number) === 6) {
+      } else if (event.kind === (Kind.Repost as number)) {
         // Use the last event id
         const id = genericEvent(event).lastTaggedEventId();
         if (id != null) {
           const registeredTasks = repostsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
         }
-      } else if (event.kind === Kind.Zap) {
+      } else if (event.kind === (Kind.Zap as number)) {
         const eTags = genericEvent(event).eTags();
         eTags.forEach(([, id]) => {
           const registeredTasks = repostsTasks.get(id) ?? [];
           resolveTasks(registeredTasks, event);
         });
-      } else if (event.kind === Kind.Contacts) {
+      } else if (event.kind === (Kind.Contacts as number)) {
         const registeredTasks = followingsTasks.get(event.pubkey) ?? [];
         resolveTasks(registeredTasks, event);
       } else if (isParameterizedReplaceableEvent(event)) {

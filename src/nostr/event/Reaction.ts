@@ -30,7 +30,7 @@ const reactionToReactionTypes = (event: Reaction): ReactionTypes => {
 
 export default class Reaction extends GenericEvent {
   constructor(rawEvent: NostrEvent) {
-    if (rawEvent.kind !== Kind.Reaction) {
+    if (rawEvent.kind !== (Kind.Reaction as number)) {
       throw new TypeError('kind should be 7');
     }
     super(rawEvent);

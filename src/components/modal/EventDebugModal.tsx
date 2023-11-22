@@ -1,4 +1,4 @@
-import { Component, For, createMemo } from 'solid-js';
+import { Component, createMemo } from 'solid-js';
 
 import { type Event as NostrEvent } from 'nostr-tools';
 

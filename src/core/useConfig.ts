@@ -181,7 +181,7 @@ const useConfig = (): UseConfig => {
   const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
 
   const hasMutedKeyword = (event: NostrEvent) => {
-    if (event.kind === Kind.Text) {
+    if (event.kind === (Kind.Text as number)) {
       return config.mutedKeywords.some((keyword) => event.content.includes(keyword));
     }
     return false;
@@ -192,7 +192,7 @@ const useConfig = (): UseConfig => {
     return (
       isPubkeyMuted(event.pubkey) ||
       ev.taggedPubkeys().some(isPubkeyMuted) ||
-      (event.kind === Kind.Text && hasMutedKeyword(event))
+      (event.kind === (Kind.Text as number) && hasMutedKeyword(event))
     );
   };
 

@@ -1,14 +1,13 @@
-import { Component, createEffect, onCleanup, onMount } from 'solid-js';
+import { Component } from 'solid-js';
 
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
-import { uniq } from 'lodash';
 import { Kind } from 'nostr-tools';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import Timeline from '@/components/timeline/Timeline';
-import { ChannelColumnType, FollowingColumnType } from '@/core/column';
+import { ChannelColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';

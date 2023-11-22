@@ -19,14 +19,12 @@ type ColumnSettingsSectionProps = {
   children: JSX.Element;
 };
 
-const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => {
-  return (
-    <div class="flex flex-col gap-2 border-b p-2">
-      <div>{props.title}</div>
-      <div>{props.children}</div>
-    </div>
-  );
-};
+const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => (
+  <div class="flex flex-col gap-2 border-b p-2">
+    <div>{props.title}</div>
+    <div>{props.children}</div>
+  </div>
+);
 
 const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   const i18n = useTranslation();

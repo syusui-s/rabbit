@@ -1,5 +1,4 @@
 import { Event as NostrEvent, Kind } from 'nostr-tools';
-import { z } from 'zod';
 
 import GenericEvent from '@/nostr/event/GenericEvent';
 import isValidId from '@/nostr/event/isValidId';
@@ -9,7 +8,6 @@ import parseTextNote, {
   ParsedTextNote,
   TagReference,
 } from '@/nostr/parseTextNote';
-import ensureSchema from '@/utils/ensureSchema';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 
@@ -69,7 +67,7 @@ export default class TextNote extends GenericEvent {
   #memoizedParsed: ParsedTextNote | undefined;
 
   constructor(rawEvent: NostrEvent) {
-    if (rawEvent.kind !== Kind.Text) {
+    if (rawEvent.kind !== (Kind.Text as number)) {
       throw new TypeError('kind should be 1');
     }
     super(rawEvent);

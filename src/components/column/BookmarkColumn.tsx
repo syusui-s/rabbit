@@ -1,4 +1,4 @@
-import { Component, Show, createEffect, onCleanup, onMount } from 'solid-js';
+import { Component, Show } from 'solid-js';
 
 import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 
@@ -9,7 +9,6 @@ import Bookmark from '@/components/timeline/Bookmark';
 import { BookmarkColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
-import useDecrypt from '@/nostr/useDecrypt';
 import useParameterizedReplaceableEvent from '@/nostr/useParameterizedReplaceableEvent';
 
 type BookmarkColumnDisplayProps = {
@@ -27,6 +26,8 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
     author: props.column.pubkey,
     identifier: props.column.identifier,
   }));
+
+  // TODO 暗号化されたデータがある場合は復号する
 
   return (
     <Column

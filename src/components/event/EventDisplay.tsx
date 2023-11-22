@@ -39,10 +39,10 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
           <EventLink eventId={props.event.id} kind={props.event.kind} />
         </span>
       </Match>
-      <Match when={props.event.kind === Kind.Text}>
+      <Match when={props.event.kind === (Kind.Text as number)}>
         <TextNote event={props.event} embedding={props.actions} actions={props.actions} />
       </Match>
-      <Match when={(props.event.kind as number) === 6}>
+      <Match when={props.event.kind === (Kind.Repost as number)}>
         <Repost event={props.event} />
       </Match>
     </Switch>

@@ -6,7 +6,6 @@ import Columns from '@/components/column/Columns';
 import GlobalModal from '@/components/modal/GlobalModal';
 import SideBar from '@/components/SideBar';
 import useConfig from '@/core/useConfig';
-import useModalState from '@/hooks/useModalState';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import { useMountShortcutKeys } from '@/hooks/useShortcutKeys';
 import usePool from '@/nostr/usePool';

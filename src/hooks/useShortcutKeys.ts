@@ -1,7 +1,4 @@
-// const commands = ['openPostForm'] as const;
-// type Commands = (typeof commands)[number];
-
-import { onMount, onCleanup, type JSX } from 'solid-js';
+import { onMount, onCleanup } from 'solid-js';
 
 import throttle from 'lodash/throttle';
 

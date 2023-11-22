@@ -16,7 +16,7 @@ const useVerification = (propsProvider: () => UseVerificationProps | null): UseV
   const props = createMemo(propsProvider);
   const query = createQuery(
     () => ['useVerification', props()] as const,
-    ({ queryKey, signal }) => {
+    ({ queryKey }) => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
       const { nip05: nip05string } = currentProps;

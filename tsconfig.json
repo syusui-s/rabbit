@@ -5,11 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
@@ -20,19 +16,10 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["src/*"]
     },
     "incremental": true
   },
-  "include": [
-    "vite.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "./.eslintrc.js"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["vite.config.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "./.eslintrc.js"],
+  "exclude": ["node_modules"]
 }

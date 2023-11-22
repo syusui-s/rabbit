@@ -4,7 +4,6 @@ about: このプロジェクトにアイデアを提案します
 title: ''
 labels: enhancement
 assignees: syusui-s
-
 ---
 
 **要望は何らかの問題に関連していますか？説明してください**

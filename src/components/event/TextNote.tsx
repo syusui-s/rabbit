@@ -1,6 +1,5 @@
 import { Show, type Component } from 'solid-js';
 
-import ColumnItem from '@/components/ColumnItem';
 // eslint-disable-next-line import/no-cycle
 import TextNoteDisplay, { TextNoteDisplayProps } from '@/components/event/textNote/TextNoteDisplay';
 import useConfig from '@/core/useConfig';

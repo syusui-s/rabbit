@@ -6,13 +6,16 @@
   "display": "browser",
   "background_color": "#fff",
   "description": "A deck style nostr client.",
-  "icons": [{
-    "src": "images/rabbit_app_256.png",
-    "sizes": "256x256",
-    "type": "image/png"
-  }, {
-    "src": "images/rabbit_app_1280.png",
-    "sizes": "1280x1280",
-    "type": "image/png"
-  }]
+  "icons": [
+    {
+      "src": "images/rabbit_app_256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "images/rabbit_app_1280.png",
+      "sizes": "1280x1280",
+      "type": "image/png"
+    }
+  ]
 }

@@ -1,4 +1,4 @@
-import { createSignal, Show, type Component, type JSX } from 'solid-js';
+import { createSignal, Show, type Component } from 'solid-js';
 
 import ClipboardDocument from 'heroicons/24/outline/clipboard-document.svg';
 
@@ -13,7 +13,7 @@ const Copy: Component<CopyProps> = (props) => {
   const handleClick = () => {
     navigator.clipboard
       .writeText(props.text)
-      .then((e) => {
+      .then(() => {
         setShowPopup(true);
         setTimeout(() => setShowPopup(false), 1000);
       })

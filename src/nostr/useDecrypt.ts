@@ -6,7 +6,9 @@ type UseDecryptProps = {
   encrypted: string;
 };
 
+// eslint-disable-next-line solid/reactivity
 const [memo, setMemo] = createRoot(() => createSignal<Record<string, string>>({}));
+// eslint-disable-next-line solid/reactivity
 const [decrypting, setDecrypting] = createRoot(() => createSignal<Record<string, boolean>>({}));
 
 const useDecrypt = (propsProvider: () => UseDecryptProps | null) => {

@@ -4,7 +4,6 @@ about: 改善に取り組めるように報告を作成します
 title: ''
 labels: bug
 assignees: syusui-s
-
 ---
 
 **バグの説明**
@@ -12,6 +11,7 @@ assignees: syusui-s
 
 **再現手順**
 発生させる手順を説明してください:
+
 1. '...'に移動
 2. '....'をクリック
 3. '....'までスクロールする
@@ -24,15 +24,17 @@ assignees: syusui-s
 スクリーンショットがあればこちらに。
 
 **デスクトップ （該当する場合は以下の情報を埋めてください）:**
- - OS: （例: Windows 11, macOS Ventura）
- - ブラウザ: （例: Chrome, Firefox, Safari, Edge）
- - バージョン: （例: 110）
+
+- OS: （例: Windows 11, macOS Ventura）
+- ブラウザ: （例: Chrome, Firefox, Safari, Edge）
+- バージョン: （例: 110）
 
 **スマートフォン （該当する場合は以下の情報を埋めてください）:**
- - デバイス: (例: iPhone 12)
- - OS: （例: iOS 16.2, Android 13）
- - ブラウザ: （例: Safari, Chrome）
- - バージョン: （例: 110）
+
+- デバイス: (例: iPhone 12)
+- OS: （例: iOS 16.2, Android 13）
+- ブラウザ: （例: Safari, Chrome）
+- バージョン: （例: 110）
 
 **追加の情報**
 問題に関する他の情報があればこちらに。

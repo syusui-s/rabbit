@@ -16,6 +16,7 @@ export type MessageChannelRequest<T> = {
 
 export type MessageChannelResponse<T> =
   | { requestId: string; ok: true; response: T }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { requestId: string; ok: false; error: any };
 
 const [channels, setChannels]: Signal<Record<string, MessageChannel>> = createSignal({});

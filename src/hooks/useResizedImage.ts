@@ -5,14 +5,14 @@ export type UseResizedImageProps = {
   imageUrl: Accessor<string | undefined>;
   width: number;
   height: number;
-  encoderOption?: number;
+  encoderOptions?: number;
 };
 
 const useResizedImage = ({
   imageUrl,
   width,
   height,
-  encoderOption,
+  encoderOptions,
 }: UseResizedImageProps): Accessor<string | undefined> => {
   const [resizedImage, setResizedImage] = createSignal<string | undefined>(undefined);
 
@@ -39,7 +39,7 @@ const useResizedImage = ({
 
       ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, dw, dh);
 
-      const dataUrl = canvas.toDataURL('image/jpeg');
+      const dataUrl = canvas.toDataURL('image/jpeg', encoderOptions);
 
       setResizedImage(dataUrl);
     });

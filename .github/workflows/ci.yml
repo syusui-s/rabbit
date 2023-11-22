@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branch:
-      - "*"
+      - '*'
 jobs:
   ci:
     permissions:

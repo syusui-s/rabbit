@@ -1,4 +1,4 @@
 #!/bin/sh
 
 prettier --write "$@"
-eslint --cache --fix "$@"
+eslint --fix "$@"
