@@ -26,10 +26,6 @@ export type NotificationFilterOptions = {
   allowedTypes: NotificationType[];
 };
 
-type BulidOptions = {
-  supportedNips: string[];
-};
-
 // const notificationFilter =
 //   (filterOption: NotificationFilterOptions) =>
 //   (event: NostrEvent): boolean => {};
