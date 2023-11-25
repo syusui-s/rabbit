@@ -10,7 +10,6 @@ import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDis
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
 import VideoDisplay from '@/components/event/textNote/VideoDisplay';
 import EventLink from '@/components/EventLink';
-import SafeLink from '@/components/utils/SafeLink';
 import PreviewedLink from '@/components/utils/PreviewedLink';
 import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
