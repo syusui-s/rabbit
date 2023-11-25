@@ -48,3 +48,27 @@ export const thumbnailUrl = (urlString: string): string => {
     return urlString;
   }
 };
+
+export const isTwitterUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'https:' && (url.host === 'twitter.com' || url.host === 'x.com');
+  } catch {
+    return false;
+  }
+};
+
+export const isYoutubeVideoUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return (
+      (url.protocol === 'https:' &&
+        url.host === 'www.youtube.com' &&
+        url.pathname === '/watch' &&
+        url.searchParams.get('v') != null) ||
+      (url.protocol === 'https:' && url.host === 'youtu.be' && url.pathname.lastIndexOf('/') === 0)
+    );
+  } catch {
+    return false;
+  }
+};
