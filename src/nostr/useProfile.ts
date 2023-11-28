@@ -5,7 +5,7 @@ import { Event as NostrEvent } from 'nostr-tools';
 
 import { Profile, ProfileWithOtherProperties, safeParseProfile } from '@/nostr/event/Profile';
 import { latestEventQuery } from '@/nostr/query';
-import { BatchedEventsTask } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, ProfileTask } from '@/nostr/useBatchedEvents';
 
 export type UseProfileProps = {
   pubkey: string;
@@ -13,6 +13,7 @@ export type UseProfileProps = {
 
 export type UseProfile = {
   profile: () => ProfileWithOtherProperties | null;
+  event: () => NostrEvent | null | undefined;
   invalidateProfile: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
@@ -39,7 +40,7 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { pubkey } = currentProps;
-        return new BatchedEventsTask({ type: 'Profile', pubkey });
+        return new BatchedEventsTask<ProfileTask>({ type: 'Profile', pubkey });
       },
       queryClient,
     }),
@@ -53,6 +54,8 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
     },
   );
 
+  const event = () => query.data;
+
   const profile = createMemo((): Profile | null => {
     if (query.data == null) return null;
     const { content } = query.data;
@@ -61,7 +64,7 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
 
   const invalidateProfile = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
 
-  return { profile, invalidateProfile, query };
+  return { profile, event, invalidateProfile, query };
 };
 
 export default useProfile;

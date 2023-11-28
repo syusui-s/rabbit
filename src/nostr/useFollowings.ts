@@ -5,7 +5,7 @@ import { Event as NostrEvent } from 'nostr-tools';
 
 import { genericEvent } from '@/nostr/event';
 import { latestEventQuery } from '@/nostr/query';
-import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, FollowingsTask, registerTask } from '@/nostr/useBatchedEvents';
 
 type Following = {
   pubkey: string;
@@ -56,7 +56,7 @@ export const fetchLatestFollowings = async (
   { pubkey }: UseFollowingsProps,
   signal?: AbortSignal,
 ) => {
-  const task = new BatchedEventsTask({ type: 'Followings', pubkey });
+  const task = new BatchedEventsTask<FollowingsTask>({ type: 'Followings', pubkey });
   registerTask({ task, signal });
 
   const latestFollowings = await task.latestEventPromise();
@@ -74,7 +74,7 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { pubkey } = currentProps;
-        return new BatchedEventsTask({ type: 'Followings', pubkey });
+        return new BatchedEventsTask<FollowingsTask>({ type: 'Followings', pubkey });
       },
       queryClient,
     }),

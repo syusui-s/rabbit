@@ -8,20 +8,20 @@ import useStats from '@/nostr/useStats';
 import ObservableTask from '@/utils/batch/ObservableTask';
 import useBatch from '@/utils/batch/useBatch';
 
-type ProfileTask = { type: 'Profile'; pubkey: string };
-type EventTask = { type: 'Event'; eventId: string };
-type ReactionsTask = { type: 'Reactions'; mentionedEventId: string };
-type ZapReceiptsTask = { type: 'ZapReceipts'; mentionedEventId: string };
-type RepostsTask = { type: 'Reposts'; mentionedEventId: string };
-type FollowingsTask = { type: 'Followings'; pubkey: string };
-type ParameterizedReplaceableEventTask = {
+export type ProfileTask = { type: 'Profile'; pubkey: string };
+export type EventTask = { type: 'Event'; eventId: string };
+export type ReactionsTask = { type: 'Reactions'; mentionedEventId: string };
+export type ZapReceiptsTask = { type: 'ZapReceipts'; mentionedEventId: string };
+export type RepostsTask = { type: 'Reposts'; mentionedEventId: string };
+export type FollowingsTask = { type: 'Followings'; pubkey: string };
+export type ParameterizedReplaceableEventTask = {
   type: 'ParameterizedReplaceableEvent';
   kind: number;
   author: string;
   identifier: string;
 };
 
-type TaskArgs = [
+export type TaskArgs = [
   ProfileTask,
   EventTask,
   FollowingsTask,

@@ -4,7 +4,11 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { Event as NostrEvent } from 'nostr-tools';
 
 import { pickLatestEvent } from '@/nostr/event/comparator';
-import { registerTask, BatchedEventsTask } from '@/nostr/useBatchedEvents';
+import {
+  registerTask,
+  BatchedEventsTask,
+  ParameterizedReplaceableEventTask,
+} from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 // Parameterized Replaceable Event
@@ -34,7 +38,7 @@ const useParameterizedReplaceableEvent = (
       if (currentProps == null) return Promise.resolve(null);
 
       const { kind, author, identifier } = currentProps;
-      const task = new BatchedEventsTask({
+      const task = new BatchedEventsTask<ParameterizedReplaceableEventTask>({
         type: 'ParameterizedReplaceableEvent',
         kind,
         author,
