@@ -7,6 +7,7 @@ import useConfig from '@/core/useConfig';
 import { sortEvents } from '@/nostr/event/comparator';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
+import epoch from '@/utils/epoch';
 
 import type { Event as NostrEvent, Filter, SubscriptionOptions } from 'nostr-tools';
 
@@ -60,7 +61,15 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   });
 
   const addEvent = (event: NostrEvent) => {
+    const SecondsToIgnore = 300; // 5 min
     const limit = propsProvider()?.limit ?? 50;
+
+    const diffSec = event.created_at - epoch();
+    if (diffSec > SecondsToIgnore) return;
+    if (diffSec > 0) {
+      setTimeout(() => addEvent(event), diffSec * 1000);
+      return;
+    }
 
     setEvents((current) => {
       const sorted = utils.insertEventIntoDescendingList(current, event).slice(0, limit);
