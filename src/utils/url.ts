@@ -16,6 +16,15 @@ export const isVideoUrl = (urlString: string): boolean => {
   }
 };
 
+export const isWebSocketUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return /^wss?:$/.test(url.protocol);
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Generate a URL of thumbnail for a given URL.
  */

@@ -3,7 +3,7 @@ import { type Component, Show } from 'solid-js';
 import { type Event as NostrEvent } from 'nostr-tools';
 
 import EmojiDisplay from '@/components/EmojiDisplay';
-import TextNoteDisplay from '@/components/event/textNote/TextNoteDisplay';
+import TextNote from '@/components/event/TextNote';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
@@ -75,7 +75,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           }
           keyed
         >
-          {(ev) => <TextNoteDisplay event={ev} />}
+          {(ev) => <TextNote event={ev} />}
         </Show>
       </div>
     </Show>

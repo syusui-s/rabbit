@@ -8,6 +8,7 @@ import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
+import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import BasicModal from '@/components/modal/BasicModal';
 import UserList from '@/components/modal/UserList';
 import Timeline from '@/components/timeline/Timeline';
@@ -15,6 +16,8 @@ import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
+import { genericEvent } from '@/nostr/event';
+import parseTextNote, { toResolved } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
 import useFollowings, { fetchLatestFollowings } from '@/nostr/useFollowings';
@@ -55,7 +58,11 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const [modal, setModal] = createSignal<'Following' | null>(null);
   const closeModal = () => setModal(null);
 
-  const { profile, query: profileQuery } = useProfile(() => ({
+  const {
+    profile,
+    event: profileEvent,
+    query: profileQuery,
+  } = useProfile(() => ({
     pubkey: props.pubkey,
   }));
   const { verification, query: verificationQuery } = useVerification(() =>
@@ -71,6 +78,16 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   };
   const isVerified = () => verification()?.pubkey === props.pubkey;
   const isMuted = () => isPubkeyMuted(props.pubkey);
+
+  const aboutParsed = createMemo(() => {
+    const ev = profileEvent();
+    const about = profile()?.about;
+    if (ev == null || about == null) return undefined;
+
+    const parsed = parseTextNote(about);
+    const resolved = toResolved(parsed, genericEvent(ev));
+    return resolved;
+  });
 
   const {
     followingPubkeys: myFollowingPubkeys,
@@ -368,10 +385,12 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           </div>
         </div>
       </div>
-      <Show when={(profile()?.about ?? '').length > 0}>
-        <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
-          {profile()?.about}
-        </div>
+      <Show when={aboutParsed()} keyed>
+        {(parsed) => (
+          <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
+            <TextNoteContentDisplay parsed={parsed} embedding={false} initialHidden />
+          </div>
+        )}
       </Show>
       <div class="flex border-t px-4 py-2">
         <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>

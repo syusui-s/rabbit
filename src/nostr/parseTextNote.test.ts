@@ -2,7 +2,12 @@ import assert from 'assert';
 
 import { describe, it } from 'vitest';
 
-import parseTextNote, { type ParsedTextNoteNode } from '@/nostr/parseTextNote';
+import Tags from '@/nostr/event/Tags';
+import parseTextNote, {
+  TagReference,
+  type ParsedTextNoteNode,
+  resolveTagReference,
+} from '@/nostr/parseTextNote';
 
 describe('parseTextNote', () => {
   /*
@@ -219,4 +224,48 @@ describe('parseTextNote', () => {
       assert.deepStrictEqual(parsed, expected);
     },
   );
+});
+
+describe('#resolveTagReference', () => {
+  it('should resolve a tag reference refers a user', () => {
+    const tagReference: TagReference = {
+      type: 'TagReference',
+      tagIndex: 1,
+      content: '#[1]',
+    };
+    const tags = new Tags([
+      ['p', '9366708117c4a7edf9178acdce538c95059b9eb3394808cdd90564094172d972'],
+      ['p', '80d3a41d8a00679c0105faac2cdf7643c9ba26835cff096bf7f9c7a0eee8c8fc'],
+    ]);
+    const result = resolveTagReference(tags, tagReference);
+    const expected = {
+      type: 'MentionedUser',
+      tagIndex: 1,
+      content: '#[1]',
+      pubkey: '80d3a41d8a00679c0105faac2cdf7643c9ba26835cff096bf7f9c7a0eee8c8fc',
+    };
+
+    assert.deepStrictEqual(result, expected);
+  });
+
+  it('should resolve a tag reference refers an other text note', () => {
+    const tagReference: TagReference = {
+      type: 'TagReference',
+      tagIndex: 1,
+      content: '#[1]',
+    };
+    const tags = new Tags([
+      ['p', '80d3a41d8a00679c0105faac2cdf7643c9ba26835cff096bf7f9c7a0eee8c8fc'],
+      ['e', 'b9cefcb857fa487d5794156e85b30a7f98cb21721040631210262091d86ff6f2', '', 'reply'],
+    ]);
+    const result = resolveTagReference(tags, tagReference);
+    const expected = {
+      type: 'MentionedEvent',
+      tagIndex: 1,
+      marker: 'reply',
+      content: '#[1]',
+      eventId: 'b9cefcb857fa487d5794156e85b30a7f98cb21721040631210262091d86ff6f2',
+    };
+    assert.deepStrictEqual(result, expected);
+  });
 });

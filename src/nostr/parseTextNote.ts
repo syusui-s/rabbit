@@ -1,6 +1,9 @@
 import { nip19 } from 'nostr-tools';
 import { DecodeResult } from 'nostr-tools/lib/nip19';
 
+import isValidId from '@/nostr/event/isValidId';
+import TagsBase from '@/nostr/event/TagsBase';
+
 const { decode } = nip19;
 
 export type PlainText = {
@@ -13,10 +16,16 @@ export type UrlText = {
   content: string;
 };
 
+// NIP-08
 export type TagReference = {
   type: 'TagReference';
   content: string;
   tagIndex: number;
+};
+
+export type TagReferenceResolved = Omit<TagReference, 'type'> & {
+  type: 'TagReferenceResolved';
+  reference: MentionedUser | MentionedEvent | undefined;
 };
 
 export type Bech32Entity = {
@@ -39,6 +48,11 @@ export type CustomEmoji = {
   shortcode: string;
 };
 
+export type CustomEmojiResolved = Omit<CustomEmoji, 'type'> & {
+  type: 'CustomEmojiResolved';
+  url: string | undefined;
+};
+
 export type ParsedTextNoteNode =
   | PlainText
   | UrlText
@@ -49,12 +63,22 @@ export type ParsedTextNoteNode =
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 
+export type ParsedTextNoteResolvedNode =
+  | Exclude<ParsedTextNoteNode, TagReference | CustomEmoji>
+  | TagReferenceResolved
+  | CustomEmojiResolved;
+
+export type ParsedTextNoteResolved = ParsedTextNoteResolvedNode[];
+
+const MarkerValues = ['reply', 'root', 'mention'] as const;
+type Markers = (typeof MarkerValues)[number];
+
 export type MentionedEvent = {
   type: 'MentionedEvent';
   content: string;
   tagIndex: number;
   eventId: string;
-  marker: 'reply' | 'root' | 'mention' | undefined;
+  marker: Markers | undefined;
 };
 
 export type MentionedUser = {
@@ -163,5 +187,56 @@ const parseTextNote = (textNoteContent: string) => {
 
   return result;
 };
+
+const isValidMarker = (marker: string | undefined): marker is Markers => {
+  if (marker == null) return false;
+  return (MarkerValues as readonly string[]).includes(marker);
+};
+
+export const resolveTagReference = (
+  tags: TagsBase,
+  { tagIndex, content }: TagReference,
+): MentionedUser | MentionedEvent | undefined => {
+  const tag = tags.tags[tagIndex];
+  if (tag == null) return undefined;
+
+  const tagName = tag[0];
+
+  if (tagName === 'p' && isValidId(tag[1])) {
+    return {
+      type: 'MentionedUser',
+      tagIndex,
+      content,
+      pubkey: tag[1],
+    } satisfies MentionedUser;
+  }
+
+  if (tagName === 'e' && isValidId(tag[1])) {
+    const marker = isValidMarker(tag[3]) ? tag[3] : undefined;
+
+    return {
+      type: 'MentionedEvent',
+      tagIndex,
+      content,
+      eventId: tag[1],
+      marker,
+    } satisfies MentionedEvent;
+  }
+
+  return undefined;
+};
+
+export const toResolved = (parsed: ParsedTextNote, tags: TagsBase): ParsedTextNoteResolved =>
+  parsed.map((node): ParsedTextNoteResolvedNode => {
+    if (node.type === 'TagReference') {
+      const reference = resolveTagReference(tags, node);
+      return { ...node, type: 'TagReferenceResolved', reference };
+    }
+    if (node.type === 'CustomEmoji') {
+      const url = tags.getEmojiUrl(node.shortcode);
+      return { ...node, type: 'CustomEmojiResolved', url };
+    }
+    return node;
+  });
 
 export default parseTextNote;

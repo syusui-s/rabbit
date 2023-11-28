@@ -1,7 +1,7 @@
 import { createSignal, type Component, type JSX, Show } from 'solid-js';
 
 import { useTranslation } from '@/i18n/useTranslation';
-import { ContentWarning } from '@/nostr/event/TextNote';
+import { ContentWarning } from '@/nostr/event/TextNoteLike';
 
 export type ContentWarningDisplayProps = {
   contentWarning: ContentWarning;
