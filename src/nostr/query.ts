@@ -15,7 +15,7 @@ export const latestEventQuery =
     queryClient: QueryClient;
   }) =>
   ({ queryKey, signal }: { queryKey: K; signal?: AbortSignal }): Promise<NostrEvent | null> => {
-    const prev = queryClient.getQueryData(queryKey) as NostrEvent;
+    const prev = queryClient.getQueryData(queryKey, { stale: true }) as NostrEvent;
     const task = taskProvider(queryKey);
     if (task == null) return Promise.resolve(null);
     const promise = task.firstEventPromise().catch(() => {
@@ -25,6 +25,8 @@ export const latestEventQuery =
       const latest = pickLatestEvent(events);
       if (prev == null || (latest != null && compareEvents(latest, prev) >= 0)) {
         queryClient.setQueryData(queryKey, latest);
+      } else {
+        console.log('old event', prev, latest);
       }
     });
     registerTask({ task, signal });
@@ -40,7 +42,7 @@ export const eventsQuery =
     queryClient: QueryClient;
   }) =>
   ({ queryKey, signal }: { queryKey: K; signal?: AbortSignal }): Promise<NostrEvent[]> => {
-    const prev = queryClient.getQueryData(queryKey) as NostrEvent[];
+    const prev = queryClient.getQueryData(queryKey, { stale: true }) as NostrEvent[];
     const task = taskProvider(queryKey);
     if (task == null) return Promise.resolve([]);
     const promise = task.toUpdatePromise().catch(() => []);

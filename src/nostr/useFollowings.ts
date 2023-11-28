@@ -80,7 +80,7 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
     }),
     {
       staleTime: 5 * 60 * 1000, // 5 min
-      cacheTime: 24 * 60 * 60 * 1000, // 24 hour
+      cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
       refetchOnMount: true,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
