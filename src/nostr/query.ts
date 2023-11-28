@@ -25,8 +25,6 @@ export const latestEventQuery =
       const latest = pickLatestEvent(events);
       if (prev == null || (latest != null && compareEvents(latest, prev) >= 0)) {
         queryClient.setQueryData(queryKey, latest);
-      } else {
-        console.log('old event', prev, latest);
       }
     });
     registerTask({ task, signal });
