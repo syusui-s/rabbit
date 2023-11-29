@@ -1,4 +1,4 @@
-import { getEventHash, Kind, type UnsignedEvent } from 'nostr-tools';
+import { getEventHash, Kind, verifySignature, type UnsignedEvent } from 'nostr-tools';
 
 // import '@/types/nostr.d';
 import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
@@ -80,12 +80,16 @@ const useCommands = () => {
     event: UnsignedEvent,
   ): Promise<Promise<void>[]> => {
     const preSignedEvent: UnsignedEvent & { id?: string } = { ...event };
-    preSignedEvent.id = getEventHash(preSignedEvent);
+    const id = getEventHash(preSignedEvent);
+    preSignedEvent.id = id;
 
     if (window.nostr == null) {
       throw new Error('NIP-07 implementation not found');
     }
     const signedEvent = await window.nostr.signEvent(preSignedEvent);
+    if (!verifySignature({ ...signedEvent, id })) {
+      throw new Error('nostr.signEvent returned invalid data');
+    }
 
     return relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
