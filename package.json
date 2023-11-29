@@ -25,6 +25,7 @@
     "checkSecrets": "node -e \"import('./scripts/checkSecrets.mjs').then((m) => m.default())\""
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.6",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "autoprefixer": "^10.4.16",
@@ -38,6 +39,7 @@
     "eslint-plugin-solid": "^0.13.0",
     "eslint-plugin-tailwindcss": "^3.13.0",
     "husky": "^8.0.3",
+    "jsdom": "^23.0.0",
     "license-checker": "^25.0.1",
     "lint-staged": "^14.0.1",
     "postcss": "^8.4.31",

@@ -48,7 +48,7 @@ export const thumbnailUrl = (urlString: string): string => {
     if (url.host === 'i.gyazo.com') {
       const result = new URL(url);
       result.host = 'thumb.gyazo.com';
-      result.pathname = `/thumb/640_w${url.pathname}`;
+      result.pathname = `/thumb/640${url.pathname}`;
       return result.toString();
     }
 
@@ -67,17 +67,37 @@ export const isTwitterUrl = (urlString: string): boolean => {
   }
 };
 
-export const isYoutubeVideoUrl = (urlString: string): boolean => {
+type YouTubeVideo = {
+  videoId: string;
+};
+
+const YouTubeHosts = ['www.youtube.com', 'm.youtube.com', 'youtube.com'];
+export const parseYouTubeVideoUrl = (urlString: string): YouTubeVideo | null => {
   try {
     const url = new URL(urlString);
-    return (
-      (url.protocol === 'https:' &&
-        url.host === 'www.youtube.com' &&
-        url.pathname === '/watch' &&
-        url.searchParams.get('v') != null) ||
-      (url.protocol === 'https:' && url.host === 'youtu.be' && url.pathname.lastIndexOf('/') === 0)
-    );
+    if (url.protocol !== 'https:') return null;
+
+    if (YouTubeHosts.includes(url.host)) {
+      if (url.pathname === '/watch') {
+        const videoId = url.searchParams.get('v');
+        if (videoId != null) {
+          return { videoId };
+        }
+      }
+      if (url.pathname.startsWith('/shorts/')) {
+        const match = url.pathname.match(/^\/shorts\/([0-9a-zA-Z_-]*)$/);
+        if (match) {
+          return { videoId: match[1] };
+        }
+      }
+    }
+
+    if (url.host === 'youtu.be' && url.pathname.lastIndexOf('/') === 0) {
+      return { videoId: url.pathname };
+    }
+
+    return null;
   } catch {
-    return false;
+    return null;
   }
 };
