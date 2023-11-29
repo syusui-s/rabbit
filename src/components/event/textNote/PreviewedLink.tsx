@@ -1,6 +1,7 @@
 import { Component, JSX, Switch, Match, createEffect } from 'solid-js';
 
 import SafeLink from '@/components/utils/SafeLink';
+import useConfig from '@/core/useConfig';
 import { useOgp } from '@/utils/ogp';
 import { isTwitterUrl, parseYouTubeVideoUrl } from '@/utils/url';
 
@@ -30,6 +31,8 @@ const youtubeUrl = (videoId: string): string => {
 const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
   let twitterRef: HTMLQuoteElement | undefined;
 
+  const { config } = useConfig();
+
   const { ogp } = useOgp(() => ({
     url: props.href,
   }));
@@ -42,7 +45,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
 
   return (
     <Switch fallback={<SafeLink class={props.class} href={props.href} />}>
-      <Match when={isTwitterUrl(props.href)}>
+      <Match when={config().embedding.twitter && isTwitterUrl(props.href)}>
         <blockquote class="twitter-tweet" ref={twitterRef}>
           <a
             class={props.class}
@@ -54,7 +57,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
           </a>
         </blockquote>
       </Match>
-      <Match when={parseYouTubeVideoUrl(props.href)} keyed>
+      <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.href)} keyed>
         {({ videoId }) => (
           <div class="my-2 aspect-video w-full">
             <iframe
@@ -67,7 +70,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
           </div>
         )}
       </Match>
-      <Match when={ogp()} keyed>
+      <Match when={config().embedding.ogp && ogp()} keyed>
         {(ogpProps) => (
           <SafeLink href={props.href}>
             <div class="my-2 rounded-lg border transition-colors hover:bg-slate-100">

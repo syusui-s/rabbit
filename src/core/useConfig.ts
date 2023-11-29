@@ -17,6 +17,7 @@ import {
   createStorageWithSerializer,
   createStoreWithStorage,
 } from '@/hooks/createSignalWithStorage';
+import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
 
 export type CustomEmojiConfig = {
@@ -33,6 +34,11 @@ export type Config = {
   useEmojiReaction: boolean;
   showEmojiReaction: boolean;
   showMedia: boolean; // TODO 'always' | 'only-followings' | 'never'
+  embedding: {
+    twitter: boolean;
+    youtube: boolean;
+    ogp: boolean;
+  };
   hideCount: boolean;
   mutedPubkeys: string[];
   mutedKeywords: string[];
@@ -81,6 +87,11 @@ const InitialConfig = (): Config => ({
   useEmojiReaction: true,
   showEmojiReaction: true,
   showMedia: true,
+  embedding: {
+    twitter: true,
+    youtube: true,
+    ogp: true,
+  },
   hideCount: false,
   mutedPubkeys: [],
   mutedKeywords: [],
@@ -98,6 +109,8 @@ const storage = createStorageWithSerializer(() => window.localStorage, serialize
 const [config, setConfig] = createStoreWithStorage('RabbitConfig', InitialConfig(), storage);
 
 const useConfig = (): UseConfig => {
+  const i18n = useTranslation();
+
   const addRelay = (relayUrl: string) => {
     setConfig('relayUrls', (current) => uniq([...current, relayUrl]));
   };
@@ -203,8 +216,8 @@ const useConfig = (): UseConfig => {
     const columns: ColumnType[] = [
       createFollowingColumn({ width: 'widest', pubkey }),
       createNotificationColumn({ pubkey }),
-      createPostsColumn({ name: '自分の投稿', pubkey }),
-      createReactionsColumn({ name: '自分のリアクション', pubkey }),
+      createPostsColumn({ name: i18n()('column.myPosts'), pubkey }),
+      createReactionsColumn({ name: i18n()('column.myReactions'), pubkey }),
     ];
 
     if (navigator.language.includes('ja')) {

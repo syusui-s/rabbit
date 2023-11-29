@@ -149,6 +149,8 @@ export default {
       reaction: 'Reaction',
       enableEmojiReaction: 'Enable emoji reaction',
       showEmojiReaction: 'Show emoji reactions on posts',
+      embedding: 'Embedded contents',
+      embeddingDescription: 'Enable/disable embedding',
       others: 'Others',
       keepOpenPostForm: 'Remain the input field open after posting',
       showMediaByDefault: 'Load media by default',
