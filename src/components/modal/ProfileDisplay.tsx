@@ -13,7 +13,9 @@ import BasicModal from '@/components/modal/BasicModal';
 import UserList from '@/components/modal/UserList';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
+import { createFollowingColumn, createPostsColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
+import { useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
@@ -45,7 +47,8 @@ const FollowersCount: Component<{ pubkey: string }> = (props) => {
 
 const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const i18n = useTranslation();
-  const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted } = useConfig();
+  const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted, saveColumn } = useConfig();
+  const request = useRequestCommand();
   const commands = useCommands();
   const myPubkey = usePubkey();
   const { showProfileEdit } = useModalState();
@@ -212,6 +215,24 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       content: () => i18n()('profile.copyPubkey'),
       onSelect: () => {
         navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+      },
+    },
+    {
+      content: () => i18n()('profile.addUserColumn'),
+      onSelect: () => {
+        const columnName = profile()?.name ?? npub();
+        saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
+        request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+        props.onClose?.();
+      },
+    },
+    {
+      content: () => i18n()('profile.addUserHomeColumn'),
+      onSelect: () => {
+        const columnName = `${i18n()('column.home')} / ${profile()?.name ?? npub()}`;
+        saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
+        request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+        props.onClose?.();
       },
     },
     {

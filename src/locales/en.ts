@@ -57,6 +57,8 @@ export default {
     unmute: 'Unmute',
     followMyself: 'Follow myself',
     unfollowMyself: 'Unfollow myself',
+    addUserColumn: 'Add user column',
+    addUserHomeColumn: 'Add home column',
     confirmUnfollow: 'Do you really want to unfollow?',
     confirmUpdateEvenIfEmpty: stripMargin`
       Your follow list appears to be empty.

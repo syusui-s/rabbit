@@ -56,6 +56,8 @@ export default {
     unmute: 'ミュート解除',
     followMyself: '自分をフォロー',
     unfollowMyself: '自分をフォロー解除',
+    addUserColumn: 'ユーザカラムを追加',
+    addUserHomeColumn: 'ホームカラムを追加',
     confirmUnfollow: '本当にフォロー解除しますか？',
     confirmUpdateEvenIfEmpty: stripMargin`
       フォローリストが空のようです。初めてのフォローであれば問題ありません。
