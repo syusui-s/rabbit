@@ -1,5 +1,6 @@
 import { Component, createSignal, Show } from 'solid-js';
 
+import LazyLoad from '@/components/utils/LazyLoad';
 import SafeLink from '@/components/utils/SafeLink';
 import { useTranslation } from '@/i18n/useTranslation';
 
@@ -25,17 +26,21 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
         </button>
       }
     >
-      <SafeLink class="my-2 block" href={props.url}>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          ref={videoRef}
-          class="max-h-64 max-w-full rounded-sm object-contain shadow"
-          src={props.url}
-          controls
-        >
-          <a href={props.url}>{i18n()('post.download')}</a>
-        </video>
-      </SafeLink>
+      <LazyLoad fallback={<div class="aspect-video max-w-full" />}>
+        {() => (
+          <SafeLink class="my-2 block" href={props.url}>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video
+              ref={videoRef}
+              class="max-h-64 max-w-full rounded-sm object-contain shadow"
+              src={props.url}
+              controls
+            >
+              <a href={props.url}>{i18n()('post.download')}</a>
+            </video>
+          </SafeLink>
+        )}
+      </LazyLoad>
     </Show>
   );
 };

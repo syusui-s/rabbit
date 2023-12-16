@@ -2,6 +2,7 @@ import { For, JSX, Show } from 'solid-js';
 
 import ProfileListItem from '@/components/event/ProfileListItem';
 import BasicModal from '@/components/modal/BasicModal';
+import LazyLoad from '@/components/utils/LazyLoad';
 import useModalState from '@/hooks/useModalState';
 
 export type UserListProps<T> = {
@@ -27,7 +28,14 @@ const UserList = <T,>(props: UserListProps<T>): JSX.Element => {
                   <Show when={props.renderInfo} keyed>
                     {(render) => render(e)}
                   </Show>
-                  <ProfileListItem pubkey={pubkey()} onShowProfile={() => showProfile(pubkey())} />
+                  <LazyLoad fallback={<div class="h-6" />}>
+                    {() => (
+                      <ProfileListItem
+                        pubkey={pubkey()}
+                        onShowProfile={() => showProfile(pubkey())}
+                      />
+                    )}
+                  </LazyLoad>
                 </div>
               );
             }}

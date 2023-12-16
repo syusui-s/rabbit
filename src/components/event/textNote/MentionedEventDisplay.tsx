@@ -5,6 +5,7 @@ import { Kind } from 'nostr-tools';
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import EventLink from '@/components/EventLink';
+import LazyLoad from '@/components/utils/LazyLoad';
 import { type MentionedEvent } from '@/nostr/parseTextNote';
 
 export type MentionedEventDisplayProps = {
@@ -17,12 +18,16 @@ const MentionedEventDisplay = (props: MentionedEventDisplayProps) => (
     fallback={<EventLink eventId={props.mentionedEvent.eventId} />}
   >
     <div class="my-1 rounded border p-1">
-      <EventDisplayById
-        eventId={props.mentionedEvent.eventId}
-        embedding={false}
-        actions={false}
-        ensureKinds={[Kind.Text]}
-      />
+      <LazyLoad>
+        {() => (
+          <EventDisplayById
+            eventId={props.mentionedEvent.eventId}
+            embedding={false}
+            actions={false}
+            ensureKinds={[Kind.Text]}
+          />
+        )}
+      </LazyLoad>
     </div>
   </Show>
 );

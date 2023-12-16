@@ -32,6 +32,7 @@ import UserList from '@/components/modal/UserList';
 import NotePostForm from '@/components/NotePostForm';
 import Post from '@/components/Post';
 import { useTimelineContext } from '@/components/timeline/TimelineContext';
+import LazyLoad from '@/components/utils/LazyLoad';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -43,6 +44,11 @@ import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
 import timeout from '@/utils/timeout';
+
+export type ActionProps = {
+  event: NostrEvent;
+  onClickReply: () => void;
+};
 
 export type TextNoteProps = {
   event: NostrEvent;
@@ -67,25 +73,19 @@ const emojiDataToReactionTypes = (emoji: EmojiData): ReactionTypes => {
   throw new Error('unknown emoji');
 };
 
-const TextNote: Component<TextNoteProps> = (props) => {
+const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
   const { config } = useConfig();
   const pubkey = usePubkey();
-  const { showProfile } = useModalState();
-  const timelineContext = useTimelineContext();
+  const commands = useCommands();
 
+  const [modal, setModal] = createSignal<'EventDebugModal' | 'Reactions' | 'Reposts' | null>(null);
   const [reacted, setReacted] = createSignal(false);
   const [reposted, setReposted] = createSignal(false);
-  const [showReplyForm, setShowReplyForm] = createSignal(false);
-  const [modal, setModal] = createSignal<'EventDebugModal' | 'Reactions' | 'Reposts' | null>(null);
-
-  const closeReplyForm = () => setShowReplyForm(false);
-  const closeModal = () => setModal(null);
 
   const event = createMemo(() => textNote(props.event));
 
-  const embedding = () => props.embedding ?? true;
-  const actions = () => props.actions ?? true;
+  const closeModal = () => setModal(null);
 
   const {
     reactions,
@@ -107,7 +107,18 @@ const TextNote: Component<TextNoteProps> = (props) => {
     eventId: props.event.id,
   }));
 
-  const commands = useCommands();
+  const isReactedByMe = createMemo(() => {
+    const p = pubkey();
+    return (p != null && isReactedBy(p)) || reacted();
+  });
+  const isReactedByMeWithEmoji = createMemo(() => {
+    const p = pubkey();
+    return p != null && isReactedByWithEmoji(p);
+  });
+  const isRepostedByMe = createMemo(() => {
+    const p = pubkey();
+    return (p != null && isRepostedBy(p)) || reposted();
+  });
 
   const publishReactionMutation = createMutation({
     mutationKey: ['publishReaction', event().id],
@@ -186,82 +197,6 @@ const TextNote: Component<TextNoteProps> = (props) => {
     },
   });
 
-  const menu: MenuItem[] = [
-    {
-      content: () => i18n()('post.copyEventId'),
-      onSelect: () => {
-        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
-      },
-    },
-    {
-      content: () => i18n()('post.showJSON'),
-      onSelect: () => {
-        setModal('EventDebugModal');
-      },
-    },
-    {
-      content: () => i18n()('post.showReposts'),
-      onSelect: () => {
-        setModal('Reposts');
-      },
-    },
-    {
-      content: () => i18n()('post.showReactions'),
-      onSelect: () => {
-        setModal('Reactions');
-      },
-    },
-    {
-      when: () => event().pubkey === pubkey(),
-      content: () => <span class="text-red-500">{i18n()('post.deletePost')}</span>,
-      onSelect: () => {
-        const p = pubkey();
-        if (p == null) return;
-
-        if (!window.confirm(i18n()('post.confirmDelete'))) return;
-        deleteMutation.mutate({
-          relayUrls: config().relayUrls,
-          pubkey: p,
-          eventId: event().id,
-        });
-      },
-    },
-  ];
-
-  const isReactedByMe = createMemo(() => {
-    const p = pubkey();
-    return (p != null && isReactedBy(p)) || reacted();
-  });
-  const isReactedByMeWithEmoji = createMemo(() => {
-    const p = pubkey();
-    return p != null && isReactedByWithEmoji(p);
-  });
-  const isRepostedByMe = createMemo(() => {
-    const p = pubkey();
-    return (p != null && isRepostedBy(p)) || reposted();
-  });
-
-  const showReplyEvent = (): string | undefined => {
-    if (embedding()) {
-      const replyingToEvent = event().replyingToEvent();
-
-      if (replyingToEvent != null && !event().containsEventMention(replyingToEvent.id)) {
-        return replyingToEvent.id;
-      }
-
-      const rootEvent = event().rootEvent();
-
-      if (
-        replyingToEvent == null &&
-        rootEvent != null &&
-        !event().containsEventMention(rootEvent.id)
-      ) {
-        return rootEvent.id;
-      }
-    }
-    return undefined;
-  };
-
   const handleRepost: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (ev) => {
     ev.stopPropagation();
 
@@ -308,6 +243,184 @@ const TextNote: Component<TextNoteProps> = (props) => {
     doReaction(emojiDataToReactionTypes(emoji));
   };
 
+  const menu: MenuItem[] = [
+    {
+      content: () => i18n()('post.copyEventId'),
+      onSelect: () => {
+        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
+      },
+    },
+    {
+      content: () => i18n()('post.showJSON'),
+      onSelect: () => {
+        setModal('EventDebugModal');
+      },
+    },
+    {
+      content: () => i18n()('post.showReposts'),
+      onSelect: () => {
+        setModal('Reposts');
+      },
+    },
+    {
+      content: () => i18n()('post.showReactions'),
+      onSelect: () => {
+        setModal('Reactions');
+      },
+    },
+    {
+      when: () => event().pubkey === pubkey(),
+      content: () => <span class="text-red-500">{i18n()('post.deletePost')}</span>,
+      onSelect: () => {
+        const p = pubkey();
+        if (p == null) return;
+
+        if (!window.confirm(i18n()('post.confirmDelete'))) return;
+        deleteMutation.mutate({
+          relayUrls: config().relayUrls,
+          pubkey: p,
+          eventId: event().id,
+        });
+      },
+    },
+  ];
+
+  return (
+    <>
+      <Show when={config().showEmojiReaction && reactions().length > 0}>
+        <EmojiReactions reactionsGrouped={reactionsGrouped()} onReaction={doReaction} />
+      </Show>
+      <div class="actions flex w-52 items-center justify-between gap-8 pt-1">
+        <button
+          class="h-4 w-4 shrink-0 text-zinc-400 hover:text-zinc-500"
+          onClick={(ev) => {
+            ev.stopPropagation();
+            props.onClickReply();
+          }}
+        >
+          <ChatBubbleLeft />
+        </button>
+        <div
+          class="flex shrink-0 items-center gap-1"
+          classList={{
+            'text-zinc-400': !isRepostedByMe(),
+            'hover:text-green-400': !isRepostedByMe(),
+            'text-green-400': isRepostedByMe() || publishRepostMutation.isLoading,
+          }}
+        >
+          <button class="h-4 w-4" onClick={handleRepost} disabled={publishRepostMutation.isLoading}>
+            <ArrowPathRoundedSquare />
+          </button>
+          <Show when={!config().hideCount && reposts().length > 0}>
+            <div class="text-sm text-zinc-400">{reposts().length}</div>
+          </Show>
+        </div>
+        <div
+          class="flex shrink-0 items-center gap-1"
+          classList={{
+            'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
+            'hover:text-rose-400': !isReactedByMe() || isReactedByMeWithEmoji(),
+            'text-rose-400':
+              (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isLoading,
+          }}
+        >
+          <button
+            class="h-4 w-4"
+            onClick={handleReaction}
+            disabled={publishReactionMutation.isLoading}
+          >
+            <Show when={isReactedByMe() && !isReactedByMeWithEmoji()} fallback={<HeartOutlined />}>
+              <HeartSolid />
+            </Show>
+          </button>
+          <Show when={!config().hideCount && !config().showEmojiReaction && reactions().length > 0}>
+            <div class="text-sm text-zinc-400">{reactions().length}</div>
+          </Show>
+        </div>
+        <Show when={config().useEmojiReaction}>
+          <div
+            class="flex shrink-0 items-center gap-1"
+            classList={{
+              'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
+              'hover:text-rose-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
+              'text-rose-400':
+                (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isLoading,
+            }}
+          >
+            <EmojiPicker onEmojiSelect={handleEmojiSelect}>
+              <span class="inline-block h-4 w-4">
+                <Plus />
+              </span>
+            </EmojiPicker>
+          </div>
+        </Show>
+        <div>
+          <ContextMenu menu={menu}>
+            <span class="inline-block h-4 w-4 text-zinc-400 hover:text-zinc-500">
+              <EllipsisHorizontal />
+            </span>
+          </ContextMenu>
+        </div>
+      </div>
+      <Switch>
+        <Match when={modal() === 'EventDebugModal'}>
+          <EventDebugModal event={props.event} onClose={closeModal} />
+        </Match>
+        <Match when={modal() === 'Reactions'}>
+          <UserList
+            data={reactions()}
+            pubkeyExtractor={(ev) => ev.pubkey}
+            renderInfo={(ev) => (
+              <div class="w-6">
+                <EmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
+              </div>
+            )}
+            onClose={closeModal}
+          />
+        </Match>
+        <Match when={modal() === 'Reposts'}>
+          <UserList data={reposts()} pubkeyExtractor={(ev) => ev.pubkey} onClose={closeModal} />
+        </Match>
+      </Switch>
+    </>
+  );
+};
+
+const TextNote: Component<TextNoteProps> = (props) => {
+  const i18n = useTranslation();
+  const { showProfile } = useModalState();
+  const timelineContext = useTimelineContext();
+
+  const [showReplyForm, setShowReplyForm] = createSignal(false);
+  const closeReplyForm = () => setShowReplyForm(false);
+  const toggleReplyForm = () => setShowReplyForm((current) => !current);
+
+  const event = createMemo(() => textNote(props.event));
+
+  const embedding = () => props.embedding ?? true;
+  const actions = () => props.actions ?? true;
+
+  const showReplyEvent = (): string | undefined => {
+    if (embedding()) {
+      const replyingToEvent = event().replyingToEvent();
+
+      if (replyingToEvent != null && !event().containsEventMention(replyingToEvent.id)) {
+        return replyingToEvent.id;
+      }
+
+      const rootEvent = event().rootEvent();
+
+      if (
+        replyingToEvent == null &&
+        rootEvent != null &&
+        !event().containsEventMention(rootEvent.id)
+      ) {
+        return rootEvent.id;
+      }
+    }
+    return undefined;
+  };
+
   return (
     <div class="nostr-textnote">
       <Post
@@ -318,7 +431,9 @@ const TextNote: Component<TextNoteProps> = (props) => {
             <Show when={showReplyEvent()} keyed>
               {(id) => (
                 <div class="mt-1 rounded border p-1">
-                  <EventDisplayById eventId={id} actions={false} embedding={false} />
+                  <LazyLoad fallback={<div class="h-12" />}>
+                    {() => <EventDisplayById eventId={id} actions={false} embedding={false} />}
+                  </LazyLoad>
                 </div>
               )}
             </Show>
@@ -354,94 +469,9 @@ const TextNote: Component<TextNoteProps> = (props) => {
         }
         actions={
           <Show when={actions()}>
-            <Show when={config().showEmojiReaction && reactions().length > 0}>
-              <EmojiReactions reactionsGrouped={reactionsGrouped()} onReaction={doReaction} />
-            </Show>
-            <div class="actions flex w-52 items-center justify-between gap-8 pt-1">
-              <button
-                class="h-4 w-4 shrink-0 text-zinc-400 hover:text-zinc-500"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  setShowReplyForm((current) => !current);
-                }}
-              >
-                <ChatBubbleLeft />
-              </button>
-              <div
-                class="flex shrink-0 items-center gap-1"
-                classList={{
-                  'text-zinc-400': !isRepostedByMe(),
-                  'hover:text-green-400': !isRepostedByMe(),
-                  'text-green-400': isRepostedByMe() || publishRepostMutation.isLoading,
-                }}
-              >
-                <button
-                  class="h-4 w-4"
-                  onClick={handleRepost}
-                  disabled={publishRepostMutation.isLoading}
-                >
-                  <ArrowPathRoundedSquare />
-                </button>
-                <Show when={!config().hideCount && reposts().length > 0}>
-                  <div class="text-sm text-zinc-400">{reposts().length}</div>
-                </Show>
-              </div>
-              <div
-                class="flex shrink-0 items-center gap-1"
-                classList={{
-                  'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
-                  'hover:text-rose-400': !isReactedByMe() || isReactedByMeWithEmoji(),
-                  'text-rose-400':
-                    (isReactedByMe() && !isReactedByMeWithEmoji()) ||
-                    publishReactionMutation.isLoading,
-                }}
-              >
-                <button
-                  class="h-4 w-4"
-                  onClick={handleReaction}
-                  disabled={publishReactionMutation.isLoading}
-                >
-                  <Show
-                    when={isReactedByMe() && !isReactedByMeWithEmoji()}
-                    fallback={<HeartOutlined />}
-                  >
-                    <HeartSolid />
-                  </Show>
-                </button>
-                <Show
-                  when={
-                    !config().hideCount && !config().showEmojiReaction && reactions().length > 0
-                  }
-                >
-                  <div class="text-sm text-zinc-400">{reactions().length}</div>
-                </Show>
-              </div>
-              <Show when={config().useEmojiReaction}>
-                <div
-                  class="flex shrink-0 items-center gap-1"
-                  classList={{
-                    'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
-                    'hover:text-rose-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
-                    'text-rose-400':
-                      (isReactedByMe() && isReactedByMeWithEmoji()) ||
-                      publishReactionMutation.isLoading,
-                  }}
-                >
-                  <EmojiPicker onEmojiSelect={handleEmojiSelect}>
-                    <span class="inline-block h-4 w-4">
-                      <Plus />
-                    </span>
-                  </EmojiPicker>
-                </div>
-              </Show>
-              <div>
-                <ContextMenu menu={menu}>
-                  <span class="inline-block h-4 w-4 text-zinc-400 hover:text-zinc-500">
-                    <EllipsisHorizontal />
-                  </span>
-                </ContextMenu>
-              </div>
-            </div>
+            <LazyLoad fallback={<div class="h-5" />}>
+              {() => <Actions event={props.event} onClickReply={toggleReplyForm} />}
+            </LazyLoad>
           </Show>
         }
         footer={
@@ -461,26 +491,6 @@ const TextNote: Component<TextNoteProps> = (props) => {
           timelineContext?.setTimeline({ type: 'Replies', event: props.event });
         }}
       />
-      <Switch>
-        <Match when={modal() === 'EventDebugModal'}>
-          <EventDebugModal event={props.event} onClose={closeModal} />
-        </Match>
-        <Match when={modal() === 'Reactions'}>
-          <UserList
-            data={reactions()}
-            pubkeyExtractor={(ev) => ev.pubkey}
-            renderInfo={(ev) => (
-              <div class="w-6">
-                <EmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
-              </div>
-            )}
-            onClose={closeModal}
-          />
-        </Match>
-        <Match when={modal() === 'Reposts'}>
-          <UserList data={reposts()} pubkeyExtractor={(ev) => ev.pubkey} onClose={closeModal} />
-        </Match>
-      </Switch>
     </div>
   );
 };
