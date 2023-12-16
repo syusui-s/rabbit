@@ -7,13 +7,14 @@ import {
   onCleanup,
   onMount,
   children,
+  Show,
 } from 'solid-js';
 
 import { Portal } from 'solid-js/web';
 
 export type PopupRef = {
   close: () => void;
-  elem: HTMLElement | undefined;
+  elem: () => Element | undefined;
 };
 
 export type PopupProps = {
@@ -27,7 +28,8 @@ export type PopupProps = {
 
 const Popup: Component<PopupProps> = (props) => {
   let buttonRef: HTMLButtonElement | undefined;
-  let popupRef: HTMLDivElement | undefined;
+
+  const [popupRef, setPopupRef] = createSignal<HTMLDivElement | undefined>();
 
   const [isOpen, setIsOpen] = createSignal(false);
   const [style, setStyle] = createSignal<JSX.CSSProperties>({});
@@ -38,7 +40,7 @@ const Popup: Component<PopupProps> = (props) => {
 
   const handleClickOutside = (ev: MouseEvent) => {
     const target = ev.target as HTMLElement;
-    if (target != null && !popupRef?.contains(target)) {
+    if (target != null && !popupRef()?.contains(target)) {
       close();
     }
   };
@@ -51,10 +53,11 @@ const Popup: Component<PopupProps> = (props) => {
   };
 
   const adjustPosition = () => {
-    if (buttonRef == null || popupRef == null) return;
+    const popupElem = popupRef();
+    if (buttonRef == null || popupElem == null) return;
 
     const buttonRect = buttonRef?.getBoundingClientRect();
-    const popupRect = popupRef?.getBoundingClientRect();
+    const popupRect = popupElem.getBoundingClientRect();
 
     let { top, left } = buttonRect;
 
@@ -117,16 +120,13 @@ const Popup: Component<PopupProps> = (props) => {
       >
         {props.button}
       </button>
-      <Portal>
-        <div
-          ref={popupRef}
-          class="absolute z-20"
-          classList={{ hidden: !isOpen(), block: isOpen() }}
-          style={style()}
-        >
-          {resolvedChildren()}
-        </div>
-      </Portal>
+      <Show when={isOpen()}>
+        <Portal>
+          <div ref={setPopupRef} class="absolute z-20" style={style()}>
+            {resolvedChildren()}
+          </div>
+        </Portal>
+      </Show>
     </div>
   );
 };

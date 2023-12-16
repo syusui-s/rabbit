@@ -85,7 +85,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
   return (
     <Switch fallback={<SafeLink class={props.class} href={props.href} />}>
       <Match when={config().embedding.twitter && isTwitterUrl(props.href)}>
-        <LazyLoad>{() => <TwitterEmbed class={props.class} href={props.href} />}</LazyLoad>
+        <TwitterEmbed class={props.class} href={props.href} />
       </Match>
       <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.href)} keyed>
         {({ videoId }) => (
