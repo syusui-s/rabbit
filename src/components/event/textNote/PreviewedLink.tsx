@@ -52,13 +52,13 @@ const TwitterEmbed: Component<{ class?: string; href: string }> = (props) => {
   );
 };
 
-const OgpEmbed: Component<{ url: string }> = (props) => {
+const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
   const { ogp } = useOgp(() => ({
     url: props.url,
   }));
 
   return (
-    <Show when={ogp()} fallback={<SafeLink href={props.url} />} keyed>
+    <Show when={ogp()} fallback={<SafeLink class={props.class} href={props.url} />} keyed>
       {(ogpProps) => (
         <SafeLink href={props.url}>
           <div class="my-2 rounded-lg border transition-colors hover:bg-slate-100">
@@ -111,7 +111,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
         )}
       </Match>
       <Match when={config().embedding.ogp}>
-        <LazyLoad>{() => <OgpEmbed url={props.href} />}</LazyLoad>
+        <LazyLoad>{() => <OgpEmbed class={props.class} url={props.href} />}</LazyLoad>
       </Match>
     </Switch>
   );
