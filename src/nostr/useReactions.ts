@@ -17,17 +17,18 @@ export type UseReactions = {
   reactionsGrouped: () => Map<string, NostrEvent[]>;
   isReactedBy: (pubkey: string) => boolean;
   isReactedByWithEmoji: (pubkey: string) => boolean;
-  invalidateReactions: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
 };
 
 const EmojiRegex = /\p{Emoji_Presentation}/u;
 
+export const queryKeyUseReactions = (props: UseReactionsProps | null) =>
+  ['useReactions', props] as const;
+
 const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactions => {
   const { shouldMuteEvent } = useConfig();
   const queryClient = useQueryClient();
-  const props = createMemo(propsProvider);
-  const genQueryKey = createMemo(() => ['useReactions', props()] as const);
+  const genQueryKey = createMemo(() => queryKeyUseReactions(propsProvider()));
 
   const query = createQuery(
     genQueryKey,
@@ -71,14 +72,11 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
     reactions().findIndex((event) => event.pubkey === pubkey && EmojiRegex.test(event.content)) !==
     -1;
 
-  const invalidateReactions = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
-
   return {
     reactions,
     reactionsGrouped,
     isReactedBy,
     isReactedByWithEmoji,
-    invalidateReactions,
     query,
   };
 };

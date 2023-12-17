@@ -14,15 +14,16 @@ export type UseRepostsProps = {
 export type UseReposts = {
   reposts: () => NostrEvent[];
   isRepostedBy: (pubkey: string) => boolean;
-  invalidateReposts: () => Promise<void>;
   query: CreateQueryResult<NostrEvent[]>;
 };
+
+export const queryKeyUseReposts = (props: UseRepostsProps) => ['useReposts', props] as const;
 
 const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
   const { shouldMuteEvent } = useConfig();
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = createMemo(() => ['useReposts', props()] as const);
+  const genQueryKey = createMemo(() => queryKeyUseReposts(props()));
 
   const query = createQuery(
     genQueryKey,
@@ -49,9 +50,7 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
   const isRepostedBy = (pubkey: string): boolean =>
     reposts().findIndex((event) => event.pubkey === pubkey) !== -1;
 
-  const invalidateReposts = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
-
-  return { reposts, isRepostedBy, invalidateReposts, query };
+  return { reposts, isRepostedBy, query };
 };
 
 export default useReposts;
