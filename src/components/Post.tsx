@@ -21,7 +21,7 @@ const Post: Component<PostProps> = (props) => {
   const { overflow, elementRef } = useDetectOverflow();
   const formatDate = useFormatDate();
 
-  const [showOverflow, setShowOverflow] = createSignal();
+  const [showOverflow, setShowOverflow] = createSignal(false);
   const createdAt = () => formatDate(props.createdAt);
   const createdAtFull = () => props.createdAt.toLocaleString();
 
@@ -88,7 +88,7 @@ const Post: Component<PostProps> = (props) => {
           <div
             ref={elementRef}
             class="overflow-hidden"
-            classList={{ 'max-h-screen': !showOverflow() }}
+            classList={{ 'max-h-screen': !showOverflow(), 'max-h-none': showOverflow() }}
           >
             {props.content}
           </div>
