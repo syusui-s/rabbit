@@ -25,7 +25,7 @@ import EventDebugModal from '@/components/modal/EventDebugModal';
 import UserList from '@/components/modal/UserList';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
-import { textNote, reaction } from '@/nostr/event';
+import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
 import useRepostMutation from '@/nostr/mutation/useRepostMutation';
@@ -322,12 +322,10 @@ const Actions: Component<ActionProps> = (props) => {
 
   const [modal, setModal] = createSignal<'EventDebugModal' | 'Reactions' | 'Reposts' | null>(null);
 
-  const event = createMemo(() => textNote(props.event));
-
   const closeModal = () => setModal(null);
 
   const deleteMutation = createMutation({
-    mutationKey: ['deleteEvent', event().id],
+    mutationKey: ['deleteEvent', props.event.id],
     mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
       commands
         .deleteEvent(...params)
@@ -375,7 +373,7 @@ const Actions: Component<ActionProps> = (props) => {
       },
     },
     {
-      when: () => event().pubkey === pubkey(),
+      when: () => props.event.pubkey === pubkey(),
       content: () => <span class="text-red-500">{i18n()('post.deletePost')}</span>,
       onSelect: () => {
         const p = pubkey();
@@ -385,7 +383,7 @@ const Actions: Component<ActionProps> = (props) => {
         deleteMutation.mutate({
           relayUrls: config().relayUrls,
           pubkey: p,
-          eventId: event().id,
+          eventId: props.event.id,
         });
       },
     },
