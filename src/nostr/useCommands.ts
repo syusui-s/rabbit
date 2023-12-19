@@ -123,18 +123,21 @@ const useCommands = () => {
     relayUrls,
     pubkey,
     eventId,
+    kind,
     reactionTypes,
     notifyPubkey,
   }: {
     relayUrls: string[];
     pubkey: string;
     eventId: string;
+    kind: number;
     reactionTypes: ReactionTypes;
     notifyPubkey: string;
   }): Promise<Promise<void>[]> => {
     const tags = [
       ['e', eventId, ''],
       ['p', notifyPubkey],
+      ['k', kind.toString()],
     ];
 
     if (reactionTypes.type === 'CustomEmoji') {
@@ -156,20 +159,23 @@ const useCommands = () => {
     relayUrls,
     pubkey,
     eventId,
+    kind,
     notifyPubkey,
   }: {
     relayUrls: string[];
     pubkey: string;
     eventId: string;
+    kind: number;
     notifyPubkey: string;
   }): Promise<Promise<void>[]> => {
     const preSignedEvent: UnsignedEvent = {
-      kind: 6 as Kind,
+      kind: kind === 1 ? Kind.Repost : 16 /* generic repost */,
       pubkey,
       created_at: epoch(),
       tags: [
         ['e', eventId, ''],
         ['p', notifyPubkey],
+        ['k', kind.toString()],
       ],
       content: '',
     };

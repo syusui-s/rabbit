@@ -93,6 +93,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
+        kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
       });
       setReacted(true);
@@ -185,6 +186,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
         relayUrls: config().relayUrls,
         pubkey: pubkeyNonNull,
         eventId: eventIdNonNull,
+        kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
       });
       setReposted(true);
@@ -269,6 +271,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
+        kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
       });
       setReacted(true);
