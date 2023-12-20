@@ -1,15 +1,16 @@
 import { createMemo, type Accessor } from 'solid-js';
 
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
-import { nip05, nip19 } from 'nostr-tools';
+import { queryProfile } from 'nostr-tools/nip05';
+import { type ProfilePointer } from 'nostr-tools/nip19';
 
 export type UseVerificationProps = {
   nip05: string;
 };
 
 export type UseVerification = {
-  verification: Accessor<nip19.ProfilePointer | null>;
-  query: CreateQueryResult<nip19.ProfilePointer | null>;
+  verification: Accessor<ProfilePointer | null>;
+  query: CreateQueryResult<ProfilePointer | null>;
 };
 
 const useVerification = (propsProvider: () => UseVerificationProps | null): UseVerification => {
@@ -22,7 +23,7 @@ const useVerification = (propsProvider: () => UseVerificationProps | null): UseV
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
       const { nip05: nip05string } = currentProps;
-      return nip05.queryProfile(nip05string);
+      return queryProfile(nip05string);
     },
     staleTime: 30 * 60 * 1000, // 30 min
     cacheTime: 24 * 60 * 60 * 1000, // 24 hour

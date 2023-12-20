@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
 import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
-import { Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { registerTask, BatchedEventsTask, EventTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';

@@ -1,7 +1,7 @@
 import { Component, Show } from 'solid-js';
 
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
-import { Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import { parseChannelMeta } from '@/nostr/event/channel';
 

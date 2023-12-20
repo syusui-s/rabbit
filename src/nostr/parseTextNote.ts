@@ -1,10 +1,7 @@
-import { nip19 } from 'nostr-tools';
-import { DecodeResult } from 'nostr-tools/lib/nip19';
+import { decode, type DecodeResult } from 'nostr-tools/nip19';
 
 import isValidId from '@/nostr/event/isValidId';
 import TagsBase from '@/nostr/event/TagsBase';
-
-const { decode } = nip19;
 
 export type PlainText = {
   type: 'PlainText';

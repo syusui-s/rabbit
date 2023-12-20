@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'solid-js';
 
-import { Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 import { createStore } from 'solid-js/store';
 
 export type TimelineContent = {

@@ -1,6 +1,6 @@
 import { type Component, Show } from 'solid-js';
 
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import EmojiDisplay from '@/components/EmojiDisplay';
 import TextNote from '@/components/event/TextNote';

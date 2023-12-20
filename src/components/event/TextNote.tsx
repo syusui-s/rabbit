@@ -1,6 +1,6 @@
 import { Show, For, createSignal, createMemo, type Component } from 'solid-js';
 
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import Actions from '@/components/Actions';
 // eslint-disable-next-line import/no-cycle

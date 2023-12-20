@@ -6,7 +6,7 @@ import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
-import { Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';

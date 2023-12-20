@@ -25,9 +25,12 @@ const Home: Component = () => {
     config().relayUrls.map(async (relayUrl) => {
       try {
         const relay = await pool().ensureRelay(relayUrl);
-        relay.on('notice', (msg: string) => {
+        relay.onnotice = (msg: string) => {
           console.error(`NOTICE: ${relayUrl}: ${msg}`);
-        });
+        };
+        relay.onclose = () => {
+          console.warn(`CLOSE: ${relayUrl}`);
+        };
       } catch (err) {
         console.error('ensureRelay failed', err);
       }

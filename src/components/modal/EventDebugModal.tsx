@@ -1,6 +1,6 @@
 import { Component, createMemo } from 'solid-js';
 
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import BasicModal from '@/components/modal/BasicModal';
 import Copy from '@/components/utils/Copy';

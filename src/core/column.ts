@@ -1,5 +1,5 @@
 // import { z } from 'zod';
-import { type Filter } from 'nostr-tools';
+import { type Filter } from 'nostr-tools/filter';
 
 import { type ColumnProps } from '@/components/column/Column';
 import { ContentFilter } from '@/core/contentFilter';

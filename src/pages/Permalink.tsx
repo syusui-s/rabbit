@@ -1,7 +1,7 @@
 import { createEffect, onMount } from 'solid-js';
 
 import { useNavigate, useParams } from '@solidjs/router';
-import { nip19 } from 'nostr-tools';
+import { decode } from 'nostr-tools/nip19';
 
 import GlobalModal from '@/components/modal/GlobalModal';
 import SideBar from '@/components/SideBar';
@@ -25,7 +25,7 @@ const Permalink = () => {
   onMount(() => {
     if (params.id != null) {
       try {
-        const decoded = nip19.decode(params.id);
+        const decoded = decode(params.id);
         if (decoded.type === 'npub') {
           showProfile(decoded.data);
         }

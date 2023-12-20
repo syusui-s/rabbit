@@ -1,4 +1,7 @@
-import { type Event as NostrEvent, type Filter, Kind, utils } from 'nostr-tools';
+import { type Filter } from 'nostr-tools/filter';
+import * as Kind from 'nostr-tools/kinds';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
+import { insertEventIntoDescendingList } from 'nostr-tools/utils';
 
 import useConfig from '@/core/useConfig';
 import { genericEvent } from '@/nostr/event';
@@ -35,7 +38,7 @@ type TaskArg = TaskArgs[number];
 
 export class BatchedEventsTask<T = TaskArg> extends ObservableTask<T, NostrEvent[]> {
   addEvent(event: NostrEvent) {
-    this.updateWith((current) => utils.insertEventIntoDescendingList(current ?? [], event));
+    this.updateWith((current) => insertEventIntoDescendingList(current ?? [], event));
   }
 
   firstEventPromise(): Promise<NostrEvent> {
@@ -63,9 +66,6 @@ const { setActiveBatchSubscriptions } = useStats();
 setInterval(() => {
   setActiveBatchSubscriptions(count);
 }, 1000);
-
-const isParameterizedReplaceableEvent = (event: NostrEvent) =>
-  event.kind >= 30000 && event.kind < 40000;
 
 const keyForParameterizedReplaceableEvent = ({
   kind,
@@ -220,22 +220,22 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
   ];
 
   const resolve = (event: NostrEvent) => {
-    if (event.kind === (Kind.Metadata as number)) {
+    if (event.kind === Kind.Metadata) {
       if (profileTasks.resolve(event)) return;
     }
-    if (event.kind === (Kind.Contacts as number)) {
+    if (event.kind === Kind.Contacts) {
       if (followingsTasks.resolve(event)) return;
     }
-    if (event.kind === (Kind.Repost as number)) {
+    if (event.kind === Kind.Repost) {
       if (repostsTasks.resolve(event)) return;
     }
-    if (event.kind === (Kind.Reaction as number)) {
+    if (event.kind === Kind.Reaction) {
       if (reactionsTasks.resolve(event)) return;
     }
-    if (event.kind === (Kind.Zap as number)) {
+    if (event.kind === Kind.Zap) {
       if (zapReceiptsTasks.resolve(event)) return;
     }
-    if (isParameterizedReplaceableEvent(event)) {
+    if (Kind.isParameterizedReplaceableKind(event.kind)) {
       if (parameterizedReplaceableEventsTasks.resolve(event)) return;
     }
     eventTasks.resolve(event);
@@ -279,18 +279,17 @@ const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
     const { config } = useConfig();
     const pool = usePool();
 
-    const sub = pool().sub(config().relayUrls, filters, {});
-
     count += 1;
-
-    sub.on('event', (event: NostrEvent & { id: string }) => {
-      builder.resolve(event);
-    });
-
-    sub.on('eose', () => {
-      finalizeTasks();
-      sub.unsub();
-      count -= 1;
+    const sub = pool().subscribeMany(config().relayUrls, filters, {
+      eoseTimeout: 15000,
+      onevent: (event: NostrEvent) => {
+        builder.resolve(event);
+      },
+      oneose: () => {
+        finalizeTasks();
+        sub.close();
+        count -= 1;
+      },
     });
   },
 }));

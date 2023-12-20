@@ -1,8 +1,8 @@
 import { createSignal } from 'solid-js';
 
-import { SimplePool } from 'nostr-tools';
+import { SimplePool } from 'nostr-tools/pool';
 
-const [pool] = createSignal<SimplePool>(new SimplePool({ eoseSubTimeout: 12000 }));
+const [pool] = createSignal<SimplePool>(new SimplePool());
 
 const usePool = () => pool;
 

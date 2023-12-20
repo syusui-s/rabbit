@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
-import { Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import { genericEvent } from '@/nostr/event';
 import { latestEventQuery } from '@/nostr/query';
