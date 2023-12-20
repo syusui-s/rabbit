@@ -117,13 +117,13 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
           'hover:text-rose-400': !isReactedByMe() || isReactedByMeWithEmoji(),
           'text-rose-400':
-            (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isLoading,
+            (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
         }}
       >
         <button
           class="h-4 w-4"
           onClick={handleReaction}
-          disabled={publishReactionMutation.isLoading}
+          disabled={publishReactionMutation.isPending}
         >
           <Show when={isReactedByMe() && !isReactedByMeWithEmoji()} fallback={<HeartOutlined />}>
             <HeartSolid />
@@ -140,7 +140,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
             'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'hover:text-rose-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'text-rose-400':
-              (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isLoading,
+              (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
           }}
         >
           <EmojiPicker onEmojiSelect={handleEmojiSelect}>
@@ -199,10 +199,10 @@ const RepostAction = (props: { event: NostrEvent }) => {
       classList={{
         'text-zinc-400': !isRepostedByMe(),
         'hover:text-green-400': !isRepostedByMe(),
-        'text-green-400': isRepostedByMe() || publishRepostMutation.isLoading,
+        'text-green-400': isRepostedByMe() || publishRepostMutation.isPending,
       }}
     >
-      <button class="h-4 w-4" onClick={handleRepost} disabled={publishRepostMutation.isLoading}>
+      <button class="h-4 w-4" onClick={handleRepost} disabled={publishRepostMutation.isPending}>
         <ArrowPathRoundedSquare />
       </button>
       <Show when={!config().hideCount && reposts().length > 0}>
@@ -327,7 +327,7 @@ const Actions: Component<ActionProps> = (props) => {
 
   const closeModal = () => setModal(null);
 
-  const deleteMutation = createMutation({
+  const deleteMutation = createMutation(() => ({
     mutationKey: ['deleteEvent', props.event.id],
     mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
       commands
@@ -348,7 +348,7 @@ const Actions: Component<ActionProps> = (props) => {
     onError: (err) => {
       console.error('failed to delete', err);
     },
-  });
+  }));
 
   const menu: MenuItem[] = [
     {

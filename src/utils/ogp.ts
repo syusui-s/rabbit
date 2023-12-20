@@ -56,12 +56,15 @@ export type UseOgpProps = {
 
 export const useOgp = (propsProvider: () => UseOgpProps) => {
   const genQueryKey = () => ['useOgp', propsProvider().url] as const;
-  const query = createQuery(genQueryKey, ({ queryKey: [, url] }) => fetchOgpContent(url), {
+
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: ({ queryKey: [, url] }) => fetchOgpContent(url),
     staleTime: 4 * 60 * 60 * 1000, // 4 hour
     cacheTime: 4 * 60 * 60 * 1000, // 4 hour
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-  });
+  }));
 
   const ogp = () => query.data;
 

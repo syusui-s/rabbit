@@ -112,7 +112,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     return p != null && userFollowingPubkeys().includes(p);
   };
 
-  const updateContactsMutation = createMutation({
+  const updateContactsMutation = createMutation(() => ({
     mutationKey: ['updateContacts'],
     mutationFn: (...params: Parameters<typeof commands.updateContacts>) =>
       commands
@@ -139,7 +139,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         .then(() => myFollowingQuery.refetch())
         .catch((err) => console.error('failed to refetch contacts', err));
     },
-  });
+  }));
 
   const updateContacts = async (op: 'follow' | 'unfollow', pubkey: string) => {
     try {
@@ -312,12 +312,12 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     {i18n()('profile.editProfile')}
                   </button>
                 </Match>
-                <Match when={updateContactsMutation.isLoading || updatingContacts()}>
+                <Match when={updateContactsMutation.isPending || updatingContacts()}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     {i18n()('general.updating')}
                   </span>
                 </Match>
-                <Match when={myFollowingQuery.isLoading || myFollowingQuery.isFetching}>
+                <Match when={myFollowingQuery.isPending || myFollowingQuery.isFetching}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     {i18n()('general.loading')}
                   </span>
@@ -329,7 +329,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     onMouseEnter={() => setHoverFollowButton(true)}
                     onMouseLeave={() => setHoverFollowButton(false)}
                     onClick={() => unfollow()}
-                    disabled={updateContactsMutation.isLoading}
+                    disabled={updateContactsMutation.isPending}
                   >
                     <Show when={!hoverFollowButton()} fallback={i18n()('profile.unfollow')}>
                       {i18n()('profile.followingCurrently')}
@@ -341,7 +341,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     class="w-28 rounded-full border border-primary px-4 py-2 text-primary
                     hover:border-rose-400 hover:text-rose-400"
                     onClick={() => follow()}
-                    disabled={updateContactsMutation.isLoading}
+                    disabled={updateContactsMutation.isPending}
                   >
                     {i18n()('profile.follow')}
                   </button>
@@ -357,7 +357,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               </ContextMenu>
             </div>
             <Switch>
-              <Match when={userFollowingQuery.isLoading}>
+              <Match when={userFollowingQuery.isPending}>
                 <div class="shrink-0 text-xs">{i18n()('general.loading')}</div>
               </Match>
               <Match when={followed()}>
@@ -369,7 +369,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </div>
       <div class="flex items-start px-4 pt-2">
         <div class="h-16 shrink overflow-hidden">
-          <Show when={profileQuery.isLoading}>{i18n()('general.loading')}</Show>
+          <Show when={profileQuery.isPending}>{i18n()('general.loading')}</Show>
           <Show when={(profile()?.display_name?.length ?? 0) > 0}>
             <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
           </Show>
@@ -387,7 +387,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     </span>
                   }
                 >
-                  <Match when={verificationQuery.isLoading}>
+                  <Match when={verificationQuery.isPending}>
                     <span class="inline-block h-3 w-3">
                       <ArrowPath />
                     </span>

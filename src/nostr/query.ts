@@ -15,7 +15,6 @@ export const latestEventQuery =
     queryClient: QueryClient;
   }) =>
   ({ queryKey, signal }: { queryKey: K; signal?: AbortSignal }): Promise<NostrEvent | null> => {
-    const prev = queryClient.getQueryData(queryKey, { stale: true }) as NostrEvent;
     const task = taskProvider(queryKey);
     if (task == null) return Promise.resolve(null);
     const promise = task.firstEventPromise().catch(() => {
@@ -23,9 +22,12 @@ export const latestEventQuery =
     });
     task.onUpdate((events) => {
       const latest = pickLatestEvent(events);
-      if (prev == null || (latest != null && compareEvents(latest, prev) >= 0)) {
-        queryClient.setQueryData(queryKey, latest);
-      }
+      queryClient.setQueriesData<NostrEvent>({ queryKey, stale: true }, (prev) => {
+        if (latest != null && (prev == null || compareEvents(latest, prev) >= 0)) {
+          return latest;
+        }
+        return undefined;
+      });
     });
     registerTask({ task, signal });
     return timeout(15000, `${JSON.stringify(queryKey)}`)(promise);
@@ -40,13 +42,12 @@ export const eventsQuery =
     queryClient: QueryClient;
   }) =>
   ({ queryKey, signal }: { queryKey: K; signal?: AbortSignal }): Promise<NostrEvent[]> => {
-    const prev = queryClient.getQueryData(queryKey, { stale: true }) as NostrEvent[];
     const task = taskProvider(queryKey);
     if (task == null) return Promise.resolve([]);
     const promise = task.toUpdatePromise().catch(() => []);
     task.onUpdate((events) => {
       // TODO consider kind:5 deletion
-      queryClient.setQueryData(queryKey, () => {
+      queryClient.setQueriesData<NostrEvent[]>({ queryKey, stale: true }, (prev) => {
         if (prev == null) return events;
         const deduped = uniqBy([...prev, ...events], (e) => e.id);
         return sortEvents(deduped);

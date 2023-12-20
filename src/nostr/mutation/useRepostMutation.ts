@@ -16,7 +16,7 @@ const useRepostMutation = (propsProvider: () => UseRepostMutationProps) => {
 
   const commands = useCommands();
 
-  const mutation = createMutation({
+  const mutation = createMutation(() => ({
     mutationKey: ['useRepostMutation', props().eventId] as const,
     mutationFn: (...params: Parameters<typeof commands.publishRepost>) =>
       commands
@@ -43,7 +43,7 @@ const useRepostMutation = (propsProvider: () => UseRepostMutationProps) => {
         .then(() => queryClient.invalidateQueries({ queryKey }))
         .catch((err) => console.error('failed to refetch repost', err));
     },
-  });
+  }));
 
   return mutation;
 };

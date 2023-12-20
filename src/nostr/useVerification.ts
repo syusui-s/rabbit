@@ -14,19 +14,19 @@ export type UseVerification = {
 
 const useVerification = (propsProvider: () => UseVerificationProps | null): UseVerification => {
   const props = createMemo(propsProvider);
-  const query = createQuery(
-    () => ['useVerification', props()] as const,
-    ({ queryKey }) => {
+  const genQueryKey = () => ['useVerification', props()] as const;
+
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: ({ queryKey }) => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
       const { nip05: nip05string } = currentProps;
       return nip05.queryProfile(nip05string);
     },
-    {
-      staleTime: 30 * 60 * 1000, // 30 min
-      cacheTime: 24 * 60 * 60 * 1000, // 24 hour
-    },
-  );
+    staleTime: 30 * 60 * 1000, // 30 min
+    cacheTime: 24 * 60 * 60 * 1000, // 24 hour
+  }));
 
   const verification = () => query?.data ?? null;
 

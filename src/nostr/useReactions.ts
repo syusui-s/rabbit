@@ -30,9 +30,9 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
   const queryClient = useQueryClient();
   const genQueryKey = createMemo(() => queryKeyUseReactions(propsProvider()));
 
-  const query = createQuery(
-    genQueryKey,
-    eventsQuery({
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: eventsQuery<ReturnType<typeof queryKeyUseReactions>>({
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { eventId: mentionedEventId } = currentProps;
@@ -40,12 +40,10 @@ const useReactions = (propsProvider: () => UseReactionsProps | null): UseReactio
       },
       queryClient,
     }),
-    {
-      staleTime: 1 * 60 * 1000, // 1 min
-      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
-      refetchInterval: 1 * 60 * 1000, // 1 min
-    },
-  );
+    staleTime: 1 * 60 * 1000, // 1 min
+    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    refetchInterval: 1 * 60 * 1000, // 1 min
+  }));
 
   const reactions = () => {
     const data = query.data ?? [];

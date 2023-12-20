@@ -50,7 +50,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   );
   const { updateProfile } = useCommands();
 
-  const mutation = createMutation({
+  const mutation = createMutation(() => ({
     mutationKey: ['updateProfile'],
     mutationFn: (...params: Parameters<typeof updateProfile>) =>
       updateProfile(...params).then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
@@ -73,12 +73,12 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
     onError: (err) => {
       console.error('failed to delete', err);
     },
-  });
+  }));
 
-  const loading = () => query.isLoading || mutation.isLoading;
+  const loading = () => query.isPending || mutation.isPending;
   const disabled = () => loading();
 
-  setInterval(() => console.log(query.isLoading, mutation.isLoading), 1000);
+  setInterval(() => console.log(query.isPending, mutation.isPending), 1000);
 
   const otherProperties = () =>
     omit(profile(), [
@@ -313,7 +313,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             <button
               type="submit"
               class="rounded bg-rose-300 p-2 font-bold text-white hover:bg-rose-400"
-              disabled={mutation.isLoading}
+              disabled={mutation.isPending}
             >
               {i18n()('profile.edit.save')}
             </button>
@@ -325,7 +325,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.cancel')}
             </button>
           </div>
-          <Show when={mutation.isLoading}>{i18n()('profile.edit.updating')}</Show>
+          <Show when={mutation.isPending}>{i18n()('profile.edit.updating')}</Show>
         </form>
       </div>
     </BasicModal>

@@ -30,9 +30,9 @@ const useParameterizedReplaceableEvent = (
   const props = createMemo(propsProvider);
   const genQueryKey = () => ['useFollowings', props()] as const;
 
-  const query = createQuery(
-    genQueryKey,
-    ({ queryKey, signal }) => {
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: ({ queryKey, signal }) => {
       console.debug('useFollowings');
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
@@ -59,11 +59,9 @@ const useParameterizedReplaceableEvent = (
         `useParameterizedReplaceableEvent: ${kind}:${author}:${identifier}`,
       )(promise);
     },
-    {
-      staleTime: 5 * 60 * 1000, // 5 min
-      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
-    },
-  );
+    staleTime: 5 * 60 * 1000, // 5 min
+    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+  }));
 
   const event = () => query.data ?? null;
 

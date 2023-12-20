@@ -16,7 +16,7 @@ const useReactionMutation = (propsProvider: () => UseReactionMutationProps) => {
 
   const commands = useCommands();
 
-  const mutation = createMutation({
+  const mutation = createMutation(() => ({
     mutationKey: ['useReactionMutation', props().eventId] as const,
     mutationFn: (...params: Parameters<typeof commands.publishReaction>) =>
       commands
@@ -43,7 +43,7 @@ const useReactionMutation = (propsProvider: () => UseReactionMutationProps) => {
         .then(() => queryClient.invalidateQueries({ queryKey }))
         .catch((err) => console.error('failed to refetch reactions', err));
     },
-  });
+  }));
 
   return mutation;
 };

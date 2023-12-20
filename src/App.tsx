@@ -1,6 +1,6 @@
 import { createEffect, onCleanup, lazy, type Component } from 'solid-js';
 
-import { Routes, Route } from '@solidjs/router';
+import { HashRouter, Route } from '@solidjs/router';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { persistQueryClient } from '@tanstack/query-persist-client-core';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
@@ -50,12 +50,12 @@ const App: Component = () => {
   return (
     <I18NextProvider i18next={i18next}>
       <QueryClientProvider client={queryClient}>
-        <Routes>
-          <Route path="/hello" element={<Hello />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/:id" element={<Permalink />} />
-          <Route path="/*" element={<NotFound />} />
-        </Routes>
+        <HashRouter>
+          <Route path="/hello" component={() => <Hello />} />
+          <Route path="/" component={() => <Home />} />
+          <Route path="/:id" component={() => <Permalink />} />
+          <Route path="/*" component={() => <NotFound />} />
+        </HashRouter>
       </QueryClientProvider>
     </I18NextProvider>
   );

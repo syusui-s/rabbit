@@ -27,16 +27,14 @@ export type UseProfiles = {
   queries: CreateQueryResult<NostrEvent | null>[];
 };
 
-type UseProfileQueryKey = readonly ['useProfile', UseProfileProps | null];
-
 const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = createMemo((): UseProfileQueryKey => ['useProfile', props()] as const);
+  const genQueryKey = createMemo(() => ['useProfile', props()] as const);
 
-  const query = createQuery(
-    genQueryKey,
-    latestEventQuery({
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: latestEventQuery<ReturnType<typeof genQueryKey>>({
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { pubkey } = currentProps;
@@ -44,15 +42,13 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
       },
       queryClient,
     }),
-    {
-      // Profiles are updated occasionally, so a short staleTime is used here.
-      // cacheTime is long so that the user see profiles instantly.
-      staleTime: 5 * 60 * 1000, // 5 min
-      cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
-      refetchInterval: 5 * 60 * 1000, // 5 min
-      refetchOnWindowFocus: false,
-    },
-  );
+    // Profiles are updated occasionally, so a short staleTime is used here.
+    // cacheTime is long so that the user see profiles instantly.
+    staleTime: 5 * 60 * 1000, // 5 min
+    cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+    refetchInterval: 5 * 60 * 1000, // 5 min
+    refetchOnWindowFocus: false,
+  }));
 
   const event = () => query.data;
 
@@ -62,7 +58,8 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
     return safeParseProfile(content);
   });
 
-  const invalidateProfile = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
+  const invalidateProfile = (): Promise<void> =>
+    queryClient.invalidateQueries({ queryKey: genQueryKey() });
 
   return { profile, event, invalidateProfile, query };
 };

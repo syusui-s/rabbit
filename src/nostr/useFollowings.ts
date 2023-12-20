@@ -68,9 +68,9 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
   const props = createMemo(propsProvider);
   const genQueryKey = () => ['useFollowings', props()] as const;
 
-  const query = createQuery(
-    genQueryKey,
-    latestEventQuery({
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: latestEventQuery<ReturnType<typeof genQueryKey>>({
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { pubkey } = currentProps;
@@ -78,17 +78,16 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
       },
       queryClient,
     }),
-    {
-      staleTime: 5 * 60 * 1000, // 5 min
-      cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchInterval: 0,
-    },
-  );
+    staleTime: 5 * 60 * 1000, // 5 min
+    cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: 0,
+  }));
 
-  const invalidateFollowings = (): Promise<void> => queryClient.invalidateQueries(genQueryKey());
+  const invalidateFollowings = (): Promise<void> =>
+    queryClient.invalidateQueries({ queryKey: genQueryKey() });
 
   return { ...buildMethods(() => query.data), invalidateFollowings, query };
 };

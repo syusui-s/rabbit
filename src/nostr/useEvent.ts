@@ -18,9 +18,9 @@ export type UseEvent = {
 const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
   const props = createMemo(propsProvider);
 
-  const query = createQuery(
-    () => ['useEvent', props()] as const,
-    ({ queryKey, signal }) => {
+  const query = createQuery(() => ({
+    queryKey: ['useEvent', props()] as const,
+    queryFn: ({ queryKey, signal }) => {
       const [, currentProps] = queryKey;
       if (currentProps == null) return null;
       const { eventId } = currentProps;
@@ -31,15 +31,13 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
       registerTask({ task, signal });
       return timeout(15000, `useEvent: ${eventId}`)(promise);
     },
-    {
-      // Text notes never change, so they can be stored for a long time.
-      // However, events tend to be unreferenced as time passes.
-      staleTime: 4 * 60 * 60 * 1000, // 4 hour
-      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  );
+    // Text notes never change, so they can be stored for a long time.
+    // However, events tend to be unreferenced as time passes.
+    staleTime: 4 * 60 * 60 * 1000, // 4 hour
+    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  }));
 
   const event = () => query.data ?? null;
 

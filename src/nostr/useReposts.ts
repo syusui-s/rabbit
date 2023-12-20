@@ -25,9 +25,9 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
   const props = createMemo(propsProvider);
   const genQueryKey = createMemo(() => queryKeyUseReposts(props()));
 
-  const query = createQuery(
-    genQueryKey,
-    eventsQuery({
+  const query = createQuery(() => ({
+    queryKey: genQueryKey(),
+    queryFn: eventsQuery<ReturnType<typeof genQueryKey>>({
       taskProvider: ([, currentProps]) => {
         if (currentProps == null) return null;
         const { eventId: mentionedEventId } = currentProps;
@@ -35,12 +35,10 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
       },
       queryClient,
     }),
-    {
-      staleTime: 1 * 60 * 1000, // 1 min
-      cacheTime: 4 * 60 * 60 * 1000, // 4 hour
-      refetchInterval: 1 * 60 * 1000, // 1 min
-    },
-  );
+    staleTime: 1 * 60 * 1000, // 1 min
+    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    refetchInterval: 1 * 60 * 1000, // 1 min
+  }));
 
   const reposts = () => {
     const data = query.data ?? [];

@@ -122,8 +122,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
-  const publishTextNoteMutation = createMutation({
-    mutationKey: ['publishTextNote'],
+  const publishTextNoteMutation = createMutation(() => ({
+    mutationKey: ['publishTextNote'] as const,
     mutationFn: commands.publishTextNote.bind(commands),
     onSuccess: () => {
       console.log('succeeded to post');
@@ -133,7 +133,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     onError: (err) => {
       console.error('error', err);
     },
-  });
+  }));
 
   const resizeTextArea = () => {
     if (textAreaRef == null) return;
@@ -141,8 +141,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     textAreaRef.style.height = `${textAreaRef.scrollHeight}px`;
   };
 
-  const uploadFilesMutation = createMutation({
-    mutationKey: ['uploadFiles'],
+  const uploadFilesMutation = createMutation(() => ({
+    mutationKey: ['uploadFiles'] as const,
     mutationFn: async (files: File[]) => {
       const uploadResults = await uploadFiles(uploadNostrBuild)(files);
       const failed: File[] = [];
@@ -161,7 +161,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         window.alert(i18n()('posting.failedToUploadFile', { filenames }));
       }
     },
-  });
+  }));
 
   const taggedPubkeysWithoutMe = createMemo(() => {
     const p = getPubkey();
@@ -197,7 +197,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submit = () => {
     if (text().length === 0) return;
-    if (publishTextNoteMutation.isLoading) return;
+    if (publishTextNoteMutation.isPending) return;
 
     if (/nsec1[0-9a-zA-Z]+/.test(text())) {
       window.alert(i18n()('posting.forbiddenToIncludeNsec'));
@@ -290,7 +290,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
      */
   const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
     ev.preventDefault();
-    if (uploadFilesMutation.isLoading) return;
+    if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
 
     const files = [...(ev.currentTarget.files ?? [])];
@@ -301,14 +301,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const handleDrop: JSX.EventHandler<HTMLTextAreaElement, DragEvent> = (ev) => {
     ev.preventDefault();
-    if (uploadFilesMutation.isLoading) return;
+    if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
     const files = [...(ev?.dataTransfer?.files ?? [])];
     uploadFilesMutation.mutate(files);
   };
 
   const handlePaste: JSX.EventHandler<HTMLTextAreaElement, ClipboardEvent> = (ev) => {
-    if (uploadFilesMutation.isLoading) return;
+    if (uploadFilesMutation.isPending) return;
 
     const items = [...(ev?.clipboardData?.items ?? [])];
 
@@ -333,10 +333,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submitDisabled = () =>
     text().trim().length === 0 ||
-    publishTextNoteMutation.isLoading ||
-    uploadFilesMutation.isLoading;
+    publishTextNoteMutation.isPending ||
+    uploadFilesMutation.isPending;
 
-  const fileUploadDisabled = () => uploadFilesMutation.isLoading;
+  const fileUploadDisabled = () => uploadFilesMutation.isPending;
 
   onMount(() => {
     setTimeout(() => {
