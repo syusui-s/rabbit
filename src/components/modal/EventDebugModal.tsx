@@ -4,6 +4,7 @@ import { type Event as NostrEvent } from 'nostr-tools';
 
 import BasicModal from '@/components/modal/BasicModal';
 import Copy from '@/components/utils/Copy';
+import usePool from '@/nostr/usePool';
 
 export type EventDebugModalProps = {
   event: NostrEvent;
@@ -11,15 +12,23 @@ export type EventDebugModalProps = {
 };
 
 const EventDebugModal: Component<EventDebugModalProps> = (props) => {
+  const pool = usePool();
+
   const json = createMemo(() => JSON.stringify(props.event, null, 2));
+  const seenOn = createMemo(() => pool().seenOn(props.event.id).join('\n'));
 
   return (
     <BasicModal onClose={props.onClose}>
       <div class="p-2">
-        <pre class="whitespace-pre-wrap break-all rounded border p-4 text-xs">{json()}</pre>
+        <h2 class="text-lg font-bold">JSON</h2>
+        <pre class="whitespace-pre-wrap break-all rounded-lg border p-4 text-xs">{json()}</pre>
         <div class="flex justify-end">
           <Copy class="h-4 w-4" text={json()} />
         </div>
+      </div>
+      <div class="p-2">
+        <h2 class="text-lg font-bold">Found in these relays</h2>
+        <pre class="whitespace-pre-wrap break-all rounded-lg border p-2 text-xs">{seenOn()}</pre>
       </div>
     </BasicModal>
   );
