@@ -1,7 +1,8 @@
-/* eslint global-require: "off", @typescript-eslint/no-var-requires: "off" */
-const colors = require('tailwindcss/colors');
+import tailwindForms from '@tailwindcss/forms';
+import { type Config } from 'tailwindcss';
+import colors from 'tailwindcss/colors';
 
-module.exports = {
+export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -13,5 +14,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms')],
-};
+  plugins: [tailwindForms],
+} satisfies Config;
