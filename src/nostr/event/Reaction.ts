@@ -1,4 +1,5 @@
-import { Event as NostrEvent, Kind } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import GenericEvent from '@/nostr/event/GenericEvent';
 
@@ -30,7 +31,7 @@ const reactionToReactionTypes = (event: Reaction): ReactionTypes => {
 
 export default class Reaction extends GenericEvent {
   constructor(rawEvent: NostrEvent) {
-    if (rawEvent.kind !== (Kind.Reaction as number)) {
+    if (rawEvent.kind !== Kind.Reaction) {
       throw new TypeError('kind should be 7');
     }
     super(rawEvent);

@@ -2,7 +2,8 @@ import { type Accessor, type Setter } from 'solid-js';
 
 import { sortBy } from 'lodash';
 import uniq from 'lodash/uniq';
-import { Kind, type Event as NostrEvent } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import {
   ColumnType,
@@ -194,7 +195,7 @@ const useConfig = (): UseConfig => {
   const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
 
   const hasMutedKeyword = (event: NostrEvent) => {
-    if (event.kind === (Kind.Text as number)) {
+    if (event.kind === Kind.ShortTextNote) {
       return config.mutedKeywords.some((keyword) => event.content.includes(keyword));
     }
     return false;
@@ -205,7 +206,7 @@ const useConfig = (): UseConfig => {
     return (
       isPubkeyMuted(event.pubkey) ||
       ev.taggedPubkeys().some(isPubkeyMuted) ||
-      (event.kind === (Kind.Text as number) && hasMutedKeyword(event))
+      (event.kind === Kind.ShortTextNote && hasMutedKeyword(event))
     );
   };
 

@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { Kind } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
 import { describe, it } from 'vitest';
 
 import TextNote from '@/nostr/event/TextNote';
@@ -142,7 +142,7 @@ describe('TextNote', () => {
     it('should return true if content of the event includes a NIP-19-styled note ID', () => {
       const textnote = new TextNote({
         id: '',
-        kind: Kind.Text,
+        kind: Kind.ShortTextNote,
         content: 'nostr:note1qpwq08jv0sgrz68qev6eyu9vj6n2gmjl7n8g73jruzp37mguy3gq8d7asa',
         created_at: 0,
         pubkey: '',
@@ -159,7 +159,7 @@ describe('TextNote', () => {
     it('should return true if content of the event includes a NIP-19-styled nevent ID', () => {
       const textnote = new TextNote({
         id: '',
-        kind: Kind.Text,
+        kind: Kind.ShortTextNote,
         content: 'nostr:nevent1qqsttdc4rmxn8fqmk9s6823fqvpcmlm8ry6dmtu4m2snv0cm9sv70kq6urpy5',
         created_at: 0,
         pubkey: '',
@@ -178,7 +178,7 @@ describe('TextNote', () => {
     it('should return a reply MarkedEventTag if the event has a reply tag', () => {
       const textnote = new TextNote({
         id: '',
-        kind: Kind.Text,
+        kind: Kind.ShortTextNote,
         content: '',
         created_at: 0,
         pubkey: '',

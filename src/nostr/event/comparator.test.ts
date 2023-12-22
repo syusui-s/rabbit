@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 import { describe, it } from 'vitest';
 
 import { compareEvents, pickLatestEvent } from '@/nostr/event/comparator';

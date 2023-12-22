@@ -1,6 +1,7 @@
 import { For, type Component, createMemo } from 'solid-js';
 
-import { Kind, type Event as NostrEvent } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ColumnItem from '@/components/ColumnItem';
 import EventDisplayById from '@/components/event/EventDisplayById';
@@ -40,7 +41,7 @@ const Bookmark: Component<BookmarkProps> = (props) => {
     <For each={[...bookmarkedEventIds(), ...bookmarkedEventIdsPrivate()]}>
       {(eventId) => (
         <ColumnItem>
-          <EventDisplayById eventId={eventId} ensureKinds={[Kind.Text]} />
+          <EventDisplayById eventId={eventId} ensureKinds={[Kind.ShortTextNote]} />
         </ColumnItem>
       )}
     </For>

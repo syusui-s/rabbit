@@ -1,7 +1,5 @@
 import { createMemo } from 'solid-js';
 
-import { Kind } from 'nostr-tools';
-
 import useConfig from '@/core/useConfig';
 import useSubscription from '@/nostr/useSubscription';
 
@@ -15,7 +13,7 @@ export default function useBookmarks(propsProvider: () => UseBookmarksProps) {
 
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
-    filters: [{ kinds: [30001 as Kind], authors: [props().pubkey] }],
+    filters: [{ kinds: [30001], authors: [props().pubkey] }],
     continuous: true,
   }));
 

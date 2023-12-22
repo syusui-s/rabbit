@@ -1,6 +1,6 @@
-import { getEventHash, Kind, verifySignature, type UnsignedEvent } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
+import { verifyEvent, getEventHash, type UnsignedEvent } from 'nostr-tools/pure';
 
-// import '@/types/nostr.d';
 import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
 import { ReactionTypes } from '@/nostr/event/Reaction';
 import usePool from '@/nostr/usePool';
@@ -87,7 +87,7 @@ const useCommands = () => {
       throw new Error('NIP-07 implementation not found');
     }
     const signedEvent = await window.nostr.signEvent(preSignedEvent);
-    if (!verifySignature({ ...signedEvent, id })) {
+    if (!verifyEvent({ ...signedEvent, id })) {
       throw new Error('nostr.signEvent returned invalid data');
     }
 
@@ -109,7 +109,7 @@ const useCommands = () => {
     const tags = buildTags(params);
 
     const preSignedEvent: UnsignedEvent = {
-      kind: 1,
+      kind: Kind.ShortTextNote,
       pubkey,
       created_at: epoch(),
       tags,
@@ -145,7 +145,7 @@ const useCommands = () => {
     }
 
     const preSignedEvent: UnsignedEvent = {
-      kind: 7,
+      kind: Kind.Reaction,
       pubkey,
       created_at: epoch(),
       tags,

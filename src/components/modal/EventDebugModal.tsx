@@ -1,6 +1,6 @@
 import { Component, createMemo } from 'solid-js';
 
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import BasicModal from '@/components/modal/BasicModal';
 import Copy from '@/components/utils/Copy';
@@ -15,7 +15,10 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
   const pool = usePool();
 
   const json = createMemo(() => JSON.stringify(props.event, null, 2));
-  const seenOn = createMemo(() => pool().seenOn(props.event.id).join('\n'));
+  const seenOn = createMemo(() => {
+    const relays = pool().seenOn.get(props.event.id) ?? [];
+    return [...relays].map((relay) => relay.url).join('\n');
+  });
 
   return (
     <BasicModal onClose={props.onClose}>

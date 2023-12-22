@@ -1,4 +1,4 @@
-import { Kind, Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import TagsBase from '@/nostr/event/TagsBase';
 
@@ -15,7 +15,7 @@ export default class GenericEvent extends TagsBase {
     return this.rawEvent.sig;
   }
 
-  get kind(): Kind {
+  get kind(): number {
     return this.rawEvent.kind;
   }
 

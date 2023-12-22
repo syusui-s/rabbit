@@ -1,12 +1,10 @@
 import { Show, type Component } from 'solid-js';
 
-import { Kind, nip19 } from 'nostr-tools';
-
-const { noteEncode, neventEncode } = nip19;
+import { noteEncode, neventEncode } from 'nostr-tools/nip19';
 
 type EventLinkProps = {
   eventId: string;
-  kind?: Kind;
+  kind?: number;
 };
 
 const tryEncodeNote = (eventId: string) => {
@@ -29,10 +27,7 @@ const tryEncodeNevent = (eventId: string) => {
 
 const EventLink: Component<EventLinkProps> = (props) => (
   <button class="text-blue-500 underline">
-    <Show
-      when={props.kind == null || props.kind === Kind.Text}
-      fallback={tryEncodeNevent(props.eventId)}
-    >
+    <Show when={props.kind == null || props.kind === 1} fallback={tryEncodeNevent(props.eventId)}>
       {tryEncodeNote(props.eventId)}
     </Show>
   </button>

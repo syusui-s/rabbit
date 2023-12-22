@@ -16,7 +16,8 @@ import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
-import { type Event as NostrEvent, nip19 } from 'nostr-tools';
+import { noteEncode } from 'nostr-tools/nip19';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import EmojiDisplay from '@/components/EmojiDisplay';
@@ -40,8 +41,6 @@ export type ActionProps = {
   event: NostrEvent;
   onClickReply: () => void;
 };
-
-const { noteEncode } = nip19;
 
 const emojiDataToReactionTypes = (emoji: EmojiData): ReactionTypes => {
   if (emoji.native != null) {

@@ -1,6 +1,6 @@
 import { For } from 'solid-js';
 
-import { Kind } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
 
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
@@ -88,7 +88,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
                   eventId={item.data.data}
                   actions={false}
                   embedding={false}
-                  ensureKinds={[Kind.Text]}
+                  ensureKinds={[Kind.ShortTextNote]}
                 />
               </div>
             );

@@ -1,6 +1,6 @@
 import { QueryClient, QueryKey } from '@tanstack/solid-query';
 import { uniqBy } from 'lodash';
-import { Event as NostrEvent } from 'nostr-tools';
+import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import { compareEvents, pickLatestEvent, sortEvents } from '@/nostr/event/comparator';
 import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';

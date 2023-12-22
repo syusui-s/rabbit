@@ -1,6 +1,7 @@
 import { Switch, Match, Component } from 'solid-js';
 
-import { Kind, type Event as NostrEvent } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 // import ChannelInfo from '@/components/event/ChannelInfo';
 // eslint-disable-next-line import/no-cycle
@@ -13,7 +14,7 @@ export type EventDisplayProps = {
   event: NostrEvent;
   embedding?: boolean;
   actions?: boolean;
-  ensureKinds?: Kind[];
+  ensureKinds?: number[];
 };
 
 const EventDisplay: Component<EventDisplayProps> = (props) => {
@@ -39,10 +40,10 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
           <EventLink eventId={props.event.id} kind={props.event.kind} />
         </span>
       </Match>
-      <Match when={props.event.kind === (Kind.Text as number)}>
+      <Match when={props.event.kind === Kind.ShortTextNote}>
         <TextNote event={props.event} embedding={props.actions} actions={props.actions} />
       </Match>
-      <Match when={props.event.kind === (Kind.Repost as number)}>
+      <Match when={props.event.kind === Kind.Repost}>
         <Repost event={props.event} />
       </Match>
     </Switch>

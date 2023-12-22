@@ -1,6 +1,4 @@
-import { nip19 } from 'nostr-tools';
-
-const { npubEncode } = nip19;
+import { npubEncode } from 'nostr-tools/nip19';
 
 const npubEncodeFallback = (pubkey: string): string => {
   try {

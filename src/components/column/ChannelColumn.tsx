@@ -1,7 +1,7 @@
 import { Component } from 'solid-js';
 
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
-import { Kind } from 'nostr-tools';
+import * as Kind from 'nostr-tools/kinds';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
