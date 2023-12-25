@@ -26,7 +26,7 @@ const useVerification = (propsProvider: () => UseVerificationProps | null): UseV
       return queryProfile(nip05string);
     },
     staleTime: 30 * 60 * 1000, // 30 min
-    cacheTime: 24 * 60 * 60 * 1000, // 24 hour
+    gcTime: 24 * 60 * 60 * 1000, // 24 hour
   }));
 
   const verification = () => query?.data ?? null;

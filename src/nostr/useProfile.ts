@@ -43,9 +43,9 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
       queryClient,
     }),
     // Profiles are updated occasionally, so a short staleTime is used here.
-    // cacheTime is long so that the user see profiles instantly.
+    // gcTime is long so that the user see profiles instantly.
     staleTime: 5 * 60 * 1000, // 5 min
-    cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+    gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
     refetchInterval: 5 * 60 * 1000, // 5 min
     refetchOnWindowFocus: false,
   }));

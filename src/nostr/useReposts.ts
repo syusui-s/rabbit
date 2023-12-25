@@ -36,7 +36,7 @@ const useReposts = (propsProvider: () => UseRepostsProps): UseReposts => {
       queryClient,
     }),
     staleTime: 1 * 60 * 1000, // 1 min
-    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    gcTime: 4 * 60 * 60 * 1000, // 4 hour
     refetchInterval: 1 * 60 * 1000, // 1 min
   }));
 

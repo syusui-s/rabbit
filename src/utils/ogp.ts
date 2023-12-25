@@ -61,7 +61,7 @@ export const useOgp = (propsProvider: () => UseOgpProps) => {
     queryKey: genQueryKey(),
     queryFn: ({ queryKey: [, url] }) => fetchOgpContent(url),
     staleTime: 4 * 60 * 60 * 1000, // 4 hour
-    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    gcTime: 4 * 60 * 60 * 1000, // 4 hour
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   }));

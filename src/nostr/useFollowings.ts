@@ -79,7 +79,7 @@ const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollo
       queryClient,
     }),
     staleTime: 5 * 60 * 1000, // 5 min
-    cacheTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+    gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
     refetchOnMount: true,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

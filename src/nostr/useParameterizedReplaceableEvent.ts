@@ -60,7 +60,7 @@ const useParameterizedReplaceableEvent = (
       )(promise);
     },
     staleTime: 5 * 60 * 1000, // 5 min
-    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    gcTime: 4 * 60 * 60 * 1000, // 4 hour
   }));
 
   const event = () => query.data ?? null;

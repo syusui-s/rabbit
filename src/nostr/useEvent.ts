@@ -34,7 +34,7 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
     // Text notes never change, so they can be stored for a long time.
     // However, events tend to be unreferenced as time passes.
     staleTime: 4 * 60 * 60 * 1000, // 4 hour
-    cacheTime: 4 * 60 * 60 * 1000, // 4 hour
+    gcTime: 4 * 60 * 60 * 1000, // 4 hour
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   }));
