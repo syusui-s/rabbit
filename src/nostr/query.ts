@@ -22,7 +22,7 @@ export const latestEventQuery =
     });
     task.onUpdate((events) => {
       const latest = pickLatestEvent(events);
-      queryClient.setQueriesData<NostrEvent>({ queryKey, stale: true }, (prev) => {
+      queryClient.setQueriesData<NostrEvent>({ queryKey }, (prev) => {
         if (latest != null && (prev == null || compareEvents(latest, prev) >= 0)) {
           return latest;
         }
@@ -47,7 +47,7 @@ export const eventsQuery =
     const promise = task.toUpdatePromise().catch(() => []);
     task.onUpdate((events) => {
       // TODO consider kind:5 deletion
-      queryClient.setQueriesData<NostrEvent[]>({ queryKey, stale: true }, (prev) => {
+      queryClient.setQueriesData<NostrEvent[]>({ queryKey }, (prev) => {
         if (prev == null) return events;
         const deduped = uniqBy([...prev, ...events], (e) => e.id);
         return sortEvents(deduped);
