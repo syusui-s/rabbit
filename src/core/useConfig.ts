@@ -1,4 +1,4 @@
-import { type Accessor, type Setter } from 'solid-js';
+import { createRoot, type Accessor, type Setter } from 'solid-js';
 
 import { sortBy } from 'lodash';
 import uniq from 'lodash/uniq';
@@ -107,7 +107,9 @@ const deserializer = (json: string): Config =>
   }) as Config;
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
-const [config, setConfig] = createStoreWithStorage('RabbitConfig', InitialConfig(), storage);
+const [config, setConfig] = createRoot(() =>
+  createStoreWithStorage('RabbitConfig', InitialConfig(), storage),
+);
 
 const useConfig = (): UseConfig => {
   const i18n = useTranslation();

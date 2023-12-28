@@ -1,4 +1,4 @@
-import { Accessor } from 'solid-js';
+import { createRoot, type Accessor } from 'solid-js';
 
 import {
   createStoreWithStorage,
@@ -31,10 +31,8 @@ const deserializer = (json: string): PersistStatus => JSON.parse(json) as Persis
 
 const storage = createStorageWithSerializer(() => window.localStorage, serializer, deserializer);
 
-const [persistStatus, setPersistStatus] = createStoreWithStorage(
-  'RabbitPersistStatus',
-  InitialPersistStatus,
-  storage,
+const [persistStatus, setPersistStatus] = createRoot(() =>
+  createStoreWithStorage('RabbitPersistStatus', InitialPersistStatus, storage),
 );
 
 const usePersistStatus = (): UsePersistStatus => {

@@ -1,3 +1,5 @@
+import { createRoot } from 'solid-js';
+
 import { type Filter } from 'nostr-tools/filter';
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
@@ -261,38 +263,40 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
   };
 };
 
-const { addTask, removeTask } = useBatch<BatchedEventsTask>(() => ({
-  interval: 2000,
-  batchSize: 150,
-  executor: (tasks) => {
-    const builder = tasksRequestBuilder(tasks);
-    const filters = builder.buildFilters();
+const { addTask, removeTask } = createRoot(() => {
+  const { config } = useConfig();
+  const pool = usePool();
 
-    if (filters.length === 0) return;
+  return useBatch<BatchedEventsTask>(() => ({
+    interval: 2000,
+    batchSize: 150,
+    executor: (tasks) => {
+      const builder = tasksRequestBuilder(tasks);
+      const filters = builder.buildFilters();
 
-    const finalizeTasks = () => {
-      tasks.forEach((task) => {
-        task.complete();
+      if (filters.length === 0) return;
+
+      const finalizeTasks = () => {
+        tasks.forEach((task) => {
+          task.complete();
+        });
+      };
+
+      count += 1;
+      const sub = pool().subscribeMany(config().relayUrls, filters, {
+        eoseTimeout: 15000,
+        onevent: (event: NostrEvent) => {
+          builder.resolve(event);
+        },
+        oneose: () => {
+          finalizeTasks();
+          sub.close();
+          count -= 1;
+        },
       });
-    };
-
-    const { config } = useConfig();
-    const pool = usePool();
-
-    count += 1;
-    const sub = pool().subscribeMany(config().relayUrls, filters, {
-      eoseTimeout: 15000,
-      onevent: (event: NostrEvent) => {
-        builder.resolve(event);
-      },
-      oneose: () => {
-        finalizeTasks();
-        sub.close();
-        count -= 1;
-      },
-    });
-  },
-}));
+    },
+  }));
+});
 
 export const registerTask = ({
   task,

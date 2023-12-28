@@ -1,10 +1,12 @@
+import { createRoot } from 'solid-js';
+
 import useConfig from '@/core/useConfig';
 import useDatePulser from '@/hooks/useDatePulser';
 import { formatRelative, formatAbsoluteLong, formatAbsoluteShort } from '@/utils/formatDate';
 
 // 7 seconds is used here so that the last digit of relative time is changed.
-const currentDateHigh = useDatePulser(() => ({ interval: 7000 }));
-const currentDateLow = useDatePulser(() => ({ interval: 60 * 1000 }));
+const currentDateHigh = createRoot(() => useDatePulser(() => ({ interval: 7000 })));
+const currentDateLow = createRoot(() => useDatePulser(() => ({ interval: 60 * 1000 })));
 
 const useFormatDate = () => {
   const { config } = useConfig();
