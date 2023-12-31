@@ -26,7 +26,7 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
     relayUrls: config().relayUrls,
     filters: [
       {
-        kinds: [1, 6, 7],
+        kinds: [1, 6, 7, 9735],
         '#p': [props.column.pubkey],
         limit: 10,
       },

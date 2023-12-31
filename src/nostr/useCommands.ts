@@ -72,6 +72,16 @@ export const buildTags = ({
   return [...eTags, ...pTags, ...otherTags];
 };
 
+const signEvent = (event: UnsignedEvent): Promise<NostrEvent> => {
+  const preSignedEvent: UnsignedEvent & { id?: string } = { ...event };
+  preSignedEvent.id = getEventHash(preSignedEvent);
+
+  if (window.nostr == null) {
+    throw new Error('NIP-07 implementation not found');
+  }
+  return window.nostr.signEvent(preSignedEvent);
+};
+
 const useCommands = () => {
   const pool = usePool();
 

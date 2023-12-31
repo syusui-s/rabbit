@@ -7,6 +7,7 @@ import ColumnItem from '@/components/ColumnItem';
 import Reaction from '@/components/event/Reaction';
 import Repost from '@/components/event/Repost';
 import TextNote from '@/components/event/TextNote';
+import ZapReceipt from '@/components/event/ZapReceipt';
 import useConfig from '@/core/useConfig';
 
 export type NotificationProps = {
@@ -35,6 +36,11 @@ const Notification: Component<NotificationProps> = (props) => {
             <Match when={event.kind === Kind.Repost}>
               <ColumnItem>
                 <Repost event={event} />
+              </ColumnItem>
+            </Match>
+            <Match when={event.kind === Kind.Zap}>
+              <ColumnItem>
+                <ZapReceipt event={event} />
               </ColumnItem>
             </Match>
           </Switch>

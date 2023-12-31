@@ -118,6 +118,7 @@ export default {
   notification: {
     reposted: ' reposted',
     reacted: ' reacted',
+    zapped: ' zapped',
   },
   config: {
     config: 'Settings',

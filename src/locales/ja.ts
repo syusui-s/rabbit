@@ -114,6 +114,7 @@ export default {
   notification: {
     reposted: 'がリポスト',
     reacted: 'がリアクション',
+    zapped: 'がZap',
   },
   config: {
     config: '設定',

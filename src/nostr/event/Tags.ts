@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-import TagsBase from '@/nostr/event/TagsBase';
-
-export const TagsSchema = z.array(z.array(z.string()));
+import TagsBase, { TagsSchema } from '@/nostr/event/TagsBase';
 
 export default class Tags extends TagsBase {
   constructor(readonly tags: string[][]) {

@@ -1,6 +1,25 @@
 import { Event as NostrEvent } from 'nostr-tools/pure';
+import { z } from 'zod';
 
-import TagsBase from '@/nostr/event/TagsBase';
+import isValidId from '@/nostr/event/isValidId';
+import TagsBase, { TagsSchema } from '@/nostr/event/TagsBase';
+
+const SigRegex = /^[0-9a-f]{128}$/;
+
+const isValidSig = (s: string): boolean => {
+  const result = typeof s === 'string' && s.length === 128 && SigRegex.test(s);
+  return result;
+};
+
+export const EventSchema = z.object({
+  id: z.string().refine(isValidId),
+  pubkey: z.string().refine(isValidId),
+  created_at: z.number().int(),
+  kind: z.number().int(),
+  tags: TagsSchema,
+  content: z.string(),
+  sig: z.string().refine(isValidSig),
+});
 
 export default class GenericEvent extends TagsBase {
   constructor(readonly rawEvent: NostrEvent) {

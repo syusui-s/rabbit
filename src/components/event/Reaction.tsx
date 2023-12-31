@@ -38,7 +38,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
 
   return (
     // if the reacted event is not found, it should be a removed event
-    <Show when={!isRemoved() || shouldMuteEvent(props.event)}>
+    <Show when={!isRemoved() && !shouldMuteEvent(props.event)}>
       <div class="flex gap-1 px-1 text-sm">
         <div class="notification-icon flex max-w-[64px] place-items-center">
           <EmojiDisplay reactionTypes={event().toReactionTypes()} />
