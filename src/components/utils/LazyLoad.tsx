@@ -21,7 +21,7 @@ const LazyLoad: Component<LazyLoadProps> = (props) => {
         });
       },
       {
-        threshold: props.threshold ?? 0,
+        threshold: props.threshold ?? [0, 1],
       },
     );
     if (containerRef != null) {
