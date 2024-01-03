@@ -21,7 +21,7 @@ const LazyLoad: Component<LazyLoadProps> = (props) => {
         });
       },
       {
-        threshold: props.threshold ?? [0, 1],
+        threshold: props.threshold ?? 0,
       },
     );
     if (containerRef != null) {
@@ -34,13 +34,12 @@ const LazyLoad: Component<LazyLoadProps> = (props) => {
   });
 
   return (
-    <>
-      <div ref={containerRef} />
+    <div ref={containerRef}>
       <Show when={visible()} fallback={props.fallback} keyed>
         {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
         {(_) => props.children()}
       </Show>
-    </>
+    </div>
   );
 };
 
