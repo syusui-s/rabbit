@@ -26,8 +26,10 @@ const Repost: Component<RepostProps> = (props) => {
   return (
     <div>
       <div class="flex items-center gap-1 text-xs">
-        <div class="flex h-4 w-4 shrink-0 place-items-center text-green-500" aria-hidden="true">
-          <ArrowPathRoundedSquare />
+        <div class="flex shrink-0 place-items-center pl-[2px]" aria-hidden="true">
+          <span class="h-4 w-4 text-green-500">
+            <ArrowPathRoundedSquare />
+          </span>
         </div>
         <div class="flex min-w-0 flex-1 overflow-hidden">
           <button
