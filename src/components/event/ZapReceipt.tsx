@@ -10,7 +10,6 @@ import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import { zapReceipt } from '@/nostr/event';
-import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 import { fetchLnurlPayRequestMetadata, getLnurlPayRequestUrl, verifyZapReceipt } from '@/nostr/zap';
 import ensureNonNull from '@/utils/ensureNonNull';
@@ -33,12 +32,6 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
   const { profile: recipientProfile, query: recipientProfileQuery } = useProfile(() =>
     ensureNonNull([event().zappedPubkey()])(([pubkey]) => ({
       pubkey,
-    })),
-  );
-
-  const { event: zappedEvent, query: zappedEventQuery } = useEvent(() =>
-    ensureNonNull([event().zappedEventId()] as const)(([eventIdNonNull]) => ({
-      eventId: eventIdNonNull,
     })),
   );
 
@@ -75,10 +68,8 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
     return result.success;
   };
 
-  const isRemoved = () => zappedEventQuery.isSuccess && zappedEvent() == null;
-
   return (
-    <Show when={!isRemoved() && !shouldMuteEvent(props.event) && verified()}>
+    <Show when={!shouldMuteEvent(props.event) && verified()}>
       <div class="flex items-center gap-1 text-sm">
         <div class="flex w-6 flex-col items-center">
           <div class="h-4 w-4 shrink-0 text-amber-500" aria-hidden="true">
@@ -114,10 +105,7 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
         </div>
       </Show>
       <div class="notification-event py-1">
-        <Show
-          when={zappedEvent()}
-          fallback={<div class="truncate">{i18n()('general.loading')}</div>}
-        >
+        <Show when={event().zappedEventId() != null}>
           <EventDisplayById eventId={event().zappedEventId()} />
         </Show>
       </div>
