@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import TagsBase, { TagsSchema } from '@/nostr/event/TagsBase';
 
 export default class Tags extends TagsBase {
