@@ -54,14 +54,14 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
               />
             </Show>
           </div>
-          <div class="flex-1 overflow-hidden">
+          <div class="flex min-w-0 flex-1 overflow-hidden">
             <button
               class="select-text truncate font-bold hover:text-blue-500 hover:underline"
               onClick={() => showProfile(props.event.pubkey)}
             >
               <UserDisplayName pubkey={props.event.pubkey} />
             </button>
-            {i18n()('notification.reacted')}
+            <span class="shrink-0">{i18n()('notification.reacted')}</span>
           </div>
         </div>
       </div>
