@@ -25,13 +25,13 @@ const Repost: Component<RepostProps> = (props) => {
 
   return (
     <div>
-      <div class="flex items-center gap-1 text-xs">
+      <div class="flex items-center gap-1">
         <div class="flex shrink-0 place-items-center pl-[2px]" aria-hidden="true">
           <span class="h-4 w-4 text-green-500">
             <ArrowPathRoundedSquare />
           </span>
         </div>
-        <div class="flex min-w-0 flex-1 overflow-hidden">
+        <div class="notification-user flex min-w-0 flex-1 overflow-hidden text-xs">
           <button
             class="select-text truncate hover:text-blue-500 hover:underline"
             onClick={() => showProfile(props.event.pubkey)}
@@ -40,7 +40,7 @@ const Repost: Component<RepostProps> = (props) => {
           </button>
           <span class="shrink-0">{i18n()('notification.reposted')}</span>
         </div>
-        <div>{formatDate(event().createdAtAsDate())}</div>
+        <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>
       </div>
       <div class="pt-1">
         <EventDisplayById eventId={eventId()} />
