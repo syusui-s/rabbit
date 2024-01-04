@@ -287,14 +287,10 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </Show>
       <div class="mt-[-54px] flex items-end gap-4 px-4 pt-4">
         <div class="flex-1 shrink-0">
-          <div class="h-28 w-28 rounded-lg shadow-md">
+          <div class="h-28 w-28 overflow-hidden rounded-lg shadow-md">
             <Show when={profileQuery.isFetched && profile()?.picture} keyed>
               {(pictureUrl) => (
-                <img
-                  src={pictureUrl}
-                  alt="user icon"
-                  class="h-full w-full rounded-lg object-cover"
-                />
+                <img src={pictureUrl} alt="user icon" class="h-full w-full object-cover" />
               )}
             </Show>
           </div>

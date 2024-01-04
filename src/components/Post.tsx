@@ -35,7 +35,7 @@ const Post: Component<PostProps> = (props) => {
       <div class="flex w-full gap-1">
         <button
           type="button"
-          class="author-icon h-10 w-10 shrink-0 overflow-hidden"
+          class="author-icon h-10 w-10 shrink-0 overflow-hidden rounded"
           onClick={(ev) => {
             ev.preventDefault();
             props.onShowProfile?.();
@@ -44,7 +44,7 @@ const Post: Component<PostProps> = (props) => {
           <Show when={author()?.picture} keyed>
             {(url) => (
               <LazyLoad>
-                {() => <img src={url} alt="icon" class="h-full w-full rounded object-cover" />}
+                {() => <img src={url} alt="icon" class="h-full w-full object-cover" />}
               </LazyLoad>
             )}
           </Show>

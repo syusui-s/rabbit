@@ -44,13 +44,13 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           <EmojiDisplay reactionTypes={event().toReactionTypes()} />
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
-          <div class="author-icon h-5 w-5 shrink-0 overflow-hidden object-cover">
+          <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
             <Show when={profile()?.picture != null}>
               <img
                 src={profile()?.picture}
                 alt="icon"
                 // TODO autofit
-                class="rounded"
+                class="h-full w-full object-cover"
               />
             </Show>
           </div>
