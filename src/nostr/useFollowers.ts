@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
 import uniq from 'lodash/uniq';
-import { Metadata } from 'nostr-tools/kinds';
+import * as Kind from 'nostr-tools/kinds';
 
 import useConfig from '@/core/useConfig';
 import useSubscription from '@/nostr/useSubscription';
@@ -16,9 +16,9 @@ export default function useFollowers(propsProvider: () => UseFollowersProps) {
 
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
-    filters: [{ kinds: [Metadata], '#p': [props().pubkey] }],
-    limit: Number.MAX_SAFE_INTEGER,
-    continuous: true,
+    filters: [{ kinds: [Kind.Contacts], '#p': [props().pubkey] }],
+    limit: 1000000,
+    continuous: false,
   }));
 
   const followersPubkeys = () => uniq(events()?.map((ev) => ev.pubkey));
