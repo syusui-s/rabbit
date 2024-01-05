@@ -13,6 +13,7 @@ import { zapReceipt } from '@/nostr/event';
 import useProfile from '@/nostr/useProfile';
 import { fetchLnurlPayRequestMetadata, getLnurlPayRequestUrl, verifyZapReceipt } from '@/nostr/zap';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { formatSiPrefix } from '@/utils/siPrefix';
 
 export type ZapReceiptProps = {
   event: NostrEvent;
@@ -75,7 +76,7 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
           <div class="h-4 w-4 shrink-0 text-amber-500" aria-hidden="true">
             <Bolt />
           </div>
-          <div class="mt-[-2px] shrink-0 text-xs">{event().amountSats()}</div>
+          <div class="mt-[-2px] shrink-0 text-xs">{formatSiPrefix(event().amountSats())}</div>
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">

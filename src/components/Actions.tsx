@@ -35,6 +35,7 @@ import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { formatSiPrefix } from '@/utils/siPrefix';
 import timeout from '@/utils/timeout';
 
 export type ActionProps = {
@@ -129,7 +130,9 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           </Show>
         </button>
         <Show when={!config().hideCount && !config().showEmojiReaction && reactions().length > 0}>
-          <div class="text-sm text-zinc-400">{reactions().length}</div>
+          <div class="text-sm text-zinc-400">
+            {formatSiPrefix(reactions().length, { minDigits: 4 })}
+          </div>
         </Show>
       </div>
       <Show when={config().useEmojiReaction}>
@@ -205,7 +208,9 @@ const RepostAction = (props: { event: NostrEvent }) => {
         <ArrowPathRoundedSquare />
       </button>
       <Show when={!config().hideCount && reposts().length > 0}>
-        <div class="text-sm text-zinc-400">{reposts().length}</div>
+        <div class="text-sm text-zinc-400">
+          {formatSiPrefix(reposts().length, { minDigits: 4 })}
+        </div>
       </Show>
     </div>
   );
