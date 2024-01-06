@@ -26,20 +26,20 @@
 
 /* LIGHT Cinnamon */
 .theme-cinnamon {
-  --color-fg: 49 38 38;
+  --color-fg: 70 20 20;
   --color-fg-secondary: 87 80 58;
   --color-fg-tertiary: 168 162 158;
   --color-bg: 234 220 211;
   --color-bg-secondary: 168 162 158;
   --color-bg-tertiary: 220 205 190;
-  --color-primary: 67 57 56;
-  --color-primary-fg: 255 255 255;
+  --color-primary: 77 57 56;
+  --color-primary-fg: 255 250 225;
   --color-primary-disabled: 100 90 90;
-  --color-primary-hover: 80 64 63;
+  --color-primary-hover: 52 10 10;
   --color-danger: 244 63 94;
   --color-link: 74 149 188;
   --color-border: 215 198 189;
-  --color-r-sidebar: 133 118 106;
+  --color-r-sidebar: 155 125 110;
   --color-r-reaction: 249 110 130;
   --color-r-repost: 0 190 0;
   --color-scroll-thumb: 49 38 38;
