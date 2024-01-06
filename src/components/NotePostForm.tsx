@@ -400,7 +400,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           </Show>
           <EmojiPicker customEmojis={true} onEmojiSelect={handleEmojiSelect}>
             <span
-              class="inline-block rounded bg-primary font-bold text-primary-fg"
+              class="inline-block rounded bg-primary text-primary-fg"
               classList={{
                 'h-8': mode() === 'normal',
                 'w-8': mode() === 'normal',
@@ -414,7 +414,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             </span>
           </EmojiPicker>
           <button
-            class="flex items-center justify-center rounded p-2 text-xs font-bold text-primary-fg"
+            class="rounded text-primary-fg"
             classList={{
               'bg-primary': !contentWarning(),
               'bg-primary-hover': contentWarning(),
@@ -433,7 +433,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <ExclamationTriangle />
           </button>
           <button
-            class="rounded font-bold text-primary-fg"
+            class="rounded text-primary-fg"
             classList={{
               'bg-primary-disabled': fileUploadDisabled(),
               'bg-primary': !fileUploadDisabled(),
@@ -453,7 +453,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <Photo />
           </button>
           <button
-            class="rounded p-2 font-bold text-primary-fg"
+            class="rounded p-2 text-primary-fg"
             classList={{
               'bg-primary-disabled': submitDisabled(),
               'bg-primary': !submitDisabled(),
