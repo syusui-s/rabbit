@@ -124,12 +124,12 @@ const [config, setConfig] = createRoot(() =>
 const useConfig = (): UseConfig => {
   const i18n = useTranslation();
 
-  const getColorTheme = (): ColorTheme | null => {
+  const getColorTheme = (): ColorTheme => {
     const colorThemeConfig = config.colorTheme;
     if (colorThemeConfig.type === 'specific' && colorThemes[colorThemeConfig.id] != null) {
       return colorThemes[colorThemeConfig.id];
     }
-    return null;
+    return colorThemes.sakura;
   };
 
   const addRelay = (relayUrl: string) => {

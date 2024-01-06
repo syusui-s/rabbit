@@ -7,7 +7,6 @@ export const useColorTheme = (el: HTMLElement) => {
 
   createEffect(() => {
     const colorTheme = getColorTheme();
-    if (colorTheme == null) return;
 
     const { className } = colorTheme;
     if (className != null) {
