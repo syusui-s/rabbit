@@ -105,11 +105,11 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
           {event().description().content}
         </div>
       </Show>
-      <div class="notification-event py-1">
-        <Show when={event().zappedEventId() != null}>
+      <Show when={event().zappedEventId() != null}>
+        <div class="notification-event py-1">
           <EventDisplayById eventId={event().zappedEventId()} />
-        </Show>
-      </div>
+        </div>
+      </Show>
     </Show>
   );
 };
