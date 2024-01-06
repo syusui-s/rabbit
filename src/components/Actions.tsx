@@ -295,7 +295,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
             return (
               <button
-                class="flex h-8 max-w-[128px] items-center rounded border border-border px-1 sm:h-6"
+                class="flex h-6 max-w-[128px] items-center rounded border border-border px-1"
                 classList={{
                   'text-fg-tertiary': !isReactedByMeWithThisContent,
                   'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
