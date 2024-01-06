@@ -68,6 +68,28 @@
   --color-scroll-bg: var(--color-bg-tertiary);
 }
 
+/* DARK Black */
+.theme-black {
+  --color-fg: 255 250 250;
+  --color-fg-secondary: 160 160 160;
+  --color-fg-tertiary: 130 130 130;
+  --color-bg: 0 0 0;
+  --color-bg-secondary: 20 20 20;
+  --color-bg-tertiary: 30 30 30;
+  --color-primary: 255 255 255;
+  --color-primary-fg: 0 0 0;
+  --color-primary-disabled: 160 160 160;
+  --color-primary-hover: 230 230 230;
+  --color-danger: 244 63 94;
+  --color-link: 59 130 246;
+  --color-border: 60 60 70;
+  --color-r-sidebar: 0 0 0;
+  --color-r-reaction: 251 113 133;
+  --color-r-repost: 74 222 128;
+  --color-scroll-thumb: var(--color-fg-secondary);
+  --color-scroll-bg: var(--color-bg-tertiary);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
