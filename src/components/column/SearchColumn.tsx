@@ -52,13 +52,13 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
     <div class="flex flex-col">
       <div class="flex h-8 items-center gap-1 px-2">
         <h2 class="flex items-center gap-1">
-          <span class="inline-block h-4 w-4 text-gray-700">
+          <span class="inline-block h-4 w-4 text-fg-secondary">
             <MagnifyingGlass />
           </span>
         </h2>
         <form class="flex-1" onSubmit={handleSubmit}>
           <input
-            class="w-full rounded border border-stone-300 px-1 py-0 focus:border-rose-100 focus:ring-rose-300"
+            class="w-full rounded border border-border bg-bg px-1 py-0 ring-border focus:border-border focus:ring-primary"
             type="text"
             name="query"
             value={query()}

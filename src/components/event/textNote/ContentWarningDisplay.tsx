@@ -1,5 +1,7 @@
 import { createSignal, type Component, type JSX, Show } from 'solid-js';
 
+import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
+
 import { useTranslation } from '@/i18n/useTranslation';
 import { ContentWarning } from '@/nostr/event/TextNoteLike';
 
@@ -17,12 +19,14 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
       when={!props.contentWarning.contentWarning || showContentWarning()}
       fallback={
         <button
-          class="mt-2 w-full rounded border p-2 text-center text-xs text-stone-600 shadow-sm hover:shadow"
+          class="mt-2 flex w-full flex-col items-center rounded border border-border p-2 text-center text-xs text-fg-secondary"
           onClick={() => setShowContentWarning(true)}
         >
-          {i18n()('post.contentWarning.show')}
+          <span class="inline-block h-4 w-4">
+            <ExclamationTriangle />
+          </span>
+          <span>{i18n()('post.contentWarning.show')}</span>
           <Show when={props.contentWarning.reason != null}>
-            <br />
             <span>
               {i18n()('post.contentWarning.reason')}: {props.contentWarning.reason}
             </span>
@@ -33,7 +37,7 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
       <div>{props.children}</div>
       <Show when={props.contentWarning.contentWarning}>
         <button
-          class="text-xs text-stone-600 hover:text-stone-800"
+          class="text-xs text-fg-secondary hover:text-fg-secondary/70"
           onClick={() => setShowContentWarning(false)}
         >
           隠す

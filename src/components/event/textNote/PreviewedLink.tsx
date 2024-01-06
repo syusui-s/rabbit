@@ -32,14 +32,24 @@ const youtubeUrl = (videoId: string): string => {
 const TwitterEmbed: Component<{ class?: string; href: string }> = (props) => {
   let twitterRef: HTMLQuoteElement | undefined;
 
+  const { getColorTheme } = useConfig();
+
   createEffect(() => {
     if (isTwitterUrl(props.href)) {
       window.twttr?.widgets?.load(twitterRef);
     }
   });
 
+  const dataTheme = () => {
+    const colorTheme = getColorTheme();
+    if (colorTheme.brightness === 'dark') {
+      return 'dark';
+    }
+    return 'light';
+  };
+
   return (
-    <blockquote class="twitter-tweet" ref={twitterRef}>
+    <blockquote ref={twitterRef} class="twitter-tweet" data-theme={dataTheme()}>
       <a
         class={props.class}
         href={twitterUrl(props.href)}
@@ -61,16 +71,16 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
     <Show when={ogp()} fallback={<SafeLink class={props.class} href={props.url} />} keyed>
       {(ogpProps) => (
         <SafeLink href={props.url}>
-          <div class="my-2 rounded-lg border transition-colors hover:bg-slate-100">
+          <div class="my-2 rounded-lg border border-border transition-colors hover:bg-bg-tertiary">
             <img
               alt={ogpProps.title}
               class="max-w-full rounded-t-lg object-contain shadow"
               src={ogpProps.image}
             />
             <div class="mb-1 p-1">
-              <div class="text-xs text-slate-500">{new URL(ogpProps.url).host}</div>
+              <div class="text-xs text-fg-secondary">{new URL(ogpProps.url).host}</div>
               <div class="text-sm">{ogpProps.title}</div>
-              <div class="text-xs text-slate-500">{ogpProps.description}</div>
+              <div class="text-xs text-fg-secondary">{ogpProps.description}</div>
             </div>
           </div>
         </SafeLink>

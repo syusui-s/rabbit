@@ -24,14 +24,18 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
     <BasicModal onClose={props.onClose}>
       <div class="p-2">
         <h2 class="text-lg font-bold">JSON</h2>
-        <pre class="whitespace-pre-wrap break-all rounded-lg border p-4 text-xs">{json()}</pre>
+        <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-4 text-xs">
+          {json()}
+        </pre>
         <div class="flex justify-end">
-          <Copy class="h-4 w-4" text={json()} />
+          <Copy class="h-4 w-4 hover:text-primary" text={json()} />
         </div>
       </div>
       <div class="p-2">
         <h2 class="text-lg font-bold">Found in these relays</h2>
-        <pre class="whitespace-pre-wrap break-all rounded-lg border p-2 text-xs">{seenOn()}</pre>
+        <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-2 text-xs">
+          {seenOn()}
+        </pre>
       </div>
     </BasicModal>
   );

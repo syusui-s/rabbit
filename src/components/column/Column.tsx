@@ -45,7 +45,7 @@ const Column: Component<ColumnProps> = (props) => {
     <TimelineContext.Provider value={timelineState}>
       <div
         ref={columnDivRef}
-        class="flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r sm:snap-align-none"
+        class="flex w-[80vw] shrink-0 snap-center snap-always flex-col border-r border-border sm:snap-align-none"
         classList={{
           'sm:w-[500px]': width() === 'widest',
           'sm:w-[360px]': width() === 'wide',
@@ -58,7 +58,7 @@ const Column: Component<ColumnProps> = (props) => {
           keyed
           fallback={
             <>
-              <div class="shrink-0 border-b">{props.header}</div>
+              <div class="shrink-0 border-b border-border">{props.header}</div>
               <div class="scrollbar flex flex-col overflow-y-scroll scroll-smooth pb-16">
                 {props.children}
               </div>
@@ -67,7 +67,7 @@ const Column: Component<ColumnProps> = (props) => {
         >
           {(timeline) => (
             <>
-              <div class="flex shrink-0 items-center border-b bg-white px-2">
+              <div class="flex shrink-0 items-center border-b border-border px-2">
                 <button
                   class="flex w-full items-center gap-1"
                   onClick={() => timelineState?.clearTimeline()}

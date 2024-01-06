@@ -56,7 +56,7 @@ const About: Component<AboutProps> = (props) => {
         <p class="my-4">
           おかしな動作を見つけたら
           <a
-            class="text-blue-500 underline"
+            class="text-link underline"
             href="https://github.com/syusui-s/rabbit/issues/new/choose"
             target="_blank"
             rel="noopener noreferrer"
@@ -70,7 +70,7 @@ const About: Component<AboutProps> = (props) => {
 
         <p class="my-4">
           ソースコードは
-          <SafeLink class="text-blue-400 underline" href="https://github.com/syusui-s/rabbit">
+          <SafeLink class="text-link underline" href="https://github.com/syusui-s/rabbit">
             GitHub
           </SafeLink>
           で入手できます。
@@ -81,7 +81,7 @@ const About: Component<AboutProps> = (props) => {
         <p class="my-4">
           Copyright (C) 2023 Shusui Moyatani and{' '}
           <SafeLink
-            class="text-blue-400 underline"
+            class="text-link underline"
             href="https://github.com/syusui-s/rabbit/graphs/contributors"
           >
             Rabbit contributors
@@ -104,17 +104,15 @@ const About: Component<AboutProps> = (props) => {
         <p class="my-4">
           あなたは、このプログラムに付随してGNUアフェロー一般公衆ライセンスのコピーを受け取っていることでしょう。
           そうでなければ、
-          <a class="link" href="https://www.gnu.org/licenses/">
-            https://www.gnu.org/licenses/
-          </a>
+          <SafeLink href="https://www.gnu.org/licenses/" />
           をご参照ください。
         </p>
 
-        <a class="text-blue-500 underline" href="https://gpl.mhatta.org/agpl.ja.html">
+        <a class="text-link underline" href="https://gpl.mhatta.org/agpl.ja.html">
           参考訳
         </a>
 
-        <pre class="max-h-96 overflow-scroll rounded bg-zinc-100 p-4 text-xs">
+        <pre class="scorllbar max-h-96 overflow-scroll rounded bg-bg-secondary p-4 text-xs">
           {packageInfo()?.self.licenseText}
         </pre>
 
@@ -126,7 +124,7 @@ const About: Component<AboutProps> = (props) => {
               <h3 class="mb-2 mt-4 font-mono">
                 {p.name}@{p.version} ({p.licenseSpdx})
               </h3>
-              <pre class="max-h-96 overflow-scroll rounded bg-zinc-100 p-4 text-xs">
+              <pre class="scrollbar max-h-96 overflow-scroll rounded bg-bg-secondary p-4 text-xs">
                 {p.licenseText}
               </pre>
             </>

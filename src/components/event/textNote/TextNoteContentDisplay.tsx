@@ -57,14 +57,14 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (isWebSocketUrl(item.content)) {
             return (
               <button
-                class="select-text text-blue-500 underline"
+                class="select-text text-link underline"
                 onClick={() => addRelayColumn(item.content)}
               >
                 {item.content}
               </button>
             );
           }
-          return <PreviewedLink class="text-blue-500 underline" href={item.content} />;
+          return <PreviewedLink class="text-link underline" href={item.content} />;
         }
         if (item.type === 'TagReferenceResolved') {
           if (item.reference == null) {
@@ -83,7 +83,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'Bech32Entity') {
           if (item.data.type === 'note' && props.embedding) {
             return (
-              <div class="my-1 rounded border p-1">
+              <div class="my-1 rounded border border-border p-1">
                 <EventDisplayById
                   eventId={item.data.data}
                   actions={false}
@@ -95,7 +95,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           }
           if (item.data.type === 'nevent' && props.embedding) {
             return (
-              <div class="my-1 rounded border p-1">
+              <div class="my-1 rounded border border-border p-1">
                 <EventDisplayById eventId={item.data.data.id} actions={false} embedding={false} />
               </div>
             );
@@ -109,20 +109,17 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'nrelay') {
             const url: string = item.data.data;
             return (
-              <button
-                class="select-text text-blue-500 underline"
-                onClick={() => addRelayColumn(url)}
-              >
+              <button class="select-text text-link underline" onClick={() => addRelayColumn(url)}>
                 {url} ({item.content})
               </button>
             );
           }
-          return <span class="text-blue-500 underline">{item.content}</span>;
+          return <span class="text-link underline">{item.content}</span>;
         }
         if (item.type === 'HashTag') {
           return (
             <button
-              class="select-text text-blue-500 underline"
+              class="select-text text-link underline"
               onClick={() => addHashTagColumn(item.content)}
             >
               {item.content}

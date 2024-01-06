@@ -66,7 +66,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
           <div class="textnote-content">
             <Show when={showReplyEvent()} keyed>
               {(id) => (
-                <div class="mt-1 rounded border p-1">
+                <div class="mt-1 rounded border border-border p-1">
                   <LazyLoad fallback={<div class="h-12" />}>
                     {() => <EventDisplayById eventId={id} actions={false} embedding={false} />}
                   </LazyLoad>
@@ -79,7 +79,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
                 <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
-                      class="select-text pr-1 text-blue-500 hover:underline"
+                      class="select-text pr-1 text-link hover:underline"
                       onClick={(ev) => {
                         ev.stopPropagation();
                         showProfile(replyToPubkey);

@@ -2,36 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
+/* LIGHT Sakura */
+.theme-sakura {
+  --color-fg: 38 25 23;
+  --color-fg-secondary: 87 83 78;
+  --color-fg-tertiary: 168 162 158;
+  --color-bg: 255 255 255;
+  --color-bg-secondary: 168 162 158;
+  --color-bg-tertiary: 235 235 233;
+  --color-primary: 253 164 175;
+  --color-primary-fg: 255 255 255;
+  --color-primary-disabled: 254 205 211;
+  --color-primary-hover: 253 155 167;
+  --color-danger: 244 63 94;
+  --color-link: 59 130 246;
+  --color-border: 231 229 228;
+  --color-r-sidebar: 255 228 230;
+  --color-r-reaction: 251 113 133;
+  --color-r-repost: 74 222 128;
+  --color-scroll-thumb: 254 205 211;
+  --color-scroll-bg: 255 255 255 / 0.7;
+}
+
+/* LIGHT Cinnamon */
+.theme-cinnamon {
+  --color-fg: 49 38 38;
+  --color-fg-secondary: 87 80 58;
+  --color-fg-tertiary: 168 162 158;
+  --color-bg: 234 220 211;
+  --color-bg-secondary: 168 162 158;
+  --color-bg-tertiary: 220 205 190;
+  --color-primary: 67 57 56;
+  --color-primary-fg: 255 255 255;
+  --color-primary-disabled: 100 90 90;
+  --color-primary-hover: 80 64 63;
+  --color-danger: 244 63 94;
+  --color-link: 74 149 188;
+  --color-border: 215 198 189;
+  --color-r-sidebar: 133 118 106;
+  --color-r-reaction: 249 110 130;
+  --color-r-repost: 0 190 0;
+  --color-scroll-thumb: 49 38 38;
+  --color-scroll-bg: 245 235 222 / 0.7;
+}
+
+/* DARK Yozakura */
+.theme-yozakura {
+  --color-fg: 255 235 235;
+  --color-fg-secondary: 220 180 180;
+  --color-fg-tertiary: 160 130 130;
+  --color-bg: 35 27 33;
+  --color-bg-secondary: 50 40 50;
+  --color-bg-tertiary: 63 40 50;
+  --color-primary: 217 121 133;
+  --color-primary-fg: var(--color-fg);
+  --color-primary-disabled: 158 93 102;
+  --color-primary-hover: 220 110 120;
+  --color-danger: 244 63 94;
+  --color-link: 59 130 246;
+  --color-border: 70 50 60;
+  --color-r-sidebar: 35 27 33;
+  --color-r-reaction: 251 113 133;
+  --color-r-repost: 139 191 67;
+  --color-scroll-thumb: var(--color-primary-fg);
+  --color-scroll-bg: var(--color-bg-tertiary);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-bg text-fg;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.link {
-  @apply underline text-blue-500;
-}
-
 em-emoji-picker {
   --background-rgb: 85, 170, 255;
   --border-radius: 8px;
-  --color-border-over: rgba(0, 0, 0, 0.1);
-  --color-border: rgba(0, 0, 0, 0.05);
+  --color-border-over: rgba(0, 0, 0, 0.3);
+  --color-border: rgba(0, 0, 0, 0.2);
   --category-icon-size: 20px;
-  --font-size: 16px;
-  --rgb-accent: 253, 164, 175;
-  --rgb-background: 255, 255, 255;
-  --rgb-color: 28, 25, 23;
-  --rgb-input: 255, 255, 255;
-  --shadow: 0 5px 8px -8px #222;
+  --font-size: 14px;
+  --rgb-accent: var(--color-primary);
+  --rgb-background: var(--color-bg);
+  --rgb-color: var(--color-fg);
+  --rgb-input: var(--color-bg);
+  --shadow: 0 8px 8px -8px #000;
 
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--color-border));
   height: 50vh;
   min-height: 400px;
   max-height: 800px;
@@ -39,19 +102,23 @@ em-emoji-picker {
   max-width: 90vw;
 }
 
+.scrollbar {
+  scrollbar-color: rgb(var(--color-scroll-thumb)) rgb(var(--color-scroll-bg));
+}
+
 .scrollbar::-webkit-scrollbar:vertical {
-  width: 8px;
+  width: 5px;
 }
 .scrollbar::-webkit-scrollbar:horizontal {
-  height: 8px;
+  height: 5px;
 }
 .scrollbar::-webkit-scrollbar {
-  background-color: #fbf9f9;
+  background-color: rgb(var(--color-scroll-bg));
 }
 .scrollbar::-webkit-scrollbar-thumb {
-  background-color: #fce9ec;
-  border-radius: 8px;
+  background-color: rgb(var(--color-scroll-thumb));
+  border-radius: 2px;
 }
 .scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #fcd9dc;
+  background-color: rgb(var(--color-scroll-thumb));
 }

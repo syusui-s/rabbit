@@ -14,7 +14,7 @@ const BasicModal: Component<BasicModalProps> = (props) => (
   <Modal onClose={() => props.onClose?.()}>
     <div class="w-[640px] max-w-full">
       <button
-        class="w-full pt-1 text-start text-stone-800"
+        class="w-full pt-1 text-start text-fg-secondary/50"
         aria-label="Close"
         onClick={() => props.onClose?.()}
       >
@@ -24,7 +24,7 @@ const BasicModal: Component<BasicModalProps> = (props) => (
           </Show>
         </span>
       </button>
-      <div class="flex max-h-[calc(100vh-6em)] flex-col overflow-y-scroll rounded-xl border bg-white text-stone-700 shadow-lg">
+      <div class="scrollbar flex max-h-[calc(100vh-6em)] flex-col overflow-y-scroll rounded-xl border border-border bg-bg text-fg shadow-lg">
         {props.children}
       </div>
     </div>

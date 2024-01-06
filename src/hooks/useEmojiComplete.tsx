@@ -26,7 +26,7 @@ const useEmojiComplete = () => {
           },
           template: (config: CustomEmojiConfig) => {
             const e = (
-              <div class="flex gap-1 border-b px-2 py-1">
+              <div class="flex gap-1 border-b border-border px-2 py-1">
                 <img class="h-6 max-w-[3rem]" src={config.url} alt={config.shortcode} />
                 <div>{config.shortcode}</div>
               </div>
@@ -38,10 +38,10 @@ const useEmojiComplete = () => {
       ],
       {
         dropdown: {
-          className: 'bg-white shadow rounded',
+          className: 'bg-bg shadow rounded',
           item: {
             className: 'cursor-pointer',
-            activeClassName: 'bg-rose-100 cursor-pointer',
+            activeClassName: 'bg-bg-tertiary cursor-pointer',
           },
         },
       },

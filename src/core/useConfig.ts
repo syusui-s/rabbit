@@ -5,6 +5,7 @@ import uniq from 'lodash/uniq';
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
+import { colorThemes, type ColorTheme } from '@/core/colorThemes';
 import {
   ColumnType,
   createFollowingColumn,
@@ -26,10 +27,16 @@ export type CustomEmojiConfig = {
   url: string;
 };
 
+export type ColorThemeConfig = {
+  type: 'specific';
+  id: string;
+};
+
 export type Config = {
   relayUrls: string[];
   columns: ColumnType[];
   customEmojis: Record<string, CustomEmojiConfig>;
+  colorTheme: ColorThemeConfig;
   dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
   keepOpenPostForm: boolean;
   useEmojiReaction: boolean;
@@ -48,6 +55,8 @@ export type Config = {
 type UseConfig = {
   config: Accessor<Config>;
   setConfig: Setter<Config>;
+  // display
+  getColorTheme: () => ColorTheme;
   // relay
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
@@ -83,6 +92,7 @@ const InitialConfig = (): Config => ({
   relayUrls: initialRelays(),
   columns: [],
   customEmojis: {},
+  colorTheme: { type: 'specific', id: 'sakura' },
   dateFormat: 'relative',
   keepOpenPostForm: false,
   useEmojiReaction: true,
@@ -113,6 +123,14 @@ const [config, setConfig] = createRoot(() =>
 
 const useConfig = (): UseConfig => {
   const i18n = useTranslation();
+
+  const getColorTheme = (): ColorTheme | null => {
+    const colorThemeConfig = config.colorTheme;
+    if (colorThemeConfig.type === 'specific' && colorThemes[colorThemeConfig.id] != null) {
+      return colorThemes[colorThemeConfig.id];
+    }
+    return null;
+  };
 
   const addRelay = (relayUrl: string) => {
     setConfig('relayUrls', (current) => uniq([...current, relayUrl]));
@@ -233,6 +251,8 @@ const useConfig = (): UseConfig => {
   return {
     config: () => config,
     setConfig,
+    // display
+    getColorTheme,
     // relay
     addRelay,
     removeRelay,

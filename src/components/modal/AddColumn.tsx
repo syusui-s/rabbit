@@ -81,7 +81,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
     <BasicModal onClose={props.onClose}>
       <div class="flex flex-wrap p-4">
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addFollowingColumn()}
         >
           <span class="inline-block h-8 w-8">
@@ -90,7 +90,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           {i18n()('column.home')}
         </button>
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addNotificationColumn()}
         >
           <span class="inline-block h-8 w-8">
@@ -99,7 +99,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           {i18n()('column.notification')}
         </button>
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addJapanRelaysColumn()}
         >
           <span class="inline-block h-8 w-8">
@@ -130,7 +130,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
         </button>
         */}
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addSearchColumn()}
         >
           <span class="inline-block h-8 w-8">
@@ -139,7 +139,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           {i18n()('column.search')}
         </button>
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addMyPostsColumn()}
         >
           <span class="inline-block h-8 w-8">
@@ -148,7 +148,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           {i18n()('column.myPosts')}
         </button>
         <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
+          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addMyReactionsColumn()}
         >
           <span class="inline-block h-8 w-8">

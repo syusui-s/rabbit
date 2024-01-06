@@ -1,6 +1,7 @@
 import { createSignal, createMemo, onMount, Show, For, type Component, type JSX } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
+import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
 import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
@@ -365,7 +366,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         <Show when={contentWarning()}>
           <input
             type="text"
-            class="rounded"
+            class="rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             placeholder={i18n()('posting.contentWarningReason')}
             maxLength={32}
             onInput={(ev) => setContentWarningReason(ev.currentTarget.value)}
@@ -379,7 +380,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             emojiTextAreaRef(el);
           }}
           name="text"
-          class="min-h-[40px] rounded-md border-none focus:ring-rose-300"
+          class="min-h-[40px] rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}
@@ -392,42 +393,56 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply'}>
             <div class="flex-1">
-              <button class="h-5 w-5 text-stone-500" onClick={() => close()}>
+              <button class="h-5 w-5 text-fg-secondary" onClick={() => close()}>
                 <XMark />
               </button>
             </div>
           </Show>
           <EmojiPicker customEmojis={true} onEmojiSelect={handleEmojiSelect}>
-            <span class="inline-block h-8 w-8 rounded bg-primary p-2 font-bold text-white">
+            <span
+              class="inline-block rounded bg-primary font-bold text-primary-fg"
+              classList={{
+                'h-8': mode() === 'normal',
+                'w-8': mode() === 'normal',
+                'p-2': mode() === 'normal',
+                'h-7': mode() === 'reply',
+                'w-7': mode() === 'reply',
+                'p-[6px]': mode() === 'reply',
+              }}
+            >
               <FaceSmile />
             </span>
           </EmojiPicker>
           <button
-            class="flex items-center justify-center rounded p-2 text-xs font-bold text-white"
+            class="flex items-center justify-center rounded p-2 text-xs font-bold text-primary-fg"
             classList={{
-              'bg-rose-300': !contentWarning(),
-              'bg-rose-400': contentWarning(),
+              'bg-primary': !contentWarning(),
+              'bg-primary-hover': contentWarning(),
               'h-8': mode() === 'normal',
               'w-8': mode() === 'normal',
+              'p-2': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
+              'p-[6px]': mode() === 'reply',
             }}
             type="button"
             aria-label={i18n()('posting.contentWarning')}
             title={i18n()('posting.contentWarning')}
             onClick={() => setContentWarning((e) => !e)}
           >
-            <span>CW</span>
+            <ExclamationTriangle />
           </button>
           <button
-            class="rounded bg-primary p-2 font-bold text-white"
+            class="rounded font-bold text-primary-fg"
             classList={{
               'bg-primary-disabled': fileUploadDisabled(),
               'bg-primary': !fileUploadDisabled(),
               'h-8': mode() === 'normal',
               'w-8': mode() === 'normal',
+              'p-2': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
+              'p-[6px]': mode() === 'reply',
             }}
             type="button"
             title={i18n()('posting.uploadImage')}
@@ -438,7 +453,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <Photo />
           </button>
           <button
-            class="rounded bg-primary p-2 font-bold text-white"
+            class="rounded p-2 font-bold text-primary-fg"
             classList={{
               'bg-primary-disabled': submitDisabled(),
               'bg-primary': !submitDisabled(),
@@ -457,7 +472,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         </div>
         <input
           ref={fileInputRef}
-          class="rounded bg-primary"
           type="file"
           hidden
           name="image"

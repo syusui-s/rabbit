@@ -39,24 +39,24 @@ const SearchButton = () => {
       }}
       position="right"
       button={
-        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary">
+        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
           <MagnifyingGlass />
         </span>
       }
       onOpen={() => inputRef?.focus()}
     >
       <form
-        class="flex w-72 items-center gap-1 rounded-md bg-white p-4 shadow-md"
+        class="flex w-72 items-center gap-1 rounded-md border border-border bg-bg p-4 shadow-md"
         onSubmit={handleSearchSubmit}
       >
         <input
           ref={inputRef}
-          class="h-8 w-full rounded border border-stone-300 focus:border-rose-100 focus:ring-rose-300"
+          class="h-8 w-full rounded border border-border bg-bg focus:border-primary focus:ring-border"
           type="text"
           value={query()}
           onChange={(ev) => setQuery(ev.currentTarget.value)}
         />
-        <button class="h-8 w-8 rounded bg-primary p-1 text-white" type="submit">
+        <button class="h-8 w-8 rounded bg-primary p-1 text-primary-fg" type="submit">
           <MagnifyingGlass />
         </button>
       </form>
@@ -68,7 +68,7 @@ const SideBar: Component = () => {
   let textAreaRef: HTMLTextAreaElement | undefined;
 
   const { showAddColumn, showAbout } = useModalState();
-  const { config } = useConfig();
+  const { config, getColorTheme } = useConfig();
 
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
@@ -93,11 +93,11 @@ const SideBar: Component = () => {
   }));
 
   return (
-    <div class="flex shrink-0 flex-row border-r bg-sidebar-bg">
-      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-rose-200 pt-5">
+    <div class="flex shrink-0 flex-row bg-r-sidebar">
+      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-5">
         <div class="flex flex-col items-center gap-3">
           <button
-            class="h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-white"
+            class="h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg hover:border-primary-hover hover:bg-primary-hover"
             onClick={() => toggleForm()}
           >
             <PencilSquare />
@@ -107,13 +107,13 @@ const SideBar: Component = () => {
         <div class="grow" />
         <div class="flex flex-col items-center pb-2">
           <button
-            class="h-10 w-12 rounded-full p-3 text-2xl text-primary"
+            class="h-10 w-12 rounded-full p-3 text-2xl text-primary hover:border-primary-hover hover:text-primary-hover"
             onClick={() => showAddColumn()}
           >
             <Plus />
           </button>
           <button
-            class="h-10 w-12 p-3 text-primary"
+            class="h-10 w-12 p-3 text-primary hover:border-primary-hover hover:text-primary-hover"
             onClick={() => setConfigOpened((current) => !current)}
           >
             <Cog6Tooth />
@@ -121,13 +121,14 @@ const SideBar: Component = () => {
           <button class="pt-2" onClick={() => showAbout()}>
             <img
               class="h-8 w-8"
-              src={resolveAsset('images/rabbit_app_256.png')}
+              src={resolveAsset(getColorTheme().rabbitIconPath)}
               alt="About rabbit"
             />
           </button>
         </div>
       </div>
       <div
+        class="border-r border-border"
         classList={{
           static: formOpened() || config().keepOpenPostForm,
           hidden: !(formOpened() || config().keepOpenPostForm),

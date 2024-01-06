@@ -25,7 +25,7 @@ const MenuItemDisplay: Component<MenuItemDisplayProps> = (props) => {
   };
 
   return (
-    <li class="border-b hover:bg-stone-200">
+    <li class="border-b border-border hover:bg-bg-tertiary">
       <button class="w-full px-4 py-1 text-start" onClick={handleClick}>
         {props.item.content()}
       </button>
@@ -46,7 +46,7 @@ const ContextMenu: Component<ContextMenuProps> = (props) => {
       button={props.children}
       position="bottom"
     >
-      <ul class="min-w-[96px] rounded border bg-white shadow-md">
+      <ul class="min-w-[96px] rounded border border-border bg-bg shadow-md">
         <For each={props.menu.filter((e) => e.when == null || e.when())}>
           {(item: MenuItem) => <MenuItemDisplay item={item} onClose={close} />}
         </For>

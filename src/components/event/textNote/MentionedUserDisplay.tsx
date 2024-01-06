@@ -12,7 +12,7 @@ const MentionedUserDisplay = (props: MentionedUserDisplayProps) => {
     showProfile(props.pubkey);
   };
   return (
-    <button class="inline select-text text-blue-500 underline" onClick={handleClick}>
+    <button class="inline select-text text-link underline" onClick={handleClick}>
       <GeneralUserMentionDisplay pubkey={props.pubkey} />
     </button>
   );

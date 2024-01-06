@@ -302,7 +302,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 <Match when={props.pubkey === myPubkey()}>
                   <button
                     class="rounded-full border border-primary px-4 py-2
-                    text-center font-bold text-primary hover:bg-primary hover:text-white sm:w-20"
+                    text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
                     onClick={() => showProfileEdit()}
                   >
                     {i18n()('profile.editProfile')}
@@ -320,8 +320,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
                 <Match when={following()}>
                   <button
-                    class="rounded-full border border-primary bg-primary px-4 py-2
-                    text-center font-bold text-white hover:bg-rose-500 sm:w-36"
+                    class="rounded-full border border-primary bg-primary px-4 py-2 text-center font-bold text-primary-fg hover:bg-primary-hover sm:w-36"
                     onMouseEnter={() => setHoverFollowButton(true)}
                     onMouseLeave={() => setHoverFollowButton(false)}
                     onClick={() => unfollow()}
@@ -334,8 +333,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
                 <Match when={!following()}>
                   <button
-                    class="w-28 rounded-full border border-primary px-4 py-2 text-primary
-                    hover:border-rose-400 hover:text-rose-400"
+                    class="w-28 rounded-full border border-primary px-4 py-2 text-primary hover:border-primary-hover hover:text-primary-hover"
                     onClick={() => follow()}
                     disabled={updateContactsMutation.isPending}
                   >
@@ -344,10 +342,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
               </Switch>
               <ContextMenu menu={menu}>
-                <button
-                  class="w-10 rounded-full border border-primary p-2 text-primary
-                  hover:border-rose-400 hover:text-rose-400"
-                >
+                <button class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover">
                   <EllipsisHorizontal />
                 </button>
               </ContextMenu>
@@ -378,7 +373,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 {nip05Identifier()?.ident}
                 <Switch
                   fallback={
-                    <span class="inline-block h-4 w-4 text-rose-500">
+                    <span class="inline-block h-4 w-4 text-danger">
                       <ExclamationCircle />
                     </span>
                   }
@@ -389,7 +384,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     </span>
                   </Match>
                   <Match when={isVerified()}>
-                    <span class="inline-block h-4 w-4 text-blue-400">
+                    <span class="inline-block h-4 w-4 text-link">
                       <CheckCircle />
                     </span>
                   </Match>
@@ -409,7 +404,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           </div>
         )}
       </Show>
-      <div class="flex border-t px-4 py-2">
+      <div class="flex border-t border-border px-4 py-2">
         <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
           <div class="text-sm">{i18n()('profile.following')}</div>
           <div class="text-xl">
@@ -429,7 +424,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 when={showFollowers()}
                 fallback={
                   <button
-                    class="text-sm hover:text-stone-800 hover:underline"
+                    class="text-sm hover:text-fg-secondary"
                     onClick={() => setShowFollowers(true)}
                   >
                     {i18n()('profile.loadFollowers')}
@@ -444,14 +439,14 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         </Show>
       </div>
       <Show when={(profile()?.website ?? '').length > 0}>
-        <ul class="border-t px-5 py-2 text-xs">
+        <ul class="border-t border-border px-5 py-2 text-xs">
           <Show when={profile()?.website} keyed>
             {(website) => (
               <li class="flex items-center gap-1">
                 <span class="inline-block h-4 w-4" area-label="website" title="website">
                   <GlobeAlt />
                 </span>
-                <SafeLink class="text-blue-500 underline" href={website} />
+                <SafeLink class="text-link underline" href={website} />
               </li>
             )}
           </Show>
@@ -462,7 +457,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           <UserList data={userFollowingPubkeys()} pubkeyExtractor={(e) => e} onClose={closeModal} />
         </Match>
       </Switch>
-      <ul class="border-t p-1">
+      <ul class="border-t border-border p-1">
         <Timeline events={events()} />
       </ul>
     </BasicModal>

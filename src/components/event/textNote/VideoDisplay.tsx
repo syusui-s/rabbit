@@ -19,7 +19,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
       when={!hidden()}
       fallback={
         <button
-          class="rounded bg-stone-300 p-3 text-xs text-stone-600 hover:shadow"
+          class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
           onClick={() => setHidden(false)}
         >
           {i18n()('post.showVideo')}

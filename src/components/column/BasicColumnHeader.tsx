@@ -19,12 +19,14 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
       <div class="flex h-8 items-center gap-1 px-2">
         <h2 class="flex min-w-0 flex-1 items-center gap-1">
           <Show when={props.icon} keyed>
-            {(icon) => <span class="inline-block h-4 w-4 shrink-0 text-gray-700">{icon}</span>}
+            {(icon) => <span class="inline-block h-4 w-4 shrink-0 text-fg-secondary">{icon}</span>}
           </Show>
-          <span class="column-name truncate">{props.name}</span>
+          <span class="truncate">{props.name}</span>
         </h2>
-        <button class="h-4 w-4" onClick={() => toggleSettingsOpened()}>
-          <EllipsisVertical />
+        <button class="flex h-full place-items-center" onClick={() => toggleSettingsOpened()}>
+          <span class="inline-block h-4 w-4">
+            <EllipsisVertical />
+          </span>
         </button>
       </div>
       <Show when={isSettingsOpened()}>{props.settings()}</Show>

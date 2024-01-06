@@ -78,8 +78,6 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const loading = () => query.isPending || mutation.isPending;
   const disabled = () => loading();
 
-  setInterval(() => console.log(query.isPending, mutation.isPending), 1000);
-
   const otherProperties = () =>
     omit(profile(), [
       'picture',
@@ -170,7 +168,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.icon')}
             </label>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
               id="picture"
               name="picture"
@@ -186,7 +184,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.banner')}
             </label>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg focus:border-border focus:ring-primary"
               type="text"
               id="banner"
               name="banner"
@@ -204,12 +202,11 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             <div class="flex w-full items-center gap-2">
               <span>@</span>
               <input
-                class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+                class="flex-1 rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
                 type="text"
                 id="name"
                 name="name"
                 value={name()}
-                // pattern="^[a-zA-Z_][a-zA-Z0-9_]+$"
                 maxlength="32"
                 required
                 disabled={disabled()}
@@ -223,7 +220,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.displayName')}
             </label>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
               name="displayName"
               value={displayName()}
@@ -238,7 +235,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.about')}
             </label>
             <textarea
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               name="about"
               value={about()}
               rows="5"
@@ -251,7 +248,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.website')}
             </label>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
               name="website"
               value={website()}
@@ -266,7 +263,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               {i18n()('profile.edit.nip05')}
             </label>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
               name="nip05"
               value={nip05()}
@@ -283,7 +280,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             </label>
             <span class="text-xs">{i18n()('profile.edit.lightningAddressDescription')}</span>
             <input
-              class="w-full rounded-md focus:border-rose-100 focus:ring-rose-300"
+              class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
               name="website"
               value={lightningAddress()}
@@ -312,14 +309,18 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           <div class="flex gap-2">
             <button
               type="submit"
-              class="rounded bg-rose-300 p-2 font-bold text-white hover:bg-rose-400"
+              class="rounded p-2 font-bold text-primary-fg hover:bg-primary-hover"
+              classList={{
+                'bg-primary': !mutation.isPending,
+                'bg-primary-disabled': mutation.isPending,
+              }}
               disabled={mutation.isPending}
             >
               {i18n()('profile.edit.save')}
             </button>
             <button
               type="button"
-              class="rounded border border-rose-300 p-2 font-bold text-rose-300 hover:border-rose-400 hover:text-rose-400"
+              class="rounded border border-primary p-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
               onClick={() => props.onClose()}
             >
               {i18n()('profile.edit.cancel')}

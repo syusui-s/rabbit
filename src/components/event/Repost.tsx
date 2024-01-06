@@ -27,13 +27,13 @@ const Repost: Component<RepostProps> = (props) => {
     <div>
       <div class="flex items-center gap-1">
         <div class="flex shrink-0 place-items-center pl-[2px]" aria-hidden="true">
-          <span class="h-4 w-4 text-green-500">
+          <span class="h-4 w-4 text-r-repost">
             <ArrowPathRoundedSquare />
           </span>
         </div>
         <div class="notification-user flex min-w-0 flex-1 overflow-hidden text-xs">
           <button
-            class="select-text truncate hover:text-blue-500 hover:underline"
+            class="select-text truncate hover:text-link hover:underline"
             onClick={() => showProfile(props.event.pubkey)}
           >
             <UserDisplayName pubkey={props.event.pubkey} />

@@ -138,6 +138,7 @@ export default {
     },
     display: {
       display: '表示',
+      colorTheme: 'カラーテーマ',
       timeNotation: '時刻の表記',
       relativeTimeNotation: '相対表記',
       relativeTimeNotationExample: '7秒前',

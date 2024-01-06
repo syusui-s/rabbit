@@ -20,7 +20,7 @@ type ColumnSettingsSectionProps = {
 };
 
 const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => (
-  <div class="flex flex-col gap-2 border-b p-2">
+  <div class="flex flex-col gap-2 border-b border-border p-2">
     <div>{props.title}</div>
     <div>{props.children}</div>
   </div>
@@ -41,29 +41,29 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   };
 
   return (
-    <div class="flex flex-col border-t">
+    <div class="flex flex-col border-t border-border">
       <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
         <div class="scrollbar flex h-9 gap-2 overflow-x-scroll">
           <button
-            class="rounded-md border px-4 hover:bg-stone-100"
+            class="rounded-md border border-border px-4"
             onClick={() => setColumnWidth('widest')}
           >
             {i18n()('column.config.widest')}
           </button>
           <button
-            class="rounded-md border px-4 hover:bg-stone-100"
+            class="rounded-md border border-border px-4"
             onClick={() => setColumnWidth('wide')}
           >
             {i18n()('column.config.wide')}
           </button>
           <button
-            class="rounded-md border px-4 hover:bg-stone-100"
+            class="rounded-md border border-border px-4"
             onClick={() => setColumnWidth('medium')}
           >
             {i18n()('column.config.medium')}
           </button>
           <button
-            class="rounded-md border px-4 hover:bg-stone-100"
+            class="rounded-md border border-border px-4"
             onClick={() => setColumnWidth('narrow')}
           >
             {i18n()('column.config.narrow')}
@@ -91,7 +91,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
         </button>
         <div class="flex-1" />
         <button
-          class="px-2 py-4 text-rose-500 hover:text-rose-600"
+          class="px-2 py-4 text-danger hover:text-rose-600"
           title={i18n()('column.config.removeColumn')}
           onClick={() => removeColumn(props.column.id)}
         >

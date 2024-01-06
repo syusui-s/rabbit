@@ -53,19 +53,19 @@ const Post: Component<PostProps> = (props) => {
           <div class="flex justify-between gap-1 text-xs">
             <button
               type="button"
-              class="author flex min-w-0 select-text truncate hover:text-blue-500"
+              class="author flex min-w-0 select-text truncate hover:text-link"
               onClick={(ev) => {
                 ev.preventDefault();
                 props?.onShowProfile?.();
               }}
             >
-              <span class="author flex min-w-0 truncate hover:text-blue-500">
+              <span class="author flex min-w-0 truncate hover:text-link">
                 <Show when={(author()?.display_name?.length ?? 0) > 0}>
                   <div class="author-name truncate pr-1 font-bold hover:underline">
                     {author()?.display_name}
                   </div>
                 </Show>
-                <div class="author-username truncate text-zinc-600">
+                <div class="author-username truncate text-fg-secondary">
                   <Show
                     when={author()?.name != null}
                     fallback={`@${npubEncodeFallback(props.authorPubkey)}`}
@@ -99,7 +99,7 @@ const Post: Component<PostProps> = (props) => {
           </div>
           <Show when={overflow()}>
             <button
-              class="mt-2 w-full rounded border p-2 text-center text-xs text-stone-600 shadow-sm hover:shadow"
+              class="mt-2 w-full rounded border border-border p-2 text-center text-xs text-fg-secondary shadow-sm hover:bg-bg-tertiary hover:shadow"
               onClick={(ev) => {
                 ev.stopPropagation();
                 setShowOverflow((current) => !current);

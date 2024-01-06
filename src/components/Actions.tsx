@@ -114,9 +114,9 @@ const ReactionAction = (props: { event: NostrEvent }) => {
       <div
         class="flex shrink-0 items-center gap-1"
         classList={{
-          'text-zinc-400': !isReactedByMe() || isReactedByMeWithEmoji(),
-          'hover:text-rose-400': !isReactedByMe() || isReactedByMeWithEmoji(),
-          'text-rose-400':
+          'text-fg-tertiary': !isReactedByMe() || isReactedByMeWithEmoji(),
+          'hover:text-r-reaction': !isReactedByMe() || isReactedByMeWithEmoji(),
+          'text-r-reaction':
             (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
         }}
       >
@@ -130,7 +130,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           </Show>
         </button>
         <Show when={!config().hideCount && !config().showEmojiReaction && reactions().length > 0}>
-          <div class="text-sm text-zinc-400">
+          <div class="text-sm text-fg-tertiary">
             {formatSiPrefix(reactions().length, { minDigits: 4 })}
           </div>
         </Show>
@@ -139,9 +139,9 @@ const ReactionAction = (props: { event: NostrEvent }) => {
         <div
           class="flex shrink-0 items-center gap-1"
           classList={{
-            'text-zinc-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
-            'hover:text-rose-400': !isReactedByMe() || !isReactedByMeWithEmoji(),
-            'text-rose-400':
+            'text-fg-tertiary': !isReactedByMe() || !isReactedByMeWithEmoji(),
+            'hover:text-r-reaction': !isReactedByMe() || !isReactedByMeWithEmoji(),
+            'text-r-reaction':
               (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
           }}
         >
@@ -199,16 +199,18 @@ const RepostAction = (props: { event: NostrEvent }) => {
     <div
       class="flex shrink-0 items-center gap-1"
       classList={{
-        'text-zinc-400': !isRepostedByMe(),
-        'hover:text-green-400': !isRepostedByMe(),
-        'text-green-400': isRepostedByMe() || publishRepostMutation.isPending,
+        'text-fg-tertiary': !isRepostedByMe(),
+        'hover:text-r-repost': !isRepostedByMe(),
+        'text-r-repost': isRepostedByMe() || publishRepostMutation.isPending,
       }}
     >
-      <button class="h-4 w-4" onClick={handleRepost} disabled={publishRepostMutation.isPending}>
-        <ArrowPathRoundedSquare />
+      <button onClick={handleRepost} disabled={publishRepostMutation.isPending}>
+        <span class="flex h-4 w-4">
+          <ArrowPathRoundedSquare />
+        </span>
       </button>
       <Show when={!config().hideCount && reposts().length > 0}>
-        <div class="text-sm text-zinc-400">
+        <div class="text-sm text-fg-tertiary">
           {formatSiPrefix(reposts().length, { minDigits: 4 })}
         </div>
       </Show>
@@ -293,13 +295,14 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
             return (
               <button
-                class="flex h-6 max-w-[128px] items-center rounded border px-1"
+                class="flex h-8 max-w-[128px] items-center rounded border border-border px-1 sm:h-6"
                 classList={{
-                  'text-zinc-400': !isReactedByMeWithThisContent,
-                  'hover:bg-zinc-50': !isReactedByMeWithThisContent,
-                  'bg-rose-50': isReactedByMeWithThisContent,
-                  'border-rose-200': isReactedByMeWithThisContent,
-                  'text-rose-400': isReactedByMeWithThisContent,
+                  'text-fg-tertiary': !isReactedByMeWithThisContent,
+                  'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
+                  'hover:border-r-reaction/40': !isReactedByMeWithThisContent,
+                  'bg-r-reaction/10': isReactedByMeWithThisContent,
+                  'border-r-reaction/40': isReactedByMeWithThisContent,
+                  'text-r-reaction': isReactedByMeWithThisContent,
                 }}
                 type="button"
                 onClick={(ev) => {
@@ -401,18 +404,20 @@ const Actions: Component<ActionProps> = (props) => {
       <EmojiReactions event={props.event} />
       <div class="actions flex w-52 items-center justify-between gap-8 pt-1">
         <button
-          class="h-4 w-4 shrink-0 text-zinc-400 hover:text-zinc-500"
+          class="shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
           onClick={(ev) => {
             ev.stopPropagation();
             props.onClickReply();
           }}
         >
-          <ChatBubbleLeft />
+          <span class="flex h-4 w-4">
+            <ChatBubbleLeft />
+          </span>
         </button>
         <RepostAction event={props.event} />
         <ReactionAction event={props.event} />
         <ContextMenu menu={menu}>
-          <span class="inline-block h-4 w-4 text-zinc-400 hover:text-zinc-500">
+          <span class="inline-block h-4 w-4 text-fg-tertiary hover:text-fg-tertiary/70">
             <EllipsisHorizontal />
           </span>
         </ContextMenu>

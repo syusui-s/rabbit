@@ -24,7 +24,7 @@ const UserList = <T,>(props: UserListProps<T>): JSX.Element => {
             {(e) => {
               const pubkey = () => props.pubkeyExtractor(e);
               return (
-                <div class="flex border-t py-1">
+                <div class="flex border-t border-border py-1">
                   <Show when={props.renderInfo} keyed>
                     {(render) => render(e)}
                   </Show>

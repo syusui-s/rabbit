@@ -1,0 +1,31 @@
+export type ColorTheme = {
+  id: string;
+  name: string;
+  brightness: 'light' | 'dark';
+  className?: string;
+  rabbitIconPath: string;
+};
+
+export const colorThemes: Record<string, ColorTheme> = {
+  sakura: {
+    id: 'sakura',
+    name: 'Sakura',
+    brightness: 'light',
+    className: 'theme-sakura',
+    rabbitIconPath: 'images/rabbit_app_256.png',
+  },
+  cinnamon: {
+    id: 'cinnamon',
+    name: 'Cinnamon',
+    brightness: 'light',
+    className: 'theme-cinnamon',
+    rabbitIconPath: 'images/rabbit_muted_256.png',
+  },
+  yozakura: {
+    id: 'yozakura',
+    name: 'Yozakura',
+    brightness: 'dark',
+    className: 'theme-yozakura',
+    rabbitIconPath: 'images/rabbit_256.png',
+  },
+};

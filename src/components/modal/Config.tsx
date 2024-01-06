@@ -10,6 +10,7 @@ import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
 import UserNameDisplay from '@/components/UserDisplayName';
+import { colorThemes } from '@/core/colorThemes';
 import useConfig, { type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -36,7 +37,7 @@ const ProfileSection = () => {
       <h3 class="font-bold">{i18n()('config.profile.profile')}</h3>
       <div class="flex gap-2">
         <button
-          class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
+          class="rounded border border-primary px-4 py-2 font-bold text-primary"
           onClick={() =>
             ensureNonNull([pubkey()])(([pubkeyNonNull]) => {
               showProfile(pubkeyNonNull);
@@ -46,7 +47,7 @@ const ProfileSection = () => {
           {i18n()('config.profile.openProfile')}
         </button>
         <button
-          class="rounded border border-rose-300 px-4 py-2 font-bold text-rose-300"
+          class="rounded border border-primary px-4 py-2 font-bold text-primary"
           onClick={() => showProfileEdit()}
         >
           {i18n()('config.profile.editProfile')}
@@ -116,14 +117,15 @@ const RelayConfig = () => {
         </ul>
         <form class="flex gap-2" onSubmit={handleClickAddRelay}>
           <input
-            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            class="flex-1 rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             type="text"
             name="relayUrl"
+            placeholder="wss://..."
             value={relayUrlInput()}
             pattern={RelayUrlRegex}
             onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
           />
-          <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
+          <button type="submit" class="rounded bg-primary p-2 font-bold text-primary-fg">
             {i18n()('config.relays.addRelay')}
           </button>
         </form>
@@ -132,7 +134,7 @@ const RelayConfig = () => {
         <h3 class="pb-1 font-bold">{i18n()('config.relays.importRelays')}</h3>
         <button
           type="button"
-          class="rounded bg-rose-300 p-2 font-bold text-white"
+          class="rounded bg-primary p-2 font-bold text-primary-fg"
           onClick={() => {
             importFromNIP07().catch((err) => {
               console.error('failed to import relays', err);
@@ -144,6 +146,47 @@ const RelayConfig = () => {
         </button>
       </div>
     </>
+  );
+};
+
+const ColorThemeConfig = () => {
+  const i18n = useTranslation();
+  const { config, setConfig } = useConfig();
+
+  const isCurrentlyUsing = (id: string) => {
+    const colorThemeConfig = config().colorTheme;
+    if (colorThemeConfig.type === 'specific') {
+      return colorThemeConfig.id === id;
+    }
+    return false;
+  };
+
+  const updateColorTheme = (id: string) => {
+    setConfig((current) => ({ ...current, colorTheme: { type: 'specific', id } }));
+  };
+
+  return (
+    <div class="py-2">
+      <h3 class="font-bold">{i18n()('config.display.colorTheme')}</h3>
+      <div class="flex max-h-[25vh] flex-col overflow-scroll rounded-md border border-border">
+        <For each={Object.values(colorThemes)}>
+          {(colorTheme) => (
+            <button
+              type="button"
+              class="border-t border-border px-2 py-1 text-left"
+              classList={{
+                'bg-primary': isCurrentlyUsing(colorTheme.id),
+                'text-primary-fg': isCurrentlyUsing(colorTheme.id),
+                'text-fg': !isCurrentlyUsing(colorTheme.id),
+              }}
+              onClick={() => updateColorTheme(colorTheme.id)}
+            >
+              {colorTheme.name}
+            </button>
+          )}
+        </For>
+      </div>
+    </div>
   );
 };
 
@@ -186,12 +229,12 @@ const DateFormatConfig = () => {
             <div class="flex flex-1 flex-row items-center gap-1 sm:flex-col">
               <button
                 type="button"
-                class="w-48 rounded border border-rose-300 p-2 font-bold sm:w-full"
+                class="w-48 rounded border border-primary p-2 font-bold sm:w-full"
                 classList={{
-                  'bg-rose-300': config().dateFormat === id,
-                  'text-white': config().dateFormat === id,
-                  'bg-white': config().dateFormat !== id,
-                  'text-rose-300': config().dateFormat !== id,
+                  'bg-primary': config().dateFormat === id,
+                  'text-primary-fg': config().dateFormat === id,
+                  'bg-bg': config().dateFormat !== id,
+                  'text-primary': config().dateFormat !== id,
                 }}
                 onClick={() => updateDateFormat(id)}
               >
@@ -211,17 +254,17 @@ const ToggleButton = (props: {
   onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent>;
 }) => (
   <button
-    class="flex h-[24px] w-[48px] items-center rounded-full border border-primary px-1"
+    class="flex h-[24px] w-[48px] items-center rounded-full border border-primary/80 px-1"
     classList={{
-      'bg-white': !props.value,
+      'bg-bg-tertiary': !props.value,
       'justify-start': !props.value,
-      'bg-rose-300': props.value,
+      'bg-primary': props.value,
       'justify-end': props.value,
     }}
     area-label={props.value}
     onClick={(event) => props.onClick(event)}
   >
-    <span class="m-[-2px] inline-block h-5 w-5 rounded-full border border-primary bg-white shadow" />
+    <span class="m-[-3px] inline-block h-5 w-5 rounded-full border bg-primary-fg shadow" />
   </button>
 );
 
@@ -301,7 +344,7 @@ const EmojiConfig = () => {
         <label class="flex flex-1 items-center gap-1">
           <div class="w-9">{i18n()('config.customEmoji.shortcode')}</div>
           <input
-            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            class="flex-1 rounded-md border-border bg-bg placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             type="text"
             name="shortcode"
             placeholder="smiley"
@@ -314,7 +357,7 @@ const EmojiConfig = () => {
         <label class="flex flex-1 items-center gap-1">
           <div class="w-9">{i18n()('config.customEmoji.url')}</div>
           <input
-            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            class="flex-1 rounded-md border-border bg-bg placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             type="text"
             name="url"
             value={urlInput()}
@@ -324,7 +367,10 @@ const EmojiConfig = () => {
             onChange={(ev) => setUrlInput(ev.currentTarget.value)}
           />
         </label>
-        <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
+        <button
+          type="submit"
+          class="w-24 self-end rounded bg-primary p-2 font-bold text-primary-fg"
+        >
           {i18n()('config.customEmoji.addEmoji')}
         </button>
       </form>
@@ -359,13 +405,16 @@ const EmojiImport = () => {
       <p>{i18n()('config.customEmoji.emojiImportDescription')}</p>
       <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <textarea
-          class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+          class="flex-1 rounded-md border-border bg-bg placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           name="json"
           value={jsonInput()}
           placeholder='{ "smiley": "https://example.com/smiley.png" }'
           onChange={(ev) => setJSONInput(ev.currentTarget.value)}
         />
-        <button type="submit" class="w-24 self-end rounded bg-rose-300 p-2 font-bold text-white">
+        <button
+          type="submit"
+          class="w-24 self-end rounded bg-primary p-2 font-bold text-primary-fg"
+        >
           {i18n()('config.customEmoji.importEmoji')}
         </button>
       </form>
@@ -421,13 +470,13 @@ const MuteConfig = () => {
         </ul>
         <form class="flex gap-2" onSubmit={handleClickAddKeyword}>
           <input
-            class="flex-1 rounded-md focus:border-rose-100 focus:ring-rose-300"
+            class="flex-1 rounded-md border border-border bg-bg ring-border focus:border-border focus:ring-primary"
             type="text"
             name="keyword"
             value={keywordInput()}
             onChange={(ev) => setKeywordInput(ev.currentTarget.value)}
           />
-          <button type="submit" class="rounded bg-rose-300 p-2 font-bold text-white">
+          <button type="submit" class="rounded bg-primary p-2 font-bold text-primary-fg">
             {i18n()('config.mute.add')}
           </button>
         </form>
@@ -551,6 +600,7 @@ const ConfigUI = (props: ConfigProps) => {
       icon: () => <PaintBrush />,
       render: () => (
         <>
+          <ColorThemeConfig />
           <DateFormatConfig />
           <ReactionConfig />
           <EmbeddingConfig />
@@ -594,7 +644,7 @@ const ConfigUI = (props: ConfigProps) => {
                   {(menuItem, i) => (
                     <li class="w-full">
                       <button
-                        class="flex w-full gap-2 py-3 hover:text-rose-400"
+                        class="flex w-full gap-2 py-3 hover:text-primary"
                         onClick={() => setMenuIndex(i)}
                       >
                         <span class="inline-block h-6 w-6">{menuItem.icon()}</span>

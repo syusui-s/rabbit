@@ -31,19 +31,19 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
         <div class="flex justify-between gap-1 text-xs">
           <button
             type="button"
-            class="profile flex min-w-0 select-text truncate hover:text-blue-500"
+            class="profile flex min-w-0 select-text truncate hover:text-link"
             onClick={(ev) => {
               ev.preventDefault();
               props?.onShowProfile?.();
             }}
           >
-            <span class="profile flex min-w-0 truncate hover:text-blue-500">
+            <span class="profile flex min-w-0 truncate hover:text-link">
               <Show when={(profile()?.display_name?.length ?? 0) > 0}>
                 <div class="profile-name truncate pr-1 font-bold hover:underline">
                   {profile()?.display_name}
                 </div>
               </Show>
-              <div class="profile-username truncate text-zinc-600">
+              <div class="profile-username truncate text-fg-secondary">
                 <Show
                   when={profile()?.name}
                   fallback={`@${npubEncodeFallback(props.pubkey)}`}

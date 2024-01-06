@@ -142,6 +142,7 @@ export default {
     },
     display: {
       display: 'Display',
+      colorTheme: 'Color theme',
       timeNotation: 'Time notation',
       relativeTimeNotation: 'Relative',
       relativeTimeNotationExample: '7s',
