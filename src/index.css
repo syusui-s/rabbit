@@ -64,7 +64,7 @@
   --color-r-sidebar: 35 27 33;
   --color-r-reaction: 251 113 133;
   --color-r-repost: 139 191 67;
-  --color-scroll-thumb: var(--color-primary-fg);
+  --color-scroll-thumb: var(--color-fg-secondary);
   --color-scroll-bg: var(--color-bg-tertiary);
 }
 

@@ -168,7 +168,7 @@ const ColorThemeConfig = () => {
   return (
     <div class="py-2">
       <h3 class="font-bold">{i18n()('config.display.colorTheme')}</h3>
-      <div class="flex max-h-[25vh] flex-col overflow-scroll rounded-md border border-border">
+      <div class="scrollbar flex max-h-[25vh] flex-col overflow-y-scroll rounded-md border border-border">
         <For each={Object.values(colorThemes)}>
           {(colorTheme) => (
             <button
