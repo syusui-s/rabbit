@@ -13,6 +13,7 @@ import { reaction } from '@/nostr/event';
 import useEvent from '@/nostr/useEvent';
 import useProfile from '@/nostr/useProfile';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { thumbnailUrl } from '@/utils/url';
 
 type ReactionDisplayProps = {
   event: NostrEvent;
@@ -47,13 +48,15 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
         </div>
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
-            <Show when={profile()?.picture != null}>
-              <img
-                src={profile()?.picture}
-                alt="icon"
-                // TODO autofit
-                class="h-full w-full object-cover"
-              />
+            <Show when={profile()?.picture} keyed>
+              {(url) => (
+                <img
+                  src={thumbnailUrl(url)}
+                  alt="icon"
+                  // TODO autofit
+                  class="h-full w-full object-cover"
+                />
+              )}
             </Show>
           </div>
           <div class="flex min-w-0 flex-1 overflow-hidden">

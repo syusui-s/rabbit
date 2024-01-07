@@ -2,6 +2,7 @@ import { Component, Show } from 'solid-js';
 
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import { thumbnailUrl } from '@/utils/url';
 
 export type ProfileListItemProps = {
   pubkey: string;
@@ -24,7 +25,9 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
         }}
       >
         <Show when={profile()?.picture} keyed>
-          {(url) => <img src={url} alt="icon" class="h-full w-full rounded object-cover" />}
+          {(url) => (
+            <img src={thumbnailUrl(url)} alt="icon" class="h-full w-full rounded object-cover" />
+          )}
         </Show>
       </button>
       <div class="min-w-0 flex-auto">
