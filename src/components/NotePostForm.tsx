@@ -414,6 +414,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
               'p-[6px]': mode() === 'reply',
             }}
+            type="button"
             onClick={() => emojiPickerPopup.open()}
           >
             <FaceSmile />
