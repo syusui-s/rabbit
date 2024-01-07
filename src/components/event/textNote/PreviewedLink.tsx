@@ -1,14 +1,15 @@
-import { Component, JSX, Switch, Match, createEffect, Show } from 'solid-js';
+import { Component, JSX, Switch, Match, createSignal, createEffect, Show } from 'solid-js';
 
 import LazyLoad from '@/components/utils/LazyLoad';
 import SafeLink from '@/components/utils/SafeLink';
 import useConfig from '@/core/useConfig';
-import { useOgp } from '@/utils/ogp';
+import { useTranslation } from '@/i18n/useTranslation';
+import { useOgp, isOgpUrl } from '@/utils/ogp';
 import { isTwitterUrl, parseYouTubeVideoUrl } from '@/utils/url';
 
 type PreviewdLinkProps = {
-  class?: string;
-  href: string;
+  url: string;
+  initialHidden: boolean;
   children?: JSX.Element;
 };
 
@@ -29,13 +30,13 @@ const youtubeUrl = (videoId: string): string => {
   return iframeUrl.href;
 };
 
-const TwitterEmbed: Component<{ class?: string; href: string }> = (props) => {
+const TwitterEmbed: Component<{ url: string }> = (props) => {
   let twitterRef: HTMLQuoteElement | undefined;
 
   const { getColorTheme } = useConfig();
 
   createEffect(() => {
-    if (isTwitterUrl(props.href)) {
+    if (isTwitterUrl(props.url)) {
       window.twttr?.widgets?.load(twitterRef);
     }
   });
@@ -51,12 +52,12 @@ const TwitterEmbed: Component<{ class?: string; href: string }> = (props) => {
   return (
     <blockquote ref={twitterRef} class="twitter-tweet" data-theme={dataTheme()}>
       <a
-        class={props.class}
-        href={twitterUrl(props.href)}
+        class="text-link underline"
+        href={twitterUrl(props.url)}
         target="_blank"
         rel="noreferrer noopener"
       >
-        {twitterUrl(props.href)}
+        {twitterUrl(props.url)}
       </a>
     </blockquote>
   );
@@ -68,7 +69,7 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
   }));
 
   return (
-    <Show when={ogp()} fallback={<SafeLink class={props.class} href={props.url} />} keyed>
+    <Show when={ogp()} fallback={<SafeLink class="text-link underline" href={props.url} />} keyed>
       {(ogpProps) => (
         <SafeLink href={props.url}>
           <div class="my-2 rounded-lg border border-border transition-colors hover:bg-bg-tertiary">
@@ -89,39 +90,75 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
   );
 };
 
+type ClickToShowProps = {
+  initialHidden: boolean;
+  url: string;
+  children: JSX.Element;
+};
+
+const ClickToShow: Component<ClickToShowProps> = (props) => {
+  const i18n = useTranslation();
+  const [hidden, setHidden] = createSignal(props.initialHidden);
+
+  return (
+    <Show
+      when={!hidden()}
+      fallback={
+        <div>
+          <button
+            class="flex flex-col items-center rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
+            onClick={() => setHidden(false)}
+          >
+            {i18n()('post.showPreview')}
+          </button>
+          <SafeLink class="text-link underline" href={props.url} />
+        </div>
+      }
+    >
+      {props.children}
+    </Show>
+  );
+};
+
 const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
   const { config } = useConfig();
 
   return (
-    <Switch fallback={<SafeLink class={props.class} href={props.href} />}>
-      <Match when={config().embedding.twitter && isTwitterUrl(props.href)}>
-        <TwitterEmbed class={props.class} href={props.href} />
+    <Switch fallback={<SafeLink class="text-link underline" href={props.url} />}>
+      <Match when={config().embedding.twitter && isTwitterUrl(props.url)}>
+        <ClickToShow url={props.url} initialHidden={props.initialHidden}>
+          <TwitterEmbed url={props.url} />
+        </ClickToShow>
       </Match>
-      <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.href)} keyed>
+      <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.url)} keyed>
         {({ videoId }) => (
-          <LazyLoad
-            fallback={
-              <div class="aspect-video max-w-full">
-                <SafeLink href={props.href} />
-              </div>
-            }
-          >
-            {() => (
-              <div class="my-2 aspect-video w-full">
-                <iframe
-                  loading="lazy"
-                  title="YouTube"
-                  class="my-2 h-full w-full"
-                  src={youtubeUrl(videoId)}
-                  allowfullscreen
-                />
-              </div>
-            )}
-          </LazyLoad>
+          <ClickToShow url={props.url} initialHidden={props.initialHidden}>
+            <LazyLoad
+              fallback={
+                <div class="aspect-video max-w-full">
+                  <SafeLink href={props.url} />
+                </div>
+              }
+            >
+              {() => (
+                <div class="my-2 aspect-video w-full">
+                  <iframe
+                    loading="lazy"
+                    title="YouTube"
+                    class="my-2 h-full w-full"
+                    src={youtubeUrl(videoId)}
+                    allowfullscreen
+                  />
+                </div>
+              )}
+            </LazyLoad>
+          </ClickToShow>
         )}
       </Match>
-      <Match when={config().embedding.ogp}>
-        <LazyLoad>{() => <OgpEmbed class={props.class} url={props.href} />}</LazyLoad>
+      <Match when={config().embedding.ogp && isOgpUrl(props.url)}>
+        <ClickToShow url={props.url} initialHidden={props.initialHidden}>
+          <LazyLoad>{() => <OgpEmbed url={props.url} />}</LazyLoad>
+        </ClickToShow>
       </Match>
     </Switch>
   );

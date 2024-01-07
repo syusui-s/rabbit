@@ -108,6 +108,7 @@ export default {
     failedToDelete: 'Failed to delete',
     showImage: 'Show image',
     showVideo: 'Show video',
+    showPreview: 'Show preview',
     showOverflow: 'Read more',
     hideOverflow: 'Hide',
     download: 'Download',

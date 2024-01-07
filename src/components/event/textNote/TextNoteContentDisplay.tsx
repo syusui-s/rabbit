@@ -64,7 +64,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
               </button>
             );
           }
-          return <PreviewedLink class="text-link underline" href={item.content} />;
+          return <PreviewedLink url={item.content} initialHidden={initialHidden()} />;
         }
         if (item.type === 'TagReferenceResolved') {
           if (item.reference == null) {

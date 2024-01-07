@@ -39,13 +39,16 @@ export const parseOgp = (text: string): OgpContent | null => {
   return parseOgpFromDOM(doc);
 };
 
-export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
+export const isOgpUrl = (urlString: string): boolean => {
   const allowList = ['www3.nhk.or.jp'];
-
   const url = new URL(urlString);
-  if (!allowList.includes(url.host)) return null;
+  return allowList.includes(url.host);
+};
 
-  const res = await fetch(url, { headers: { Accept: 'text/html' } });
+export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
+  if (!isOgpUrl(urlString)) return null;
+
+  const res = await fetch(urlString, { headers: { Accept: 'text/html' } });
   const text = await res.text();
   return parseOgp(text);
 };
