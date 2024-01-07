@@ -138,12 +138,16 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
           }
         },
         oneose: () => {
+          // sometimes `oneose` called twice
+          if (eose()) return;
+
           if (onEOSE != null) {
             onEOSE();
           }
 
           setEose(true);
           updateEvents();
+          storedEvents.splice(0, storedEvents.length);
 
           if (!continuous) {
             sub.close();
@@ -157,20 +161,15 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     );
 
     // avoid updating an array too rapidly while this is fetching stored events
-    let updating = false;
     const intervalId = setInterval(() => {
-      if (updating) return;
-      updating = true;
       if (eose()) {
         clearInterval(intervalId);
-        updating = false;
         return;
       }
       if (pushed) {
         pushed = false;
         updateEvents();
       }
-      updating = false;
     }, 100);
 
     onCleanup(() => {

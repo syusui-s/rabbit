@@ -48,6 +48,9 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
       ],
       eoseLimit: 20,
       continuous: loadMore.continuous(),
+      onEOSE: () => {
+        console.log('home: eose');
+      },
       clientEventFilter: (event) => {
         if (props.column.contentFilter == null) return true;
         return applyContentFilter(props.column.contentFilter)(event.content);
