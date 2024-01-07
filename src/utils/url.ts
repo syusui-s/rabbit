@@ -33,7 +33,7 @@ export const thumbnailUrl = (urlString: string): string => {
     const url = new URL(urlString);
     // Imgur
     if (url.host === 'i.imgur.com' || url.host === 'imgur.com') {
-      const match = url.pathname.match(/^\/([a-zA-Z0-9]+)\.(jpg|jpeg|png|gif)/);
+      const match = url.pathname.match(/^\/([a-zA-Z0-9]+)\.(jpeg|jpg|png|gif|webp|avif|apng)/);
       if (match != null) {
         const result = new URL(url);
         const imageId = match[1];
@@ -49,6 +49,21 @@ export const thumbnailUrl = (urlString: string): string => {
       const result = new URL(url);
       result.host = 'thumb.gyazo.com';
       result.pathname = `/thumb/640${url.pathname}`;
+      return result.toString();
+    }
+
+    // nostr.build
+    // https://github.com/nostrbuild/nostr.build/blob/main/api/v2/routes_upload.php
+    if (url.host === 'nostr.build' || url.host === 'image.nostr.build') {
+      const result = new URL(url);
+      result.host = 'nostr.build';
+      if (url.pathname.startsWith('/i/')) {
+        result.pathname = `/responsive/240p${url.pathname}`;
+      } else if (url.pathname.match(/^\/[0-9a-zA-Z]+\.(jpeg|jpg|png|gif|webp|avif|apng)$/)) {
+        result.pathname = `/responsive/240p/i${url.pathname}`;
+      } else {
+        return urlString;
+      }
       return result.toString();
     }
 

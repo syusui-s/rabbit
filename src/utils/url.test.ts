@@ -10,4 +10,22 @@ describe('thumbnailUrl', () => {
     const expected = 'https://i.imgur.com/uBf5Qtsl.webp';
     assert.deepStrictEqual(actual, expected);
   });
+
+  it('should return url for nostr.build', () => {
+    const actual = thumbnailUrl(
+      'https://nostr.build/i/2489ee648a4fef6943f4a7c88349477e78a91e28232246b801fe8ce86e64624e.png',
+    );
+    const expected =
+      'https://nostr.build/responsive/240p/i/2489ee648a4fef6943f4a7c88349477e78a91e28232246b801fe8ce86e64624e.png';
+    assert.deepStrictEqual(actual, expected);
+  });
+
+  it('should return url for image.nostr.build', () => {
+    const actual = thumbnailUrl(
+      'https://image.nostr.build/f56ee902307158c1ebbcb5ac00430dbf1425eac12d55e4277ebccbe54d09671b.jpg',
+    );
+    const expected =
+      'https://nostr.build/responsive/240p/i/f56ee902307158c1ebbcb5ac00430dbf1425eac12d55e4277ebccbe54d09671b.jpg';
+    assert.deepStrictEqual(actual, expected);
+  });
 });
