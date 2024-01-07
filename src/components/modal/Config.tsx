@@ -417,9 +417,13 @@ const EmojiConfig = () => {
                   class="flex w-full flex-col items-center gap-1 rounded p-2 hover:bg-bg-tertiary/20 hover:shadow"
                   onClick={() => popup.open()}
                 >
-                  <div class="flex h-8 max-w-8 items-center">
-                    <img class="object-contain" src={url} alt={shortcode} />
-                  </div>
+                  <LazyLoad fallback={<div class="h-8 w-8" />}>
+                    {() => (
+                      <div class="flex h-8 max-w-8 items-center">
+                        <img class="object-contain" src={url} alt={shortcode} />
+                      </div>
+                    )}
+                  </LazyLoad>
                   <div class="w-full truncate text-xs text-fg-secondary">{shortcode}</div>
                 </button>
                 {popup.popup()}
