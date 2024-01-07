@@ -17,6 +17,7 @@ const LazyLoad: Component<LazyLoadProps> = (props) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setVisible(true);
+            observer.disconnect();
           }
         });
       },
@@ -34,12 +35,10 @@ const LazyLoad: Component<LazyLoadProps> = (props) => {
   });
 
   return (
-    <div ref={containerRef}>
-      <Show when={visible()} fallback={props.fallback} keyed>
-        {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
-        {(_) => props.children()}
-      </Show>
-    </div>
+    <Show when={visible()} fallback={<div ref={containerRef}>{props.fallback}</div>} keyed>
+      {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
+      {(_) => props.children()}
+    </Show>
   );
 };
 
