@@ -7,12 +7,12 @@ import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
 
-import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import BasicModal from '@/components/modal/BasicModal';
 import UserList from '@/components/modal/UserList';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
+import useContextMenu from '@/components/utils/useContextMenu';
 import { createFollowingColumn, createPostsColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
@@ -202,62 +202,63 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     });
   };
 
-  const menu: MenuItem[] = [
-    /*
-    {
-      content: () => 'ユーザ宛に投稿',
-      onSelect: () => {
-        navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+  const otherActionsPopup = useContextMenu(() => ({
+    menu: [
+      /*
+        {
+          content: () => 'ユーザ宛に投稿',
+          onSelect: () => {
+            navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+          },
+        },
+       */
+      {
+        content: i18n()('profile.copyPubkey'),
+        onSelect: () => {
+          navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+        },
       },
-    },
-     */
-    {
-      content: () => i18n()('profile.copyPubkey'),
-      onSelect: () => {
-        navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
+      {
+        content: i18n()('profile.addUserColumn'),
+        onSelect: () => {
+          const columnName = profile()?.name ?? npub();
+          saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
+          request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+          props.onClose?.();
+        },
       },
-    },
-    {
-      content: () => i18n()('profile.addUserColumn'),
-      onSelect: () => {
-        const columnName = profile()?.name ?? npub();
-        saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
-        request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
-        props.onClose?.();
+      {
+        content: i18n()('profile.addUserHomeColumn'),
+        onSelect: () => {
+          const columnName = `${i18n()('column.home')} / ${profile()?.name ?? npub()}`;
+          saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
+          request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+          props.onClose?.();
+        },
       },
-    },
-    {
-      content: () => i18n()('profile.addUserHomeColumn'),
-      onSelect: () => {
-        const columnName = `${i18n()('column.home')} / ${profile()?.name ?? npub()}`;
-        saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
-        request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
-        props.onClose?.();
+      {
+        content: !isMuted() ? i18n()('profile.mute') : i18n()('profile.unmute'),
+        onSelect: () => {
+          if (!isMuted()) {
+            addMutedPubkey(props.pubkey);
+          } else {
+            removeMutedPubkey(props.pubkey);
+          }
+        },
       },
-    },
-    {
-      content: () => (!isMuted() ? i18n()('profile.mute') : i18n()('profile.unmute')),
-      onSelect: () => {
-        if (!isMuted()) {
-          addMutedPubkey(props.pubkey);
-        } else {
-          removeMutedPubkey(props.pubkey);
-        }
+      {
+        when: () => props.pubkey === myPubkey(),
+        content: !following() ? i18n()('profile.followMyself') : i18n()('profile.unfollowMyself'),
+        onSelect: () => {
+          if (!following()) {
+            follow();
+          } else {
+            unfollow();
+          }
+        },
       },
-    },
-    {
-      when: () => props.pubkey === myPubkey(),
-      content: () =>
-        !following() ? i18n()('profile.followMyself') : i18n()('profile.unfollowMyself'),
-      onSelect: () => {
-        if (!following()) {
-          follow();
-        } else {
-          unfollow();
-        }
-      },
-    },
-  ];
+    ],
+  }));
 
   const { events } = useSubscription(() => ({
     relayUrls: config().relayUrls,
@@ -341,11 +342,15 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                   </button>
                 </Match>
               </Switch>
-              <ContextMenu menu={menu}>
-                <button class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover">
-                  <EllipsisHorizontal />
-                </button>
-              </ContextMenu>
+              <button
+                ref={otherActionsPopup.targetRef}
+                type="button"
+                class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover"
+                onClick={() => otherActionsPopup.open()}
+              >
+                <EllipsisHorizontal />
+              </button>
+              {otherActionsPopup.popup()}
             </div>
             <Switch>
               <Match when={userFollowingQuery.isPending}>

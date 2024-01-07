@@ -388,9 +388,7 @@ const EmojiConfig = () => {
       <ul class="mt-4 flex max-h-[40vh] flex-wrap overflow-y-scroll border-t border-border">
         <For each={Object.values(config().customEmojis)}>
           {({ shortcode, url }) => {
-            const [ref, setRef] = createSignal<HTMLLIElement | undefined>();
             const popup = usePopup(() => ({
-              target: ref(),
               popup: (
                 <div class="flex min-w-24 flex-col items-center rounded border border-border bg-bg shadow">
                   <div class="flex items-center p-1">
@@ -411,7 +409,7 @@ const EmojiConfig = () => {
             }));
 
             return (
-              <li ref={setRef} class="min-w-0 basis-1/2 sm:basis-1/4">
+              <li ref={popup.targetRef} class="min-w-0 basis-1/2 sm:basis-1/4">
                 <button
                   type="button"
                   class="flex w-full flex-col items-center gap-1 rounded p-2 hover:bg-bg-tertiary/20 hover:shadow"

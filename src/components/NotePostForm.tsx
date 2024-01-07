@@ -9,7 +9,7 @@ import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
 import { Event as NostrEvent } from 'nostr-tools/pure';
 
-import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
+import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
@@ -339,6 +339,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const fileUploadDisabled = () => uploadFilesMutation.isPending;
 
+  const emojiPickerPopup = useEmojiPicker(() => ({
+    customEmojis: true,
+    onEmojiSelect: handleEmojiSelect,
+  }));
+
   onMount(() => {
     setTimeout(() => {
       textAreaRef?.click();
@@ -398,21 +403,22 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </button>
             </div>
           </Show>
-          <EmojiPicker customEmojis={true} onEmojiSelect={handleEmojiSelect}>
-            <span
-              class="inline-block rounded bg-primary text-primary-fg"
-              classList={{
-                'h-8': mode() === 'normal',
-                'w-8': mode() === 'normal',
-                'p-2': mode() === 'normal',
-                'h-7': mode() === 'reply',
-                'w-7': mode() === 'reply',
-                'p-[6px]': mode() === 'reply',
-              }}
-            >
-              <FaceSmile />
-            </span>
-          </EmojiPicker>
+          <button
+            ref={emojiPickerPopup.targetRef}
+            class="inline-block rounded bg-primary text-primary-fg"
+            classList={{
+              'h-8': mode() === 'normal',
+              'w-8': mode() === 'normal',
+              'p-2': mode() === 'normal',
+              'h-7': mode() === 'reply',
+              'w-7': mode() === 'reply',
+              'p-[6px]': mode() === 'reply',
+            }}
+            onClick={() => emojiPickerPopup.open()}
+          >
+            <FaceSmile />
+          </button>
+          {emojiPickerPopup.popup()}
           <button
             class="rounded text-primary-fg"
             classList={{

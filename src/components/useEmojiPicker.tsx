@@ -1,8 +1,8 @@
-import { Component, JSX, onCleanup } from 'solid-js';
+import { createMemo, children } from 'solid-js';
 
 import { Picker } from 'emoji-mart';
 
-import Popup, { PopupRef } from '@/components/utils/Popup';
+import usePopup, { type UsePopup, type UsePopupProps } from '@/components/utils/usePopup';
 import useConfig from '@/core/useConfig';
 
 // https://github.com/missive/emoji-mart/blob/main/packages/emoji-mart/src/utils.ts#L26
@@ -16,31 +16,19 @@ export type EmojiData = {
   shortcodes: string;
 };
 
-type EmojiPickerProps = {
+type UseEmojiPickerProps = Omit<UsePopupProps, 'popup'> & {
   onEmojiSelect?: (emoji: EmojiData) => void;
   customEmojis?: boolean;
-  children: JSX.Element;
 };
 
-const EmojiPicker: Component<EmojiPickerProps> = (props) => {
-  let popupRef: PopupRef | undefined;
-  let pickerElement: HTMLElement | undefined;
-
+const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
   const { config } = useConfig();
 
-  const removePicker = () => {
-    if (pickerElement != null) {
-      pickerElement.remove();
-      pickerElement = undefined;
-    }
-  };
+  const props = createMemo(propsProvider);
 
-  const handleOpen = () => {
-    if (pickerElement != null) {
-      console.error('unexpected state');
-    }
-    removePicker();
+  let popup: UsePopup | undefined;
 
+  const pickerElement = children(() => {
     const customEmojis = Object.entries(config().customEmojis).map(([name, { url }]) => ({
       id: name,
       name,
@@ -71,31 +59,22 @@ const EmojiPicker: Component<EmojiPickerProps> = (props) => {
       theme: 'light',
       onEmojiSelect: (emoji: EmojiData) => {
         console.log(emoji);
-        props.onEmojiSelect?.(emoji);
-        popupRef?.close();
+        props().onEmojiSelect?.(emoji);
+        popup?.close();
       },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pickerElement = picker as any as HTMLElement;
-    popupRef?.elem()?.appendChild(pickerElement);
-  };
-
-  onCleanup(() => {
-    removePicker();
+    return picker as any as HTMLElement;
   });
 
-  return (
-    <Popup
-      ref={(e) => {
-        popupRef = e;
-      }}
-      position="bottom"
-      button={props.children}
-      onOpen={handleOpen}
-      onClose={removePicker}
-    />
-  );
+  popup = usePopup(() => ({
+    position: 'bottom',
+    ...props(),
+    popup: () => pickerElement(),
+  }));
+
+  return popup;
 };
 
-export default EmojiPicker;
+export default useEmojiPicker;

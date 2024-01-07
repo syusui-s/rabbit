@@ -19,11 +19,11 @@ import HeartSolid from 'heroicons/24/solid/heart.svg';
 import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import ContextMenu, { MenuItem } from '@/components/ContextMenu';
 import EmojiDisplay from '@/components/EmojiDisplay';
-import EmojiPicker, { EmojiData } from '@/components/EmojiPicker';
 import EventDebugModal from '@/components/modal/EventDebugModal';
 import UserList from '@/components/modal/UserList';
+import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
+import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import { reaction } from '@/nostr/event';
@@ -109,6 +109,10 @@ const ReactionAction = (props: { event: NostrEvent }) => {
     doReaction(emojiDataToReactionTypes(emoji));
   };
 
+  const emojiPickerPopup = useEmojiPicker(() => ({
+    onEmojiSelect: handleEmojiSelect,
+  }));
+
   return (
     <>
       <div
@@ -145,11 +149,14 @@ const ReactionAction = (props: { event: NostrEvent }) => {
               (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
           }}
         >
-          <EmojiPicker onEmojiSelect={handleEmojiSelect}>
-            <span class="inline-block h-4 w-4">
-              <Plus />
-            </span>
-          </EmojiPicker>
+          <button
+            ref={emojiPickerPopup.targetRef}
+            class="h-4 w-4"
+            onClick={() => emojiPickerPopup.open()}
+          >
+            <Plus />
+          </button>
+          {emojiPickerPopup.popup()}
         </div>
       </Show>
     </>
@@ -357,47 +364,51 @@ const Actions: Component<ActionProps> = (props) => {
     },
   }));
 
-  const menu: MenuItem[] = [
-    {
-      content: () => i18n()('post.copyEventId'),
-      onSelect: () => {
-        navigator.clipboard.writeText(noteEncode(props.event.id)).catch((err) => window.alert(err));
+  const otherActionsPopup = useContextMenu(() => ({
+    menu: [
+      {
+        content: i18n()('post.copyEventId'),
+        onSelect: () => {
+          navigator.clipboard
+            .writeText(noteEncode(props.event.id))
+            .catch((err) => window.alert(err));
+        },
       },
-    },
-    {
-      content: () => i18n()('post.showJSON'),
-      onSelect: () => {
-        setModal('EventDebugModal');
+      {
+        content: i18n()('post.showJSON'),
+        onSelect: () => {
+          setModal('EventDebugModal');
+        },
       },
-    },
-    {
-      content: () => i18n()('post.showReposts'),
-      onSelect: () => {
-        setModal('Reposts');
+      {
+        content: i18n()('post.showReposts'),
+        onSelect: () => {
+          setModal('Reposts');
+        },
       },
-    },
-    {
-      content: () => i18n()('post.showReactions'),
-      onSelect: () => {
-        setModal('Reactions');
+      {
+        content: i18n()('post.showReactions'),
+        onSelect: () => {
+          setModal('Reactions');
+        },
       },
-    },
-    {
-      when: () => props.event.pubkey === pubkey(),
-      content: () => <span class="text-red-500">{i18n()('post.deletePost')}</span>,
-      onSelect: () => {
-        const p = pubkey();
-        if (p == null) return;
+      {
+        when: () => props.event.pubkey === pubkey(),
+        content: <span class="text-red-500">{i18n()('post.deletePost')}</span>,
+        onSelect: () => {
+          const p = pubkey();
+          if (p == null) return;
 
-        if (!window.confirm(i18n()('post.confirmDelete'))) return;
-        deleteMutation.mutate({
-          relayUrls: config().relayUrls,
-          pubkey: p,
-          eventId: props.event.id,
-        });
+          if (!window.confirm(i18n()('post.confirmDelete'))) return;
+          deleteMutation.mutate({
+            relayUrls: config().relayUrls,
+            pubkey: p,
+            eventId: props.event.id,
+          });
+        },
       },
-    },
-  ];
+    ],
+  }));
 
   return (
     <>
@@ -416,11 +427,15 @@ const Actions: Component<ActionProps> = (props) => {
         </button>
         <RepostAction event={props.event} />
         <ReactionAction event={props.event} />
-        <ContextMenu menu={menu}>
-          <span class="inline-block h-4 w-4 text-fg-tertiary hover:text-fg-tertiary/70">
-            <EllipsisHorizontal />
-          </span>
-        </ContextMenu>
+        <button
+          ref={otherActionsPopup.targetRef}
+          type="button"
+          class="h-4 w-4 shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
+          onClick={() => otherActionsPopup.open()}
+        >
+          <EllipsisHorizontal />
+        </button>
+        {otherActionsPopup.popup()}
       </div>
       <Switch>
         <Match when={modal() === 'EventDebugModal'}>

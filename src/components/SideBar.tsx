@@ -7,7 +7,7 @@ import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
 import Config from '@/components/modal/Config';
 import NotePostForm from '@/components/NotePostForm';
-import Popup, { PopupRef } from '@/components/utils/Popup';
+import usePopup, { type UsePopup } from '@/components/utils/usePopup';
 import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
@@ -15,42 +15,28 @@ import useModalState from '@/hooks/useModalState';
 import resolveAsset from '@/utils/resolveAsset';
 
 const SearchButton = () => {
-  let popupRef: PopupRef | undefined;
-  let inputRef: HTMLInputElement | undefined;
-
   const { saveColumn } = useConfig();
   const request = useRequestCommand();
-
   const [query, setQuery] = createSignal('');
+
+  let popup: UsePopup;
 
   const handleSearchSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
     ev.preventDefault();
 
     saveColumn(createSearchColumn({ query: query() }));
     request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
-    popupRef?.close();
+    popup.close();
     setQuery('');
   };
 
-  return (
-    <Popup
-      ref={(r) => {
-        popupRef = r;
-      }}
-      position="right"
-      button={
-        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
-          <MagnifyingGlass />
-        </span>
-      }
-      onOpen={() => inputRef?.focus()}
-    >
+  popup = usePopup(() => ({
+    popup: (
       <form
         class="flex w-72 items-center gap-1 rounded-md border border-border bg-bg p-4 shadow-md"
         onSubmit={handleSearchSubmit}
       >
         <input
-          ref={inputRef}
           class="h-8 w-full rounded border border-border bg-bg focus:border-primary focus:ring-border"
           type="text"
           value={query()}
@@ -60,7 +46,22 @@ const SearchButton = () => {
           <MagnifyingGlass />
         </button>
       </form>
-    </Popup>
+    ),
+    position: 'right',
+  }));
+
+  return (
+    <>
+      <button
+        ref={popup.targetRef}
+        type="button"
+        class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
+        onClick={() => popup.open()}
+      >
+        <MagnifyingGlass />
+      </button>
+      {popup.popup()}
+    </>
   );
 };
 

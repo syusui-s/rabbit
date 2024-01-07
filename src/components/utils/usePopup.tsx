@@ -11,12 +11,12 @@ import {
 import { Portal } from 'solid-js/web';
 
 export type UsePopupProps = {
-  target?: HTMLElement;
-  popup?: JSX.Element;
+  popup?: JSX.Element | (() => JSX.Element);
   position?: 'left' | 'bottom' | 'right' | 'top';
 };
 
-type UsePopup = {
+export type UsePopup = {
+  targetRef: (el: HTMLElement) => void;
   open: () => void;
   close: () => void;
   toggle: () => void;
@@ -26,11 +26,18 @@ type UsePopup = {
 const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   const props = createMemo(propsProvider);
 
+  const [targetRef, setTargetRef] = createSignal<HTMLElement | undefined>();
   const [popupRef, setPopupRef] = createSignal<HTMLDivElement | undefined>();
   const [style, setStyle] = createSignal<JSX.CSSProperties>({});
   const [isOpen, setIsOpen] = createSignal(false);
 
-  const resolvedChildren = children(() => props().popup);
+  const resolvedChildren = children(() => {
+    const { popup } = props();
+    if (typeof popup === 'function') {
+      return popup();
+    }
+    return popup;
+  });
 
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
@@ -38,8 +45,6 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
   const handleClickOutside = (ev: MouseEvent) => {
     const target = ev.target as HTMLElement;
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
     if (target != null && !popupRef()?.contains(target)) {
       close();
     }
@@ -53,7 +58,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   };
 
   const adjustPosition = () => {
-    const { target } = props();
+    const target = targetRef();
     const popupElem = popupRef();
     if (target == null || popupElem == null) return;
 
@@ -102,6 +107,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   );
 
   return {
+    targetRef: setTargetRef,
     open,
     close,
     toggle,
