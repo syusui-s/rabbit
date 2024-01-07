@@ -23,7 +23,7 @@ const twitterUrl = (urlString: string): string => {
 };
 
 const youtubeUrl = (videoId: string): string => {
-  const iframeUrl = new URL(`https://www.youtube.com/embed/`);
+  const iframeUrl = new URL(`https://www.youtube-nocookie.com/embed/`);
   iframeUrl.pathname += videoId;
   iframeUrl.searchParams.set('origin', window.location.origin);
   return iframeUrl.href;
