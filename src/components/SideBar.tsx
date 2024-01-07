@@ -1,4 +1,4 @@
-import { createSignal, Show, type JSX, Component } from 'solid-js';
+import { createSignal, createEffect, Show, type JSX, Component } from 'solid-js';
 
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
@@ -15,6 +15,8 @@ import useModalState from '@/hooks/useModalState';
 import resolveAsset from '@/utils/resolveAsset';
 
 const SearchButton = () => {
+  let inputRef: HTMLInputElement | undefined;
+
   const { saveColumn } = useConfig();
   const request = useRequestCommand();
   const [query, setQuery] = createSignal('');
@@ -37,6 +39,7 @@ const SearchButton = () => {
         onSubmit={handleSearchSubmit}
       >
         <input
+          ref={inputRef}
           class="h-8 w-full rounded border border-border bg-bg focus:border-primary focus:ring-border"
           type="text"
           value={query()}
@@ -56,7 +59,10 @@ const SearchButton = () => {
         ref={popup.targetRef}
         type="button"
         class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
-        onClick={() => popup.open()}
+        onClick={() => {
+          popup.open();
+          inputRef?.focus();
+        }}
       >
         <MagnifyingGlass />
       </button>
@@ -83,13 +89,16 @@ const SideBar: Component = () => {
   const closeForm = () => setFormOpened(false);
   const toggleForm = () => setFormOpened((current) => !current);
 
+  createEffect(() => {
+    if (formOpened() && textAreaRef != null) {
+      setTimeout(() => focusTextArea(), 100);
+    }
+  });
+
   useHandleCommand(() => ({
     commandType: 'openPostForm',
     handler: () => {
       openForm();
-      if (textAreaRef != null) {
-        setTimeout(() => focusTextArea(), 100);
-      }
     },
   }));
 
