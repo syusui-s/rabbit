@@ -214,7 +214,7 @@ const ColorThemeConfig = () => {
 
   return (
     <Section title={i18n()('config.display.colorTheme')}>
-      <div class="scrollbar flex max-h-[25vh] flex-col overflow-y-scroll rounded-md border border-border">
+      <div class="scrollbar flex flex-col overflow-y-scroll rounded-md border border-border">
         <For each={Object.values(colorThemes)}>
           {(colorTheme) => (
             <button
@@ -385,7 +385,7 @@ const EmojiConfig = () => {
           {i18n()('config.customEmoji.addEmoji')}
         </button>
       </form>
-      <ul class="mt-4 flex max-h-[40vh] flex-wrap overflow-y-scroll border-t border-border">
+      <ul class="mt-4 flex max-h-[40vh] min-h-64 flex-wrap overflow-y-scroll border-t border-border">
         <For each={Object.values(config().customEmojis)}>
           {({ shortcode, url }) => {
             const popup = usePopup(() => ({
@@ -493,7 +493,7 @@ const MuteConfig = () => {
   return (
     <>
       <Section title={i18n()('config.mute.mutedUsers')} initialOpened={false}>
-        <ul class="flex max-h-[50vh] flex-col overflow-y-scroll">
+        <ul class="flex max-h-[50vh] min-h-64 flex-col overflow-y-scroll">
           <For each={config().mutedPubkeys}>
             {(pubkey) => (
               <li class="flex items-center border-b border-border">
@@ -521,7 +521,7 @@ const MuteConfig = () => {
             {i18n()('config.mute.add')}
           </button>
         </form>
-        <ul class="mt-2 flex max-h-[50vh] flex-col overflow-y-scroll border-t border-border">
+        <ul class="mt-2 flex max-h-[50vh] min-h-64 flex-col overflow-y-scroll border-t border-border">
           <For each={config().mutedKeywords}>
             {(keyword) => (
               <li class="flex items-center border-b border-border">
