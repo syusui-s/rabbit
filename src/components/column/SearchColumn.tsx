@@ -1,10 +1,11 @@
-import { Component, createSignal, Show, JSX, onMount } from 'solid-js';
+import { Component, createEffect, createSignal, Show, JSX, onMount } from 'solid-js';
 
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
+import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
 import { SearchColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
@@ -84,7 +85,11 @@ export type SearchColumnDisplayProps = {
 const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
   const { removeColumn } = useConfig();
 
-  const { events } = useSubscription(() => {
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+  }));
+
+  const { events, eose } = useSubscription(() => {
     const { query } = props.column;
 
     if (query.length === 0) return null;
@@ -93,11 +98,14 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
       relayUrls: relaysForSearching,
       filters: [
         {
-          kinds: [1, 6],
+          kinds: [1],
           search: query,
-          limit: 25,
+          limit: 20,
+          since: loadMore.since(),
+          until: loadMore.until(),
         },
       ],
+      eoseLimit: 20,
       clientEventFilter: (event) => {
         if (event.tags.findIndex(([tagName]) => tagName === 'mostr' || tagName === 'proxy') >= 0)
           return false;
@@ -105,6 +113,10 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
         return applyContentFilter(props.column.contentFilter)(event.content);
       },
     };
+  });
+
+  createEffect(() => {
+    loadMore.setEvents(events());
   });
 
   return (
@@ -119,8 +131,11 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      timelineRef={loadMore.timelineRef}
     >
-      <Timeline events={events()} />
+      <LoadMore loadMore={loadMore} eose={eose()}>
+        <Timeline events={events()} />
+      </LoadMore>
     </Column>
   );
 };

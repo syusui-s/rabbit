@@ -19,5 +19,11 @@ export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | undefined =>
   return events.reduce((a, b) => (compareEvents(a, b) > 0 ? a : b));
 };
 
+export const pickOldestEvent = (events: NostrEvent[]): NostrEvent | undefined => {
+  if (events.length === 0) return undefined;
+  if (events.length === 1) return events[0];
+  return events.reduce((a, b) => (-compareEvents(a, b) > 0 ? a : b));
+};
+
 export const sortEvents = (events: NostrEvent[]) =>
   Array.from(events).sort((a, b) => -compareEvents(a, b));

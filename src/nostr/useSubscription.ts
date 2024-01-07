@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onMount, onCleanup, on } from 'solid-js';
+import { createSignal, createEffect, createMemo, onMount, onCleanup, on } from 'solid-js';
 
 import uniqBy from 'lodash/uniqBy';
 import { type Filter } from 'nostr-tools/filter';
@@ -25,6 +25,11 @@ export type UseSubscriptionProps = {
    * limit the number of events
    */
   limit?: number;
+  /**
+   * limit the number of events until EOSE
+   * This should be same to `limit` of REQ
+   */
+  eoseLimit?: number;
   clientEventFilter?: (event: NostrEvent) => boolean;
   onEvent?: (event: NostrEvent & { id: string }) => void;
   onEOSE?: () => void;
@@ -43,6 +48,11 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const { config, shouldMuteEvent } = useConfig();
   const pool = usePool();
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
+  const [eose, setEose] = createSignal<boolean>(false);
+  const props = createMemo(propsProvider);
+
+  const eoseLimit = () => propsProvider()?.eoseLimit ?? 25;
+  const limit = () => propsProvider()?.limit ?? 50;
 
   createEffect(
     on(
@@ -63,7 +73,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
 
   const addEvent = (event: NostrEvent) => {
     const SecondsToIgnore = 300; // 5 min
-    const limit = propsProvider()?.limit ?? 50;
 
     const diffSec = event.created_at - epoch();
     if (diffSec > SecondsToIgnore) return;
@@ -73,7 +82,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     }
 
     setEvents((current) => {
-      const sorted = insertEventIntoDescendingList(current, event).slice(0, limit);
+      const sorted = insertEventIntoDescendingList(current, event).slice(0, limit());
       // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
       // https://github.com/syusui-s/rabbit/issues/5
       const deduped = uniqBy(sorted, (e) => e.id);
@@ -87,15 +96,25 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const startSubscription = () => {
     console.debug('startSubscription: start');
 
-    const props = propsProvider();
-    if (props == null) return;
-    const { relayUrls, filters, options, onEvent, onEOSE, continuous = true } = props;
+    const currentProps = props();
+    if (currentProps == null) return;
+    const {
+      relayUrls,
+      filters,
+      options,
+      onEvent,
+      onEOSE,
+      clientEventFilter,
+      continuous = true,
+    } = currentProps;
     let subscribing = true;
     count += 1;
 
     let pushed = false;
-    let eose = false;
+    setEose(false);
     const storedEvents: NostrEvent[] = [];
+
+    const updateEvents = () => setEvents(sortEvents(storedEvents).slice(0, eoseLimit()));
 
     const sub = pool().subscribeMany(
       relayUrls,
@@ -107,11 +126,11 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
           if (onEvent != null) {
             onEvent(event as NostrEvent & { id: string });
           }
-          if (props.clientEventFilter != null && !props.clientEventFilter(event)) {
+          if (clientEventFilter != null && !clientEventFilter(event)) {
             return;
           }
 
-          if (!eose) {
+          if (!eose()) {
             pushed = true;
             storedEvents.push(event);
           } else {
@@ -123,8 +142,8 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
             onEOSE();
           }
 
-          eose = true;
-          setEvents(sortEvents(storedEvents));
+          setEose(true);
+          updateEvents();
 
           if (!continuous) {
             sub.close();
@@ -142,14 +161,14 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     const intervalId = setInterval(() => {
       if (updating) return;
       updating = true;
-      if (eose) {
+      if (eose()) {
         clearInterval(intervalId);
         updating = false;
         return;
       }
       if (pushed) {
         pushed = false;
-        setEvents(sortEvents(storedEvents));
+        updateEvents();
       }
       updating = false;
     }, 100);
@@ -165,11 +184,14 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     });
   };
 
-  createEffect(() => {
-    startSubscription();
-  });
+  createEffect(
+    on(
+      () => [props()],
+      () => startSubscription(),
+    ),
+  );
 
-  return { events };
+  return { events, eose };
 };
 
 export default useSubscription;

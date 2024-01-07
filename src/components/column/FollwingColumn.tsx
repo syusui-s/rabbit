@@ -6,6 +6,7 @@ import { uniq } from 'lodash';
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
+import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
 import { FollowingColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
@@ -13,7 +14,6 @@ import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import useFollowings from '@/nostr/useFollowings';
 import useSubscription from '@/nostr/useSubscription';
-import epoch from '@/utils/epoch';
 
 type FollowingColumnDisplayProps = {
   columnIndex: number;
@@ -27,7 +27,11 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
 
   const { followingPubkeys } = useFollowings(() => ({ pubkey: props.column.pubkey }));
 
-  const { events } = useSubscription(() => {
+  const loadMore = useLoadMore(() => ({
+    duration: 4 * 60 * 60,
+  }));
+
+  const { events, eose } = useSubscription(() => {
     const authors = uniq([...followingPubkeys()]);
     if (authors.length === 0) return null;
     return {
@@ -37,10 +41,13 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
         {
           kinds: [1, 6],
           authors,
-          limit: 10,
-          since: epoch() - 4 * 60 * 60,
+          limit: 20,
+          since: loadMore.since(),
+          until: loadMore.until(),
         },
       ],
+      eoseLimit: 20,
+      continuous: loadMore.continuous(),
       clientEventFilter: (event) => {
         if (props.column.contentFilter == null) return true;
         return applyContentFilter(props.column.contentFilter)(event.content);
@@ -50,6 +57,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
 
   createEffect(() => {
     console.log('home', events());
+    loadMore.setEvents(events());
   });
 
   onMount(() => console.log('home timeline mounted'));
@@ -68,8 +76,11 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      timelineRef={loadMore.timelineRef}
     >
-      <Timeline events={events()} />
+      <LoadMore loadMore={loadMore} eose={eose()}>
+        <Timeline events={events()} />
+      </LoadMore>
     </Column>
   );
 };

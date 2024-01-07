@@ -32,6 +32,8 @@ export default {
     myPosts: 'My posts',
     myReactions: 'My reactions',
     back: 'Back',
+    loadLatest: 'Load latest posts',
+    loadOld: 'Load old posts',
     config: {
       columnWidth: 'Column width',
       widest: 'Widest',

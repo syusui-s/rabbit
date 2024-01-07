@@ -31,6 +31,8 @@ export default {
     myPosts: '自分の投稿',
     myReactions: '自分のリアクション',
     back: '戻る',
+    loadLatest: '最新の投稿を読み込む',
+    loadOld: '古い投稿を読み込む',
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',

@@ -1,10 +1,11 @@
-import { Component } from 'solid-js';
+import { createEffect, Component } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
+import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Notification from '@/components/timeline/Notification';
 import { NotificationColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
@@ -22,20 +23,27 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
-  const { events: notifications } = useSubscription(() => ({
+  const loadMore = useLoadMore(() => ({ duration: null }));
+
+  const { events: notifications, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,
     filters: [
       {
         kinds: [1, 6, 7, 9735],
         '#p': [props.column.pubkey],
-        limit: 10,
+        limit: 20,
+        since: loadMore.since(),
+        until: loadMore.until(),
       },
     ],
+    eoseLimit: 20,
     clientEventFilter: (event) => {
       if (props.column.contentFilter == null) return true;
       return applyContentFilter(props.column.contentFilter)(event.content);
     },
   }));
+
+  createEffect(() => loadMore.setEvents(notifications()));
 
   return (
     <Column
@@ -50,8 +58,11 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      timelineRef={loadMore.timelineRef}
     >
-      <Notification events={notifications()} />
+      <LoadMore loadMore={loadMore} eose={eose()}>
+        <Notification events={notifications()} />
+      </LoadMore>
     </Column>
   );
 };
