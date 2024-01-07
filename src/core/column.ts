@@ -12,7 +12,7 @@ export type NotificationType =
   // The event which includes ["e", ...] tags.
   | 'EventMention'
   // The event which has the deprecated kind 6.
-  | 'DeprecatedRepost'
+  | 'Repost'
   // The event which has the deprecated kind 7.
   | 'Reaction';
 

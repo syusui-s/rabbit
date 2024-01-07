@@ -40,11 +40,6 @@ const App: Component = () => {
       persister: indexedDBPersister,
     });
 
-    // TODO remove this in the future
-    if (window.localStorage != null) {
-      window.localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-    }
-
     onCleanup(() => unsubscribe());
   });
 
