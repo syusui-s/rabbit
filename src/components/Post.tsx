@@ -6,6 +6,7 @@ import useFormatDate from '@/hooks/useFormatDate';
 import { useTranslation } from '@/i18n/useTranslation';
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
+import { thumbnailUrl } from '@/utils/url';
 
 export type PostProps = {
   authorPubkey: string;
@@ -44,7 +45,9 @@ const Post: Component<PostProps> = (props) => {
           <Show when={author()?.picture} keyed>
             {(url) => (
               <LazyLoad>
-                {() => <img src={url} alt="icon" class="h-full w-full object-cover" />}
+                {() => (
+                  <img src={thumbnailUrl(url)} alt="icon" class="h-full w-full object-cover" />
+                )}
               </LazyLoad>
             )}
           </Show>
