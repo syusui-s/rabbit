@@ -1,6 +1,8 @@
 import { createSignal, Show, For, type JSX, batch } from 'solid-js';
 
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
+import ChevronDown from 'heroicons/24/outline/chevron-down.svg';
+import ChevronUp from 'heroicons/24/outline/chevron-up.svg';
 import EyeSlash from 'heroicons/24/outline/eye-slash.svg';
 import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import PaintBrush from 'heroicons/24/outline/paint-brush.svg';
@@ -10,6 +12,8 @@ import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
 import UserNameDisplay from '@/components/UserDisplayName';
+import LazyLoad from '@/components/utils/LazyLoad';
+import usePopup from '@/components/utils/usePopup';
 import { colorThemes } from '@/core/colorThemes';
 import useConfig, { type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
@@ -27,17 +31,62 @@ const BaseUrlRegex = (schemaRegex: string) =>
 const HttpUrlRegex = BaseUrlRegex('https?');
 const RelayUrlRegex = BaseUrlRegex('wss?');
 
+const Section = (props: { title: string; initialOpened?: boolean; children: JSX.Element }) => {
+  const [opened, setOpened] = createSignal(props.initialOpened ?? true);
+  const toggleOpened = () => setOpened((current) => !current);
+
+  return (
+    <div class="mb-2 rounded border border-border shadow hover:shadow-md">
+      <h3 class="text-lg font-bold">
+        <button
+          type="button"
+          class="flex w-full items-center p-2 text-start"
+          onClick={() => toggleOpened()}
+        >
+          <span class="flex-1 hover:text-fg-secondary">{props.title}</span>
+          <span class="inline-block h-4 w-4 shrink-0 text-fg">
+            <Show when={opened()} fallback={<ChevronDown />}>
+              <ChevronUp />
+            </Show>
+          </span>
+        </button>
+      </h3>
+      <Show when={opened()}>
+        <div class="border-t border-border p-2">{props.children}</div>
+      </Show>
+    </div>
+  );
+};
+
+const ToggleButton = (props: {
+  value: boolean;
+  onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent>;
+}) => (
+  <button
+    class="flex h-[24px] w-[48px] items-center rounded-full border border-primary/80 px-1"
+    classList={{
+      'bg-bg-tertiary': !props.value,
+      'justify-start': !props.value,
+      'bg-primary': props.value,
+      'justify-end': props.value,
+    }}
+    area-label={props.value}
+    onClick={(event) => props.onClick(event)}
+  >
+    <span class="m-[-3px] inline-block h-5 w-5 rounded-full border bg-primary-fg shadow" />
+  </button>
+);
+
 const ProfileSection = () => {
   const i18n = useTranslation();
   const pubkey = usePubkey();
   const { showProfile, showProfileEdit } = useModalState();
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.profile.profile')}</h3>
-      <div class="flex gap-2">
+    <Section title={i18n()('config.profile.profile')}>
+      <div class="flex gap-2 py-1">
         <button
-          class="rounded border border-primary px-4 py-2 font-bold text-primary"
+          class="rounded border border-primary px-4 py-1 font-bold text-primary"
           onClick={() =>
             ensureNonNull([pubkey()])(([pubkeyNonNull]) => {
               showProfile(pubkeyNonNull);
@@ -47,13 +96,13 @@ const ProfileSection = () => {
           {i18n()('config.profile.openProfile')}
         </button>
         <button
-          class="rounded border border-primary px-4 py-2 font-bold text-primary"
+          class="rounded border border-primary px-4 py-1 font-bold text-primary"
           onClick={() => showProfileEdit()}
         >
           {i18n()('config.profile.editProfile')}
         </button>
       </div>
-    </div>
+    </Section>
   );
 };
 
@@ -98,23 +147,10 @@ const RelayConfig = () => {
 
   return (
     <>
-      <div class="py-2">
-        <h3 class="font-bold">{i18n()('config.relays.relays')}</h3>
+      <Section title={i18n()('config.relays.relays')}>
         <p class="py-1">
           {i18n()('config.relays.numOfRelays', { count: config().relayUrls.length })}
         </p>
-        <ul>
-          <For each={config().relayUrls}>
-            {(relayUrl: string) => (
-              <li class="flex items-center">
-                <div class="flex-1 truncate">{relayUrl}</div>
-                <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
-                  <XMark />
-                </button>
-              </li>
-            )}
-          </For>
-        </ul>
         <form class="flex gap-2" onSubmit={handleClickAddRelay}>
           <input
             class="flex-1 rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
@@ -129,9 +165,20 @@ const RelayConfig = () => {
             {i18n()('config.relays.addRelay')}
           </button>
         </form>
-      </div>
-      <div class="py-2">
-        <h3 class="pb-1 font-bold">{i18n()('config.relays.importRelays')}</h3>
+        <ul class="pt-2">
+          <For each={config().relayUrls}>
+            {(relayUrl: string) => (
+              <li class="flex items-center border-t border-border">
+                <div class="flex-1 truncate">{relayUrl}</div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
+                  <XMark />
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Section>
+      <Section title={i18n()('config.relays.importRelays')}>
         <button
           type="button"
           class="rounded bg-primary p-2 font-bold text-primary-fg"
@@ -144,7 +191,7 @@ const RelayConfig = () => {
         >
           {i18n()('config.relays.importFromExtension')}
         </button>
-      </div>
+      </Section>
     </>
   );
 };
@@ -166,14 +213,13 @@ const ColorThemeConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.display.colorTheme')}</h3>
+    <Section title={i18n()('config.display.colorTheme')}>
       <div class="scrollbar flex max-h-[25vh] flex-col overflow-y-scroll rounded-md border border-border">
         <For each={Object.values(colorThemes)}>
           {(colorTheme) => (
             <button
               type="button"
-              class="border-t border-border px-2 py-1 text-left"
+              class="border-t border-border px-2 py-1 text-left first:border-none"
               classList={{
                 'bg-primary': isCurrentlyUsing(colorTheme.id),
                 'text-primary-fg': isCurrentlyUsing(colorTheme.id),
@@ -186,7 +232,7 @@ const ColorThemeConfig = () => {
           )}
         </For>
       </div>
-    </div>
+    </Section>
   );
 };
 
@@ -221,8 +267,7 @@ const DateFormatConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.display.timeNotation')}</h3>
+    <Section title={i18n()('config.display.timeNotation')}>
       <div class="flex flex-col justify-evenly gap-2 sm:flex-row">
         <For each={dateFormats}>
           {({ id, name, example }) => (
@@ -245,28 +290,9 @@ const DateFormatConfig = () => {
           )}
         </For>
       </div>
-    </div>
+    </Section>
   );
 };
-
-const ToggleButton = (props: {
-  value: boolean;
-  onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent>;
-}) => (
-  <button
-    class="flex h-[24px] w-[48px] items-center rounded-full border border-primary/80 px-1"
-    classList={{
-      'bg-bg-tertiary': !props.value,
-      'justify-start': !props.value,
-      'bg-primary': props.value,
-      'justify-end': props.value,
-    }}
-    area-label={props.value}
-    onClick={(event) => props.onClick(event)}
-  >
-    <span class="m-[-3px] inline-block h-5 w-5 rounded-full border bg-primary-fg shadow" />
-  </button>
-);
 
 const ReactionConfig = () => {
   const i18n = useTranslation();
@@ -287,8 +313,7 @@ const ReactionConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.display.reaction')}</h3>
+    <Section title={i18n()('config.display.reaction')}>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
           <div class="flex-1">{i18n()('config.display.enableEmojiReaction')}</div>
@@ -305,7 +330,7 @@ const ReactionConfig = () => {
           />
         </div>
       </div>
-    </div>
+    </Section>
   );
 };
 
@@ -325,21 +350,7 @@ const EmojiConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.customEmoji.customEmoji')}</h3>
-      <ul class="flex flex-col gap-1 py-2">
-        <For each={Object.values(config().customEmojis)}>
-          {({ shortcode, url }) => (
-            <li class="flex items-center gap-2">
-              <img class="h-7 min-w-7 max-w-[128px]" src={url} alt={shortcode} />
-              <div class="flex-1 truncate">{shortcode}</div>
-              <button class="h-3 w-3 shrink-0" onClick={() => removeEmoji(shortcode)}>
-                <XMark />
-              </button>
-            </li>
-          )}
-        </For>
-      </ul>
+    <Section title={i18n()('config.customEmoji.customEmoji')}>
       <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <label class="flex flex-1 items-center gap-1">
           <div class="w-9">{i18n()('config.customEmoji.shortcode')}</div>
@@ -374,7 +385,50 @@ const EmojiConfig = () => {
           {i18n()('config.customEmoji.addEmoji')}
         </button>
       </form>
-    </div>
+      <ul class="mt-4 flex max-h-[40vh] flex-wrap overflow-y-scroll border-t border-border">
+        <For each={Object.values(config().customEmojis)}>
+          {({ shortcode, url }) => {
+            const [ref, setRef] = createSignal<HTMLLIElement | undefined>();
+            const popup = usePopup(() => ({
+              target: ref(),
+              popup: (
+                <div class="flex min-w-24 flex-col items-center rounded border border-border bg-bg shadow">
+                  <div class="flex items-center p-1">
+                    <img class="h-20 max-w-20 object-contain" src={url} alt={shortcode} />
+                  </div>
+                  <div class="p-1 text-center text-sm">{shortcode}</div>
+                  <div class="w-full border-t border-border">
+                    <button
+                      type="button"
+                      class="w-full px-2 py-1 text-danger"
+                      onClick={() => removeEmoji(shortcode)}
+                    >
+                      {i18n()('config.customEmoji.removeEmoji')}
+                    </button>
+                  </div>
+                </div>
+              ),
+            }));
+
+            return (
+              <li ref={setRef} class="min-w-0 basis-1/2 sm:basis-1/4">
+                <button
+                  type="button"
+                  class="flex w-full flex-col items-center gap-1 rounded p-2 hover:bg-bg-tertiary/20 hover:shadow"
+                  onClick={() => popup.open()}
+                >
+                  <div class="flex h-8 max-w-8 items-center">
+                    <img class="object-contain" src={url} alt={shortcode} />
+                  </div>
+                  <div class="w-full truncate text-xs text-fg-secondary">{shortcode}</div>
+                </button>
+                {popup.popup()}
+              </li>
+            );
+          }}
+        </For>
+      </ul>
+    </Section>
   );
 };
 
@@ -400,8 +454,7 @@ const EmojiImport = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.customEmoji.emojiImport')}</h3>
+    <Section title={i18n()('config.customEmoji.emojiImport')}>
       <p>{i18n()('config.customEmoji.emojiImportDescription')}</p>
       <form class="flex flex-col gap-2" onSubmit={handleClickSaveEmoji}>
         <textarea
@@ -418,7 +471,7 @@ const EmojiImport = () => {
           {i18n()('config.customEmoji.importEmoji')}
         </button>
       </form>
-    </div>
+    </Section>
   );
 };
 
@@ -437,14 +490,13 @@ const MuteConfig = () => {
 
   return (
     <>
-      <div class="py-2">
-        <h3 class="font-bold">{i18n()('config.mute.mutedUsers')}</h3>
-        <ul class="flex flex-col">
+      <Section title={i18n()('config.mute.mutedUsers')} initialOpened={false}>
+        <ul class="flex max-h-[50vh] flex-col overflow-y-scroll">
           <For each={config().mutedPubkeys}>
             {(pubkey) => (
-              <li class="flex items-center">
+              <li class="flex items-center border-b border-border">
                 <div class="flex-1 truncate">
-                  <UserNameDisplay pubkey={pubkey} />
+                  <LazyLoad>{() => <UserNameDisplay pubkey={pubkey} />}</LazyLoad>
                 </div>
                 <button class="h-3 w-3 shrink-0" onClick={() => removeMutedPubkey(pubkey)}>
                   <XMark />
@@ -453,21 +505,8 @@ const MuteConfig = () => {
             )}
           </For>
         </ul>
-      </div>
-      <div class="py-2">
-        <h3 class="font-bold">{i18n()('config.mute.mutedKeywords')}</h3>
-        <ul class="flex flex-col">
-          <For each={config().mutedKeywords}>
-            {(keyword) => (
-              <li class="flex items-center">
-                <div class="flex-1 truncate">{keyword}</div>
-                <button class="h-3 w-3 shrink-0" onClick={() => removeMutedKeyword(keyword)}>
-                  <XMark />
-                </button>
-              </li>
-            )}
-          </For>
-        </ul>
+      </Section>
+      <Section title={i18n()('config.mute.mutedKeywords')} initialOpened={false}>
         <form class="flex gap-2" onSubmit={handleClickAddKeyword}>
           <input
             class="flex-1 rounded-md border border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -480,7 +519,19 @@ const MuteConfig = () => {
             {i18n()('config.mute.add')}
           </button>
         </form>
-      </div>
+        <ul class="mt-2 flex max-h-[50vh] flex-col overflow-y-scroll border-t border-border">
+          <For each={config().mutedKeywords}>
+            {(keyword) => (
+              <li class="flex items-center border-b border-border">
+                <div class="flex-1 truncate">{keyword}</div>
+                <button class="h-3 w-3 shrink-0" onClick={() => removeMutedKeyword(keyword)}>
+                  <XMark />
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Section>
     </>
   );
 };
@@ -500,8 +551,7 @@ const EmbeddingConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.display.embedding')}</h3>
+    <Section title={i18n()('config.display.embedding')}>
       <p>{i18n()('config.display.embeddingDescription')}</p>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
@@ -517,7 +567,7 @@ const EmbeddingConfig = () => {
           <ToggleButton value={config().embedding.ogp} onClick={() => toggle('ogp')} />
         </div>
       </div>
-    </div>
+    </Section>
   );
 };
 
@@ -547,8 +597,7 @@ const OtherConfig = () => {
   };
 
   return (
-    <div class="py-2">
-      <h3 class="font-bold">{i18n()('config.display.others')}</h3>
+    <Section title={i18n()('config.display.others')}>
       <div class="flex flex-col justify-evenly gap-2">
         <div class="flex w-full">
           <div class="flex-1">{i18n()('config.display.keepOpenPostForm')}</div>
@@ -576,7 +625,7 @@ const OtherConfig = () => {
         </div>
         */}
       </div>
-    </div>
+    </Section>
   );
 };
 

@@ -161,6 +161,7 @@ export default {
       shortcode: '名前',
       url: 'URL',
       addEmoji: '追加',
+      removeEmoji: '削除',
       emojiImport: '絵文字のインポート',
       emojiImportDescription:
         '絵文字の名前をキー、画像のURLを値とするJSONを読み込むことができます。',

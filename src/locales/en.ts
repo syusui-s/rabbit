@@ -165,6 +165,7 @@ export default {
       shortcode: 'Name',
       url: 'URL',
       addEmoji: 'Add',
+      removeEmoji: 'Remove',
       emojiImport: 'Emoji import',
       emojiImportDescription: 'Paste a JSON where the keys are names and the values are image URLs',
       importEmoji: 'Import',
