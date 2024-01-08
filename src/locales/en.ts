@@ -125,8 +125,6 @@ export default {
   },
   config: {
     config: 'Settings',
-    importOldDomainConfig: 'Import config from the old domain',
-    confirmImportOldDomainConfig: 'Import? (The config will be overwritten)',
     profile: {
       profile: 'Profile',
       openProfile: 'Open',

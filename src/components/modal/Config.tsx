@@ -16,7 +16,6 @@ import LazyLoad from '@/components/utils/LazyLoad';
 import usePopup from '@/components/utils/usePopup';
 import { colorThemes } from '@/core/colorThemes';
 import useConfig, { type Config } from '@/core/useConfig';
-import { useOldConfig } from '@/hooks/useInterWindow';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import usePubkey from '@/nostr/usePubkey';
@@ -635,7 +634,6 @@ const OtherConfig = () => {
 const ConfigUI = (props: ConfigProps) => {
   const i18n = useTranslation();
   const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
-  const { canImport, importConfig } = useOldConfig();
 
   const menu = [
     {
@@ -692,19 +690,6 @@ const ConfigUI = (props: ConfigProps) => {
           fallback={
             <>
               <h2 class="flex-1 text-center text-lg font-bold">{i18n()('config.config')}</h2>
-              <Show when={canImport()}>
-                <button
-                  type="button"
-                  class="rounded bg-primary p-2 text-primary-fg"
-                  onClick={() => {
-                    if (window.confirm(i18n()('config.confirmImportOldDomainConfig'))) {
-                      importConfig();
-                    }
-                  }}
-                >
-                  {i18n()('config.importOldDomainConfig')}
-                </button>
-              </Show>
               <ul class="flex flex-col">
                 <For each={menu}>
                   {(menuItem, i) => (

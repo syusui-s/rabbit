@@ -121,8 +121,6 @@ export default {
   },
   config: {
     config: '設定',
-    importOldDomainConfig: '古いドメインから設定をインポート',
-    confirmImportOldDomainConfig: 'インポートしますか？（現在の設定は上書きされます）',
     profile: {
       profile: 'プロフィール',
       openProfile: '開く',
