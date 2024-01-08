@@ -126,7 +126,7 @@ const SideBar: Component = () => {
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
         <div class="flex w-full flex-col items-center">
           <button
-            class="absolute bottom-0 left-[calc(50vw-2rem)] p-4 sm:static sm:w-full sm:py-1"
+            class="absolute bottom-0 left-[calc(50vw-2rem)] p-4 sm:static sm:w-full sm:px-0 sm:py-1"
             type="button"
             onClick={() => {
               toggleForm();
