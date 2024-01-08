@@ -37,12 +37,11 @@ jobs:
       - name: Test
         run: npm run test
       - name: Build
-        run: npm run build -- --base="/rabbit/"
+        run: npm run build
         env:
           VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
-      # disable temporally
-      #- name: Set CNAME
-      #  run: echo "rabbit.syusui.net" >> ./dist/CNAME
+      - name: Set CNAME
+        run: echo "rabbit.syusui.net" >> ./dist/CNAME
       - name: Check license
         run: npm run checkLicense
       - name: Deploy
