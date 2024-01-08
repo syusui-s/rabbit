@@ -28,6 +28,13 @@ export const colorThemes: Record<string, ColorTheme> = {
     className: 'theme-yozakura',
     rabbitIconPath: 'images/rabbit_256.png',
   },
+  'midnight-blue': {
+    id: 'midnight-blue',
+    name: 'Midnight Blue',
+    brightness: 'dark',
+    className: 'theme-midnight-blue',
+    rabbitIconPath: 'images/rabbit_muted_256.png',
+  },
   black: {
     id: 'black',
     name: 'Black',

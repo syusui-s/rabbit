@@ -68,6 +68,29 @@
   --color-scroll-bg: var(--color-bg-tertiary);
 }
 
+/* DARK Midnight Blue */
+/* Thank to https://gist.github.com/kaosf/d8f58ade388f7328d0b5b6a12e5a14c8 */
+.theme-midnight-blue {
+  --color-fg: 199 199 199;
+  --color-fg-secondary: 156 156 156;
+  --color-fg-tertiary: 168 168 168;
+  --color-bg: 32 39 50;
+  --color-bg-secondary: 37 42 51;
+  --color-bg-tertiary: 52 65 84;
+  --color-primary: 220 220 220;
+  --color-primary-fg: 32 39 50;
+  --color-primary-disabled: 150 150 150;
+  --color-primary-hover: 255 255 255;
+  --color-danger: 244 63 94;
+  --color-link: 119 112 240;
+  --color-border: 64 69 77;
+  --color-r-sidebar: 32 39 50;
+  --color-r-reaction: 249 110 130;
+  --color-r-repost: 0 190 0;
+  --color-scroll-thumb: 102 102 102;
+  --color-scroll-bg: 136 136 136 / .1;
+}
+
 /* DARK Black */
 .theme-black {
   --color-fg: 255 250 250;
