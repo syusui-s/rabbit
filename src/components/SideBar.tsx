@@ -93,7 +93,7 @@ const SideBar: Component = () => {
 
   createEffect(() => {
     if (formOpened() && textAreaRef != null) {
-      setTimeout(() => focusTextArea(), 100);
+      focusTextArea();
     }
   });
 

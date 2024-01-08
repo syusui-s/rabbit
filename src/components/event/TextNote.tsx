@@ -23,13 +23,20 @@ export type TextNoteProps = {
 };
 
 const TextNote: Component<TextNoteProps> = (props) => {
+  let textAreaRef: HTMLTextAreaElement | undefined;
+
   const i18n = useTranslation();
   const { showProfile } = useModalState();
   const timelineContext = useTimelineContext();
 
   const [showReplyForm, setShowReplyForm] = createSignal(false);
   const closeReplyForm = () => setShowReplyForm(false);
-  const toggleReplyForm = () => setShowReplyForm((current) => !current);
+  const toggleReplyForm = () => {
+    setShowReplyForm((current) => !current);
+    if (showReplyForm() && textAreaRef != null) {
+      textAreaRef.focus();
+    }
+  };
 
   const event = createMemo(() => textNote(props.event));
 
@@ -113,6 +120,9 @@ const TextNote: Component<TextNoteProps> = (props) => {
         footer={
           <Show when={showReplyForm()}>
             <NotePostForm
+              textAreaRef={(el) => {
+                textAreaRef = el;
+              }}
               mode="reply"
               replyTo={props.event}
               onClose={closeReplyForm}

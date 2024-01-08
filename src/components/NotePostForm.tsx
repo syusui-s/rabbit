@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onMount, Show, For, type Component, type JSX } from 'solid-js';
+import { createSignal, createMemo, Show, For, type Component, type JSX } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
@@ -343,13 +343,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     customEmojis: true,
     onEmojiSelect: handleEmojiSelect,
   }));
-
-  onMount(() => {
-    setTimeout(() => {
-      textAreaRef?.click();
-      textAreaRef?.focus();
-    }, 50);
-  });
 
   return (
     <div class="p-1">
