@@ -14,7 +14,7 @@ const BasicModal: Component<BasicModalProps> = (props) => (
   <Modal onClose={() => props.onClose?.()}>
     <div class="w-[640px] max-w-full">
       <button
-        class="w-full pt-1 text-start text-fg-secondary/50"
+        class="w-full pt-1 text-start text-fg-secondary"
         aria-label="Close"
         onClick={() => props.onClose?.()}
       >

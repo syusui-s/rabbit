@@ -16,14 +16,14 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
 
   return (
     <div class="flex flex-col">
-      <div class="flex h-8 items-center gap-1 px-2">
-        <h2 class="flex min-w-0 flex-1 items-center gap-1">
+      <div class="flex h-8 items-center gap-1">
+        <h2 class="flex min-w-0 flex-1 items-center gap-1 ps-2">
           <Show when={props.icon} keyed>
             {(icon) => <span class="inline-block h-4 w-4 shrink-0 text-fg-secondary">{icon}</span>}
           </Show>
           <span class="truncate">{props.name}</span>
         </h2>
-        <button class="flex h-full place-items-center" onClick={() => toggleSettingsOpened()}>
+        <button class="flex h-full place-items-center px-2" onClick={() => toggleSettingsOpened()}>
           <span class="inline-block h-4 w-4">
             <EllipsisVertical />
           </span>

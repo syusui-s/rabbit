@@ -1,4 +1,4 @@
-import { Component, JSX } from 'solid-js';
+import { Component, JSX, For } from 'solid-js';
 
 import ChevronLeft from 'heroicons/24/outline/chevron-left.svg';
 import ChevronRight from 'heroicons/24/outline/chevron-right.svg';
@@ -44,30 +44,22 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
     <div class="flex flex-col border-t border-border">
       <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
         <div class="scrollbar flex h-9 gap-2 overflow-x-scroll">
-          <button
-            class="rounded-md border border-border px-4"
-            onClick={() => setColumnWidth('widest')}
-          >
-            {i18n()('column.config.widest')}
-          </button>
-          <button
-            class="rounded-md border border-border px-4"
-            onClick={() => setColumnWidth('wide')}
-          >
-            {i18n()('column.config.wide')}
-          </button>
-          <button
-            class="rounded-md border border-border px-4"
-            onClick={() => setColumnWidth('medium')}
-          >
-            {i18n()('column.config.medium')}
-          </button>
-          <button
-            class="rounded-md border border-border px-4"
-            onClick={() => setColumnWidth('narrow')}
-          >
-            {i18n()('column.config.narrow')}
-          </button>
+          <For each={['widest', 'wide', 'medium', 'narrow'] as const}>
+            {(width) => (
+              <button
+                class="rounded-md border px-4 text-fg-secondary"
+                classList={{
+                  'border-fg-secondary': props.column.width === width,
+                  'font-bold': props.column.width === width,
+                  'border-border': props.column.width !== width,
+                  'font-normal': props.column.width !== width,
+                }}
+                onClick={() => setColumnWidth(width)}
+              >
+                {i18n()(`column.config.${width}`)}
+              </button>
+            )}
+          </For>
         </div>
       </ColumnSettingsSection>
       <div class="flex h-10 items-center gap-2">

@@ -57,14 +57,16 @@ const SearchButton = () => {
     <>
       <button
         ref={popup.targetRef}
+        class="w-full py-1"
         type="button"
-        class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
         onClick={() => {
           popup.open();
           inputRef?.focus();
         }}
       >
-        <MagnifyingGlass />
+        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
+          <MagnifyingGlass />
+        </span>
       </button>
       {popup.popup()}
     </>
@@ -104,31 +106,34 @@ const SideBar: Component = () => {
 
   return (
     <div class="flex shrink-0 flex-row bg-r-sidebar">
-      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-5">
-        <div class="flex flex-col items-center gap-3">
-          <button
-            class="h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg hover:border-primary-hover hover:bg-primary-hover"
-            onClick={() => toggleForm()}
-          >
-            <PencilSquare />
+      <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
+        <div class="flex w-full flex-col items-center">
+          <button class="w-full py-1" type="button" onClick={() => toggleForm()}>
+            <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg hover:border-primary-hover hover:bg-primary-hover">
+              <PencilSquare />
+            </span>
           </button>
           <SearchButton />
         </div>
         <div class="grow" />
-        <div class="flex flex-col items-center pb-2">
+        <div class="flex w-full flex-col items-center gap-2 pb-2">
           <button
-            class="h-10 w-12 rounded-full p-3 text-2xl text-primary hover:border-primary-hover hover:text-primary-hover"
+            class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => showAddColumn()}
           >
-            <Plus />
+            <span class="inline-block h-6 w-6">
+              <Plus />
+            </span>
           </button>
           <button
-            class="h-10 w-12 p-3 text-primary hover:border-primary-hover hover:text-primary-hover"
+            class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => setConfigOpened((current) => !current)}
           >
-            <Cog6Tooth />
+            <span class="h-6 w-6">
+              <Cog6Tooth />
+            </span>
           </button>
-          <button class="pt-2" onClick={() => showAbout()}>
+          <button class="flex w-full flex-col items-center" onClick={() => showAbout()}>
             <img
               class="h-8 w-8"
               src={resolveAsset(getColorTheme().rabbitIconPath)}

@@ -711,9 +711,16 @@ const ConfigUI = (props: ConfigProps) => {
         >
           {(menuItem) => (
             <div class="flex flex-col">
-              <button class="inline-block h-6 w-6" onClick={() => setMenuIndex(null)}>
-                <ArrowLeft />
-              </button>
+              <div>
+                <button
+                  class="pr-4 text-fg hover:text-fg-secondary"
+                  onClick={() => setMenuIndex(null)}
+                >
+                  <span class="inline-block h-6 w-6">
+                    <ArrowLeft />
+                  </span>
+                </button>
+              </div>
               <div class="w-full flex-1 pt-4">{menuItem.render()}</div>
             </div>
           )}
