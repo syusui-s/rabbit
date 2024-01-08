@@ -24,6 +24,7 @@ import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
 type NotePostFormProps = {
   replyTo?: NostrEvent;
   mode?: 'normal' | 'reply';
+  closable?: boolean;
   onClose: () => void;
   onPost?: () => void;
   textAreaRef?: (textAreaRef: HTMLTextAreaElement) => void;
@@ -78,7 +79,9 @@ const format = (parsed: ParsedTextNote) => {
 
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   const i18n = useTranslation();
+
   let textAreaRef: HTMLTextAreaElement | undefined;
+  let contentWarningReasonRef: HTMLInputElement | undefined;
   let fileInputRef: HTMLInputElement | undefined;
 
   const { elementRef: emojiTextAreaRef } = useEmojiComplete();
@@ -257,6 +260,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const handleEmojiSelect = (emoji: EmojiData) => {
     appendText(emoji.native ?? `:${emoji.id}:`);
+    textAreaRef?.focus();
   };
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
@@ -363,6 +367,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
         <Show when={contentWarning()}>
           <input
+            ref={contentWarningReasonRef}
             type="text"
             class="rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             placeholder={i18n()('posting.contentWarningReason')}
@@ -389,7 +394,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           value={text()}
         />
         <div class="flex items-end justify-end gap-1">
-          <Show when={mode() === 'reply'}>
+          <Show when={mode() === 'reply' || props.closable}>
             <div class="flex-1">
               <button class="h-5 w-5 text-fg-secondary" onClick={() => close()}>
                 <XMark />
@@ -428,7 +433,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             type="button"
             aria-label={i18n()('posting.contentWarning')}
             title={i18n()('posting.contentWarning')}
-            onClick={() => setContentWarning((e) => !e)}
+            onClick={() => {
+              setContentWarning((e) => !e);
+              contentWarningReasonRef?.focus();
+            }}
           >
             <ExclamationTriangle />
           </button>

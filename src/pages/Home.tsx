@@ -56,7 +56,7 @@ const Home: Component = () => {
   });
 
   return (
-    <div class="absolute inset-0 flex w-screen touch-manipulation flex-row overflow-hidden">
+    <div class="absolute inset-0 flex h-svh w-screen touch-manipulation flex-row overflow-hidden">
       <SideBar />
       <Columns />
       <GlobalModal />

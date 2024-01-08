@@ -1,9 +1,10 @@
-import { createSignal, Show, type JSX, Component } from 'solid-js';
+import { createSignal, Show, onMount, onCleanup, type JSX, Component } from 'solid-js';
 
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
+import throttle from 'lodash/throttle';
 
 import Config from '@/components/modal/Config';
 import NotePostForm from '@/components/NotePostForm';
@@ -13,6 +14,22 @@ import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import resolveAsset from '@/utils/resolveAsset';
+
+const useInnerWidth = () => {
+  const [innerWidth, setInnerWidth] = createSignal(window.innerWidth);
+
+  onMount(() => {
+    const resizeHandler = throttle(() => {
+      setInnerWidth(window.innerWidth);
+    }, 200);
+    window.addEventListener('resize', resizeHandler);
+    onCleanup(() => {
+      window.addEventListener('resize', resizeHandler);
+    });
+  });
+
+  return { innerWidth };
+};
 
 const SearchButton = () => {
   let inputRef: HTMLInputElement | undefined;
@@ -78,6 +95,7 @@ const SideBar: Component = () => {
 
   const { showAddColumn, showAbout } = useModalState();
   const { config, getColorTheme } = useConfig();
+  const { innerWidth } = useInnerWidth();
 
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
@@ -106,7 +124,7 @@ const SideBar: Component = () => {
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
         <div class="flex w-full flex-col items-center">
           <button
-            class="w-full py-1"
+            class="absolute bottom-4 left-[calc(50vw-1rem)] sm:static sm:w-full sm:py-1"
             type="button"
             onClick={() => {
               toggleForm();
@@ -115,7 +133,7 @@ const SideBar: Component = () => {
               }
             }}
           >
-            <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg hover:border-primary-hover hover:bg-primary-hover">
+            <span class="inline-block h-14 w-14 rounded-full border border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:border-primary-hover hover:bg-primary-hover sm:h-9 sm:w-9 sm:border-primary sm:p-2 sm:drop-shadow-none">
               <PencilSquare />
             </span>
           </button>
@@ -149,7 +167,7 @@ const SideBar: Component = () => {
         </div>
       </div>
       <div
-        class="border-r border-border"
+        class="absolute bottom-0 z-10 w-full border-t border-border bg-r-sidebar px-2 pt-2 sm:relative sm:z-0 sm:w-56 sm:border-r sm:p-0"
         classList={{
           static: formOpened() || config().keepOpenPostForm,
           hidden: !(formOpened() || config().keepOpenPostForm),
@@ -159,6 +177,7 @@ const SideBar: Component = () => {
           textAreaRef={(el) => {
             textAreaRef = el;
           }}
+          closable={innerWidth() < 640}
           onClose={closeForm}
         />
       </div>
