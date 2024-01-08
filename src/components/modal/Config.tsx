@@ -636,6 +636,7 @@ const ConfigUI = (props: ConfigProps) => {
   const i18n = useTranslation();
   const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
   const { canImport, importConfig } = useOldConfig();
+  const { config, setConfig } = useConfig();
 
   const menu = [
     {
@@ -692,19 +693,54 @@ const ConfigUI = (props: ConfigProps) => {
           fallback={
             <>
               <h2 class="flex-1 text-center text-lg font-bold">{i18n()('config.config')}</h2>
-              <Show when={canImport()}>
-                <button
-                  type="button"
-                  class="rounded bg-primary p-2 text-primary-fg"
-                  onClick={() => {
-                    if (window.confirm(i18n()('config.confirmImportOldDomainConfig'))) {
-                      importConfig();
-                    }
-                  }}
-                >
-                  {i18n()('config.importOldDomainConfig')}
-                </button>
-              </Show>
+              <div class="flex gap-1">
+                <Show when={canImport() && window.location.host === 'syusui-s.github.io'}>
+                  <button
+                    type="button"
+                    class="rounded bg-primary p-2 text-primary-fg"
+                    onClick={() => {
+                      if (window.confirm(i18n()('config.confirmImportOldDomainConfig'))) {
+                        importConfig();
+                      }
+                    }}
+                  >
+                    {i18n()('config.importOldDomainConfig')}
+                  </button>
+                </Show>
+                <Show when={window.location.host === 'syusui-s.github.io'}>
+                  <button
+                    type="button"
+                    class="rounded bg-primary p-2 text-primary-fg"
+                    onClick={() => {
+                      navigator.clipboard
+                        .writeText(JSON.stringify(config(), null, 2))
+                        .then(() => window.alert('OK'))
+                        .catch(() => window.alert('failed to copy'));
+                    }}
+                  >
+                    {i18n()('config.copyToClipboard')}
+                  </button>
+                </Show>
+                <Show when={window.location.host === 'rabbit.syusui.net'}>
+                  <button
+                    type="button"
+                    class="rounded bg-primary p-2 text-primary-fg"
+                    onClick={() => {
+                      const text = window.prompt('Paste config') ?? '';
+                      if (text.length === 0) {
+                        window.alert('empty');
+                        return;
+                      }
+                      const json = JSON.parse(text) as ReturnType<typeof config>;
+                      if (window.confirm(`import?:\n${text}`)) {
+                        setConfig(json);
+                      }
+                    }}
+                  >
+                    {i18n()('config.importFromClipboard')}
+                  </button>
+                </Show>
+              </div>
               <ul class="flex flex-col">
                 <For each={menu}>
                   {(menuItem, i) => (

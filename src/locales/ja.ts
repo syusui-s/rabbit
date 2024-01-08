@@ -122,7 +122,9 @@ export default {
   config: {
     config: '設定',
     importOldDomainConfig: '古いドメインから設定をインポート',
-    confirmImportOldDomainConfig: 'インポートしますか？（現在の設定は上書きされます）',
+    confirmImport: 'インポートしますか？（現在の設定は上書きされます）',
+    copyToClipboard: 'クリップボードに設定をコピー',
+    importFromClipboard: '設定をクリップボードから読み込む',
     profile: {
       profile: 'プロフィール',
       openProfile: '開く',
