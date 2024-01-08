@@ -40,8 +40,9 @@ jobs:
         run: npm run build
         env:
           VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
-      - name: Set CNAME
-        run: echo "rabbit.syusui.net" >> ./dist/CNAME
+      # disable temporally
+      #- name: Set CNAME
+      #  run: echo "rabbit.syusui.net" >> ./dist/CNAME
       - name: Check license
         run: npm run checkLicense
       - name: Deploy
