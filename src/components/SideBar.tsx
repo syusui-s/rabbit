@@ -145,8 +145,8 @@ const SideBar: Component = () => {
         <div
           class="flex w-full flex-col items-center gap-2"
           classList={{
-            'pb-2': !(isMediaSm() && formOpened()),
-            'pb-44': isMediaSm() && formOpened(),
+            'pb-2': !(isMediaSm() && (formOpened() || config().keepOpenPostForm)),
+            'pb-44': isMediaSm() && (formOpened() || config().keepOpenPostForm),
           }}
         >
           <button
