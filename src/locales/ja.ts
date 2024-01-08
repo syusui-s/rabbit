@@ -78,7 +78,7 @@ export default {
       displayName: 'ユーザ名',
       about: '自己紹介',
       website: 'ウェブサイト',
-      nip05: 'ドメイン認証（NIP-05）',
+      nip05: 'ドメイン証明（NIP-05）',
       lightningAddress: 'LNURLアドレス / ライトニングアドレス',
       lightningAddressDescription: 'どちらか片方のみが保存されます。',
       otherProperties: 'その他の項目',
