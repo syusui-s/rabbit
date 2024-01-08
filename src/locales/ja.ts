@@ -185,4 +185,10 @@ export default {
     signerUnavailable: '利用にはNIP-07に対応した拡張機能が必要です。',
     loginWithSigner: 'NIP-07 拡張機能でログイン',
   },
+  domainTransfer: {
+    announcementHead: 'Rabbitは新しいドメインに移りました',
+    announcementDescription: 'ブックマークやリンクの更新をお願いします',
+    howToMigrateSettings: '設定の移行方法について',
+    close: '閉じる',
+  },
 };

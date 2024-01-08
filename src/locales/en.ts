@@ -188,4 +188,10 @@ export default {
     signerUnavailable: 'Please install NIP-07 browser extension.',
     loginWithSigner: 'Login with NIP-07 browser extension',
   },
+  domainTransfer: {
+    announcementHead: 'Rabbit has moved to the new domain',
+    announcementDescription: 'Please update your bookmark and links',
+    howToMigrateSettings: 'How to migrate settings',
+    close: 'Close',
+  },
 } satisfies typeof ja;

@@ -6,6 +6,7 @@ import { persistQueryClient } from '@tanstack/query-persist-client-core';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { get as getItem, set as setItem, del as removeItem } from 'idb-keyval';
 
+import DomainTransferInfo from '@/components/DomainTransferInfo';
 import useColorTheme from '@/hooks/useColorTheme';
 import i18nextInstance from '@/i18n/i18n';
 import { I18NextProvider } from '@/i18n/useTranslation';
@@ -48,12 +49,14 @@ const App: Component = () => {
   return (
     <I18NextProvider i18next={i18next}>
       <QueryClientProvider client={queryClient}>
-        <HashRouter>
-          <Route path="/hello" component={() => <Hello />} />
-          <Route path="/" component={() => <Home />} />
-          <Route path="/:id" component={() => <Permalink />} />
-          <Route path="/*" component={() => <NotFound />} />
-        </HashRouter>
+        <DomainTransferInfo>
+          <HashRouter>
+            <Route path="/hello" component={() => <Hello />} />
+            <Route path="/" component={() => <Home />} />
+            <Route path="/:id" component={() => <Permalink />} />
+            <Route path="/*" component={() => <NotFound />} />
+          </HashRouter>
+        </DomainTransferInfo>
       </QueryClientProvider>
     </I18NextProvider>
   );
