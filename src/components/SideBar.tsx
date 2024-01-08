@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Show, type JSX, Component } from 'solid-js';
+import { createSignal, Show, type JSX, Component } from 'solid-js';
 
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
@@ -91,16 +91,13 @@ const SideBar: Component = () => {
   const closeForm = () => setFormOpened(false);
   const toggleForm = () => setFormOpened((current) => !current);
 
-  createEffect(() => {
-    if (formOpened() && textAreaRef != null) {
-      focusTextArea();
-    }
-  });
-
   useHandleCommand(() => ({
     commandType: 'openPostForm',
     handler: () => {
-      openForm();
+      setTimeout(() => {
+        openForm();
+        focusTextArea();
+      }, 10);
     },
   }));
 
@@ -108,7 +105,16 @@ const SideBar: Component = () => {
     <div class="flex shrink-0 flex-row bg-r-sidebar">
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
         <div class="flex w-full flex-col items-center">
-          <button class="w-full py-1" type="button" onClick={() => toggleForm()}>
+          <button
+            class="w-full py-1"
+            type="button"
+            onClick={() => {
+              toggleForm();
+              if (formOpened()) {
+                focusTextArea();
+              }
+            }}
+          >
             <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg hover:border-primary-hover hover:bg-primary-hover">
               <PencilSquare />
             </span>
