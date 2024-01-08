@@ -121,7 +121,6 @@ export default {
   },
   config: {
     config: '設定',
-    importOldDomainConfig: '古いドメインから設定をインポート',
     confirmImport: 'インポートしますか？（現在の設定は上書きされます）',
     copyToClipboard: 'クリップボードに設定をコピー',
     importFromClipboard: '設定をクリップボードから読み込む',

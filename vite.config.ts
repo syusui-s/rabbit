@@ -14,12 +14,6 @@ export default defineConfig({
   build: {
     target: 'esnext',
     sourcemap: true,
-    rollupOptions: {
-      input: {
-        main: './index.html',
-        transferConfig: './transfer-config.html',
-      },
-    },
   },
   resolve: {
     alias: {

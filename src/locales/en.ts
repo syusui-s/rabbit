@@ -125,7 +125,6 @@ export default {
   },
   config: {
     config: 'Settings',
-    importOldDomainConfig: 'Import config from the old domain',
     confirmImport: 'Import? (The config will be overwritten)',
     copyToClipboard: 'Copy to clipboard',
     importFromClipboard: 'Import from clipboard',
