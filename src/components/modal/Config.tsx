@@ -699,7 +699,7 @@ const ConfigUI = (props: ConfigProps) => {
                     type="button"
                     class="rounded bg-primary p-2 text-primary-fg"
                     onClick={() => {
-                      if (window.confirm(i18n()('config.confirmImportOldDomainConfig'))) {
+                      if (window.confirm(i18n()('config.confirmImport'))) {
                         importConfig();
                       }
                     }}
@@ -732,7 +732,7 @@ const ConfigUI = (props: ConfigProps) => {
                         return;
                       }
                       const json = JSON.parse(text) as ReturnType<typeof config>;
-                      if (window.confirm(`import?:\n${text}`)) {
+                      if (window.confirm(`${i18n()('config.confirmImport')}:\n${text}`)) {
                         setConfig(json);
                       }
                     }}
