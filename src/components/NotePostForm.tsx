@@ -395,7 +395,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         />
         <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply' || props.closable}>
-            <button class="flex h-8 w-7 items-center" onClick={() => close()}>
+            <button class="flex h-8 w-8 items-center" onClick={() => close()}>
               <span class="inline-block h-5 w-5 text-fg-secondary/70">
                 <XMark />
               </span>
