@@ -126,7 +126,7 @@ const SideBar: Component = () => {
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
         <div class="flex w-full flex-col items-center">
           <button
-            class="absolute bottom-4 left-[calc(50vw-1rem)] sm:static sm:w-full sm:py-1"
+            class="absolute bottom-0 left-[calc(50vw-2rem)] p-4 sm:static sm:w-full sm:py-1"
             type="button"
             onClick={() => {
               toggleForm();
@@ -135,7 +135,7 @@ const SideBar: Component = () => {
               }
             }}
           >
-            <span class="inline-block h-14 w-14 rounded-full border border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:border-primary-hover hover:bg-primary-hover sm:h-9 sm:w-9 sm:border-primary sm:p-2 sm:drop-shadow-none">
+            <span class="inline-block h-14 w-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover sm:h-9 sm:w-9 sm:border sm:border-primary sm:p-2 sm:drop-shadow-none">
               <PencilSquare />
             </span>
           </button>
