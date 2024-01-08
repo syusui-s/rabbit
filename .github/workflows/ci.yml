@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: npm run test
       - name: Build
-        run: npm run build -- --base="/rabbit/"
+        run: npm run build
         env:
           VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
       - name: Check license
