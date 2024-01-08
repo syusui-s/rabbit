@@ -2,6 +2,8 @@ import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
 
+import useConfig from '@/core/useConfig';
+import { useOldConfig } from '@/hooks/useInterWindow';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import { useTranslation } from '@/i18n/useTranslation';
 import resolveAsset from '@/utils/resolveAsset';
@@ -36,13 +38,24 @@ const Hello: Component = () => {
   const signerStatus = useSignerStatus();
   const navigate = useNavigate();
   const { persistStatus, loggedIn } = usePersistStatus();
+  const { config } = useConfig();
+  const { canImport, importConfig } = useOldConfig();
 
   const handleLogin = () => {
+    if (
+      config().columns.length === 0 &&
+      canImport() &&
+      window.confirm('import config from old domain?')
+    ) {
+      importConfig();
+    }
+
     loggedIn();
     navigate('/');
   };
 
   onMount(() => {
+    console.log();
     if (persistStatus().loggedIn) {
       navigate('/');
     }
