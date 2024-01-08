@@ -57,6 +57,9 @@ export const thumbnailUrl = (urlString: string): string => {
     if (url.host === 'nostr.build' || url.host === 'image.nostr.build') {
       const result = new URL(url);
       result.host = 'nostr.build';
+      // profile pic (PFP)
+      if (url.pathname.startsWith('/i/p/')) return urlString;
+
       if (url.pathname.startsWith('/i/')) {
         result.pathname = `/responsive/240p${url.pathname}`;
       } else if (url.pathname.match(/^\/[0-9a-zA-Z]+\.(jpeg|jpg|png|gif|webp|avif|apng)$/)) {
