@@ -15,7 +15,7 @@ import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import resolveAsset from '@/utils/resolveAsset';
 
-const useInnerWidth = () => {
+const useMediaWidth = () => {
   const [innerWidth, setInnerWidth] = createSignal(window.innerWidth);
 
   onMount(() => {
@@ -28,7 +28,9 @@ const useInnerWidth = () => {
     });
   });
 
-  return { innerWidth };
+  const isMediaSm = () => innerWidth() < 640;
+
+  return { innerWidth, isMediaSm };
 };
 
 const SearchButton = () => {
@@ -95,7 +97,7 @@ const SideBar: Component = () => {
 
   const { showAddColumn, showAbout } = useModalState();
   const { config, getColorTheme } = useConfig();
-  const { innerWidth } = useInnerWidth();
+  const { isMediaSm } = useMediaWidth();
 
   const [formOpened, setFormOpened] = createSignal(false);
   const [configOpened, setConfigOpened] = createSignal(false);
@@ -140,7 +142,13 @@ const SideBar: Component = () => {
           <SearchButton />
         </div>
         <div class="grow" />
-        <div class="flex w-full flex-col items-center gap-2 pb-2">
+        <div
+          class="flex w-full flex-col items-center gap-2"
+          classList={{
+            'pb-2': !(isMediaSm() && formOpened()),
+            'pb-44': isMediaSm() && formOpened(),
+          }}
+        >
           <button
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => showAddColumn()}
@@ -166,21 +174,41 @@ const SideBar: Component = () => {
           </button>
         </div>
       </div>
-      <div
-        class="absolute bottom-0 z-10 w-full border-t border-border bg-r-sidebar px-2 pt-2 sm:relative sm:z-0 sm:w-56 sm:border-r sm:p-0"
-        classList={{
-          static: formOpened() || config().keepOpenPostForm,
-          hidden: !(formOpened() || config().keepOpenPostForm),
-        }}
+      <Show
+        when={isMediaSm()}
+        fallback={
+          <div
+            class="w-56 border-r border-border bg-r-sidebar px-2 pt-2"
+            classList={{
+              static: formOpened() || config().keepOpenPostForm,
+              hidden: !(formOpened() || config().keepOpenPostForm),
+            }}
+          >
+            <NotePostForm
+              textAreaRef={(el) => {
+                textAreaRef = el;
+              }}
+              onClose={closeForm}
+            />
+          </div>
+        }
       >
-        <NotePostForm
-          textAreaRef={(el) => {
-            textAreaRef = el;
+        <div
+          class="absolute bottom-0 z-10 w-full border-t border-border bg-r-sidebar px-2 pt-2"
+          classList={{
+            static: formOpened() || config().keepOpenPostForm,
+            hidden: !(formOpened() || config().keepOpenPostForm),
           }}
-          closable={innerWidth() < 640}
-          onClose={closeForm}
-        />
-      </div>
+        >
+          <NotePostForm
+            textAreaRef={(el) => {
+              textAreaRef = el;
+            }}
+            closable
+            onClose={closeForm}
+          />
+        </div>
+      </Show>
       <Show when={configOpened()}>
         <Config onClose={() => setConfigOpened(false)} />
       </Show>
