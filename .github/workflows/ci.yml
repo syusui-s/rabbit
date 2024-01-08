@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: npm run test
       - name: Build
-        run: npm run build
+        run: npm run build -- --base="/rabbit/"
         env:
           VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
       # disable temporally
