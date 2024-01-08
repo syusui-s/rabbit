@@ -6,7 +6,7 @@ A nostr client like TweetDeck made with SolidJS.
 
 1. NIP-07に対応したブラウザ拡張機能のインストールが事前に必要です
    - [NIP-07](https://scrapbox.io/nostr/NIP-07#63e1c10c8b8fcb00000584fc) を参考に拡張機能をインストールしてください。
-1. https://syusui-s.github.io/rabbit/ にアクセス
+1. https://rabbit.syusui.net/rabbit/ にアクセス
 1. NIP-07拡張機能に許可を求められるので許可ボタンを押す
 1. タイムラインが表示されます
 
@@ -19,6 +19,8 @@ AGPL-3.0-or-later
 Please note that some files are licensed in other FLOSS licenses.
 Those files contain the license text in the first lines.
 If the file does not have such text, it must be considered licensed in AGPL.
+
+The icon of Rabbit can be used 
 
 ### English
 
