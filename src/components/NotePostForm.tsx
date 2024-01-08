@@ -395,12 +395,13 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         />
         <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply' || props.closable}>
-            <div class="flex-1">
-              <button class="h-5 w-5 text-fg-secondary" onClick={() => close()}>
+            <button class="flex h-8 w-7 items-center" onClick={() => close()}>
+              <span class="inline-block h-5 w-5 text-fg-secondary/70">
                 <XMark />
-              </button>
-            </div>
+              </span>
+            </button>
           </Show>
+          <span class="flex-1" />
           <button
             ref={emojiPickerPopup.targetRef}
             class="inline-block rounded bg-primary text-primary-fg"
