@@ -88,7 +88,7 @@
   --color-r-reaction: 249 110 130;
   --color-r-repost: 0 190 0;
   --color-scroll-thumb: 102 102 102;
-  --color-scroll-bg: 136 136 136 / .1;
+  --color-scroll-bg: 136 136 136 / 0.1;
 }
 
 /* DARK Black */
