@@ -1,15 +1,13 @@
 import { bech32 } from 'bech32';
-import * as Kind from 'nostr-tools/kinds';
-import { type Event as NostrEvent, type UnsignedEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 import { z } from 'zod';
 
 import GenericEvent, { EventSchema } from '@/nostr/event/GenericEvent';
 import isValidId from '@/nostr/event/isValidId';
 import ensureSchema from '@/utils/ensureSchema';
-import epoch from '@/utils/epoch';
 
 export type Bolt11 = {
-  amount: string;
+  amount?: string;
   multiplier: string;
   millisatoshis: number;
   satoshis: number;
@@ -31,117 +29,100 @@ const asSatoshi = (amount: string, multiplier: string): number => {
 };
 
 export const parseBolt11 = (bolt11: string): Bolt11 => {
-  const match = bolt11.match(/^lnbc(?<amount>\d+)(?<multiplier>[munp]?)1.*$/);
+  const { prefix } = bech32.decode(bolt11, 4000);
+
+  const match = prefix.match(/^ln(bc|tb|tbs|bcrt)(?<amount>\d+)(?<multiplier>[munp]?)$/);
   if (match?.groups == null) throw new Error('invalid invoice format');
 
   const { amount, multiplier } = match.groups;
+
+  if (multiplier === 'p' && amount[amount.length - 1] !== '0')
+    throw new Error('last decimal of amount is not zero');
+
   const satoshis = asSatoshi(amount, multiplier);
   const millisatoshis = satoshis * 1000;
 
-  return { amount, multiplier, millisatoshis, satoshis };
-};
-
-export const createZapRequest = ({
-  pubkey,
-  content,
-  relays,
-  recipientPubkey,
-  eventId,
-  amountMilliSats,
-  lnurl,
-}: {
-  pubkey: string;
-  content: string;
-  relays: string[];
-  recipientPubkey: string;
-  eventId?: string;
-  amountMilliSats: string;
-  lnurl?: string;
-}): UnsignedEvent => {
-  const tags: string[][] = [
-    ['relays', ...relays],
-    ['amount', amountMilliSats],
-    ['p', recipientPubkey],
-  ];
-  if (eventId != null) tags.push(['e', eventId]);
-  if (lnurl != null) tags.push(['lnurl', lnurl]);
-
-  const event: UnsignedEvent = {
-    kind: Kind.ZapRequest,
-    pubkey,
-    created_at: epoch(),
-    tags,
-    content,
+  return {
+    amount: amount.length > 0 ? amount : undefined,
+    multiplier,
+    millisatoshis,
+    satoshis,
   };
-  return event;
 };
 
-const LnurlPayRequestMetadataSchema = z.object({
+const LnurlEndpointErrorSchema = z.object({
+  status: z.literal('ERROR'),
+  reason: z.string(),
+});
+
+export type LnurlError = z.infer<typeof LnurlEndpointErrorSchema>;
+
+const LnurlEndpointSchema = z.object({
+  // lud06 fields
   callback: z.string().nonempty(),
   maxSendable: z.number().positive(),
   minSendable: z.number().positive(),
   metadata: z.string(),
   tag: z.literal('payRequest'),
+  // nostr NIP-57 fields
   allowsNostr: z.optional(z.boolean()),
   nostrPubkey: z.optional(z.string().refine(isValidId)),
+  // lud12 comment
+  commentAllowed: z.optional(z.number()),
 });
 
-export type LnurlPayRequestMetadata = z.infer<typeof LnurlPayRequestMetadataSchema>;
+export type LnurlEndpoint = z.infer<typeof LnurlEndpointSchema>;
 
-export const getLnurlPayRequestUrl = ({
-  lud06,
-  lud16,
-}: {
-  lud06?: string;
-  lud16?: string;
-}): string | null => {
-  if (lud06 != null && lud06.length > 0) {
-    const { words } = bech32.decode(lud06, 2000);
-    const data = bech32.fromWords(words);
-    return new TextDecoder('utf-8').decode(new Uint8Array(data));
-  }
+export const getLnurlPayUrlFromLud06 = (lud06: string): string | null => {
+  if (lud06.length === 0) return null;
 
-  if (lud16 != null && lud16.length > 0) {
-    const [name, domain] = lud16.split('@');
-    if (domain == null) return null;
-    return `https://${domain}/.well-known/lnurlp/${name}`;
-  }
-
-  return null;
+  const { prefix, words } = bech32.decode(lud06, 2000);
+  if (prefix.toLowerCase() !== 'lnurl') return null;
+  const data = bech32.fromWords(words);
+  return new TextDecoder('utf-8').decode(new Uint8Array(data));
 };
 
-export const fetchLnurlPayRequestMetadata = async (params: {
-  lud06?: string;
-  lud16?: string;
-}): Promise<LnurlPayRequestMetadata | null> => {
-  try {
-    const lnurl = getLnurlPayRequestUrl(params);
-    if (lnurl == null) return null;
+export const getLnurlPayUrlFromLud16 = (lud16: string): string | null => {
+  if (lud16.length === 0) return null;
 
-    const res = await fetch(lnurl, { mode: 'cors' });
-    if (res.status !== 200) return null;
+  const [name, domain] = lud16.split('@');
+  if (domain == null) return null;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const body = await res.json();
-    if (!ensureSchema(LnurlPayRequestMetadataSchema)(body)) return null;
+  const url = new URL(`https://${domain}/`);
+  url.pathname = `.well-known/lnurlp/${name}`;
+  return url.toString();
+};
 
-    return body;
-  } catch (e) {
-    console.error('failed to get lnurl metadata', params, e);
-    return null;
+export const lnurlPayUrlToLud06 = (url: string): string => {
+  const data = new TextEncoder().encode(url);
+  const words = bech32.toWords(data);
+  return bech32.encode('lnurl', words, 2000);
+};
+
+export const fetchLnurlEndpoint = async (lnurl: string): Promise<LnurlEndpoint | LnurlError> => {
+  const res = await fetch(lnurl, { mode: 'cors' });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const body = await res.json();
+  if (ensureSchema(LnurlEndpointErrorSchema)(body)) return body;
+
+  if (!ensureSchema(LnurlEndpointSchema)(body)) {
+    throw new Error('invalid form of endpoint response');
   }
+
+  return body;
 };
 
 type ZapReceiptVerificationResult = { success: true } | { success: false; reason: string };
 
 export const verifyZapReceipt = ({
   zapReceipt: rawZapReceipt,
-  lnurlProviderPubkey,
   lnurlPayUrl,
+  lnurlProviderPubkey,
 }: {
   zapReceipt: NostrEvent;
-  lnurlProviderPubkey: string;
   lnurlPayUrl: string;
+  lnurlProviderPubkey: string;
 }): ZapReceiptVerificationResult => {
   const zapReceipt = new GenericEvent(rawZapReceipt);
 
@@ -188,7 +169,14 @@ export const verifyZapReceipt = ({
 
   // lnurl should match
   const lnurl = zapRequest.findFirstTagByName('lnurl')?.[1];
-  if (lnurl != null && lnurl !== lnurlPayUrl) {
+  if (
+    lnurl != null &&
+    !(
+      lnurl.toLowerCase() === lnurlPayUrlToLud06(lnurlPayUrl).toLowerCase() ||
+      // for compatibility: Wallet of Satoshi
+      lnurl === lnurlPayUrl
+    )
+  ) {
     return {
       success: false,
       reason: `lnurl mismatch: fromProfile=${lnurlPayUrl}, request=${lnurl}`,
