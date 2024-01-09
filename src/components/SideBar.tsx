@@ -142,13 +142,7 @@ const SideBar: Component = () => {
           <SearchButton />
         </div>
         <div class="grow" />
-        <div
-          class="flex w-full flex-col items-center gap-2"
-          classList={{
-            'pb-2': !(isMediaSm() && (formOpened() || config().keepOpenPostForm)),
-            'pb-44': isMediaSm() && (formOpened() || config().keepOpenPostForm),
-          }}
-        >
+        <div class="flex w-full flex-col items-center gap-2 pb-2">
           <button
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => showAddColumn()}
@@ -194,7 +188,7 @@ const SideBar: Component = () => {
         }
       >
         <div
-          class="absolute bottom-0 z-10 w-full border-t border-border bg-r-sidebar px-2 pt-2"
+          class="absolute bottom-0 left-20 z-10 w-[calc(100vw-8rem)] rounded-md border-t border-border bg-r-sidebar px-2 pt-2 shadow"
           classList={{
             static: formOpened() || config().keepOpenPostForm,
             hidden: !(formOpened() || config().keepOpenPostForm),

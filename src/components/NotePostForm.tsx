@@ -395,7 +395,16 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         />
         <div class="flex items-end justify-end gap-1">
           <Show when={mode() === 'reply' || props.closable}>
-            <button class="flex h-8 w-8 items-center" onClick={() => close()}>
+            <button
+              class="flex items-center"
+              classList={{
+                'h-9': mode() === 'normal',
+                'w-9': mode() === 'normal',
+                'h-8': mode() === 'reply',
+                'w-8': mode() === 'reply',
+              }}
+              onClick={() => close()}
+            >
               <span class="inline-block h-5 w-5 text-fg-secondary/70">
                 <XMark />
               </span>
@@ -406,8 +415,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             ref={emojiPickerPopup.targetRef}
             class="inline-block rounded bg-primary text-primary-fg"
             classList={{
-              'h-8': mode() === 'normal',
-              'w-8': mode() === 'normal',
+              'h-9': mode() === 'normal',
+              'w-9': mode() === 'normal',
               'p-2': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
@@ -424,8 +433,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             classList={{
               'bg-primary': !contentWarning(),
               'bg-primary-hover': contentWarning(),
-              'h-8': mode() === 'normal',
-              'w-8': mode() === 'normal',
+              'h-9': mode() === 'normal',
+              'w-9': mode() === 'normal',
               'p-2': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
@@ -446,8 +455,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             classList={{
               'bg-primary-disabled': fileUploadDisabled(),
               'bg-primary': !fileUploadDisabled(),
-              'h-8': mode() === 'normal',
-              'w-8': mode() === 'normal',
+              'h-9': mode() === 'normal',
+              'w-9': mode() === 'normal',
               'p-2': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
@@ -466,8 +475,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             classList={{
               'bg-primary-disabled': submitDisabled(),
               'bg-primary': !submitDisabled(),
-              'h-8': mode() === 'normal',
-              'w-8': mode() === 'normal',
+              'h-9': mode() === 'normal',
+              'w-9': mode() === 'normal',
               'h-7': mode() === 'reply',
               'w-7': mode() === 'reply',
             }}
