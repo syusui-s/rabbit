@@ -293,7 +293,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
   return (
     <Show when={config().showEmojiReaction && reactions().length > 0}>
-      <div class="flex gap-2 overflow-x-auto py-1">
+      <div class="scrollbar flex gap-2 overflow-x-scroll py-1">
         <For each={[...reactionsGrouped().entries()]}>
           {([, events]) => {
             const isReactedByMeWithThisContent =
