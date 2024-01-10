@@ -1,4 +1,4 @@
-import { createMemo, children } from 'solid-js';
+import { createMemo } from 'solid-js';
 
 import { Picker } from 'emoji-mart';
 
@@ -28,7 +28,7 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
 
   let popup: UsePopup | undefined;
 
-  const pickerElement = children(() => {
+  const pickerElement = () => {
     const customEmojis = Object.entries(config().customEmojis).map(([name, { url }]) => ({
       id: name,
       name,
@@ -66,7 +66,7 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return picker as any as HTMLElement;
-  });
+  };
 
   popup = usePopup(() => ({
     position: 'bottom',

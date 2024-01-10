@@ -1,12 +1,4 @@
-import {
-  createSignal,
-  createEffect,
-  createMemo,
-  onCleanup,
-  children,
-  Show,
-  type JSX,
-} from 'solid-js';
+import { createSignal, createEffect, createMemo, onCleanup, Show, type JSX } from 'solid-js';
 
 import { Portal } from 'solid-js/web';
 
@@ -31,13 +23,13 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   const [style, setStyle] = createSignal<JSX.CSSProperties>({});
   const [isOpen, setIsOpen] = createSignal(false);
 
-  const resolvedChildren = children(() => {
+  const resolvedChildren = () => {
     const { popup } = props();
     if (typeof popup === 'function') {
       return popup();
     }
     return popup;
-  });
+  };
 
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
