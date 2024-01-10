@@ -1,4 +1,4 @@
-import { Component, createMemo } from 'solid-js';
+import { Component, createMemo, Show } from 'solid-js';
 
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
@@ -8,6 +8,7 @@ import usePool from '@/nostr/usePool';
 
 export type EventDebugModalProps = {
   event: NostrEvent;
+  extra?: string;
   onClose: () => void;
 };
 
@@ -22,17 +23,26 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
 
   return (
     <BasicModal onClose={props.onClose}>
-      <div class="p-2">
-        <h2 class="text-lg font-bold">JSON</h2>
+      <div class="p-4">
+        <h2 class="text-lg font-bold">Event JSON</h2>
         <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-4 text-xs">
           {json()}
         </pre>
         <div class="flex justify-end">
-          <Copy class="h-4 w-4 hover:text-primary" text={json()} />
+          <Copy class="size-4 hover:text-primary" text={json()} />
         </div>
       </div>
-      <div class="p-2">
+      <Show when={props.extra}>
+        <div class="p-4">
+          <h2 class="text-lg font-bold">Extra</h2>
+          <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-4 text-xs">
+            {props.extra}
+          </pre>
+        </div>
+      </Show>
+      <div class="p-4">
         <h2 class="text-lg font-bold">Found in these relays</h2>
+        <p>If this is empty, it is from the cache.</p>
         <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-2 text-xs">
           {seenOn()}
         </pre>

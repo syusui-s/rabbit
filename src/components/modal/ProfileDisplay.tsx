@@ -9,6 +9,7 @@ import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
 
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import BasicModal from '@/components/modal/BasicModal';
+import EventDebugModal from '@/components/modal/EventDebugModal';
 import UserList from '@/components/modal/UserList';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
@@ -58,7 +59,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
-  const [modal, setModal] = createSignal<'Following' | null>(null);
+  const [modal, setModal] = createSignal<'Following' | 'EventDebugModal' | null>(null);
   const closeModal = () => setModal(null);
 
   const {
@@ -219,22 +220,33 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         },
       },
       {
-        content: i18n.t('profile.addUserColumn'),
+        content: i18n.t('profile.showJSON'),
         onSelect: () => {
-          const columnName = profile()?.name ?? npub();
-          saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
-          request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
-          props.onClose?.();
+          setModal('EventDebugModal');
         },
       },
       {
-        content: i18n.t('profile.addUserHomeColumn'),
-        onSelect: () => {
-          const columnName = `${i18n.t('column.home')} / ${profile()?.name ?? npub()}`;
-          saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
-          request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
-          props.onClose?.();
-        },
+        content: i18n.t('profile.addColumn'),
+        items: [
+          {
+            content: i18n.t('profile.addUserColumn'),
+            onSelect: () => {
+              const columnName = profile()?.name ?? npub();
+              saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
+              request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+              props.onClose?.();
+            },
+          },
+          {
+            content: i18n.t('profile.addUserHomeColumn'),
+            onSelect: () => {
+              const columnName = `${i18n.t('column.home')} / ${profile()?.name ?? npub()}`;
+              saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
+              request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
+              props.onClose?.();
+            },
+          },
+        ],
       },
       {
         content: !isMuted() ? i18n.t('profile.mute') : i18n.t('profile.unmute'),
@@ -460,6 +472,15 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       <Switch>
         <Match when={modal() === 'Following'}>
           <UserList data={userFollowingPubkeys()} pubkeyExtractor={(e) => e} onClose={closeModal} />
+        </Match>
+        <Match when={modal() === 'EventDebugModal' && profileQuery.data} keyed>
+          {(event) => (
+            <EventDebugModal
+              event={event}
+              extra={JSON.stringify(profile(), null, 2)}
+              onClose={closeModal}
+            />
+          )}
         </Match>
       </Switch>
       <ul class="border-t border-border p-1">
