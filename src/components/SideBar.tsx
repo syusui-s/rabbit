@@ -13,6 +13,7 @@ import { createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
+import isMobile from '@/utils/isMobile';
 import resolveAsset from '@/utils/resolveAsset';
 
 const useMediaWidth = () => {
@@ -111,6 +112,13 @@ const SideBar: Component = () => {
   const closeForm = () => setFormOpened(false);
   const toggleForm = () => setFormOpened((current) => !current);
 
+  const shouldUseMobileUI = () => isMobile() && isMediaSm();
+
+  const handleClickOpenForm = () => {
+    toggleForm();
+    if (formOpened()) focusTextArea();
+  };
+
   useHandleCommand(() => ({
     commandType: 'openPostForm',
     handler: () => {
@@ -125,20 +133,26 @@ const SideBar: Component = () => {
     <div class="flex shrink-0 flex-row bg-r-sidebar">
       <div class="flex w-14 flex-auto flex-col items-center gap-3 border-r border-border pt-4">
         <div class="flex w-full flex-col items-center">
-          <button
-            class="absolute bottom-0 left-[calc(50vw-2rem)] p-4 sm:static sm:w-full sm:px-0 sm:py-1"
-            type="button"
-            onClick={() => {
-              toggleForm();
-              if (formOpened()) {
-                focusTextArea();
-              }
-            }}
+          <Show
+            when={shouldUseMobileUI()}
+            fallback={
+              <button class="static w-full px-0 py-1" type="button" onClick={handleClickOpenForm}>
+                <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg">
+                  <PencilSquare />
+                </span>
+              </button>
+            }
           >
-            <span class="inline-block h-14 w-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover sm:h-9 sm:w-9 sm:border sm:border-primary sm:p-2 sm:drop-shadow-none">
-              <PencilSquare />
-            </span>
-          </button>
+            <button
+              class="absolute bottom-0 left-[calc(50vw-2rem)] p-4"
+              type="button"
+              onClick={handleClickOpenForm}
+            >
+              <span class="inline-block h-14 w-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover">
+                <PencilSquare />
+              </span>
+            </button>
+          </Show>
           <SearchButton />
         </div>
         <div class="grow" />
@@ -169,7 +183,7 @@ const SideBar: Component = () => {
         </div>
       </div>
       <Show
-        when={isMediaSm()}
+        when={shouldUseMobileUI()}
         fallback={
           <div
             class="w-56 border-r border-border bg-r-sidebar px-2 pt-2"

@@ -62,6 +62,7 @@
     "@textcomplete/textarea": "^0.1.13",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@types/lodash": "^4.14.202",
+    "@types/ua-parser-js": "^0.7.39",
     "bech32": "^2.0.0",
     "emoji-mart": "^5.5.2",
     "heroicons": "^2.1.1",
@@ -72,6 +73,7 @@
     "nostr-tools": "^2.0.3",
     "solid-js": "^1.8.7",
     "tailwindcss": "^3.4.0",
+    "ua-parser-js": "^1.0.37",
     "zod": "^3.22.4"
   },
   "lint-staged": {
