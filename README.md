@@ -6,7 +6,7 @@ A nostr client like TweetDeck made with SolidJS.
 
 1. NIP-07に対応したブラウザ拡張機能のインストールが事前に必要です
    - [NIP-07](https://scrapbox.io/nostr/NIP-07#63e1c10c8b8fcb00000584fc) を参考に拡張機能をインストールしてください。
-1. https://rabbit.syusui.net/rabbit/ にアクセス
+1. https://rabbit.syusui.net/ にアクセス
 1. NIP-07拡張機能に許可を求められるので許可ボタンを押す
 1. タイムラインが表示されます
 
