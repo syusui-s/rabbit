@@ -168,7 +168,7 @@ const RelayConfig = () => {
         <ul class="pt-2">
           <For each={config().relayUrls}>
             {(relayUrl: string) => (
-              <li class="flex items-center border-t border-border">
+              <li class="flex items-center border-t border-border pr-4">
                 <div class="flex-1 truncate">{relayUrl}</div>
                 <button class="h-3 w-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
                   <XMark />
@@ -496,7 +496,7 @@ const MuteConfig = () => {
         <ul class="flex max-h-[50vh] min-h-64 flex-col overflow-y-scroll">
           <For each={config().mutedPubkeys}>
             {(pubkey) => (
-              <li class="flex items-center border-b border-border">
+              <li class="flex items-center border-b border-border pr-4">
                 <div class="flex-1 truncate">
                   <LazyLoad>{() => <UserNameDisplay pubkey={pubkey} />}</LazyLoad>
                 </div>
@@ -524,7 +524,7 @@ const MuteConfig = () => {
         <ul class="mt-2 flex max-h-[50vh] min-h-64 flex-col overflow-y-scroll border-t border-border">
           <For each={config().mutedKeywords}>
             {(keyword) => (
-              <li class="flex items-center border-b border-border">
+              <li class="flex items-center border-b border-border pr-4">
                 <div class="flex-1 truncate">{keyword}</div>
                 <button class="h-3 w-3 shrink-0" onClick={() => removeMutedKeyword(keyword)}>
                   <XMark />
