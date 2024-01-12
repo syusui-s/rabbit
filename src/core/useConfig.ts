@@ -1,6 +1,6 @@
 import { createRoot, type Accessor, type Setter } from 'solid-js';
 
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';

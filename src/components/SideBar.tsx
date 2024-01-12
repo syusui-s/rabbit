@@ -1,4 +1,4 @@
-import { createSignal, Show, onMount, onCleanup, type JSX, Component } from 'solid-js';
+import { createSignal, Show, onMount, onCleanup, lazy, type JSX, Component } from 'solid-js';
 
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
@@ -6,7 +6,6 @@ import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 import throttle from 'lodash/throttle';
 
-import Config from '@/components/modal/Config';
 import NotePostForm from '@/components/NotePostForm';
 import usePopup, { type UsePopup } from '@/components/utils/usePopup';
 import { createSearchColumn } from '@/core/column';
@@ -15,6 +14,8 @@ import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import isMobile from '@/utils/isMobile';
 import resolveAsset from '@/utils/resolveAsset';
+
+const Config = lazy(() => import('@/components/modal/Config'));
 
 const useMediaWidth = () => {
   const [innerWidth, setInnerWidth] = createSignal(window.innerWidth);

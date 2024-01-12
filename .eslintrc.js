@@ -42,6 +42,28 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    /*
+    'import/no-extraneous-dependencies': [
+      'error',
+      { devDependencies: false, optionalDependencies: false, peerDependencies: false },
+    ],
+    */
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          // enforce importing function individually
+          {
+            name: 'lodash',
+            message: 'please use lodash/... instead',
+          },
+          {
+            name: 'nostr-tools',
+            message: 'please use nostr-tools/... instead',
+          },
+        ],
+      },
+    ],
     'import/order': [
       'warn',
       {

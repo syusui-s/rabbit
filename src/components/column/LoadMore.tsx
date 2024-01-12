@@ -8,7 +8,7 @@ import {
   type Component,
 } from 'solid-js';
 
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ColumnItem from '@/components/ColumnItem';
 import useScroll from '@/hooks/useScroll';

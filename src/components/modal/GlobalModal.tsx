@@ -1,12 +1,13 @@
-import { Show, Switch, Match, Component } from 'solid-js';
+import { lazy, Show, Switch, Match, Component } from 'solid-js';
 
-import About from '@/components/modal/About';
-import AddColumn from '@/components/modal/AddColumn';
-import ProfileDisplay from '@/components/modal/ProfileDisplay';
-import ProfileEdit from '@/components/modal/ProfileEdit';
 import useModalState from '@/hooks/useModalState';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
+
+const About = lazy(() => import('@/components/modal/About'));
+const AddColumn = lazy(() => import('@/components/modal/AddColumn'));
+const ProfileDisplay = lazy(() => import('@/components/modal/ProfileDisplay'));
+const ProfileEdit = lazy(() => import('@/components/modal/ProfileEdit'));
 
 const GlobalModal: Component = () => {
   const pubkey = usePubkey();

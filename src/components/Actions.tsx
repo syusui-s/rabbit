@@ -1,6 +1,7 @@
 import {
   type JSX,
   type Component,
+  lazy,
   Switch,
   Match,
   Show,
@@ -20,8 +21,6 @@ import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import EmojiDisplay from '@/components/EmojiDisplay';
-import EventDebugModal from '@/components/modal/EventDebugModal';
-import UserList from '@/components/modal/UserList';
 import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
@@ -37,6 +36,9 @@ import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
 import { formatSiPrefix } from '@/utils/siPrefix';
 import timeout from '@/utils/timeout';
+
+const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
+const UserList = lazy(() => import('@/components/modal/UserList'));
 
 export type ActionProps = {
   event: NostrEvent;

@@ -1,7 +1,7 @@
 import { Component, createEffect, onCleanup, onMount } from 'solid-js';
 
 import Home from 'heroicons/24/outline/home.svg';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';

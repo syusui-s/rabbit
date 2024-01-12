@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
 import { createQuery } from '@tanstack/solid-query';
-import { type Event as NostrEvent } from 'nostr-tools';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import isValidId from '@/nostr/event/isValidId';
 import { fetchLnurlEndpoint, verifyZapReceipt, type LnurlEndpoint } from '@/nostr/zap';
