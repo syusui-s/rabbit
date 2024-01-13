@@ -54,7 +54,11 @@ export const thumbnailUrl = (urlString: string): string => {
 
     // nostr.build
     // https://github.com/nostrbuild/nostr.build/blob/main/api/v2/routes_upload.php
-    if (url.host === 'nostr.build' || url.host === 'image.nostr.build') {
+    if (
+      url.host === 'nostr.build' ||
+      url.host === 'image.nostr.build' ||
+      url.host === 'cdn.nostr.build'
+    ) {
       const result = new URL(url);
       result.host = 'nostr.build';
       // profile pic (PFP)

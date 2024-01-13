@@ -28,4 +28,13 @@ describe('thumbnailUrl', () => {
       'https://nostr.build/responsive/240p/i/f56ee902307158c1ebbcb5ac00430dbf1425eac12d55e4277ebccbe54d09671b.jpg';
     assert.deepStrictEqual(actual, expected);
   });
+
+  it('should return url for cdn.nostr.build', () => {
+    const actual = thumbnailUrl(
+      'https://cdn.nostr.build/i/6a2868ebb53da2c295e3a2a20a29fa009f230f721b71e88c7ffc3ec8eaae870f.png',
+    );
+    const expected =
+      'https://nostr.build/responsive/240p/i/6a2868ebb53da2c295e3a2a20a29fa009f230f721b71e88c7ffc3ec8eaae870f.png';
+    assert.deepStrictEqual(actual, expected);
+  });
 });
