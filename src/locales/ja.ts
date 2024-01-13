@@ -119,6 +119,22 @@ export default {
     reacted: 'がリアクション',
     zapped: 'がZap',
   },
+  zap: {
+    lud06: 'LNURLアドレス',
+    lud16: 'ライトニングアドレス',
+    fetchingLnUrlEndpoint: 'LNURLエンドポイントを取得中...',
+    fetchingLnUrlEndpointError: 'LNURLエンドポイントを取得できませんでした',
+    lnUrlEndpointError: 'LNURLエンドポイントがエラーを返しました: ',
+    fetchingLnUrlInvoice: 'ライトニングインボイスを取得中...',
+    fetchingLnUrlInvoiceError: 'ライトニングインボイスを取得できませんでした',
+    userDidNotConfigureZap: 'このユーザはZapを設定していないため、Zapできません。',
+    lnurlServiceDoesNotAllowNostr:
+      '受取人のLNURLサービスがZapをサポートしていないため、通常のライトニング送金となります。',
+    zapSplitIsNotSupported: 'Zap分配はまだサポートされていません。投稿者のみへの送金となります。',
+    comment: 'コメント (任意)',
+    sendViaWallet: 'ウォレットで送る',
+    sendViaWebLN: '拡張機能で送る',
+  },
   config: {
     config: '設定',
     confirmImport: 'インポートしますか？（現在の設定は上書きされます）',

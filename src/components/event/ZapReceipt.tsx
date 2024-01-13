@@ -8,10 +8,11 @@ import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
-import { zapReceipt } from '@/nostr/event';
+import ZapReceipt from '@/nostr/event/ZapReceipt';
 import useLnurlEndpoint from '@/nostr/useLnurlEndpoint';
 import useProfile from '@/nostr/useProfile';
-import { getLnurlPayUrlFromLud06, getLnurlPayUrlFromLud16 } from '@/nostr/zap';
+import lud06ToLnurlPayUrl from '@/nostr/zap/lud06ToLnurlPayUrl';
+import lud16ToLnurlPayUrl from '@/nostr/zap/lud16ToLnurlPayUrl';
 import ensureNonNull from '@/utils/ensureNonNull';
 import { formatSiPrefix } from '@/utils/siPrefix';
 
@@ -19,12 +20,12 @@ export type ZapReceiptProps = {
   event: NostrEvent;
 };
 
-const ZapReceipt: Component<ZapReceiptProps> = (props) => {
+const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
   const i18n = useTranslation();
   const { shouldMuteEvent } = useConfig();
   const { showProfile } = useModalState();
 
-  const event = createMemo(() => zapReceipt(props.event));
+  const event = createMemo(() => new ZapReceipt(props.event));
 
   const { profile: senderProfile } = useProfile(() => ({
     pubkey: event().senderPubkey(),
@@ -37,13 +38,13 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
   const lnurlPayUrlLud06 = () => {
     const lud06 = recipientProfile()?.lud06;
     if (lud06 == null) return null;
-    return getLnurlPayUrlFromLud06(lud06);
+    return lud06ToLnurlPayUrl(lud06);
   };
 
   const lnurlPayUrlLud16 = () => {
     const lud16 = recipientProfile()?.lud16;
     if (lud16 == null) return null;
-    return getLnurlPayUrlFromLud16(lud16);
+    return lud16ToLnurlPayUrl(lud16);
   };
 
   const lnurlEndpointLud06 = useLnurlEndpoint(() =>
@@ -58,6 +59,12 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
     })),
   );
 
+  const amountSi = () => {
+    const amountSats = event().amountSats();
+    if (amountSats == null) return null;
+    return formatSiPrefix(amountSats);
+  };
+
   const isZapReceiptVerified = () =>
     lnurlEndpointLud06.isZapReceiptVerified(props.event) ||
     lnurlEndpointLud16.isZapReceiptVerified(props.event);
@@ -69,7 +76,7 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
           <div class="h-4 w-4 shrink-0 text-amber-500" aria-hidden="true">
             <Bolt />
           </div>
-          <div class="mt-[-2px] shrink-0 text-xs">{formatSiPrefix(event().amountSats())}</div>
+          <div class="mt-[-2px] shrink-0 text-xs">{amountSi()}</div>
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
@@ -107,4 +114,4 @@ const ZapReceipt: Component<ZapReceiptProps> = (props) => {
   );
 };
 
-export default ZapReceipt;
+export default ZapReceiptDisplay;

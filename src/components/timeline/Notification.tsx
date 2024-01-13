@@ -1,4 +1,4 @@
-import { For, Switch, Match, type Component, Show } from 'solid-js';
+import { For, Switch, Match, lazy, type Component, Show } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
@@ -7,8 +7,9 @@ import ColumnItem from '@/components/ColumnItem';
 import Reaction from '@/components/event/Reaction';
 import Repost from '@/components/event/Repost';
 import TextNote from '@/components/event/TextNote';
-import ZapReceipt from '@/components/event/ZapReceipt';
 import useConfig from '@/core/useConfig';
+
+const ZapReceipt = lazy(() => import('@/components/event/ZapReceipt'));
 
 export type NotificationProps = {
   events: NostrEvent[];

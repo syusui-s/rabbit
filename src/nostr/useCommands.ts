@@ -1,75 +1,34 @@
-import * as Kind from 'nostr-tools/kinds';
-import { verifyEvent, getEventHash, type UnsignedEvent } from 'nostr-tools/pure';
+import {
+  verifyEvent,
+  getEventHash,
+  type Event as NostrEvent,
+  type UnsignedEvent,
+} from 'nostr-tools/pure';
 
-import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
-import { ReactionTypes } from '@/nostr/event/Reaction';
+import createContacts from '@/nostr/builder/createContects';
+import createDeletion from '@/nostr/builder/createDeletion';
+import createProfile from '@/nostr/builder/createProfile';
+import createReaction from '@/nostr/builder/createReaction';
+import createRepost from '@/nostr/builder/createRepost';
+import createTextNote from '@/nostr/builder/createTextNote';
 import usePool from '@/nostr/usePool';
-import epoch from '@/utils/epoch';
 
-export type TagParams = {
-  tags?: string[][];
-  notifyPubkeys?: string[];
-  rootEventId?: string;
-  mentionEventIds?: string[];
-  replyEventId?: string;
-  hashtags?: string[];
-  urls?: string[];
-  contentWarning?: string;
-};
+type WithRelayUrls<T> = T & { relayUrls: string[] };
 
-export type PublishTextNoteParams = {
-  relayUrls: string[];
-  pubkey: string;
-  content: string;
-} & TagParams;
+export const signEvent = async (unsignedEvent: UnsignedEvent): Promise<NostrEvent> => {
+  const id = getEventHash(unsignedEvent);
+  const preSignedEvent: UnsignedEvent & { id: string } = { ...unsignedEvent, id };
 
-export const buildTags = ({
-  notifyPubkeys,
-  rootEventId,
-  mentionEventIds,
-  replyEventId,
-  contentWarning,
-  hashtags,
-  urls,
-  tags,
-}: TagParams): string[][] => {
-  // NIP-10
-  const eTags = [];
-  const pTags = notifyPubkeys?.map((p) => ['p', p]) ?? [];
-  const otherTags = [];
-
-  // the order of e tags should be [rootId, ...mentionIds, replyIds] for old clients
-  if (rootEventId != null) {
-    eTags.push(['e', rootEventId, '', 'root']);
+  if (window.nostr == null) {
+    throw new Error('NIP-07 implementation not found');
   }
-  // For top level replies, only the "root" marker should be used.
-  if (rootEventId == null && replyEventId != null) {
-    eTags.push(['e', replyEventId, '', 'root']);
-  }
-  if (mentionEventIds != null) {
-    mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
-  }
-  if (rootEventId != null && replyEventId != null && rootEventId !== replyEventId) {
-    eTags.push(['e', replyEventId, '', 'reply']);
+  const signedEvent = await window.nostr.signEvent(preSignedEvent);
+
+  if (!verifyEvent({ ...signedEvent, id })) {
+    throw new Error('nostr.signEvent returned invalid data');
   }
 
-  if (hashtags != null) {
-    hashtags.forEach((tag) => otherTags.push(['t', tag]));
-  }
-
-  if (urls != null) {
-    urls.forEach((url) => otherTags.push(['r', url]));
-  }
-
-  if (contentWarning != null) {
-    otherTags.push(['content-warning', contentWarning]);
-  }
-
-  if (tags != null && tags.length > 0) {
-    otherTags.push(...tags);
-  }
-
-  return [...eTags, ...pTags, ...otherTags];
+  return signedEvent;
 };
 
 const useCommands = () => {
@@ -79,17 +38,7 @@ const useCommands = () => {
     relayUrls: string[],
     event: UnsignedEvent,
   ): Promise<Promise<void>[]> => {
-    const preSignedEvent: UnsignedEvent & { id?: string } = { ...event };
-    const id = getEventHash(preSignedEvent);
-    preSignedEvent.id = id;
-
-    if (window.nostr == null) {
-      throw new Error('NIP-07 implementation not found');
-    }
-    const signedEvent = await window.nostr.signEvent(preSignedEvent);
-    if (!verifyEvent({ ...signedEvent, id })) {
-      throw new Error('nostr.signEvent returned invalid data');
-    }
+    const signedEvent = await signEvent(event);
 
     return relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
@@ -103,158 +52,21 @@ const useCommands = () => {
     });
   };
 
-  // NIP-01
-  const publishTextNote = async (params: PublishTextNoteParams): Promise<Promise<void>[]> => {
-    const { relayUrls, pubkey, content } = params;
-    const tags = buildTags(params);
-
-    const preSignedEvent: UnsignedEvent = {
-      kind: Kind.ShortTextNote,
-      pubkey,
-      created_at: epoch(),
-      tags,
-      content,
+  const asPublish =
+    <P>(f: (p: P) => UnsignedEvent) =>
+    async (params: WithRelayUrls<P>) => {
+      const unsignedEvent = f(params);
+      const signedEvent = await signEvent(unsignedEvent);
+      return publishEvent(params.relayUrls, signedEvent);
     };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
-
-  // NIP-25
-  const publishReaction = async ({
-    relayUrls,
-    pubkey,
-    eventId,
-    kind,
-    reactionTypes,
-    notifyPubkey,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    eventId: string;
-    kind: number;
-    reactionTypes: ReactionTypes;
-    notifyPubkey: string;
-  }): Promise<Promise<void>[]> => {
-    const tags = [
-      ['e', eventId, ''],
-      ['p', notifyPubkey],
-      ['k', kind.toString()],
-    ];
-
-    if (reactionTypes.type === 'CustomEmoji') {
-      tags.push(['emoji', reactionTypes.shortcode, reactionTypes.url]);
-    }
-
-    const preSignedEvent: UnsignedEvent = {
-      kind: Kind.Reaction,
-      pubkey,
-      created_at: epoch(),
-      tags,
-      content: reactionTypes.content,
-    };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
-
-  // NIP-18
-  const publishRepost = async ({
-    relayUrls,
-    pubkey,
-    eventId,
-    kind,
-    notifyPubkey,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    eventId: string;
-    kind: number;
-    notifyPubkey: string;
-  }): Promise<Promise<void>[]> => {
-    const preSignedEvent: UnsignedEvent = {
-      kind: kind === 1 ? Kind.Repost : 16 /* generic repost */,
-      pubkey,
-      created_at: epoch(),
-      tags: [
-        ['e', eventId, ''],
-        ['p', notifyPubkey],
-        ['k', kind.toString()],
-      ],
-      content: '',
-    };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
-
-  const updateProfile = async ({
-    relayUrls,
-    pubkey,
-    profile,
-    otherProperties,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    profile: Profile;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    otherProperties: Record<string, any>;
-  }): Promise<Promise<void>[]> => {
-    const content: ProfileWithOtherProperties = {
-      ...profile,
-      ...otherProperties,
-    };
-    const preSignedEvent: UnsignedEvent = {
-      kind: Kind.Metadata,
-      pubkey,
-      created_at: epoch(),
-      tags: [],
-      content: JSON.stringify(content),
-    };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
-
-  const updateContacts = async ({
-    relayUrls,
-    pubkey,
-    updatedTags,
-    content,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    updatedTags: string[][];
-    content: string;
-  }): Promise<Promise<void>[]> => {
-    const preSignedEvent: UnsignedEvent = {
-      kind: Kind.Contacts,
-      pubkey,
-      created_at: epoch(),
-      tags: updatedTags,
-      content,
-    };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
-
-  const deleteEvent = async ({
-    relayUrls,
-    pubkey,
-    eventId,
-  }: {
-    relayUrls: string[];
-    pubkey: string;
-    eventId: string;
-  }): Promise<Promise<void>[]> => {
-    const preSignedEvent: UnsignedEvent = {
-      kind: Kind.EventDeletion,
-      pubkey,
-      created_at: epoch(),
-      tags: [['e', eventId, '']],
-      content: '',
-    };
-    return publishEvent(relayUrls, preSignedEvent);
-  };
 
   return {
-    publishTextNote,
-    publishReaction,
-    publishRepost,
-    updateProfile,
-    updateContacts,
-    deleteEvent,
+    publishTextNote: asPublish(createTextNote),
+    publishReaction: asPublish(createReaction),
+    publishRepost: asPublish(createRepost),
+    updateProfile: asPublish(createProfile),
+    updateContacts: asPublish(createContacts),
+    deleteEvent: asPublish(createDeletion),
   };
 };
 

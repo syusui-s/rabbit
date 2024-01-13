@@ -35,6 +35,7 @@ export default {
           sidebar: 'rgb(var(--color-r-sidebar))',
           reaction: 'rgb(var(--color-r-reaction))',
           repost: 'rgb(var(--color-r-repost))',
+          zap: 'rgb(var(--color-r-zap))',
         },
       },
     },

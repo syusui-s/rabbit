@@ -2,10 +2,10 @@ import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import GenericEvent from '@/nostr/event/GenericEvent';
 import ZapRequest from '@/nostr/event/ZapRequest';
-import { parseBolt11, Bolt11 } from '@/nostr/zap';
+import { parseBolt11, type PaymentRequestObject } from '@/nostr/zap/bolt11';
 
 export default class ZapReceipt extends GenericEvent {
-  #bolt11?: Bolt11;
+  #bolt11?: PaymentRequestObject;
 
   #description?: ZapRequest;
 
@@ -19,7 +19,7 @@ export default class ZapReceipt extends GenericEvent {
     return this.#description;
   }
 
-  bolt11(): Bolt11 {
+  bolt11(): PaymentRequestObject {
     if (this.#bolt11 != null) return this.#bolt11;
 
     const rawBolt11 = this.findFirstTagByName('bolt11')?.[1];
@@ -28,7 +28,7 @@ export default class ZapReceipt extends GenericEvent {
     return this.#bolt11;
   }
 
-  amountSats(): number {
+  amountSats(): number | null | undefined {
     return this.bolt11().satoshis;
   }
 

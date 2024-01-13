@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { describe, it } from 'vitest';
 
-import { buildTags } from '@/nostr/useCommands';
+import { buildTags } from '@/nostr/builder/createTextNote';
 
 describe('buildTags', () => {
   it('should return a root tag if only rootEventId is given', () => {

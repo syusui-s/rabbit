@@ -14,6 +14,9 @@ export type UseProfileProps = {
 export type UseProfile = {
   profile: () => ProfileWithOtherProperties | null;
   event: () => NostrEvent | null | undefined;
+  lud06: () => string | undefined;
+  lud16: () => string | undefined;
+  isZapConfigured: () => boolean;
   invalidateProfile: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
@@ -58,10 +61,24 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
     return safeParseProfile(content);
   });
 
+  const lud06 = (): string | undefined => {
+    const p = profile();
+    if (p == null || p.lud06 == null || p.lud06.length === 0) return undefined;
+    return p.lud06;
+  };
+
+  const lud16 = (): string | undefined => {
+    const p = profile();
+    if (p == null || p.lud16 == null || p.lud16.length === 0) return undefined;
+    return p.lud16;
+  };
+
+  const isZapConfigured = (): boolean => lud06() != null || lud16() != null;
+
   const invalidateProfile = (): Promise<void> =>
     queryClient.invalidateQueries({ queryKey: genQueryKey() });
 
-  return { profile, event, invalidateProfile, query };
+  return { profile, lud06, lud16, event, isZapConfigured, invalidateProfile, query };
 };
 
 export default useProfile;

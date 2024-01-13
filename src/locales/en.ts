@@ -123,6 +123,22 @@ export default {
     reacted: ' reacted',
     zapped: ' zapped',
   },
+  zap: {
+    lud06: 'LNURL address',
+    lud16: 'Lightning Address',
+    fetchingLnUrlEndpoint: 'Fetching LNURL endpoint...',
+    fetchingLnUrlEndpointError: 'Failed to fetch LNURL endpoint.',
+    lnUrlEndpointError: 'LNURL returned an error: ',
+    fetchingLnUrlInvoice: 'Fetching Lightning invoice...',
+    fetchingLnUrlInvoiceError: 'Failed to fetch Lightning invoice.',
+    userDidNotConfigureZap: "You cannot Zap because the user did't configure Zap.",
+    lnurlServiceDoesNotAllowNostr:
+      "The LNURL service doesn't support Zap. This will be normal lightning payment.",
+    zapSplitIsNotSupported: "Zap split is not supported yet. You'll zap to the author only.",
+    comment: 'Comment (optional)',
+    sendViaWallet: 'Send via wallet',
+    sendViaWebLN: 'Send via extension',
+  },
   config: {
     config: 'Settings',
     confirmImport: 'Import? (The config will be overwritten)',

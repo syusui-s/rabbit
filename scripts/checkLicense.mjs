@@ -12,6 +12,8 @@ const acceptableLicenses = [
   'BSD-3-Clause',
   'CC-BY-4.0',
   'Unlicense',
+  // sha.js for polyfill
+  '(MIT AND BSD-3-Clause)',
 ];
 
 const asyncLicenseChecker = (options) => {

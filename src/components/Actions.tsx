@@ -1,10 +1,10 @@
 import {
   type JSX,
   type Component,
-  lazy,
   Switch,
   Match,
   Show,
+  lazy,
   createSignal,
   createMemo,
   For,
@@ -12,6 +12,7 @@ import {
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
+import Bolt from 'heroicons/24/outline/bolt.svg';
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
@@ -39,6 +40,8 @@ import timeout from '@/utils/timeout';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
 const UserList = lazy(() => import('@/components/modal/UserList'));
+// eslint-disable-next-line import/no-cycle
+const ZapRequestModal = lazy(() => import('@/components/modal/ZapRequestModal'));
 
 export type ActionProps = {
   event: NostrEvent;
@@ -339,7 +342,9 @@ const Actions: Component<ActionProps> = (props) => {
   const pubkey = usePubkey();
   const commands = useCommands();
 
-  const [modal, setModal] = createSignal<'EventDebugModal' | 'Reactions' | 'Reposts' | null>(null);
+  const [modal, setModal] = createSignal<
+    'EventDebugModal' | 'Reactions' | 'Reposts' | 'ZapRequest' | null
+  >(null);
 
   const closeModal = () => setModal(null);
 
@@ -415,7 +420,7 @@ const Actions: Component<ActionProps> = (props) => {
   return (
     <>
       <EmojiReactions event={props.event} />
-      <div class="actions flex w-52 items-center justify-between gap-8 pt-1">
+      <div class="actions flex w-64 max-w-full items-center justify-between pt-1">
         <button
           class="shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
           onClick={(ev) => {
@@ -429,6 +434,11 @@ const Actions: Component<ActionProps> = (props) => {
         </button>
         <RepostAction event={props.event} />
         <ReactionAction event={props.event} />
+        <button type="button" onClick={() => setModal('ZapRequest')}>
+          <span class="flex h-4 w-4 text-fg-tertiary hover:text-r-zap">
+            <Bolt />
+          </span>
+        </button>
         <button
           ref={otherActionsPopup.targetRef}
           type="button"
@@ -448,6 +458,9 @@ const Actions: Component<ActionProps> = (props) => {
         </Match>
         <Match when={modal() === 'Reposts'}>
           <RepostsModal event={props.event} onClose={closeModal} />
+        </Match>
+        <Match when={modal() === 'ZapRequest'}>
+          <ZapRequestModal event={props.event} onClose={closeModal} />
         </Match>
       </Switch>
     </>

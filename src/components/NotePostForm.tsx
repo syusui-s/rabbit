@@ -14,9 +14,10 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
+import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
-import useCommands, { PublishTextNoteParams } from '@/nostr/useCommands';
+import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
@@ -221,7 +222,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
     setLastUsedHashTags(hashtags);
 
-    let textNoteParams: PublishTextNoteParams = {
+    let textNoteParams: CreateTextNoteParams & { relayUrls: string[] } = {
       relayUrls: config().relayUrls,
       pubkey,
       content: formattedContent,

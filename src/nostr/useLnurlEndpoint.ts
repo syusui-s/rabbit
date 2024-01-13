@@ -1,16 +1,28 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery } from '@tanstack/solid-query';
+import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import isValidId from '@/nostr/event/isValidId';
-import { fetchLnurlEndpoint, verifyZapReceipt, type LnurlEndpoint } from '@/nostr/zap';
+import { type LnurlError } from '@/nostr/zap/common';
+import fetchLnurlEndpoint, { type LnurlEndpoint } from '@/nostr/zap/fetchLnurlEndpoint';
+import verifyZapReceipt from '@/nostr/zap/verifyZapReceipt';
 
-export type UseLnurlPayRequestMetadataProps = {
+export type UseLnurlEndpointProps = {
   lnurlPayUrl: string;
 };
 
-const useLnurlEndpoint = (propsProvider: () => UseLnurlPayRequestMetadataProps | null) => {
+export type UseLnurlEndpoint = {
+  endpoint: () => LnurlEndpoint | null;
+  error: () => LnurlError | null;
+  lnurlPayUrl: () => string | undefined;
+  allowsNostr: () => boolean;
+  commentAllowed: () => number;
+  isZapReceiptVerified: (event: NostrEvent) => boolean;
+  query: CreateQueryResult<LnurlEndpoint | LnurlError | undefined>;
+};
+
+const useLnurlEndpoint = (propsProvider: () => UseLnurlEndpointProps | null): UseLnurlEndpoint => {
   const props = createMemo(propsProvider);
 
   const query = createQuery(() => ({
@@ -20,6 +32,7 @@ const useLnurlEndpoint = (propsProvider: () => UseLnurlPayRequestMetadataProps |
       if (params == null) return undefined;
       return fetchLnurlEndpoint(params.lnurlPayUrl);
     },
+    enabled: props() != null,
     staleTime: 5 * 60 * 1000, // 5 min
     gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
   }));
@@ -30,10 +43,23 @@ const useLnurlEndpoint = (propsProvider: () => UseLnurlPayRequestMetadataProps |
     return data as LnurlEndpoint;
   };
 
+  const error = (): LnurlError | null => {
+    const { data } = query;
+    if (data == null || !('status' in data) || data.status !== 'ERROR') return null;
+    return data;
+  };
+
   const allowsNostr = () => {
     const data = endpoint();
     if (data == null) return false;
     return !!data.allowsNostr && data.nostrPubkey != null && isValidId(data.nostrPubkey);
+  };
+
+  const commentAllowed = (): number => {
+    const data = endpoint();
+    if (data == null) return 0;
+    if (data.commentAllowed == null) return 0;
+    return data.commentAllowed;
   };
 
   const verifyReceipt = (zapReceipt: NostrEvent) => {
@@ -66,7 +92,10 @@ const useLnurlEndpoint = (propsProvider: () => UseLnurlPayRequestMetadataProps |
 
   return {
     endpoint,
+    error,
+    lnurlPayUrl: () => props()?.lnurlPayUrl,
     allowsNostr,
+    commentAllowed,
     isZapReceiptVerified,
     query,
   };
