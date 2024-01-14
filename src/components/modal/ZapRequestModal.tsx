@@ -140,7 +140,7 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
 
   return (
     <Show
-      when={zapped()}
+      when={!zapped()}
       fallback={
         <div class="flex flex-col items-center gap-4 py-8">
           <span class="inline-block h-28 w-28 rounded-full border-4 border-primary p-4 text-primary">
