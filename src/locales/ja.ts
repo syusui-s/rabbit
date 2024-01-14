@@ -134,6 +134,7 @@ export default {
     comment: 'コメント (任意)',
     sendViaWallet: 'ウォレットで送る',
     sendViaWebLN: '拡張機能で送る',
+    completed: '完了',
   },
   config: {
     config: '設定',

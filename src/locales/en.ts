@@ -138,6 +138,7 @@ export default {
     comment: 'Comment (optional)',
     sendViaWallet: 'Send via wallet',
     sendViaWebLN: 'Send via extension',
+    completed: 'Completed',
   },
   config: {
     config: 'Settings',

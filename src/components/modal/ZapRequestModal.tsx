@@ -12,6 +12,8 @@ import {
 
 import { createMutation } from '@tanstack/solid-query';
 import Bolt from 'heroicons/24/outline/bolt.svg';
+import Check from 'heroicons/24/solid/check.svg';
+import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 import qrcode from 'qrcode';
 import { requestProvider, type WebLNProvider } from 'webln';
@@ -23,15 +25,18 @@ import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import createZapRequest from '@/nostr/builder/createZapRequest';
 import { genericEvent } from '@/nostr/event';
+import ZapReceipt from '@/nostr/event/ZapReceipt';
 import { signEvent } from '@/nostr/useCommands';
 import useLnurlEndpoint from '@/nostr/useLnurlEndpoint';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
+import useSubscription from '@/nostr/useSubscription';
 import fetchLnurlCallback, { type FetchLnurlCallbackParams } from '@/nostr/zap/fetchLnurlCallback';
 import lud06ToLnurlPayUrl from '@/nostr/zap/lud06ToLnurlPayUrl';
 import lud16ToLnurlPayUrl from '@/nostr/zap/lud16ToLnurlPayUrl';
 import verifyInvoice from '@/nostr/zap/verifyInvoice';
 import ensureNonNull from '@/utils/ensureNonNull';
+import epoch from '@/utils/epoch';
 
 export type ZapRequestModalProps = {
   event: NostrEvent;
@@ -90,11 +95,33 @@ const QRCodeDisplay: Component<{ text: string }> = (props) => {
   return <canvas width="256" height="256" ref={canvasRef} />;
 };
 
-const InvoiceDisplay: Component<{ invoice: string }> = (props) => {
+const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubkey?: string }> = (
+  props,
+) => {
   const i18n = useTranslation();
+  const { config } = useConfig();
   const webln = useWebLN();
 
   const lightingInvoice = () => `lightning:${props.invoice}`;
+
+  const { events } = useSubscription(() =>
+    ensureNonNull([props.nostrPubkey] as const)(([nostrPubkey]) => ({
+      relayUrls: config().relayUrls,
+      filters: [
+        {
+          kinds: [Kind.Zap],
+          authors: nostrPubkey != null ? [nostrPubkey] : undefined,
+          '#p': [props.event.pubkey],
+          '#e': [props.event.id],
+          since: epoch(),
+        },
+      ],
+      continuous: true,
+    })),
+  );
+
+  const zapped = () =>
+    events().find((ev) => new ZapReceipt(ev).bolt11().paymentRequest === props.invoice);
 
   const handleClickWebLN = () => {
     const provider = webln.provider();
@@ -112,26 +139,38 @@ const InvoiceDisplay: Component<{ invoice: string }> = (props) => {
   };
 
   return (
-    <div class="flex flex-col items-center gap-2">
-      <div>
-        <QRCodeDisplay text={lightingInvoice()} />
-      </div>
-      <a
-        class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
-        href={lightingInvoice()}
-      >
-        {i18n()('zap.sendViaWallet')}
-      </a>
-      <Show when={webln.status() === 'available'}>
-        <button
-          type="button"
+    <Show
+      when={zapped()}
+      fallback={
+        <div class="flex flex-col items-center gap-4 py-8">
+          <span class="inline-block h-28 w-28 rounded-full border-4 border-primary p-4 text-primary">
+            <Check />
+          </span>
+          <div class="text-secondary text-xl">{i18n()('zap.completed')}</div>
+        </div>
+      }
+    >
+      <div class="flex flex-col items-center gap-2">
+        <div>
+          <QRCodeDisplay text={lightingInvoice()} />
+        </div>
+        <a
           class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
-          onClick={handleClickWebLN}
+          href={lightingInvoice()}
         >
-          {i18n()('zap.sendViaWebLN')}
-        </button>
-      </Show>
-    </div>
+          {i18n()('zap.sendViaWallet')}
+        </a>
+        <Show when={webln.status() === 'available'}>
+          <button
+            type="button"
+            class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
+            onClick={handleClickWebLN}
+          >
+            {i18n()('zap.sendViaWebLN')}
+          </button>
+        </Show>
+      </div>
+    </Show>
   );
 };
 
@@ -250,7 +289,13 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
         {i18n()('zap.fetchingLnUrlInvoiceError')}: {getInvoiceMutation?.error?.message}
       </Match>
       <Match when={getInvoiceMutation.isSuccess && getInvoiceMutation.data} keyed>
-        {(invoice) => <InvoiceDisplay invoice={invoice} />}
+        {(invoice) => (
+          <InvoiceDisplay
+            invoice={invoice}
+            event={props.event}
+            nostrPubkey={endpoint()?.nostrPubkey}
+          />
+        )}
       </Match>
       <Match when={query.isSuccess}>
         <div class="flex flex-col items-center">
