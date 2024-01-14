@@ -34,27 +34,21 @@ export const signEvent = async (unsignedEvent: UnsignedEvent): Promise<NostrEven
 const useCommands = () => {
   const pool = usePool();
 
-  const publishEvent = async (
-    relayUrls: string[],
-    event: UnsignedEvent,
-  ): Promise<Promise<void>[]> => {
-    const signedEvent = await signEvent(event);
-
-    return relayUrls.map(async (relayUrl) => {
+  const publishEvent = (relayUrls: string[], event: NostrEvent): Promise<void>[] =>
+    relayUrls.map(async (relayUrl) => {
       const relay = await pool().ensureRelay(relayUrl);
       try {
-        await relay.publish(signedEvent);
+        await relay.publish(event);
         console.log(`${relayUrl} has accepted our event`);
       } catch (err) {
         const reason = err instanceof Error ? err.message : JSON.stringify(err);
         console.warn(`failed to publish to ${relayUrl}: ${reason}`);
       }
     });
-  };
 
   const asPublish =
     <P>(f: (p: P) => UnsignedEvent) =>
-    async (params: WithRelayUrls<P>) => {
+    async (params: WithRelayUrls<P>): Promise<Promise<void>[]> => {
       const unsignedEvent = f(params);
       const signedEvent = await signEvent(unsignedEvent);
       return publishEvent(params.relayUrls, signedEvent);
