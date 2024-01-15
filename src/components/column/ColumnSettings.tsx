@@ -43,7 +43,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   return (
     <div class="flex flex-col border-t border-border">
       <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
-        <div class="scrollbar flex h-9 gap-2 overflow-x-scroll">
+        <div class="scrollbar flex h-9 gap-2 overflow-x-auto">
           <For each={['widest', 'wide', 'medium', 'narrow'] as const}>
             {(width) => (
               <button

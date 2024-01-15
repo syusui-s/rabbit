@@ -112,7 +112,7 @@ const About: Component<AboutProps> = (props) => {
           参考訳
         </a>
 
-        <pre class="scorllbar max-h-96 overflow-scroll rounded bg-bg-secondary p-4 text-xs">
+        <pre class="scorllbar max-h-96 overflow-auto rounded bg-bg-secondary p-4 text-xs">
           {packageInfo()?.self.licenseText}
         </pre>
 
@@ -124,7 +124,7 @@ const About: Component<AboutProps> = (props) => {
               <h3 class="mb-2 mt-4 font-mono">
                 {p.name}@{p.version} ({p.licenseSpdx})
               </h3>
-              <pre class="scrollbar max-h-96 overflow-scroll rounded bg-bg-secondary p-4 text-xs">
+              <pre class="scrollbar max-h-96 overflow-auto rounded bg-bg-secondary p-4 text-xs">
                 {p.licenseText}
               </pre>
             </>

@@ -24,9 +24,8 @@
     <script>
       /*
       if (location.hostname === 'syusui-s.github.io' && location.pathname.startsWith('/rabbit/')) {
-        const url = new URL(location.href);
-        url.host = 'rabbit.syusui.net';
-        url.pathname = '/';
+        const url = new URL('https://rabbit.syusui.net/');
+        url.pathname = location.pathname.replace(/^\/rabbit/, '');
         location.href = url.href;
       }
       */

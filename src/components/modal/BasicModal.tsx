@@ -24,7 +24,7 @@ const BasicModal: Component<BasicModalProps> = (props) => (
           </Show>
         </span>
       </button>
-      <div class="scrollbar flex max-h-[calc(100vh-6em)] flex-col overflow-y-scroll rounded-xl border border-border bg-bg text-fg shadow-lg">
+      <div class="scrollbar flex max-h-[calc(100vh-6em)] flex-col overflow-y-auto rounded-xl border border-border bg-bg text-fg shadow-lg">
         {props.children}
       </div>
     </div>
