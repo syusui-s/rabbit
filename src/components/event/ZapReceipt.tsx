@@ -81,13 +81,15 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
-            <Show when={senderProfile()?.picture != null}>
-              <img
-                src={thumbnailUrl(senderProfile()?.picture, 'icon')}
-                alt="icon"
-                // TODO autofit
-                class="h-full w-full object-cover"
-              />
+            <Show when={senderProfile()?.picture} keyed>
+              {(url) => (
+                <img
+                  src={thumbnailUrl(url, 'icon')}
+                  alt="icon"
+                  // TODO autofit
+                  class="h-full w-full object-cover"
+                />
+              )}
             </Show>
           </div>
           <div class="flex min-w-0 flex-1 overflow-hidden">
