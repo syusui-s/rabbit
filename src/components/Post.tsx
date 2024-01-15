@@ -46,7 +46,12 @@ const Post: Component<PostProps> = (props) => {
             {(url) => (
               <LazyLoad>
                 {() => (
-                  <img src={thumbnailUrl(url)} alt="icon" class="h-full w-full object-cover" />
+                  <img
+                    src={thumbnailUrl(url, 'icon')}
+                    alt="icon"
+                    referrerpolicy="no-referrer"
+                    class="h-full w-full object-cover"
+                  />
                 )}
               </LazyLoad>
             )}

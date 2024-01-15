@@ -51,7 +51,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
             <Show when={profile()?.picture} keyed>
               {(url) => (
                 <img
-                  src={thumbnailUrl(url)}
+                  src={thumbnailUrl(url, 'icon')}
                   alt="icon"
                   // TODO autofit
                   class="h-full w-full object-cover"

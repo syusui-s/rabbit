@@ -15,6 +15,7 @@ import lud06ToLnurlPayUrl from '@/nostr/zap/lud06ToLnurlPayUrl';
 import lud16ToLnurlPayUrl from '@/nostr/zap/lud16ToLnurlPayUrl';
 import ensureNonNull from '@/utils/ensureNonNull';
 import { formatSiPrefix } from '@/utils/siPrefix';
+import { thumbnailUrl } from '@/utils/url';
 
 export type ZapReceiptProps = {
   event: NostrEvent;
@@ -82,7 +83,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
           <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
             <Show when={senderProfile()?.picture != null}>
               <img
-                src={senderProfile()?.picture}
+                src={thumbnailUrl(senderProfile()?.picture, 'icon')}
                 alt="icon"
                 // TODO autofit
                 class="h-full w-full object-cover"
