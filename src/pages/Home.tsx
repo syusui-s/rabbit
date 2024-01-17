@@ -22,18 +22,22 @@ const Home: Component = () => {
   const pubkey = usePubkey();
 
   createEffect(() => {
-    config().relayUrls.map(async (relayUrl) => {
-      try {
-        const relay = await pool().ensureRelay(relayUrl);
-        relay.onnotice = (msg: string) => {
-          console.error(`NOTICE: ${relayUrl}: ${msg}`);
-        };
-        relay.onclose = () => {
-          console.warn(`CLOSE: ${relayUrl}`);
-        };
-      } catch (err) {
-        console.error('ensureRelay failed', err);
-      }
+    Promise.allSettled(
+      config().relayUrls.map(async (relayUrl) => {
+        try {
+          const relay = await pool().ensureRelay(relayUrl);
+          relay.onnotice = (msg: string) => {
+            console.error(`NOTICE: ${relayUrl}: ${msg}`);
+          };
+          relay.onclose = () => {
+            console.warn(`CLOSE: ${relayUrl}`);
+          };
+        } catch (err) {
+          console.error('ensureRelay failed', err);
+        }
+      }),
+    ).catch(() => {
+      /* nothing to do */
     });
   });
 
