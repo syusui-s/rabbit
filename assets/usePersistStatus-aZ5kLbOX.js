@@ -1,0 +1,2 @@
+import{ad as i,n as g,ae as l}from"./index-yaV19nBq.js";const f=e=>{const s=new URL("/rabbit/",window.location.href);return new URL(e,s).href},a={loggedIn:!1,agreements:{nostrBuild:!1}},S=e=>JSON.stringify(e),c=e=>JSON.parse(e),d=i(()=>window.localStorage,S,c),[r,o]=g(()=>l("RabbitPersistStatus",a,d)),w=()=>({persistStatus:()=>({...a,...r}),loggedIn:()=>{o(t=>({...t,loggedIn:!0}))},agreeToToS:t=>{o("agreements",n=>({...n,[t]:!0}))},didAgreeToToS:t=>r.agreements[t]??!1});export{f as r,w as u};
+//# sourceMappingURL=usePersistStatus-aZ5kLbOX.js.map
