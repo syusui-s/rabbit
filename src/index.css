@@ -170,5 +170,5 @@ em-emoji-picker {
   border-radius: 2px;
 }
 .scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(var(--color-scroll-thumb));
+  background-color: rgba(var(--color-scroll-thumb) / 0.5);
 }
