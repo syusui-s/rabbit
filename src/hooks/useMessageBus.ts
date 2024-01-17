@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onMount, type Signal, onCleanup } from 'solid-js';
+import { createRoot, createSignal, createMemo, onMount, type Signal, onCleanup } from 'solid-js';
 
 export type UseRequestMessageProps = {
   id: string;
@@ -19,7 +19,9 @@ export type MessageChannelResponse<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { requestId: string; ok: false; error: any };
 
-const [channels, setChannels]: Signal<Record<string, MessageChannel>> = createSignal({});
+const [channels, setChannels]: Signal<Record<string, MessageChannel>> = createRoot(() =>
+  createSignal({}),
+);
 
 const registerChannelIfNotExist = (id: string) => {
   if (channels()[id] == null) {

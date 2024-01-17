@@ -1,8 +1,8 @@
 import '@/types/nostr.d';
-import { createSignal, onMount, type Accessor } from 'solid-js';
+import { createRoot, createSignal, onMount, type Accessor } from 'solid-js';
 
 let asking = false;
-const [pubkey, setPubkey] = createSignal<string | undefined>(undefined);
+const [pubkey, setPubkey] = createRoot(() => createSignal<string | undefined>(undefined));
 
 // TODO 失敗したときに通知等を表示したい
 const usePubkey = (): Accessor<string | undefined> => {

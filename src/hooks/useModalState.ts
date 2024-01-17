@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createRoot, createSignal } from 'solid-js';
 
 type ModalState =
   | { type: 'Login' }
@@ -9,7 +9,7 @@ type ModalState =
   | { type: 'About' }
   | { type: 'Closed' };
 
-const [modalState, setModalState] = createSignal<ModalState>({ type: 'Closed' });
+const [modalState, setModalState] = createRoot(() => createSignal<ModalState>({ type: 'Closed' }));
 
 const useModalState = () => {
   const showLogin = () => {
