@@ -1,7 +1,7 @@
 import { For, Switch, Match } from 'solid-js';
 
 import BookmarkColumn from '@/components/column/BookmarkColumn';
-import FollowingColumn from '@/components/column/FollwingColumn';
+import FollowingColumn from '@/components/column/FollowingColumn';
 import NotificationColumn from '@/components/column/NotificationColumn';
 import PostsColumn from '@/components/column/PostsColumn';
 import ReactionsColumn from '@/components/column/ReactionsColumn';

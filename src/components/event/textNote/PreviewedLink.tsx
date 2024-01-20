@@ -7,7 +7,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { useOgp, isOgpUrl } from '@/utils/ogp';
 import { isTwitterUrl, parseYouTubeVideoUrl } from '@/utils/url';
 
-type PreviewdLinkProps = {
+type PreviewedLinkProps = {
   url: string;
   initialHidden: boolean;
   children?: JSX.Element;
@@ -120,7 +120,7 @@ const ClickToShow: Component<ClickToShowProps> = (props) => {
   );
 };
 
-const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
+const PreviewedLink: Component<PreviewedLinkProps> = (props) => {
   const { config } = useConfig();
 
   return (
@@ -145,7 +145,7 @@ const PreviewedLink: Component<PreviewdLinkProps> = (props) => {
                   <iframe
                     loading="lazy"
                     title="YouTube"
-                    class="my-2 h-full w-full"
+                    class="my-2 size-full"
                     src={youtubeUrl(videoId)}
                     allowfullscreen
                   />
