@@ -1,6 +1,6 @@
-import { createEffect, onCleanup, lazy, type Component } from 'solid-js';
+import { createEffect, onCleanup, Show, lazy, type Component } from 'solid-js';
 
-import { HashRouter, Route } from '@solidjs/router';
+import { HashRouter, Route, Navigate } from '@solidjs/router';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { persistQueryClient } from '@tanstack/query-persist-client-core';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
@@ -8,12 +8,13 @@ import { get as getItem, set as setItem, del as removeItem } from 'idb-keyval';
 
 import DomainTransferInfo from '@/components/DomainTransferInfo';
 import useColorTheme from '@/hooks/useColorTheme';
+import usePersistStatus from '@/hooks/usePersistStatus';
 import i18nextInstance from '@/i18n/i18n';
 import { I18NextProvider } from '@/i18n/useTranslation';
 
+const Hello = lazy(() => import('@/pages/Hello'));
 const Home = lazy(() => import('@/pages/Home'));
 const Permalink = lazy(() => import('@/pages/Permalink'));
-const Hello = lazy(() => import('@/pages/Hello'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 const queryClient = new QueryClient({});
@@ -34,6 +35,16 @@ const indexedDBPersister = createAsyncStoragePersister({
   },
 });
 
+const EntryPoint: Component = () => {
+  const { persistStatus } = usePersistStatus();
+
+  return (
+    <Show when={persistStatus().loggedIn} fallback={<Hello />}>
+      <Home />
+    </Show>
+  );
+};
+
 const App: Component = () => {
   createEffect(() => {
     const [unsubscribe] = persistQueryClient({
@@ -51,8 +62,8 @@ const App: Component = () => {
       <QueryClientProvider client={queryClient}>
         <DomainTransferInfo>
           <HashRouter>
-            <Route path="/hello" component={() => <Hello />} />
-            <Route path="/" component={() => <Home />} />
+            <Route path="/hello" component={() => <Navigate href="/" />} />
+            <Route path="/" component={() => <EntryPoint />} />
             <Route path="/:id" component={() => <Permalink />} />
             <Route path="/*" component={() => <NotFound />} />
           </HashRouter>
