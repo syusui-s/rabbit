@@ -162,9 +162,12 @@ const ExtensionList = () => {
       <div>
         <For each={extensions()}>
           {(extension) => (
-            <div class="my-2 flex items-center rounded-lg border border-border p-2 hover:shadow">
+            <div class="my-2 flex items-center rounded-lg border border-border p-2">
               <div class="flex-1">
-                <SafeLink class="font-bold hover:text-fg-secondary" href={extension.url}>
+                <SafeLink
+                  class="font-bold hover:text-fg-secondary hover:underline"
+                  href={extension.url}
+                >
                   <h3>{extension.name}</h3>
                 </SafeLink>
                 <div class="flex items-center">
@@ -188,11 +191,13 @@ const ExtensionList = () => {
                   </For>
                 </ul>
               </div>
-              <SafeLink class="shrink-0 font-bold text-fg-secondary" href={extension.url}>
-                <span class="ms-1 inline-block size-16 p-5">
-                  <ArrowTopRightOnSquare />
-                </span>
-              </SafeLink>
+              <div class="shrink-0" aria-hidden="true">
+                <SafeLink class="font-bold text-fg-secondary" href={extension.url}>
+                  <span class="ms-1 inline-block size-16 p-5">
+                    <ArrowTopRightOnSquare />
+                  </span>
+                </SafeLink>
+              </div>
             </div>
           )}
         </For>
@@ -234,6 +239,15 @@ const Hello: Component = () => {
             <h2 class="font-bold">{i18n()('hello.signerUnavailable')}</h2>
             <p>{i18n()('hello.signerUnavailableMessage')}</p>
             <ExtensionList />
+            <div class="flex flex-col items-center gap-2">
+              <p class="text-sm">{i18n()('hello.reloadAfterInstall')}</p>
+              <button
+                class="rounded bg-primary px-4 py-2 text-sm font-bold text-primary-fg hover:bg-primary-hover"
+                onClick={() => window.location.reload()}
+              >
+                {i18n()('hello.reload')}
+              </button>
+            </div>
           </Match>
           <Match when={signerStatus() === 'available'}>
             <button

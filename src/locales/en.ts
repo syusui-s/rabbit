@@ -205,6 +205,8 @@ export default {
     signerUnavailable: 'Please install a signer extension.',
     loginWithSigner: 'Login with signer extension',
     signerUnavailableMessage: 'You need to install a signer browser extension.',
+    reloadAfterInstall: 'Please reload after the installation is complete.',
+    reload: 'Reload',
   },
   domainTransfer: {
     announcementHead: 'Rabbit has moved to the new domain',

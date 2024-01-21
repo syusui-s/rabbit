@@ -200,8 +200,10 @@ export default {
   hello: {
     signerChecking: 'ブラウザ拡張機能のインストール状況を確認中...',
     signerUnavailable: 'ブラウザ拡張機能が必要です',
-    loginWithSigner: 'ブラウザ拡張機能でログイン',
+    loginWithSigner: '拡張機能でログイン',
     signerUnavailableMessage: '利用するにはブラウザ拡張機能をインストールしてください。',
+    reloadAfterInstall: 'インストールが完了したら再読み込みしてください。',
+    reload: '再読み込み',
   },
   domainTransfer: {
     announcementHead: 'Rabbitは新しいドメインに移りました',
