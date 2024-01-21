@@ -232,7 +232,7 @@ export default {
       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
       GNU Affero General Public License for more details.
     `,
-    agplTranslationJa: 'Japanese translation',
+    agplTranslationJa: 'Japanese translation as a reference',
     usingLibraries: 'Using libraries',
   },
   domainTransfer: {

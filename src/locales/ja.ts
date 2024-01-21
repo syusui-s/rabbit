@@ -229,7 +229,7 @@ export default {
       _商品性_や_特定目的適合性_ に対する保証は暗示されたものも含めて存在しません。
       詳しくはGNUアフェロー一般公衆ライセンスをご覧ください。
     `,
-    agplTranslationJa: '日本語訳',
+    agplTranslationJa: '参考日本語訳',
     usingLibraries: '使用ライブラリ',
   },
   domainTransfer: {
