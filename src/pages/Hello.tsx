@@ -1,6 +1,7 @@
 import { createSignal, onMount, For, Switch, Match, type Component } from 'solid-js';
 
 import { useNavigate } from '@solidjs/router';
+import ArrowTopRightOnSquare from 'heroicons/24/outline/arrow-top-right-on-square.svg';
 import { UAParser } from 'ua-parser-js';
 
 import SafeLink from '@/components/utils/SafeLink';
@@ -161,8 +162,8 @@ const ExtensionList = () => {
       <div>
         <For each={extensions()}>
           {(extension) => (
-            <div class="my-2 rounded-lg border border-border p-2 hover:shadow">
-              <div>
+            <div class="my-2 flex items-center rounded-lg border border-border p-2 hover:shadow">
+              <div class="flex-1">
                 <SafeLink class="font-bold hover:text-fg-secondary" href={extension.url}>
                   <h3>{extension.name}</h3>
                 </SafeLink>
@@ -187,6 +188,11 @@ const ExtensionList = () => {
                   </For>
                 </ul>
               </div>
+              <SafeLink class="shrink-0 font-bold text-fg-secondary" href={extension.url}>
+                <span class="ms-1 inline-block size-16 p-5">
+                  <ArrowTopRightOnSquare />
+                </span>
+              </SafeLink>
             </div>
           )}
         </For>
