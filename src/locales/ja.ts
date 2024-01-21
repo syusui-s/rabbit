@@ -198,9 +198,10 @@ export default {
     },
   },
   hello: {
-    signerChecking: '拡張機能のインストール状況を確認中です...',
-    signerUnavailable: '利用にはNIP-07に対応した拡張機能が必要です。',
-    loginWithSigner: 'NIP-07 拡張機能でログイン',
+    signerChecking: 'ブラウザ拡張機能のインストール状況を確認中...',
+    signerUnavailable: 'ブラウザ拡張機能が必要です',
+    loginWithSigner: 'ブラウザ拡張機能でログイン',
+    signerUnavailableMessage: '利用するにはブラウザ拡張機能をインストールしてください。',
   },
   domainTransfer: {
     announcementHead: 'Rabbitは新しいドメインに移りました',

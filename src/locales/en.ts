@@ -201,9 +201,10 @@ export default {
     },
   },
   hello: {
-    signerChecking: 'Checking that browser extension is installed...',
-    signerUnavailable: 'Please install NIP-07 browser extension.',
-    loginWithSigner: 'Login with NIP-07 browser extension',
+    signerChecking: 'Checking that signer extension is installed...',
+    signerUnavailable: 'Please install a signer extension.',
+    loginWithSigner: 'Login with signer extension',
+    signerUnavailableMessage: 'You need to install a signer browser extension.',
   },
   domainTransfer: {
     announcementHead: 'Rabbit has moved to the new domain',
