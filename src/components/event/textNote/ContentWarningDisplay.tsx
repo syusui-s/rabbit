@@ -22,7 +22,7 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
           class="mt-2 flex w-full flex-col items-center rounded border border-border p-2 text-center text-xs text-fg-secondary"
           onClick={() => setShowContentWarning(true)}
         >
-          <span class="inline-block h-4 w-4">
+          <span class="inline-block size-4">
             <ExclamationTriangle />
           </span>
           <span>{i18n()('post.contentWarning.show')}</span>
@@ -40,7 +40,7 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
           class="text-xs text-fg-secondary hover:text-fg-secondary/70"
           onClick={() => setShowContentWarning(false)}
         >
-          隠す
+          {i18n()('post.contentWarning.hide')}
         </button>
       </Show>
     </Show>

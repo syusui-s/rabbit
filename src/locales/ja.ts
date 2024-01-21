@@ -5,6 +5,10 @@ export default {
     loading: '読み込み中',
     updating: '更新中',
   },
+  notFound: {
+    title: 'ページが見つかりませんでした',
+    back: '戻る',
+  },
   posting: {
     placeholder: 'いまどうしてる？',
     placeholderReply: '返信を投稿',
@@ -111,8 +115,11 @@ export default {
     contentWarning: {
       show: '表示するにはクリック',
       reason: '理由',
+      hide: '隠す',
     },
     failedToFetchEvent: '取得に失敗しました',
+    unexpectedKind: '予期しないイベントです（kind:{{kind}}）',
+    unsupportedKind: '未対応のイベントです（kind:{{kind}}）',
   },
   notification: {
     reposted: 'がリポスト',
@@ -204,6 +211,26 @@ export default {
     signerUnavailableMessage: '利用するにはブラウザ拡張機能をインストールしてください。',
     reloadAfterInstall: 'インストールが完了したら再読み込みしてください。',
     reload: '再読み込み',
+  },
+  about: {
+    bugReport: 'バグ報告',
+    sourceCode: 'ソースコード',
+    termOfService: '利用規約',
+    agplText: stripMargin`
+      このプログラムは自由ソフトウェアです。
+
+      フリーソフトウェア財団から発行された GNUアフェロー一般公衆ライセンス
+      （バージョン3か、(任意で)より新しいバージョンのいずれか）の条件の下で
+      再頒布や改変、あるいはその両方を行うことができます。
+
+      このプログラムは役立つことを願って頒布されていますが、
+      **いかなる保証もありません**。
+
+      _商品性_や_特定目的適合性_ に対する保証は暗示されたものも含めて存在しません。
+      詳しくはGNUアフェロー一般公衆ライセンスをご覧ください。
+    `,
+    agplTranslationJa: '日本語訳',
+    usingLibraries: '使用ライブラリ',
   },
   domainTransfer: {
     announcementHead: 'Rabbitは新しいドメインに移りました',

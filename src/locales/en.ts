@@ -6,6 +6,10 @@ export default {
     loading: 'Loading',
     updating: 'Updating',
   },
+  notFound: {
+    title: 'Not found',
+    back: 'Back',
+  },
   posting: {
     placeholder: "What's happening?",
     placeholderReply: 'Post a reply',
@@ -115,8 +119,11 @@ export default {
     contentWarning: {
       show: 'Click to display',
       reason: 'Reason',
+      hide: 'Hide',
     },
     failedToFetchEvent: 'Failed to fetch event',
+    unexpectedKind: 'Unexpected event（kind:{{kind}}）',
+    unsupportedKind: 'Unsupported event（kind:{{kind}}）',
   },
   notification: {
     reposted: ' reposted',
@@ -207,6 +214,26 @@ export default {
     signerUnavailableMessage: 'You need to install a signer browser extension.',
     reloadAfterInstall: 'Please reload after the installation is complete.',
     reload: 'Reload',
+  },
+  about: {
+    bugReport: 'Report bug',
+    sourceCode: 'Source code',
+    termOfService: 'License',
+    agplText: stripMargin`
+      This program is free software:
+
+      you can redistribute it and/or modify it under the terms of
+      the GNU Affero General Public License as published by
+      the Free Software Foundation, either version 3 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU Affero General Public License for more details.
+    `,
+    agplTranslationJa: 'Japanese translation',
+    usingLibraries: 'Using libraries',
   },
   domainTransfer: {
     announcementHead: 'Rabbit has moved to the new domain',

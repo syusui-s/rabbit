@@ -6,21 +6,13 @@ import { decode } from 'nostr-tools/nip19';
 import GlobalModal from '@/components/modal/GlobalModal';
 import SideBar from '@/components/SideBar';
 import useModalState from '@/hooks/useModalState';
-import usePersistStatus from '@/hooks/usePersistStatus';
 
 const Permalink = () => {
   const navigate = useNavigate();
   const params = useParams();
   const { modalState, showProfile } = useModalState();
-  const { persistStatus } = usePersistStatus();
 
-  const navigateTop = () => {
-    if (persistStatus().loggedIn) {
-      navigate('/');
-    } else {
-      navigate('/hello');
-    }
-  };
+  const navigateTop = () => navigate('/');
 
   onMount(() => {
     if (params.id != null) {

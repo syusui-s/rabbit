@@ -9,6 +9,7 @@ import Repost from '@/components/event/Repost';
 // eslint-disable-next-line import/no-cycle
 import TextNote from '@/components/event/TextNote';
 import EventLink from '@/components/EventLink';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export type EventDisplayProps = {
   event: NostrEvent;
@@ -18,8 +19,8 @@ export type EventDisplayProps = {
 };
 
 const EventDisplay: Component<EventDisplayProps> = (props) => {
-  // noteの場合は kind:1 であることを保証するために利用できる
-  // タイムラインで表示されるべきでないイベントが表示されてしまうのを防ぐ
+  const i18n = useTranslation();
+
   const isAllowedKind = () =>
     props.ensureKinds == null ||
     props.ensureKinds.length === 0 ||
@@ -28,17 +29,17 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
   return (
     <Switch
       fallback={
-        <span>
-          <span>未対応のイベント種別（{props.event.kind}）</span>
+        <div>
+          <span>{i18n()('post.unsupportedKind', { kind: props.event.kind })}</span>
           <EventLink eventId={props.event.id} kind={props.event.kind} />
-        </span>
+        </div>
       }
     >
       <Match when={!isAllowedKind()} keyed>
-        <span>
-          予期しないイベント種別（{props.event.kind}）
+        <div>
+          <span>{i18n()('post.unexpectedKind', { kind: props.event.kind })}</span>
           <EventLink eventId={props.event.id} kind={props.event.kind} />
-        </span>
+        </div>
       </Match>
       <Match when={props.event.kind === Kind.ShortTextNote}>
         <TextNote event={props.event} embedding={props.actions} actions={props.actions} />
