@@ -1,27 +1,25 @@
 import { Component, JSX, createContext, createEffect, createSignal, useContext } from 'solid-js';
 
-import i18next from 'i18next';
-
-type I18Next = typeof i18next;
+import i18next, { type i18n } from 'i18next';
 
 export type I18NextProviderProps = {
-  i18next: I18Next | Promise<I18Next | void> | void;
+  i18next: i18n | Promise<i18n>;
   children?: JSX.Element;
 };
 
-const I18NextContext = createContext<I18Next>(i18next);
+const I18NextContext = createContext<i18n>(i18next);
 
-export const useTranslation = () => useContext<I18Next>(I18NextContext);
+export const useTranslation = () => useContext<i18n>(I18NextContext);
 
 export const I18NextProvider: Component<I18NextProviderProps> = (props) => {
-  const [i18nextInstance, setI18nextInstance] = createSignal<I18Next>(i18next);
+  const [i18nextInstance, setI18nextInstance] = createSignal<i18n>(i18next);
 
   createEffect(() => {
     if (props.i18next instanceof Promise) {
       props.i18next
         .then((instance) => {
           if (instance != null) {
-            setI18nextInstance(() => instance);
+            setI18nextInstance(instance);
           }
         })
         .catch((err) => {
