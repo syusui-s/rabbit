@@ -14,6 +14,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
   let imageRef: HTMLImageElement | undefined;
   const i18n = useTranslation();
   const [hidden, setHidden] = createSignal(props.initialHidden);
+  const [isError, setIsError] = createSignal(false);
 
   return (
     <Show
@@ -30,19 +31,25 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
       <LazyLoad
         fallback={
           <div class="aspect-video max-w-full">
-            <SafeLink href={props.url} />
+            <SafeLink class="text-link underline" href={props.url} />
           </div>
         }
       >
         {() => (
-          <SafeLink class="my-2 block" href={props.url}>
-            <img
-              ref={imageRef}
-              class="max-h-64 max-w-full rounded object-contain shadow hover:shadow-md"
-              src={thumbnailUrl(props.url)}
-              alt={props.url}
-            />
-          </SafeLink>
+          <Show
+            when={!isError()}
+            fallback={<SafeLink class="text-link underline" href={props.url} />}
+          >
+            <SafeLink class="my-2 block" href={props.url}>
+              <img
+                ref={imageRef}
+                class="max-h-64 max-w-full rounded object-contain shadow hover:shadow-md"
+                src={thumbnailUrl(props.url)}
+                alt={props.url}
+                onError={() => setIsError(true)}
+              />
+            </SafeLink>
+          </Show>
         )}
       </LazyLoad>
     </Show>
