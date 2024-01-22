@@ -22,7 +22,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
           class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
           onClick={() => setHidden(false)}
         >
-          {i18n()('post.showVideo')}
+          {i18n.t('post.showVideo')}
         </button>
       }
     >
@@ -36,7 +36,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
               src={props.url}
               controls
             >
-              <a href={props.url}>{i18n()('post.download')}</a>
+              <a href={props.url}>{i18n.t('post.download')}</a>
             </video>
           </SafeLink>
         )}

@@ -42,7 +42,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
 
   return (
     <div class="flex flex-col border-t border-border">
-      <ColumnSettingsSection title={i18n()('column.config.columnWidth')}>
+      <ColumnSettingsSection title={i18n.t('column.config.columnWidth')}>
         <div class="scrollbar flex h-9 gap-2 overflow-x-auto">
           <For each={['widest', 'wide', 'medium', 'narrow'] as const}>
             {(width) => (
@@ -56,7 +56,7 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
                 }}
                 onClick={() => setColumnWidth(width)}
               >
-                {i18n()(`column.config.${width}`)}
+                {i18n.t(`column.config.${width}`)}
               </button>
             )}
           </For>
@@ -65,29 +65,29 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
       <div class="flex h-10 items-center gap-2">
         <button
           class="py-4 pl-2"
-          title={i18n()('column.config.moveLeft')}
+          title={i18n.t('column.config.moveLeft')}
           onClick={() => move(props.columnIndex - 1)}
         >
-          <span class="inline-block h-4 w-4">
+          <span class="inline-block size-4">
             <ChevronLeft />
           </span>
         </button>
         <button
           class="py-4 pr-2"
-          title={i18n()('column.config.moveRight')}
+          title={i18n.t('column.config.moveRight')}
           onClick={() => move(props.columnIndex + 1)}
         >
-          <span class="inline-block h-4 w-4">
+          <span class="inline-block size-4">
             <ChevronRight />
           </span>
         </button>
         <div class="flex-1" />
         <button
           class="px-2 py-4 text-danger hover:text-rose-600"
-          title={i18n()('column.config.removeColumn')}
+          title={i18n.t('column.config.removeColumn')}
           onClick={() => removeColumn(props.column.id)}
         >
-          <span class="inline-block h-4 w-4" aria-label={i18n()('column.config.removeColumn')}>
+          <span class="inline-block size-4" aria-label={i18n.t('column.config.removeColumn')}>
             <Trash />
           </span>
         </button>

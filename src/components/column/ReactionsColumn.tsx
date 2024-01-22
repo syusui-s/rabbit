@@ -49,7 +49,7 @@ const ReactionsColumn: Component<ReactionsColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.reactions')}
+          name={props.column.name ?? i18n.t('column.reactions')}
           icon={<Heart />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

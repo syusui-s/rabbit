@@ -4,7 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en';
 import ja from '@/locales/ja';
 
-const i18nextInstance = (): Promise<void | typeof i18next.t> =>
+const i18nextInstance = () =>
   i18next
     .use(LanguageDetector)
     .init({

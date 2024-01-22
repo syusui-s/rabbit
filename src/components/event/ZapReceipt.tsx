@@ -74,20 +74,20 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
     <Show when={!shouldMuteEvent(props.event) && isZapReceiptVerified()}>
       <div class="flex items-center gap-1 text-sm">
         <div class="flex w-6 flex-col items-center">
-          <div class="h-4 w-4 shrink-0 text-amber-500" aria-hidden="true">
+          <div class="size-4 shrink-0 text-amber-500" aria-hidden="true">
             <Bolt />
           </div>
           <div class="mt-[-2px] shrink-0 text-xs">{amountSi()}</div>
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
-          <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
+          <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
             <Show when={senderProfile()?.picture} keyed>
               {(url) => (
                 <img
                   src={thumbnailUrl(url, 'icon')}
                   alt="icon"
                   // TODO autofit
-                  class="h-full w-full object-cover"
+                  class="size-full object-cover"
                 />
               )}
             </Show>
@@ -99,7 +99,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
             >
               <UserDisplayName pubkey={event().senderPubkey()} />
             </button>
-            <span class="shrink-0">{i18n()('notification.zapped')}</span>
+            <span class="shrink-0">{i18n.t('notification.zapped')}</span>
           </div>
         </div>
       </div>

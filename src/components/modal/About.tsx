@@ -61,17 +61,17 @@ const About: Component<AboutProps> = (props) => {
             class="rounded border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
             href="https://github.com/syusui-s/rabbit/issues/new/choose"
           >
-            {i18n()('about.bugReport')}
+            {i18n.t('about.bugReport')}
           </SafeLink>
           <SafeLink
             class="rounded border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
             href="https://github.com/syusui-s/rabbit"
           >
-            {i18n()('about.sourceCode')}
+            {i18n.t('about.sourceCode')}
           </SafeLink>
         </div>
 
-        <h2 class="my-4 text-xl font-bold">{i18n()('about.termOfService')}</h2>
+        <h2 class="my-4 text-xl font-bold">{i18n.t('about.termOfService')}</h2>
 
         <p class="my-4">
           Copyright (C) 2023 Shusui Moyatani and{' '}
@@ -84,12 +84,12 @@ const About: Component<AboutProps> = (props) => {
         </p>
 
         <pre class=" max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
-          {i18n()('about.agplText')}
+          {i18n.t('about.agplText')}
         </pre>
 
         <p>
           <SafeLink class="text-link underline" href="https://gpl.mhatta.org/agpl.ja.html">
-            {i18n()('about.agplTranslationJa')}
+            {i18n.t('about.agplTranslationJa')}
           </SafeLink>
         </p>
 
@@ -97,7 +97,7 @@ const About: Component<AboutProps> = (props) => {
           {packageInfo()?.self.licenseText}
         </pre>
 
-        <h2 class="my-4 text-xl font-bold">{i18n()('about.usingLibraries')}</h2>
+        <h2 class="my-4 text-xl font-bold">{i18n.t('about.usingLibraries')}</h2>
 
         <For each={packageInfo()?.packages ?? []}>
           {(p) => (

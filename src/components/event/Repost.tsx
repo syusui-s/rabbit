@@ -27,7 +27,7 @@ const Repost: Component<RepostProps> = (props) => {
     <div>
       <div class="flex items-center gap-1">
         <div class="flex shrink-0 place-items-center pl-[2px]" aria-hidden="true">
-          <span class="h-4 w-4 text-r-repost">
+          <span class="size-4 text-r-repost">
             <ArrowPathRoundedSquare />
           </span>
         </div>
@@ -38,7 +38,7 @@ const Repost: Component<RepostProps> = (props) => {
           >
             <UserDisplayName pubkey={props.event.pubkey} />
           </button>
-          <span class="shrink-0">{i18n()('notification.reposted')}</span>
+          <span class="shrink-0">{i18n.t('notification.reposted')}</span>
         </div>
         <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>
       </div>

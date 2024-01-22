@@ -151,12 +151,12 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
 
       if (
         (latest.data() == null || latest.followingPubkeys().length === 0) &&
-        !window.confirm(i18n()('profile.confirmUpdateEvenIfEmpty'))
+        !window.confirm(i18n.t('profile.confirmUpdateEvenIfEmpty'))
       )
         return;
 
       if ((latest?.data()?.created_at ?? 0) < (myFollowingQuery.data?.created_at ?? 0)) {
-        window.alert(i18n()('profile.failedToFetchLatestFollowList'));
+        window.alert(i18n.t('profile.failedToFetchLatestFollowList'));
         return;
       }
 
@@ -182,7 +182,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       });
     } catch (err) {
       console.error('failed to update contact list', err);
-      window.alert(i18n()('profile.failedToUpdateFollowList'));
+      window.alert(i18n.t('profile.failedToUpdateFollowList'));
     } finally {
       setUpdatingContacts(false);
     }
@@ -195,7 +195,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   };
 
   const unfollow = () => {
-    if (!window.confirm(i18n()('profile.confirmUnfollow'))) return;
+    if (!window.confirm(i18n.t('profile.confirmUnfollow'))) return;
 
     updateContacts('unfollow', props.pubkey).catch((err) => {
       console.log('failed to unfollow', err);
@@ -213,13 +213,13 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         },
        */
       {
-        content: i18n()('profile.copyPubkey'),
+        content: i18n.t('profile.copyPubkey'),
         onSelect: () => {
           navigator.clipboard.writeText(npub()).catch((err) => window.alert(err));
         },
       },
       {
-        content: i18n()('profile.addUserColumn'),
+        content: i18n.t('profile.addUserColumn'),
         onSelect: () => {
           const columnName = profile()?.name ?? npub();
           saveColumn(createPostsColumn({ name: columnName, pubkey: props.pubkey }));
@@ -228,16 +228,16 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         },
       },
       {
-        content: i18n()('profile.addUserHomeColumn'),
+        content: i18n.t('profile.addUserHomeColumn'),
         onSelect: () => {
-          const columnName = `${i18n()('column.home')} / ${profile()?.name ?? npub()}`;
+          const columnName = `${i18n.t('column.home')} / ${profile()?.name ?? npub()}`;
           saveColumn(createFollowingColumn({ name: columnName, pubkey: props.pubkey }));
           request({ command: 'moveToLastColumn' }).catch((err) => console.error(err));
           props.onClose?.();
         },
       },
       {
-        content: !isMuted() ? i18n()('profile.mute') : i18n()('profile.unmute'),
+        content: !isMuted() ? i18n.t('profile.mute') : i18n.t('profile.unmute'),
         onSelect: () => {
           if (!isMuted()) {
             addMutedPubkey(props.pubkey);
@@ -248,7 +248,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       },
       {
         when: () => props.pubkey === myPubkey(),
-        content: !following() ? i18n()('profile.followMyself') : i18n()('profile.unfollowMyself'),
+        content: !following() ? i18n.t('profile.followMyself') : i18n.t('profile.unfollowMyself'),
         onSelect: () => {
           if (!following()) {
             follow();
@@ -282,16 +282,16 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       >
         {(bannerUrl) => (
           <div class="h-40 w-full shrink-0 sm:h-52">
-            <img src={bannerUrl} alt="header" class="h-full w-full object-cover" />
+            <img src={bannerUrl} alt="header" class="size-full object-cover" />
           </div>
         )}
       </Show>
       <div class="mt-[-54px] flex items-end gap-4 px-4 pt-4">
         <div class="flex-1 shrink-0">
-          <div class="h-28 w-28 overflow-hidden rounded-lg shadow-md">
+          <div class="size-28 overflow-hidden rounded-lg shadow-md">
             <Show when={profileQuery.isFetched && profile()?.picture} keyed>
               {(pictureUrl) => (
-                <img src={pictureUrl} alt="user icon" class="h-full w-full object-cover" />
+                <img src={pictureUrl} alt="user icon" class="size-full object-cover" />
               )}
             </Show>
           </div>
@@ -306,17 +306,17 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
                     onClick={() => showProfileEdit()}
                   >
-                    {i18n()('profile.editProfile')}
+                    {i18n.t('profile.editProfile')}
                   </button>
                 </Match>
                 <Match when={updateContactsMutation.isPending || updatingContacts()}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    {i18n()('general.updating')}
+                    {i18n.t('general.updating')}
                   </span>
                 </Match>
                 <Match when={myFollowingQuery.isPending || myFollowingQuery.isFetching}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
-                    {i18n()('general.loading')}
+                    {i18n.t('general.loading')}
                   </span>
                 </Match>
                 <Match when={following()}>
@@ -327,8 +327,8 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     onClick={() => unfollow()}
                     disabled={updateContactsMutation.isPending}
                   >
-                    <Show when={!hoverFollowButton()} fallback={i18n()('profile.unfollow')}>
-                      {i18n()('profile.followingCurrently')}
+                    <Show when={!hoverFollowButton()} fallback={i18n.t('profile.unfollow')}>
+                      {i18n.t('profile.followingCurrently')}
                     </Show>
                   </button>
                 </Match>
@@ -338,7 +338,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     onClick={() => follow()}
                     disabled={updateContactsMutation.isPending}
                   >
-                    {i18n()('profile.follow')}
+                    {i18n.t('profile.follow')}
                   </button>
                 </Match>
               </Switch>
@@ -354,10 +354,10 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
             </div>
             <Switch>
               <Match when={userFollowingQuery.isPending}>
-                <div class="shrink-0 text-xs">{i18n()('general.loading')}</div>
+                <div class="shrink-0 text-xs">{i18n.t('general.loading')}</div>
               </Match>
               <Match when={followed()}>
-                <div class="shrink-0 text-xs">{i18n()('profile.followsYou')}</div>
+                <div class="shrink-0 text-xs">{i18n.t('profile.followsYou')}</div>
               </Match>
             </Switch>
           </div>
@@ -365,7 +365,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </div>
       <div class="flex items-start px-4 pt-2">
         <div class="h-16 shrink overflow-hidden">
-          <Show when={profileQuery.isPending}>{i18n()('general.loading')}</Show>
+          <Show when={profileQuery.isPending}>{i18n.t('general.loading')}</Show>
           <Show when={(profile()?.display_name?.length ?? 0) > 0}>
             <div class="truncate text-xl font-bold">{profile()?.display_name}</div>
           </Show>
@@ -378,18 +378,18 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 {nip05Identifier()?.ident}
                 <Switch
                   fallback={
-                    <span class="inline-block h-4 w-4 text-danger">
+                    <span class="inline-block size-4 text-danger">
                       <ExclamationCircle />
                     </span>
                   }
                 >
                   <Match when={verificationQuery.isPending}>
-                    <span class="inline-block h-3 w-3">
+                    <span class="inline-block size-3">
                       <ArrowPath />
                     </span>
                   </Match>
                   <Match when={isVerified()}>
-                    <span class="inline-block h-4 w-4 text-link">
+                    <span class="inline-block size-4 text-link">
                       <CheckCircle />
                     </span>
                   </Match>
@@ -411,11 +411,11 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </Show>
       <div class="flex border-t border-border px-4 py-2">
         <button class="flex flex-1 flex-col items-start" onClick={() => setModal('Following')}>
-          <div class="text-sm">{i18n()('profile.following')}</div>
+          <div class="text-sm">{i18n.t('profile.following')}</div>
           <div class="text-xl">
             <Show
               when={userFollowingQuery.isFetched}
-              fallback={<span class="text-sm">{i18n()('general.loading')}</span>}
+              fallback={<span class="text-sm">{i18n.t('general.loading')}</span>}
             >
               {userFollowingPubkeys().length}
             </Show>
@@ -423,7 +423,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         </button>
         <Show when={!config().hideCount}>
           <div class="flex flex-1 flex-col items-start">
-            <div class="text-sm">{i18n()('profile.followers')}</div>
+            <div class="text-sm">{i18n.t('profile.followers')}</div>
             <div class="text-xl">
               <Show
                 when={showFollowers()}
@@ -432,7 +432,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     class="text-sm hover:text-fg-secondary"
                     onClick={() => setShowFollowers(true)}
                   >
-                    {i18n()('profile.loadFollowers')}
+                    {i18n.t('profile.loadFollowers')}
                   </button>
                 }
                 keyed
@@ -448,7 +448,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
           <Show when={profile()?.website} keyed>
             {(website) => (
               <li class="flex items-center gap-1">
-                <span class="inline-block h-4 w-4" area-label="website" title="website">
+                <span class="inline-block size-4" area-label="website" title="website">
                   <GlobeAlt />
                 </span>
                 <SafeLink class="text-link underline" href={website} />

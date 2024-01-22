@@ -58,11 +58,11 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        window.alert(i18n()('profile.edit.updateSucceeded'));
+        window.alert(i18n.t('profile.edit.updateSucceeded'));
       } else if (succeeded > 0) {
-        window.alert(i18n()('profile.edit.failedToUpdatePartially', { count: failed }));
+        window.alert(i18n.t('profile.edit.failedToUpdatePartially', { count: failed }));
       } else {
-        window.alert(i18n()('profile.edit.failedToUpdate'));
+        window.alert(i18n.t('profile.edit.failedToUpdate'));
       }
       invalidateProfile()
         .then(() => query.refetch())
@@ -149,23 +149,23 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       <div>
         <Show when={banner().length > 0} fallback={<div class="h-24 shrink-0" />} keyed>
           <div class="h-40 w-full shrink-0 sm:h-52">
-            <img src={banner()} alt="header" class="h-full w-full object-cover" />
+            <img src={banner()} alt="header" class="size-full object-cover" />
           </div>
         </Show>
-        <div class="ml-4 mt-[-64px] h-28 w-28 rounded-lg shadow-md">
+        <div class="ml-4 mt-[-64px] size-28 rounded-lg shadow-md">
           <Show when={picture().length > 0}>
-            <img src={picture()} alt="user icon" class="h-full w-full rounded-lg object-cover" />
+            <img src={picture()} alt="user icon" class="size-full rounded-lg object-cover" />
           </Show>
         </div>
       </div>
       <Show when={loading()}>
-        <div class="px-4 pt-4">{i18n()('general.loading')}</div>
+        <div class="px-4 pt-4">{i18n.t('general.loading')}</div>
       </Show>
       <div>
         <form class="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="picture">
-              {i18n()('profile.edit.icon')}
+              {i18n.t('profile.edit.icon')}
             </label>
             <input
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -181,7 +181,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="picture">
-              {i18n()('profile.edit.banner')}
+              {i18n.t('profile.edit.banner')}
             </label>
             <input
               class="w-full rounded-md border-border bg-bg focus:border-border focus:ring-primary"
@@ -197,7 +197,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.name')}
+              {i18n.t('profile.edit.name')}
             </label>
             <div class="flex w-full items-center gap-2">
               <span>@</span>
@@ -217,7 +217,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.displayName')}
+              {i18n.t('profile.edit.displayName')}
             </label>
             <input
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -232,7 +232,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.about')}
+              {i18n.t('profile.edit.about')}
             </label>
             <textarea
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -245,7 +245,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.website')}
+              {i18n.t('profile.edit.website')}
             </label>
             <input
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -260,7 +260,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.nip05')}
+              {i18n.t('profile.edit.nip05')}
             </label>
             <input
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
@@ -276,9 +276,9 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <div class="flex flex-col items-start gap-1">
             <label class="font-bold" for="name">
-              {i18n()('profile.edit.lightningAddress')}
+              {i18n.t('profile.edit.lightningAddress')}
             </label>
-            <span class="text-xs">{i18n()('profile.edit.lightningAddressDescription')}</span>
+            <span class="text-xs">{i18n.t('profile.edit.lightningAddressDescription')}</span>
             <input
               class="w-full rounded-md border-border bg-bg ring-border focus:border-border focus:ring-primary"
               type="text"
@@ -293,7 +293,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           </div>
           <Show when={Object.entries(otherProperties()).length > 0}>
             <div>
-              <span class="font-bold">{i18n()('profile.edit.otherProperties')}</span>
+              <span class="font-bold">{i18n.t('profile.edit.otherProperties')}</span>
               <div>
                 <For each={Object.entries(otherProperties())}>
                   {([key, value]) => (
@@ -316,17 +316,17 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               }}
               disabled={mutation.isPending}
             >
-              {i18n()('profile.edit.save')}
+              {i18n.t('profile.edit.save')}
             </button>
             <button
               type="button"
               class="rounded border border-primary p-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
               onClick={() => props.onClose()}
             >
-              {i18n()('profile.edit.cancel')}
+              {i18n.t('profile.edit.cancel')}
             </button>
           </div>
-          <Show when={mutation.isPending}>{i18n()('profile.edit.updating')}</Show>
+          <Show when={mutation.isPending}>{i18n.t('profile.edit.updating')}</Show>
         </form>
       </div>
     </BasicModal>

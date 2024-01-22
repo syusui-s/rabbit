@@ -33,7 +33,7 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.bookmark')}
+          name={props.column.name ?? i18n.t('column.bookmark')}
           icon={<BookmarkIcon />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

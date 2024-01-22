@@ -143,10 +143,10 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
       when={!zapped()}
       fallback={
         <div class="flex flex-col items-center gap-4 py-8">
-          <span class="inline-block h-28 w-28 rounded-full border-4 border-primary p-4 text-primary">
+          <span class="inline-block size-28 rounded-full border-4 border-primary p-4 text-primary">
             <Check />
           </span>
-          <div class="text-secondary text-xl">{i18n()('zap.completed')}</div>
+          <div class="text-secondary text-xl">{i18n.t('zap.completed')}</div>
         </div>
       }
     >
@@ -158,7 +158,7 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
           class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
           href={lightingInvoice()}
         >
-          {i18n()('zap.sendViaWallet')}
+          {i18n.t('zap.sendViaWallet')}
         </a>
         <Show when={webln.status() === 'available'}>
           <button
@@ -166,7 +166,7 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
             class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
             onClick={handleClickWebLN}
           >
-            {i18n()('zap.sendViaWebLN')}
+            {i18n.t('zap.sendViaWebLN')}
           </button>
         </Show>
       </div>
@@ -274,19 +274,19 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
   return (
     <Switch>
       <Match when={query.isError}>
-        {i18n()('zap.fetchingLnUrlEndpointError')}: {query?.error?.message}
+        {i18n.t('zap.fetchingLnUrlEndpointError')}: {query?.error?.message}
       </Match>
       <Match when={error()} keyed>
         {(err) => (
           <>
-            {i18n()('zap.lnUrlEndpointError')}: {err.reason}
+            {i18n.t('zap.lnUrlEndpointError')}: {err.reason}
           </>
         )}
       </Match>
-      <Match when={query.isFetching}>{i18n()('zap.fetchingLnUrlEndpoint')}</Match>
-      <Match when={getInvoiceMutation.isPending}>{i18n()('zap.fetchingLnUrlInvoice')}</Match>
+      <Match when={query.isFetching}>{i18n.t('zap.fetchingLnUrlEndpoint')}</Match>
+      <Match when={getInvoiceMutation.isPending}>{i18n.t('zap.fetchingLnUrlInvoice')}</Match>
       <Match when={getInvoiceMutation.isError}>
-        {i18n()('zap.fetchingLnUrlInvoiceError')}: {getInvoiceMutation?.error?.message}
+        {i18n.t('zap.fetchingLnUrlInvoiceError')}: {getInvoiceMutation?.error?.message}
       </Match>
       <Match when={getInvoiceMutation.isSuccess && getInvoiceMutation.data} keyed>
         {(invoice) => (
@@ -300,10 +300,10 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
       <Match when={query.isSuccess}>
         <div class="flex flex-col items-center">
           <Show when={!allowsNostr()}>
-            <div class="pb-8 text-center">{i18n()('zap.lnurlServiceDoesNotAllowNostr')}</div>
+            <div class="pb-8 text-center">{i18n.t('zap.lnurlServiceDoesNotAllowNostr')}</div>
           </Show>
           <Show when={hasZapTag()}>
-            <div class="pb-8 text-center">{i18n()('zap.zapSplitIsNotSupported')}</div>
+            <div class="pb-8 text-center">{i18n.t('zap.zapSplitIsNotSupported')}</div>
           </Show>
           <div class="flex flex-col items-center overflow-hidden rounded px-8 py-2 text-fg-secondary">
             <Show when={lnurlServiceIcon()} keyed>
@@ -342,7 +342,7 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
               name="comment"
               class="w-full rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
               maxLength={commentAllowed() > 0 ? commentAllowed() : 70}
-              placeholder={i18n()('zap.comment')}
+              placeholder={i18n.t('zap.comment')}
               disabled={query.isPending}
               value={comment()}
               onChange={(ev) => setComment(ev.target.value)}
@@ -352,7 +352,7 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
               class="flex w-full items-center justify-center rounded bg-primary py-4 text-primary-fg hover:bg-primary-hover"
               disabled={getInvoiceMutation.isPending}
             >
-              <span class="inline-block h-6 w-6">
+              <span class="inline-block size-6">
                 <Bolt />
               </span>
             </button>
@@ -379,7 +379,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
   return (
     <BasicModal onClose={props.onClose}>
       <div class="p-8">
-        <Show when={isZapConfigured()} fallback={i18n()('zap.userDidNotConfigureZap')}>
+        <Show when={isZapConfigured()} fallback={i18n.t('zap.userDidNotConfigureZap')}>
           <Show when={lud06() != null && lud16() != null}>
             <div class="flex justify-center gap-3 pb-2">
               <button
@@ -393,7 +393,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
                 }}
                 onClick={() => setLnurlSource('lud06')}
               >
-                {i18n()('zap.lud06')}
+                {i18n.t('zap.lud06')}
               </button>
               <button
                 type="button"
@@ -406,7 +406,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
                 }}
                 onClick={() => setLnurlSource('lud16')}
               >
-                {i18n()('zap.lud16')}
+                {i18n.t('zap.lud16')}
               </button>
             </div>
           </Show>

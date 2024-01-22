@@ -49,7 +49,7 @@ const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.posts')}
+          name={props.column.name ?? i18n.t('column.posts')}
           icon={<User />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

@@ -70,7 +70,7 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.home')}
+          name={props.column.name ?? i18n.t('column.home')}
           icon={<Home />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

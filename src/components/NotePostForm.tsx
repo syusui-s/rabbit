@@ -112,10 +112,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const placeholder = (mode: NotePostFormProps['mode']) => {
     switch (mode) {
       case 'reply':
-        return i18n()('posting.placeholderReply');
+        return i18n.t('posting.placeholderReply');
       case 'normal':
       default:
-        return i18n()('posting.placeholder');
+        return i18n.t('posting.placeholder');
     }
   };
 
@@ -163,7 +163,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
       if (failed.length > 0) {
         const filenames = failed.map((f) => f.name).join(', ');
-        window.alert(i18n()('posting.failedToUploadFile', { filenames }));
+        window.alert(i18n.t('posting.failedToUploadFile', { filenames }));
       }
     },
   }));
@@ -205,7 +205,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (publishTextNoteMutation.isPending) return;
 
     if (/nsec1[0-9a-zA-Z]+/.test(text())) {
-      window.alert(i18n()('posting.forbiddenToIncludeNsec'));
+      window.alert(i18n.t('posting.forbiddenToIncludeNsec'));
       return;
     }
 
@@ -353,7 +353,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     <div class="p-1">
       <Show when={props.replyTo != null}>
         <div>
-          {i18n()('posting.replyToPre')}
+          {i18n.t('posting.replyToPre')}
           <For each={notifyPubkeys()}>
             {(pubkey, index) => (
               <>
@@ -362,7 +362,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               </>
             )}
           </For>
-          {i18n()('posting.replyToPost')}
+          {i18n.t('posting.replyToPost')}
         </div>
       </Show>
       <form class="flex flex-col gap-1" onSubmit={handleSubmit}>
@@ -371,7 +371,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             ref={contentWarningReasonRef}
             type="text"
             class="rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
-            placeholder={i18n()('posting.contentWarningReason')}
+            placeholder={i18n.t('posting.contentWarningReason')}
             maxLength={32}
             onInput={(ev) => setContentWarningReason(ev.currentTarget.value)}
             value={contentWarningReason()}
@@ -406,7 +406,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               }}
               onClick={() => close()}
             >
-              <span class="inline-block h-5 w-5 text-fg-secondary/70">
+              <span class="inline-block size-5 text-fg-secondary/70">
                 <XMark />
               </span>
             </button>
@@ -442,8 +442,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'p-[6px]': mode() === 'reply',
             }}
             type="button"
-            aria-label={i18n()('posting.contentWarning')}
-            title={i18n()('posting.contentWarning')}
+            aria-label={i18n.t('posting.contentWarning')}
+            title={i18n.t('posting.contentWarning')}
             onClick={() => {
               setContentWarning((e) => !e);
               contentWarningReasonRef?.focus();
@@ -464,8 +464,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'p-[6px]': mode() === 'reply',
             }}
             type="button"
-            title={i18n()('posting.uploadImage')}
-            aria-label={i18n()('posting.uploadImage')}
+            title={i18n.t('posting.uploadImage')}
+            aria-label={i18n.t('posting.uploadImage')}
             disabled={fileUploadDisabled()}
             onClick={() => fileInputRef?.click()}
           >
@@ -482,8 +482,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'w-7': mode() === 'reply',
             }}
             type="submit"
-            aria-label={i18n()('posting.submit')}
-            title={i18n()('posting.submit')}
+            aria-label={i18n.t('posting.submit')}
+            title={i18n.t('posting.submit')}
             disabled={submitDisabled()}
           >
             <PaperAirplane />

@@ -47,14 +47,14 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           <EmojiDisplay reactionTypes={event().toReactionTypes()} />
         </div>
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
-          <div class="author-icon h-5 w-5 shrink-0 overflow-hidden rounded">
+          <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
             <Show when={profile()?.picture} keyed>
               {(url) => (
                 <img
                   src={thumbnailUrl(url, 'icon')}
                   alt="icon"
                   // TODO autofit
-                  class="h-full w-full object-cover"
+                  class="size-full object-cover"
                 />
               )}
             </Show>
@@ -66,7 +66,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
             >
               <UserDisplayName pubkey={props.event.pubkey} />
             </button>
-            <span class="shrink-0">{i18n()('notification.reacted')}</span>
+            <span class="shrink-0">{i18n.t('notification.reacted')}</span>
           </div>
         </div>
         <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>
@@ -76,7 +76,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           when={reactedEvent()}
           fallback={
             <div class="truncate">
-              {i18n()('general.loading')} {eventId()}
+              {i18n.t('general.loading')} {eventId()}
             </div>
           }
           keyed

@@ -59,19 +59,19 @@ const Hello: Component = () => {
       <div class="rounded-md p-8 shadow-md">
         <Switch>
           <Match when={signerStatus() === 'checking'}>
-            <p>{i18n()('hello.signerChecking')}</p>
+            <p>{i18n.t('hello.signerChecking')}</p>
           </Match>
           <Match when={signerStatus() === 'unavailable'}>
-            <h2 class="font-bold">{i18n()('hello.signerUnavailable')}</h2>
-            <p>{i18n()('hello.signerUnavailableMessage')}</p>
+            <h2 class="font-bold">{i18n.t('hello.signerUnavailable')}</h2>
+            <p>{i18n.t('hello.signerUnavailableMessage')}</p>
             <SignerExtensions />
             <div class="flex flex-col items-center gap-2">
-              <p class="text-sm">{i18n()('hello.reloadAfterInstall')}</p>
+              <p class="text-sm">{i18n.t('hello.reloadAfterInstall')}</p>
               <button
                 class="rounded bg-primary px-4 py-2 text-sm font-bold text-primary-fg hover:bg-primary-hover"
                 onClick={() => window.location.reload()}
               >
-                {i18n()('hello.reload')}
+                {i18n.t('hello.reload')}
               </button>
             </div>
           </Match>
@@ -80,7 +80,7 @@ const Hello: Component = () => {
               class="rounded bg-primary p-4 text-lg font-bold text-primary-fg hover:shadow-md"
               onClick={handleLogin}
             >
-              {i18n()('hello.loginWithSigner')}
+              {i18n.t('hello.loginWithSigner')}
             </button>
           </Match>
         </Switch>

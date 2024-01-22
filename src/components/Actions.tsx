@@ -130,7 +130,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
         }}
       >
         <button
-          class="h-4 w-4"
+          class="size-4"
           onClick={handleReaction}
           disabled={publishReactionMutation.isPending}
         >
@@ -156,7 +156,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
         >
           <button
             ref={emojiPickerPopup.targetRef}
-            class="h-4 w-4"
+            class="size-4"
             onClick={() => emojiPickerPopup.open()}
           >
             <Plus />
@@ -217,7 +217,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
       }}
     >
       <button onClick={handleRepost} disabled={publishRepostMutation.isPending}>
-        <span class="flex h-4 w-4">
+        <span class="flex size-4">
           <ArrowPathRoundedSquare />
         </span>
       </button>
@@ -359,11 +359,11 @@ const Actions: Component<ActionProps> = (props) => {
       const succeeded = results.filter((res) => res.status === 'fulfilled').length;
       const failed = results.length - succeeded;
       if (succeeded === results.length) {
-        window.alert(i18n()('post.deletedSuccessfully'));
+        window.alert(i18n.t('post.deletedSuccessfully'));
       } else if (succeeded > 0) {
-        window.alert(i18n()('post.failedToDeletePartially', { count: failed }));
+        window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
       } else {
-        window.alert(i18n()('post.failedToDelete'));
+        window.alert(i18n.t('post.failedToDelete'));
       }
     },
     onError: (err) => {
@@ -374,7 +374,7 @@ const Actions: Component<ActionProps> = (props) => {
   const otherActionsPopup = useContextMenu(() => ({
     menu: [
       {
-        content: i18n()('post.copyEventId'),
+        content: i18n.t('post.copyEventId'),
         onSelect: () => {
           navigator.clipboard
             .writeText(noteEncode(props.event.id))
@@ -382,31 +382,31 @@ const Actions: Component<ActionProps> = (props) => {
         },
       },
       {
-        content: i18n()('post.showJSON'),
+        content: i18n.t('post.showJSON'),
         onSelect: () => {
           setModal('EventDebugModal');
         },
       },
       {
-        content: i18n()('post.showReposts'),
+        content: i18n.t('post.showReposts'),
         onSelect: () => {
           setModal('Reposts');
         },
       },
       {
-        content: i18n()('post.showReactions'),
+        content: i18n.t('post.showReactions'),
         onSelect: () => {
           setModal('Reactions');
         },
       },
       {
         when: () => props.event.pubkey === pubkey(),
-        content: <span class="text-red-500">{i18n()('post.deletePost')}</span>,
+        content: <span class="text-red-500">{i18n.t('post.deletePost')}</span>,
         onSelect: () => {
           const p = pubkey();
           if (p == null) return;
 
-          if (!window.confirm(i18n()('post.confirmDelete'))) return;
+          if (!window.confirm(i18n.t('post.confirmDelete'))) return;
           deleteMutation.mutate({
             relayUrls: config().relayUrls,
             pubkey: p,
@@ -428,21 +428,21 @@ const Actions: Component<ActionProps> = (props) => {
             props.onClickReply();
           }}
         >
-          <span class="flex h-4 w-4">
+          <span class="flex size-4">
             <ChatBubbleLeft />
           </span>
         </button>
         <RepostAction event={props.event} />
         <ReactionAction event={props.event} />
         <button type="button" onClick={() => setModal('ZapRequest')}>
-          <span class="flex h-4 w-4 text-fg-tertiary hover:text-r-zap">
+          <span class="flex size-4 text-fg-tertiary hover:text-r-zap">
             <Bolt />
           </span>
         </button>
         <button
           ref={otherActionsPopup.targetRef}
           type="button"
-          class="h-4 w-4 shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
+          class="size-4 shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
           onClick={() => otherActionsPopup.open()}
         >
           <EllipsisHorizontal />

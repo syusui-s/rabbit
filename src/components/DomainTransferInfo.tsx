@@ -17,24 +17,24 @@ const DomainTransferInfo: Component<{ children: JSX.Element }> = (props) => {
       when={isPermittedDomain(window.location) || showContent()}
       fallback={
         <div class="flex h-svh w-screen shrink-0 flex-col items-center justify-center border-b border-border bg-bg-tertiary text-fg">
-          <h3 class="text-2xl font-bold">{i18n()('domainTransfer.announcementHead')}</h3>
-          <div>{i18n()('domainTransfer.announcementDescription')}</div>
+          <h3 class="text-2xl font-bold">{i18n.t('domainTransfer.announcementHead')}</h3>
+          <div>{i18n.t('domainTransfer.announcementDescription')}</div>
           <SafeLink class="text-lg text-link underline" href="https://rabbit.syusui.net/" />
           <SafeLink
             class="mt-4 text-sm text-link underline"
             href="https://scrapbox.io/nostr/Rabbit#659be5fa1246d700005facb8"
           >
-            {i18n()('domainTransfer.howToMigrateSettings')}
+            {i18n.t('domainTransfer.howToMigrateSettings')}
           </SafeLink>
           <button
             type="button"
             class="mt-4 flex items-center text-fg-secondary"
             onClick={() => setShowContent(true)}
           >
-            <span class="inline-block h-5 w-5">
+            <span class="inline-block size-5">
               <XMark />
             </span>
-            {i18n()('domainTransfer.close')}
+            {i18n.t('domainTransfer.close')}
           </button>
         </div>
       }

@@ -73,10 +73,10 @@ const Column: Component<ColumnProps> = (props) => {
                   class="flex w-full items-center gap-1"
                   onClick={() => timelineState?.clearTimeline()}
                 >
-                  <div class="inline-block h-4 w-4">
+                  <div class="inline-block size-4">
                     <ArrowLeft />
                   </div>
-                  <div>{i18n()('column.back')}</div>
+                  <div>{i18n.t('column.back')}</div>
                 </button>
               </div>
               <div class="scrollbar flex max-h-full flex-col overflow-y-scroll scroll-smooth pb-16">

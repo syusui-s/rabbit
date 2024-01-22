@@ -36,7 +36,7 @@ const Post: Component<PostProps> = (props) => {
       <div class="flex w-full gap-1">
         <button
           type="button"
-          class="author-icon h-10 w-10 shrink-0 overflow-hidden rounded"
+          class="author-icon size-10 shrink-0 overflow-hidden rounded"
           onClick={(ev) => {
             ev.preventDefault();
             props.onShowProfile?.();
@@ -50,7 +50,7 @@ const Post: Component<PostProps> = (props) => {
                     src={thumbnailUrl(url, 'icon')}
                     alt="icon"
                     referrerpolicy="no-referrer"
-                    class="h-full w-full object-cover"
+                    class="size-full object-cover"
                   />
                 )}
               </LazyLoad>
@@ -113,8 +113,8 @@ const Post: Component<PostProps> = (props) => {
                 setShowOverflow((current) => !current);
               }}
             >
-              <Show when={!showOverflow()} fallback={i18n()('post.hideOverflow')}>
-                {i18n()('post.showOverflow')}
+              <Show when={!showOverflow()} fallback={i18n.t('post.hideOverflow')}>
+                {i18n.t('post.showOverflow')}
               </Show>
             </button>
           </Show>

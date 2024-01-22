@@ -44,7 +44,7 @@ const ChannelColumn: Component<ChannelColumnProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.channel')}
+          name={props.column.name ?? i18n.t('column.channel')}
           icon={<ChatBubbleLeftRight />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

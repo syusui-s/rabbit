@@ -91,7 +91,7 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
             onClick={() => props.loadMore.loadLatest()}
           >
-            <span>{i18n()('column.loadLatest')}</span>
+            <span>{i18n.t('column.loadLatest')}</span>
           </button>
         </ColumnItem>
       </Show>
@@ -102,7 +102,7 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
           disabled={!props.eose}
           onClick={() => props.loadMore.loadOld()}
         >
-          <span>{i18n()('column.loadOld')}</span>
+          <span>{i18n.t('column.loadOld')}</span>
         </button>
       </ColumnItem>
     </>

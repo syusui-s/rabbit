@@ -2,38 +2,37 @@ import { Component, JSX, createContext, createEffect, createSignal, useContext }
 
 import i18next from 'i18next';
 
-type I18Next = typeof i18next.t;
+type I18Next = typeof i18next;
 
 export type I18NextProviderProps = {
   i18next: I18Next | Promise<I18Next | void> | void;
   children?: JSX.Element;
 };
 
-const I18NextContext = createContext<I18Next | Promise<I18Next | void> | void>();
+const I18NextContext = createContext<I18Next>(i18next);
 
-export const useTranslation = () => {
-  const [i18nextFn, setI18nextFn] = createSignal<I18Next>(i18next.t);
-  const maybePromise = useContext(I18NextContext);
+export const useTranslation = () => useContext<I18Next>(I18NextContext);
+
+export const I18NextProvider: Component<I18NextProviderProps> = (props) => {
+  const [i18nextInstance, setI18nextInstance] = createSignal<I18Next>(i18next);
 
   createEffect(() => {
-    if (maybePromise instanceof Promise) {
-      maybePromise
+    if (props.i18next instanceof Promise) {
+      props.i18next
         .then((instance) => {
           if (instance != null) {
-            setI18nextFn(() => instance);
+            setI18nextInstance(() => instance);
           }
         })
         .catch((err) => {
-          console.error('failed to initialize i18next', err);
+          console.error('failed to initialize i18n.text', err);
         });
-    } else if (maybePromise != null) {
-      setI18nextFn(() => maybePromise);
+    } else if (props.i18next != null) {
+      setI18nextInstance(props.i18next);
     }
   });
 
-  return i18nextFn;
+  return (
+    <I18NextContext.Provider value={i18nextInstance()}>{props.children}</I18NextContext.Provider>
+  );
 };
-
-export const I18NextProvider: Component<I18NextProviderProps> = (props) => (
-  <I18NextContext.Provider value={props.i18next}>{props.children}</I18NextContext.Provider>
-);

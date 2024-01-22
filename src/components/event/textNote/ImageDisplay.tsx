@@ -23,7 +23,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
           class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
           onClick={() => setHidden(false)}
         >
-          {i18n()('post.showImage')}
+          {i18n.t('post.showImage')}
         </button>
       }
     >

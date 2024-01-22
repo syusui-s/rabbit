@@ -25,10 +25,10 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
           <span class="inline-block size-4">
             <ExclamationTriangle />
           </span>
-          <span>{i18n()('post.contentWarning.show')}</span>
+          <span>{i18n.t('post.contentWarning.show')}</span>
           <Show when={props.contentWarning.reason != null}>
             <span>
-              {i18n()('post.contentWarning.reason')}: {props.contentWarning.reason}
+              {i18n.t('post.contentWarning.reason')}: {props.contentWarning.reason}
             </span>
           </Show>
         </button>
@@ -40,7 +40,7 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
           class="text-xs text-fg-secondary hover:text-fg-secondary/70"
           onClick={() => setShowContentWarning(false)}
         >
-          {i18n()('post.contentWarning.hide')}
+          {i18n.t('post.contentWarning.hide')}
         </button>
       </Show>
     </Show>

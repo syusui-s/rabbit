@@ -83,7 +83,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
             </Show>
             <Show when={event().taggedPubkeys().length > 0}>
               <div class="text-xs">
-                {i18n()('post.replyToPre')}
+                {i18n.t('post.replyToPre')}
                 <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
@@ -97,7 +97,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
                     </button>
                   )}
                 </For>
-                {i18n()('post.replyToPost')}
+                {i18n.t('post.replyToPost')}
               </div>
             </Show>
             <ContentWarningDisplay contentWarning={event().contentWarning()}>

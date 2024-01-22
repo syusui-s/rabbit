@@ -49,7 +49,7 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.notification')}
+          name={props.column.name ?? i18n.t('column.notification')}
           icon={<Bell />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}

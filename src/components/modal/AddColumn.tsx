@@ -84,28 +84,28 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addFollowingColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <Home />
           </span>
-          {i18n()('column.home')}
+          {i18n.t('column.home')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addNotificationColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <Bell />
           </span>
-          {i18n()('column.notification')}
+          {i18n.t('column.notification')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addJapanRelaysColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <GlobeAlt />
           </span>
-          {i18n()('column.japanese')}
+          {i18n.t('column.japanese')}
         </button>
         {/*
         <button
@@ -133,28 +133,28 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addSearchColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <MagnifyingGlass />
           </span>
-          {i18n()('column.search')}
+          {i18n.t('column.search')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addMyPostsColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <User />
           </span>
-          {i18n()('column.myPosts')}
+          {i18n.t('column.myPosts')}
         </button>
         <button
           class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
           onClick={() => addMyReactionsColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <Heart />
           </span>
-          {i18n()('column.myReactions')}
+          {i18n.t('column.myReactions')}
         </button>
       </div>
     </BasicModal>

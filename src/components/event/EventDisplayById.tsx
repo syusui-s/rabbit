@@ -33,7 +33,7 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
     <Switch
       fallback={
         <span>
-          {i18n()('post.failedToFetchEvent')}
+          {i18n.t('post.failedToFetchEvent')}
           {props.eventId}
         </span>
       }
@@ -45,7 +45,7 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
       <Match when={eventQuery.isLoading && localProps.eventId} keyed>
         {(id) => (
           <div class="truncate">
-            {i18n()('general.loading')} <EventLink eventId={id} />
+            {i18n.t('general.loading')} <EventLink eventId={id} />
           </div>
         )}
       </Match>

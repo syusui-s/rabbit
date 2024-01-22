@@ -30,14 +30,14 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
     <Switch
       fallback={
         <div>
-          <span>{i18n()('post.unsupportedKind', { kind: props.event.kind })}</span>
+          <span>{i18n.t('post.unsupportedKind', { kind: props.event.kind })}</span>
           <EventLink eventId={props.event.id} kind={props.event.kind} />
         </div>
       }
     >
       <Match when={!isAllowedKind()} keyed>
         <div>
-          <span>{i18n()('post.unexpectedKind', { kind: props.event.kind })}</span>
+          <span>{i18n.t('post.unexpectedKind', { kind: props.event.kind })}</span>
           <EventLink eventId={props.event.id} kind={props.event.kind} />
         </div>
       </Match>

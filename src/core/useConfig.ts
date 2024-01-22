@@ -237,8 +237,8 @@ const useConfig = (): UseConfig => {
     const columns: ColumnType[] = [
       createFollowingColumn({ width: 'widest', pubkey }),
       createNotificationColumn({ pubkey }),
-      createPostsColumn({ name: i18n()('column.myPosts'), pubkey }),
-      createReactionsColumn({ name: i18n()('column.myReactions'), pubkey }),
+      createPostsColumn({ name: i18n.t('column.myPosts'), pubkey }),
+      createReactionsColumn({ name: i18n.t('column.myReactions'), pubkey }),
     ];
 
     if (navigator.language.includes('ja')) {

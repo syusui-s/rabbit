@@ -109,7 +109,7 @@ const ClickToShow: Component<ClickToShowProps> = (props) => {
             class="flex flex-col items-center rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
             onClick={() => setHidden(false)}
           >
-            {i18n()('post.showPreview')}
+            {i18n.t('post.showPreview')}
           </button>
           <SafeLink class="text-link underline" href={props.url} />
         </div>

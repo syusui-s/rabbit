@@ -50,7 +50,7 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
     <Column
       header={
         <BasicColumnHeader
-          name={props.column.name ?? i18n()('column.relay')}
+          name={props.column.name ?? i18n.t('column.relay')}
           icon={<GlobeAlt />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
