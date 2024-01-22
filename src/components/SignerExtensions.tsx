@@ -4,6 +4,7 @@ import ArrowTopRightOnSquare from 'heroicons/24/outline/arrow-top-right-on-squar
 import { UAParser } from 'ua-parser-js';
 
 import SafeLink from '@/components/utils/SafeLink';
+import { useTranslation } from '@/i18n/useTranslation';
 
 const Browsers = ['pc-chrome', 'pc-firefox', 'ios', 'android'] as const;
 
@@ -86,7 +87,9 @@ const getBrowsers = () => {
 };
 
 const SignerExtensions = () => {
+  const i18n = useTranslation();
   const [selectedBrowsers, setSelectedBrowsers] = createSignal(getBrowsers());
+
   const toggleBrowser = (browser: Browser) =>
     setSelectedBrowsers((current) => {
       const newSet = new Set(current);
@@ -143,7 +146,7 @@ const SignerExtensions = () => {
                 </SafeLink>
                 <div class="flex items-center">
                   <ul class="flex items-center gap-1 text-xs">
-                    <For each={extension.guides}>
+                    <For each={extension.guides.filter((guide) => i18n.language === guide.lang)}>
                       {(guide) => (
                         <li class="text-link underline">
                           <SafeLink href={guide.url}>{guide.title}</SafeLink>
@@ -163,7 +166,7 @@ const SignerExtensions = () => {
                 </ul>
               </div>
               <div class="shrink-0" aria-hidden="true">
-                <SafeLink class="font-bold text-fg-secondary" href={extension.url}>
+                <SafeLink class="font-bold text-fg hover:text-fg-secondary" href={extension.url}>
                   <span class="ms-1 inline-block size-16 p-5">
                     <ArrowTopRightOnSquare />
                   </span>
