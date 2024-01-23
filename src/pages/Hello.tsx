@@ -68,7 +68,7 @@ const Hello: Component = () => {
             <div class="flex flex-col items-center gap-2">
               <p class="text-sm">{i18n.t('hello.reloadAfterInstall')}</p>
               <button
-                class="rounded bg-primary px-4 py-2 text-sm font-bold text-primary-fg hover:bg-primary-hover"
+                class="rounded border border-primary px-4 py-2 text-sm font-bold text-primary hover:text-primary-hover"
                 onClick={() => window.location.reload()}
               >
                 {i18n.t('hello.reload')}

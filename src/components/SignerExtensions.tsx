@@ -33,8 +33,8 @@ const browserAsString = (browser: Browser) => BrowserToString[browser];
 const Extensions: ExtensionDefinition[] = [
   {
     name: 'nos2x',
-    url: 'https://chrome.google.com/webstore/detail/nos2x/kpgefcfmnafjgpblomihpgmejjdanjjp',
-    browsers: ['pc-chrome', 'android'],
+    url: 'https://chromewebstore.google.com/detail/nos2x/kpgefcfmnafjgpblomihpgmejjdanjjp',
+    browsers: ['pc-chrome'],
     guides: [
       {
         title: 'nos2xのセットアップと使い方',
@@ -66,6 +66,24 @@ const Extensions: ExtensionDefinition[] = [
         lang: 'ja',
       },
     ],
+  },
+  {
+    name: 'Spring - The Nostr Browser',
+    browsers: ['android'],
+    url: 'https://spring.site/',
+    guides: [
+      {
+        title: 'Spring Browserのセットアップと使い方',
+        url: 'https://scrapbox.io/nostr/Spring_Browser%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97%E3%81%A8%E4%BD%BF%E3%81%84%E6%96%B9',
+        lang: 'ja',
+      },
+    ],
+  },
+  {
+    name: 'AKA Profiles',
+    url: 'https://chromewebstore.google.com/detail/aka-profiles/ncmflpbbagcnakkolfpcpogheckolnad',
+    browsers: ['pc-chrome'],
+    guides: [],
   },
 ];
 
