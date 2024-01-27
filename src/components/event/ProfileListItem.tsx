@@ -18,7 +18,7 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
     <div class="flex w-full items-center gap-1">
       <button
         type="button"
-        class="profile-icon h-6 w-6 shrink-0 overflow-hidden"
+        class="profile-icon size-6 shrink-0 overflow-hidden"
         onClick={(ev) => {
           ev.preventDefault();
           props.onShowProfile?.();
@@ -26,7 +26,7 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
       >
         <Show when={profile()?.picture} keyed>
           {(url) => (
-            <img src={thumbnailUrl(url)} alt="icon" class="h-full w-full rounded object-cover" />
+            <img src={thumbnailUrl(url)} alt="icon" class="size-full rounded object-cover" />
           )}
         </Show>
       </button>

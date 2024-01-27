@@ -19,7 +19,7 @@ const ChannelInfo: Component<ChannelInfoProps> = (props) => {
       {(meta) => (
         <button class="flex flex-col gap-1 px-1">
           <div class="flex items-center gap-1">
-            <span class="inline-block h-4 w-4 text-purple-400">
+            <span class="inline-block size-4 text-purple-400">
               <ChatBubbleLeftRight />
             </span>
             <span>{meta.name}</span>

@@ -18,7 +18,7 @@ const BasicModal: Component<BasicModalProps> = (props) => (
         aria-label="Close"
         onClick={() => props.onClose?.()}
       >
-        <span class="inline-block h-8 w-8">
+        <span class="inline-block size-8">
           <Show when={props?.closeButton} fallback={<XMark />} keyed>
             {(button) => button()}
           </Show>

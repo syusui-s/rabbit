@@ -66,7 +66,7 @@ const SearchButton = () => {
           value={query()}
           onChange={(ev) => setQuery(ev.currentTarget.value)}
         />
-        <button class="h-8 w-8 rounded bg-primary p-1 text-primary-fg" type="submit">
+        <button class="size-8 rounded bg-primary p-1 text-primary-fg" type="submit">
           <MagnifyingGlass />
         </button>
       </form>
@@ -85,7 +85,7 @@ const SearchButton = () => {
           inputRef?.focus();
         }}
       >
-        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
+        <span class="inline-block size-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
           <MagnifyingGlass />
         </span>
       </button>
@@ -138,7 +138,7 @@ const SideBar: Component = () => {
             when={shouldUseMobileUI()}
             fallback={
               <button class="static w-full px-0 py-1" type="button" onClick={handleClickOpenForm}>
-                <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg">
+                <span class="inline-block size-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg">
                   <PencilSquare />
                 </span>
               </button>
@@ -149,7 +149,7 @@ const SideBar: Component = () => {
               type="button"
               onClick={handleClickOpenForm}
             >
-              <span class="inline-block h-14 w-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover">
+              <span class="inline-block size-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover">
                 <PencilSquare />
               </span>
             </button>
@@ -162,7 +162,7 @@ const SideBar: Component = () => {
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => showAddColumn()}
           >
-            <span class="inline-block h-6 w-6">
+            <span class="inline-block size-6">
               <Plus />
             </span>
           </button>
@@ -170,13 +170,13 @@ const SideBar: Component = () => {
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => setConfigOpened((current) => !current)}
           >
-            <span class="h-6 w-6">
+            <span class="size-6">
               <Cog6Tooth />
             </span>
           </button>
           <button class="flex w-full flex-col items-center" onClick={() => showAbout()}>
             <img
-              class="h-8 w-8"
+              class="size-8"
               src={resolveAsset(getColorTheme().rabbitIconPath)}
               alt="About rabbit"
             />

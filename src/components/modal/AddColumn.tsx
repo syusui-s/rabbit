@@ -112,7 +112,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
           onClick={() => window.alert()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <ChatBubbleLeftRight />
           </span>
           チャンネル
@@ -123,7 +123,7 @@ const AddColumn: Component<AddColumnProps> = (props) => {
           class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
           onClick={() => addBookmarkColumn()}
         >
-          <span class="inline-block h-8 w-8">
+          <span class="inline-block size-8">
             <BookmarkIcon />
           </span>
           ブックマーク
