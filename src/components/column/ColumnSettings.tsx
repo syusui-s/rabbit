@@ -6,12 +6,11 @@ import Trash from 'heroicons/24/outline/trash.svg';
 
 import { ColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
-import { useRequestCommand } from '@/hooks/useCommandBus';
+import useCursor from '@/hooks/useCursor';
 import { useTranslation } from '@/i18n/useTranslation';
 
 type ColumnSettingsProps = {
   column: ColumnType;
-  columnIndex: number;
 };
 
 type ColumnSettingsSectionProps = {
@@ -29,15 +28,15 @@ const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => 
 const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
   const i18n = useTranslation();
   const { saveColumn, removeColumn, moveColumn } = useConfig();
-  const request = useRequestCommand();
+  const { setCursor } = useCursor();
 
   const setColumnWidth = (width: ColumnType['width']) => {
     saveColumn({ ...props.column, width });
   };
 
-  const move = (index: number) => {
-    moveColumn(props.column.id, index);
-    request({ command: 'moveToColumn', columnIndex: index }).catch((err) => console.error(err));
+  const move = (diff: number) => {
+    moveColumn(props.column.id, diff);
+    setCursor({ columnId: props.column.id });
   };
 
   return (
@@ -63,20 +62,12 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
         </div>
       </ColumnSettingsSection>
       <div class="flex h-10 items-center gap-2">
-        <button
-          class="py-4 pl-2"
-          title={i18n.t('column.config.moveLeft')}
-          onClick={() => move(props.columnIndex - 1)}
-        >
+        <button class="py-4 pl-2" title={i18n.t('column.config.moveLeft')} onClick={() => move(-1)}>
           <span class="inline-block size-4">
             <ChevronLeft />
           </span>
         </button>
-        <button
-          class="py-4 pr-2"
-          title={i18n.t('column.config.moveRight')}
-          onClick={() => move(props.columnIndex + 1)}
-        >
+        <button class="py-4 pr-2" title={i18n.t('column.config.moveRight')} onClick={() => move(1)}>
           <span class="inline-block size-4">
             <ChevronRight />
           </span>

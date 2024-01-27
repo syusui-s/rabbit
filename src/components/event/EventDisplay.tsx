@@ -1,15 +1,18 @@
-import { Switch, Match, Component } from 'solid-js';
+import { Switch, Match, lazy, Component } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-// import ChannelInfo from '@/components/event/ChannelInfo';
+// eslint-disable-next-line import/no-cycle
+import Reaction from '@/components/event/Reaction';
 // eslint-disable-next-line import/no-cycle
 import Repost from '@/components/event/Repost';
 // eslint-disable-next-line import/no-cycle
 import TextNote from '@/components/event/TextNote';
 import EventLink from '@/components/EventLink';
 import { useTranslation } from '@/i18n/useTranslation';
+
+const ZapReceipt = lazy(() => import('@/components/event/ZapReceipt'));
 
 export type EventDisplayProps = {
   event: NostrEvent;
@@ -47,13 +50,14 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
       <Match when={props.event.kind === Kind.Repost}>
         <Repost event={props.event} />
       </Match>
+      <Match when={props.event.kind === Kind.Reaction}>
+        <Reaction event={props.event} />
+      </Match>
+      <Match when={props.event.kind === Kind.Zap}>
+        <ZapReceipt event={props.event} />
+      </Match>
     </Switch>
   );
-  /*
-      <Match when={props.event.kind === Kind.ChannelCreation}>
-        <ChannelInfo event={props.event} />
-      </Match>
-   */
 };
 
 export default EventDisplay;

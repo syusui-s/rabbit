@@ -62,7 +62,7 @@ type UseConfig = {
   removeRelay: (url: string) => void;
   // column
   saveColumn: (column: ColumnType) => void;
-  moveColumn: (columnId: string, index: number) => void;
+  moveColumn: (columnId: string, diff: number) => void;
   removeColumn: (columnId: string) => void;
   initializeColumns: (param: { pubkey: string }) => void;
   // emoji
@@ -168,15 +168,12 @@ const useConfig = (): UseConfig => {
     });
   };
 
-  const moveColumn = (columnId: string, index: number) => {
+  const moveColumn = (columnId: string, diff: number) => {
     setConfig('columns', (current) => {
-      // index starts with 1
-      const idx = index - 1;
-      const toIndex = Math.max(Math.min(idx, current.length), 0);
       const fromIndex = current.findIndex((e) => e.id === columnId);
+      const toIndex = Math.max(Math.min(fromIndex + diff, current.length), 0);
       if (fromIndex < 0 || toIndex === fromIndex) return current;
 
-      console.log(fromIndex, toIndex);
       const modified = [...current];
       const [column] = modified.splice(fromIndex, 1);
       modified.splice(toIndex, 0, column);

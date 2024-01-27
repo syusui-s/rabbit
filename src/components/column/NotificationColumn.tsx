@@ -6,7 +6,7 @@ import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
-import Notification from '@/components/timeline/Notification';
+import Timeline from '@/components/timeline/Timeline';
 import { NotificationColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
@@ -14,8 +14,6 @@ import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 
 type NotificationColumnDisplayProps = {
-  columnIndex: number;
-  lastColumn: boolean;
   column: NotificationColumnType;
 };
 
@@ -47,21 +45,20 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
 
   return (
     <Column
+      columnId={props.column.id}
       header={
         <BasicColumnHeader
           name={props.column.name ?? i18n.t('column.notification')}
           icon={<Bell />}
-          settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
+          settings={() => <ColumnSettings column={props.column} />}
           onClose={() => removeColumn(props.column.id)}
         />
       }
       width={props.column.width}
-      columnIndex={props.columnIndex}
-      lastColumn={props.lastColumn}
       timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
-        <Notification events={notifications()} />
+        <Timeline events={notifications()} />
       </LoadMore>
     </Column>
   );

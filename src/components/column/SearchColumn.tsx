@@ -77,8 +77,6 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
 };
 
 export type SearchColumnDisplayProps = {
-  columnIndex: number;
-  lastColumn: boolean;
   column: SearchColumnType;
 };
 
@@ -121,16 +119,15 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
 
   return (
     <Column
+      columnId={props.column.id}
       header={
         <SearchColumnHeader
           column={props.column}
-          settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
+          settings={() => <ColumnSettings column={props.column} />}
           onClose={() => removeColumn(props.column.id)}
         />
       }
       width={props.column.width}
-      columnIndex={props.columnIndex}
-      lastColumn={props.lastColumn}
       timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>

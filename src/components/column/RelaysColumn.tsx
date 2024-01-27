@@ -14,8 +14,6 @@ import { useTranslation } from '@/i18n/useTranslation';
 import useSubscription from '@/nostr/useSubscription';
 
 type RelaysColumnDisplayProps = {
-  columnIndex: number;
-  lastColumn: boolean;
   column: RelaysColumnType;
 };
 
@@ -48,17 +46,16 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
 
   return (
     <Column
+      columnId={props.column.id}
       header={
         <BasicColumnHeader
           name={props.column.name ?? i18n.t('column.relay')}
           icon={<GlobeAlt />}
-          settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
+          settings={() => <ColumnSettings column={props.column} />}
           onClose={() => removeColumn(props.column.id)}
         />
       }
       width={props.column.width}
-      columnIndex={props.columnIndex}
-      lastColumn={props.lastColumn}
       timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>

@@ -12,8 +12,6 @@ import { useTranslation } from '@/i18n/useTranslation';
 import useParameterizedReplaceableEvent from '@/nostr/useParameterizedReplaceableEvent';
 
 type BookmarkColumnDisplayProps = {
-  columnIndex: number;
-  lastColumn: boolean;
   column: BookmarkColumnType;
 };
 
@@ -31,17 +29,16 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
 
   return (
     <Column
+      columnId={props.column.id}
       header={
         <BasicColumnHeader
           name={props.column.name ?? i18n.t('column.bookmark')}
           icon={<BookmarkIcon />}
-          settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
+          settings={() => <ColumnSettings column={props.column} />}
           onClose={() => removeColumn(props.column.id)}
         />
       }
       width={props.column.width}
-      columnIndex={props.columnIndex}
-      lastColumn={props.lastColumn}
     >
       <Show when={event()} keyed>
         {(ev) => <Bookmark event={ev} />}

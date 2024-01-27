@@ -42,6 +42,7 @@ const ChannelColumn: Component<ChannelColumnProps> = (props) => {
 
   return (
     <Column
+      columnId={props.column.id}
       header={
         <BasicColumnHeader
           name={props.column.name ?? i18n.t('column.channel')}

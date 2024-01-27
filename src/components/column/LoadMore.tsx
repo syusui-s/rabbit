@@ -86,25 +86,21 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
   return (
     <>
       <Show when={!props.loadMore.continuous()}>
-        <ColumnItem>
-          <button
-            class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
-            onClick={() => props.loadMore.loadLatest()}
-          >
-            <span>{i18n.t('column.loadLatest')}</span>
-          </button>
-        </ColumnItem>
+        <button
+          class="flex h-12 w-full flex-col items-center justify-center border-b border-border py-4 hover:text-fg-secondary"
+          onClick={() => props.loadMore.loadLatest()}
+        >
+          <span>{i18n.t('column.loadLatest')}</span>
+        </button>
       </Show>
       {props.children}
-      <ColumnItem>
-        <button
-          class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary disabled:text-fg-secondary/30"
-          disabled={!props.eose}
-          onClick={() => props.loadMore.loadOld()}
-        >
-          <span>{i18n.t('column.loadOld')}</span>
-        </button>
-      </ColumnItem>
+      <button
+        class="flex h-12 w-full flex-col items-center justify-center border-b border-border py-4 hover:text-fg-secondary disabled:text-fg-secondary/30"
+        disabled={!props.eose}
+        onClick={() => props.loadMore.loadOld()}
+      >
+        <span>{i18n.t('column.loadOld')}</span>
+      </button>
     </>
   );
 };
