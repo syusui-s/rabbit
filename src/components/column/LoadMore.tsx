@@ -11,7 +11,7 @@ import {
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ColumnItem from '@/components/ColumnItem';
-import useScroll from '@/hooks/useScroll';
+import { useScroller } from '@/hooks/useScroller';
 import { useTranslation } from '@/i18n/useTranslation';
 import { pickOldestEvent } from '@/nostr/event/comparator';
 import epoch from '@/utils/epoch';
@@ -21,7 +21,6 @@ export type UseLoadMoreProps = {
 };
 
 export type UseLoadMore = {
-  timelineRef: (el: HTMLElement) => void;
   setEvents: (event: NostrEvent[]) => void;
   since: Accessor<number | undefined>;
   until: Accessor<number | undefined>;
@@ -49,14 +48,14 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
   const [until, setUntil] = createSignal<number | undefined>();
   const continuous = () => until() == null;
 
-  const scroll = useScroll();
+  const scroller = useScroller();
 
   const loadLatest = () => {
     batch(() => {
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
-    scroll.scrollToTop();
+    scroller.scrollToTop();
   };
 
   const loadOld = () => {
@@ -66,11 +65,10 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
-    scroll.scrollToTop();
+    scroller.scrollToTop();
   };
 
   return {
-    timelineRef: scroll.targetRef,
     setEvents,
     since,
     until,

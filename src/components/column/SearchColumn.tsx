@@ -53,7 +53,7 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
     <div class="flex flex-col">
       <div class="flex h-8 items-center gap-1 px-2">
         <h2 class="flex items-center gap-1">
-          <span class="inline-block h-4 w-4 text-fg-secondary">
+          <span class="inline-block size-4 text-fg-secondary">
             <MagnifyingGlass />
           </span>
         </h2>
@@ -67,7 +67,7 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
             onBlur={handleBlur}
           />
         </form>
-        <button class="h-4 w-4" onClick={() => toggleSettingsOpened()}>
+        <button class="size-4" onClick={() => toggleSettingsOpened()}>
           <EllipsisVertical />
         </button>
       </div>
@@ -131,7 +131,6 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
-      timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Timeline events={events()} />
