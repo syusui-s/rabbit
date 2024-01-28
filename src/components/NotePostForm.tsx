@@ -91,7 +91,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [contentWarningReason, setContentWarningReason] = createSignal('');
   const [lastUsedHashTags, setLastUsedHashTags] = createSignal<string[]>([]);
 
-  const appendText = (s: string) => setText((current) => `${current} ${s}`);
+  const appendText = (s: string) => setText((current) => (current === '' ? s : `${current} ${s}`));
 
   const resetText = () => {
     setText(
