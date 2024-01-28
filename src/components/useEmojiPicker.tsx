@@ -55,7 +55,7 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
           emojis: customEmojis,
         },
       ],
-      autoFocus: false,
+      autoFocus: true,
       theme: 'light',
       onEmojiSelect: (emoji: EmojiData) => {
         console.log(emoji);
