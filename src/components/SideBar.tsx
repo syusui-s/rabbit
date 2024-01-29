@@ -113,6 +113,39 @@ const SearchButton = () => {
   );
 };
 
+type ColumnKind = ColumnType['columnType'];
+const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: ParseKeys }>> = {
+  Bookmark: {
+    icon: BookmarkIcon,
+    nameKey: 'column.bookmark',
+  },
+  Channel: {
+    icon: ChatBubbleLeftRight,
+    nameKey: 'column.channel',
+  },
+  Following: {
+    icon: Home,
+    nameKey: 'column.home',
+  },
+  Notification: {
+    icon: Bell,
+    nameKey: 'column.notification',
+  },
+  Posts: {
+    icon: User,
+    nameKey: 'column.posts',
+  },
+  Reactions: {
+    icon: Heart,
+    nameKey: 'column.reactions',
+  },
+  Relays: {
+    icon: GlobeAlt,
+    nameKey: 'column.relay',
+  },
+  Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
+};
+
 const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
   const i18n = useTranslation();
 
@@ -122,39 +155,6 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
       command: 'moveToColumn',
       columnIndex: props.index,
     }).catch((err) => console.error(err));
-  };
-
-  type ColumnKind = ColumnType['columnType'];
-  const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: ParseKeys }>> = {
-    Bookmark: {
-      icon: BookmarkIcon,
-      nameKey: 'column.bookmark',
-    },
-    Channel: {
-      icon: ChatBubbleLeftRight,
-      nameKey: 'column.channel',
-    },
-    Following: {
-      icon: Home,
-      nameKey: 'column.home',
-    },
-    Notification: {
-      icon: Bell,
-      nameKey: 'column.notification',
-    },
-    Posts: {
-      icon: User,
-      nameKey: 'column.posts',
-    },
-    Reactions: {
-      icon: Heart,
-      nameKey: 'column.reactions',
-    },
-    Relays: {
-      icon: GlobeAlt,
-      nameKey: 'column.relay',
-    },
-    Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
   };
 
   const Icon = createMemo(() => columns[props.column.columnType].icon);
