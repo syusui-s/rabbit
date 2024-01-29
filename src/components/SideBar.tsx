@@ -166,14 +166,14 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
 
   return (
     <button
-      class="relative my-2 flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
+      class="relative flex w-full flex-col items-center py-3 text-primary hover:text-primary-hover"
       onClick={() => jumpToColumn()}
       title={props.column.name ?? t(columnNameKey())}
     >
-      <span class="inline-block size-7">
+      <span class="inline-block size-6">
         <Icon />
       </span>
-      <span class="absolute -bottom-2 right-0 text-sm text-primary">{props.index}</span>
+      <span class="absolute bottom-2 right-0 text-xs text-primary">{props.index}</span>
     </button>
   );
 };
