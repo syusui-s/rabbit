@@ -14,7 +14,6 @@ import Bell from 'heroicons/24/outline/bell.svg';
 import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
-import Funnel from 'heroicons/24/outline/funnel.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import Heart from 'heroicons/24/outline/heart.svg';
 import Home from 'heroicons/24/outline/home.svg';
@@ -116,7 +115,6 @@ const SearchButton = () => {
 
 const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
   const i18n = useTranslation();
-  const t = (key?: ParseKeys) => (key ? i18n.t(key) : '');
 
   const request = useRequestCommand();
   const jumpToColumn = () => {
@@ -127,7 +125,7 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
   };
 
   type ColumnKind = ColumnType['columnType'];
-  const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey?: ParseKeys }>> = {
+  const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: ParseKeys }>> = {
     Bookmark: {
       icon: BookmarkIcon,
       nameKey: 'column.bookmark',
@@ -157,9 +155,6 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
       nameKey: 'column.relay',
     },
     Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
-    CustomFilter: {
-      icon: Funnel,
-    },
   };
 
   const Icon = createMemo(() => columns[props.column.columnType].icon);
@@ -169,7 +164,7 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
     <button
       class="relative flex w-full flex-col items-center py-3 text-primary hover:text-primary-hover"
       onClick={() => jumpToColumn()}
-      title={props.column.name ?? t(columnNameKey())}
+      title={props.column.name ?? i18n.t(columnNameKey())}
     >
       <span class="inline-block size-6">
         <Icon />

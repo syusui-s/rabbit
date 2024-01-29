@@ -112,8 +112,9 @@ export type ColumnType =
   | ChannelColumnType
   | RelaysColumnType
   | SearchColumnType
-  | BookmarkColumnType
-  | CustomFilterColumnType;
+  | BookmarkColumnType;
+/* WIP: */
+/* | CustomFilterColumnType */
 
 type CreateParams<T extends BaseColumn> = Omit<T, keyof BaseColumn | 'columnType'> &
   Partial<BaseColumn>;
