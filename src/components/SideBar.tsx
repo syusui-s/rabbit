@@ -250,8 +250,8 @@ const SideBar: Component = () => {
           </Show>
           <SearchButton />
         </div>
-        <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden px-2 ">
-          <div class="size-full flex-col items-center justify-center border-y border-primary py-2 text-primary">
+        <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
+          <div class="size-full flex-col items-center justify-center py-2">
             <ColumnButtons />
           </div>
         </div>
