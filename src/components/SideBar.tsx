@@ -1,17 +1,36 @@
-import { createSignal, Show, onMount, onCleanup, lazy, type JSX, Component } from 'solid-js';
+import {
+  createSignal,
+  Show,
+  onMount,
+  onCleanup,
+  lazy,
+  type JSX,
+  Component,
+  For,
+  createMemo,
+} from 'solid-js';
 
+import Bell from 'heroicons/24/outline/bell.svg';
+import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
+import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
+import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
+import Heart from 'heroicons/24/outline/heart.svg';
+import Home from 'heroicons/24/outline/home.svg';
+import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
-import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
+import User from 'heroicons/24/outline/user.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
+import { ParseKeys } from 'i18next';
 import throttle from 'lodash/throttle';
 
 import NotePostForm from '@/components/NotePostForm';
 import usePopup, { type UsePopup } from '@/components/utils/usePopup';
-import { createSearchColumn } from '@/core/column';
+import { ColumnType, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import isMobile from '@/utils/isMobile';
 import resolveAsset from '@/utils/resolveAsset';
 
@@ -94,6 +113,81 @@ const SearchButton = () => {
   );
 };
 
+type ColumnKind = ColumnType['columnType'];
+const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: ParseKeys }>> = {
+  Bookmark: {
+    icon: BookmarkIcon,
+    nameKey: 'column.bookmark',
+  },
+  Channel: {
+    icon: ChatBubbleLeftRight,
+    nameKey: 'column.channel',
+  },
+  Following: {
+    icon: Home,
+    nameKey: 'column.home',
+  },
+  Notification: {
+    icon: Bell,
+    nameKey: 'column.notification',
+  },
+  Posts: {
+    icon: User,
+    nameKey: 'column.posts',
+  },
+  Reactions: {
+    icon: Heart,
+    nameKey: 'column.reactions',
+  },
+  Relays: {
+    icon: GlobeAlt,
+    nameKey: 'column.relay',
+  },
+  Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
+};
+
+const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
+  const i18n = useTranslation();
+
+  const request = useRequestCommand();
+  const jumpToColumn = () => {
+    request({
+      command: 'moveToColumn',
+      columnIndex: props.index,
+    }).catch((err) => console.error(err));
+  };
+
+  const Icon = createMemo(() => columns[props.column.columnType].icon);
+  const columnNameKey = createMemo(() => columns[props.column.columnType].nameKey);
+
+  return (
+    <button
+      class="relative flex w-full flex-col items-center py-3 text-primary hover:text-primary-hover"
+      onClick={() => jumpToColumn()}
+      title={props.column.name ?? i18n.t(columnNameKey())}
+    >
+      <span class="inline-block size-6">
+        <Icon />
+      </span>
+      <span class="absolute bottom-2 right-0 text-xs text-primary">{props.index}</span>
+    </button>
+  );
+};
+
+const ColumnButtons: Component = () => {
+  const { config } = useConfig();
+
+  return (
+    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
+      <div class="size-full flex-col items-center justify-center py-2">
+        <For each={config().columns}>
+          {(column, index) => <ColumnButton column={column} index={index() + 1} />}
+        </For>
+      </div>
+    </div>
+  );
+};
+
 const SideBar: Component = () => {
   let textAreaRef: HTMLTextAreaElement | undefined;
 
@@ -156,7 +250,7 @@ const SideBar: Component = () => {
           </Show>
           <SearchButton />
         </div>
-        <div class="grow" />
+        <ColumnButtons />
         <div class="flex w-full flex-col items-center gap-2 pb-2">
           <button
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
