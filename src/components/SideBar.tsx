@@ -124,6 +124,7 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
       command: 'moveToColumn',
       columnIndex: props.index,
     }).catch((err) => console.error(err));
+  };
 
   type ColumnKind = ColumnType['columnType'];
   const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey?: ParseKeys }>> = {
