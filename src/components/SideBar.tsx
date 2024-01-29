@@ -178,9 +178,13 @@ const ColumnButtons: Component = () => {
   const { config } = useConfig();
 
   return (
-    <For each={config().columns}>
-      {(column, index) => <ColumnButton column={column} index={index() + 1} />}
-    </For>
+    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
+      <div class="size-full flex-col items-center justify-center py-2">
+        <For each={config().columns}>
+          {(column, index) => <ColumnButton column={column} index={index() + 1} />}
+        </For>
+      </div>
+    </div>
   );
 };
 
@@ -246,11 +250,7 @@ const SideBar: Component = () => {
           </Show>
           <SearchButton />
         </div>
-        <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
-          <div class="size-full flex-col items-center justify-center py-2">
-            <ColumnButtons />
-          </div>
-        </div>
+        <ColumnButtons />
         <div class="flex w-full flex-col items-center gap-2 pb-2">
           <button
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
