@@ -10,6 +10,16 @@ import {
   createMemo,
 } from 'solid-js';
 
+import {
+  DragDropProvider,
+  DragDropSensors,
+  DragEventHandler,
+  SortableProvider,
+  createSortable,
+  closestCenter,
+  useDragDropContext,
+  type Transformer,
+} from '@thisbeyond/solid-dnd';
 import Bell from 'heroicons/24/outline/bell.svg';
 import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
@@ -149,6 +159,8 @@ const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: Pa
 const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
   const i18n = useTranslation();
 
+  const sortable = createSortable(props.column.id);
+
   const request = useRequestCommand();
   const jumpToColumn = () => {
     request({
@@ -162,7 +174,12 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
 
   return (
     <button
-      class="relative flex w-full flex-col items-center py-3 text-primary hover:text-primary-hover"
+      // https://github.com/thisbeyond/solid-dnd/issues/60
+      // https://github.com/thisbeyond/solid-dnd/issues/68
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      use:sortable
+      class="relative flex w-full touch-none select-none flex-col items-center py-3 text-primary hover:text-primary-hover"
       onClick={() => jumpToColumn()}
       title={props.column.name ?? i18n.t(columnNameKey())}
     >
@@ -174,15 +191,52 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
   );
 };
 
+const ConstrainDragAxis = () => {
+  const dragDropContext = useDragDropContext();
+  const actions = dragDropContext?.[1];
+
+  const transformer: Transformer = {
+    id: 'constrain-x-axis',
+    order: 100,
+    callback: (transform) => ({ ...transform, x: 0 }),
+  };
+
+  actions?.onDragStart(({ draggable }) => {
+    actions?.addTransformer('draggables', draggable.id, transformer);
+  });
+
+  actions?.onDragEnd(({ draggable }) => {
+    actions?.removeTransformer('draggables', draggable.id, transformer.id);
+  });
+
+  return <></>;
+};
+
 const ColumnButtons: Component = () => {
-  const { config } = useConfig();
+  const { config, moveColumnById } = useConfig();
+
+  const columnIds = () => config().columns.map((column) => column.id);
+
+  const handleDragEnd: DragEventHandler = ({ draggable, droppable }) => {
+    if (draggable && droppable) {
+      const columnId = draggable?.id as string;
+      const insertBeforeId = droppable?.id as string;
+      moveColumnById(columnId, insertBeforeId);
+    }
+  };
 
   return (
     <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
       <div class="size-full flex-col items-center justify-center py-2">
-        <For each={config().columns}>
-          {(column, index) => <ColumnButton column={column} index={index() + 1} />}
-        </For>
+        <DragDropProvider onDragEnd={handleDragEnd} collisionDetector={closestCenter}>
+          <DragDropSensors />
+          <ConstrainDragAxis />
+          <SortableProvider ids={columnIds()}>
+            <For each={config().columns}>
+              {(column, index) => <ColumnButton column={column} index={index() + 1} />}
+            </For>
+          </SortableProvider>
+        </DragDropProvider>
       </div>
     </div>
   );

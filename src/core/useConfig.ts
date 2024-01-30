@@ -63,6 +63,7 @@ type UseConfig = {
   // column
   saveColumn: (column: ColumnType) => void;
   moveColumn: (columnId: string, index: number) => void;
+  moveColumnById: (columnId: string, insertBeforeId: string) => void;
   removeColumn: (columnId: string) => void;
   initializeColumns: (param: { pubkey: string }) => void;
   // emoji
@@ -184,6 +185,11 @@ const useConfig = (): UseConfig => {
     });
   };
 
+  const moveColumnById = (columnId: string, insertBeforeId: string) => {
+    const toIndex = config.columns.findIndex((column) => column.id === insertBeforeId);
+    moveColumn(columnId, toIndex + 1);
+  };
+
   const removeColumn = (columnId: string) => {
     setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
   };
@@ -259,6 +265,7 @@ const useConfig = (): UseConfig => {
     // column
     saveColumn,
     moveColumn,
+    moveColumnById,
     removeColumn,
     initializeColumns,
     // emoji
