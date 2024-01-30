@@ -131,7 +131,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           // const { imageRef, canvas } = useImageAnimation({ initialPlaying: false });
           return (
             <img
-              class="inline-block h-8 max-w-[128px] align-middle"
+              class="inline-block h-8 max-w-[8rem]"
               src={item.url}
               alt={item.content}
               title={item.shortcode}
