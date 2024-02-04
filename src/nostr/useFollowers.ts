@@ -18,6 +18,7 @@ export default function useFollowers(propsProvider: () => UseFollowersProps) {
     relayUrls: config().relayUrls,
     filters: [{ kinds: [Kind.Contacts], '#p': [props().pubkey] }],
     limit: 1000000,
+    eoseLimit: 1000000,
     continuous: false,
   }));
 

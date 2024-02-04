@@ -120,8 +120,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
       relayUrls,
       filters,
       options ?? {
-        eoseTimeout: 12000,
-        maxWait: 6000,
+        maxWait: 12000,
         onevent: (event: NostrEvent) => {
           if (onEvent != null) {
             onEvent(event as NostrEvent & { id: string });
