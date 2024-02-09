@@ -20,6 +20,7 @@ import { useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import parseNip05Address from '@/nostr/parseNip05Address';
 import parseTextNote, { toResolved } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
@@ -72,14 +73,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const { verification, query: verificationQuery } = useVerification(() =>
     ensureNonNull([profile()?.nip05] as const)(([nip05]) => ({ nip05 })),
   );
-  const nip05Identifier = () => {
-    const ident = profile()?.nip05;
-    if (ident == null) return null;
-    const [user, domain] = ident.split('@');
-    if (domain == null) return null;
-    if (user === '_') return { domain, ident: domain };
-    return { user, domain, ident };
-  };
+  const nip05Identifier = () => parseNip05Address(profile()?.nip05);
   const isVerified = () => verification()?.pubkey === props.pubkey;
   const isMuted = () => isPubkeyMuted(props.pubkey);
 
