@@ -1,2 +1,0 @@
-import{c,o as i,C as l,a as f,i as u,j as d,t as h,n as b}from"./index-TwtfprWo.js";const m=h("<div>"),g=s=>{let t;const[r,o]=c(!1);return i(()=>{const e=new IntersectionObserver(n=>{n.forEach(a=>{a.isIntersecting&&(o(!0),e.disconnect())})},{threshold:s.threshold??0});t!=null&&e.observe(t),l(()=>{e.disconnect()})}),f(d,{get when(){return r()},get fallback(){return(()=>{const e=m(),n=t;return typeof n=="function"?b(n,e):t=e,u(e,()=>s.fallback),e})()},keyed:!0,children:e=>s.children()})};export{g as L};
-//# sourceMappingURL=LazyLoad-P00TKE2f.js.map
