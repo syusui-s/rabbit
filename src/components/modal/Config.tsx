@@ -634,7 +634,6 @@ const OtherConfig = () => {
 const ConfigUI = (props: ConfigProps) => {
   const i18n = useTranslation();
   const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
-  const { config, setConfig } = useConfig();
 
   const menu = [
     {
@@ -691,41 +690,6 @@ const ConfigUI = (props: ConfigProps) => {
           fallback={
             <>
               <h2 class="flex-1 text-center text-lg font-bold">{i18n.t('config.config')}</h2>
-              <div class="flex gap-1">
-                <Show when={window.location.host === 'syusui-s.github.io'}>
-                  <button
-                    type="button"
-                    class="rounded bg-primary p-2 text-primary-fg"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(JSON.stringify(config(), null, 2))
-                        .then(() => window.alert('OK'))
-                        .catch(() => window.alert('failed to copy'));
-                    }}
-                  >
-                    {i18n.t('config.copyToClipboard')}
-                  </button>
-                </Show>
-                <Show when={window.location.host === 'rabbit.syusui.net'}>
-                  <button
-                    type="button"
-                    class="rounded bg-primary p-2 text-primary-fg"
-                    onClick={() => {
-                      const text = window.prompt('Paste config') ?? '';
-                      if (text.length === 0) {
-                        window.alert('empty');
-                        return;
-                      }
-                      const json = JSON.parse(text) as ReturnType<typeof config>;
-                      if (window.confirm(`import?:\n${text}`)) {
-                        setConfig(json);
-                      }
-                    }}
-                  >
-                    {i18n.t('config.importFromClipboard')}
-                  </button>
-                </Show>
-              </div>
               <ul class="flex flex-col">
                 <For each={menu}>
                   {(menuItem, i) => (
