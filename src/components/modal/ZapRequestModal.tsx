@@ -247,16 +247,11 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
     }
 
     const invoice = callbackResponse.pr;
-    console.log(callbackResponse, invoice);
-    if (
-      !(await verifyInvoice(invoice, {
-        amountMilliSats,
-        metadata: endpointData.metadata,
-        zapRequest: callbackParams.zapRequest,
-      }))
-    ) {
-      throw new Error('Invalid invoice');
-    }
+    await verifyInvoice(invoice, {
+      amountMilliSats,
+      metadata: endpointData.metadata,
+      zapRequest: callbackParams.zapRequest,
+    });
 
     return invoice;
   };
