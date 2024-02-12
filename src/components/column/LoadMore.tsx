@@ -11,7 +11,6 @@ import {
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ColumnItem from '@/components/ColumnItem';
-import { useScroller } from '@/hooks/useScroller';
 import { useTranslation } from '@/i18n/useTranslation';
 import { pickOldestEvent } from '@/nostr/event/comparator';
 import epoch from '@/utils/epoch';
@@ -27,6 +26,7 @@ export type UseLoadMore = {
   continuous: Accessor<boolean>;
   loadLatest: () => void;
   loadOld: () => void;
+  loadLatestRef: (el: HTMLButtonElement | undefined) => void;
 };
 
 export type LoadMoreProps = {
@@ -46,16 +46,15 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
   const [since, setSince] = createSignal<number | undefined>(calcSince(epoch()));
   const [until, setUntil] = createSignal<number | undefined>();
+  const [loadLatestRef, setLoadLatestRef] = createSignal<HTMLButtonElement | undefined>();
   const continuous = () => until() == null;
-
-  const scroller = useScroller();
 
   const loadLatest = () => {
     batch(() => {
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
-    scroller.scrollToTop();
+    loadLatestRef()?.scrollIntoView();
   };
 
   const loadOld = () => {
@@ -65,7 +64,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
-    scroller.scrollToTop();
+    loadLatestRef()?.scrollIntoView();
   };
 
   return {
@@ -75,6 +74,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
     continuous,
     loadLatest,
     loadOld,
+    loadLatestRef: setLoadLatestRef,
   };
 };
 
@@ -86,6 +86,7 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
       <Show when={!props.loadMore.continuous()}>
         <ColumnItem>
           <button
+            ref={props.loadMore.loadLatestRef}
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
             onClick={() => props.loadMore.loadLatest()}
           >
