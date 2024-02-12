@@ -40,7 +40,7 @@ const fetchLnurlCallback = async ({
     callbackUrl.searchParams.set('nostr', JSON.stringify(zapRequest));
   }
 
-  const res = await fetch(callbackUrl, { mode: 'cors' });
+  const res = await fetch(callbackUrl, { mode: 'cors', redirect: 'error' });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const body = await res.json();
 

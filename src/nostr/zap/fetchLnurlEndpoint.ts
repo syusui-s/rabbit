@@ -84,7 +84,7 @@ export const parseLnurlEndpointMetadata = (
 };
 
 const fetchLnurlEndpoint = async (lnurl: string): Promise<LnurlEndpoint | LnurlError> => {
-  const res = await fetch(lnurl, { mode: 'cors' });
+  const res = await fetch(lnurl, { mode: 'cors', redirect: 'error' });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const body = await res.json();

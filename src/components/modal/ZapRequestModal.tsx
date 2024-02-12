@@ -247,11 +247,8 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
     }
 
     const invoice = callbackResponse.pr;
-    await verifyInvoice(invoice, {
-      amountMilliSats,
-      metadata: endpointData.metadata,
-      zapRequest: callbackParams.zapRequest,
-    });
+
+    verifyInvoice(invoice, { amountMilliSats });
 
     return invoice;
   };
