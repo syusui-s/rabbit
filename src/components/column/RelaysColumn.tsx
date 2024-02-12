@@ -59,7 +59,6 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
-      timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Timeline events={events()} />

@@ -8,7 +8,6 @@ import { useHandleCommand } from '@/hooks/useCommandBus';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export type ColumnProps = {
-  timelineRef?: (el: HTMLDivElement) => void;
   columnIndex: number;
   lastColumn: boolean;
   width: 'widest' | 'wide' | 'medium' | 'narrow' | null | undefined;
@@ -60,9 +59,7 @@ const Column: Component<ColumnProps> = (props) => {
           fallback={
             <>
               <div class="shrink-0 border-b border-border">{props.header}</div>
-              <div ref={props.timelineRef} class="scrollbar flex flex-col overflow-y-scroll pb-16">
-                {props.children}
-              </div>
+              <div class="scrollbar flex flex-col overflow-y-scroll pb-16">{props.children}</div>
             </>
           }
         >
