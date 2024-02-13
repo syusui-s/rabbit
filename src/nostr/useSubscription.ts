@@ -78,6 +78,12 @@ const useThrottledEvents = ({
     }, 100);
   };
 
+  const stopTimer = () => {
+    if (timeoutId != null) {
+      clearTimeout(timeoutId);
+    }
+  };
+
   const addEvent = (event: NostrEvent) => {
     const diffSec = event.created_at - epoch();
     if (diffSec > SecondsToIgnore) return;
@@ -101,6 +107,11 @@ const useThrottledEvents = ({
     }
   };
 
+  const clearEvents = () => {
+    setEvents([]);
+    stopTimer();
+  };
+
   createEffect(() => {
     if (eose()) {
       reflectDelayedEvents();
@@ -108,12 +119,10 @@ const useThrottledEvents = ({
   });
 
   onCleanup(() => {
-    if (timeoutId != null) {
-      clearTimeout(timeoutId);
-    }
+    stopTimer();
   });
 
-  return { events, setEvents, addEvent };
+  return { events, setEvents, addEvent, clearEvents };
 };
 
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
@@ -125,7 +134,11 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const eoseLimit = () => propsProvider()?.eoseLimit ?? 25;
   const limit = () => propsProvider()?.limit ?? 50;
 
-  const { events, setEvents, addEvent } = useThrottledEvents({ eose, eoseLimit, limit });
+  const { events, addEvent, clearEvents, setEvents } = useThrottledEvents({
+    eose,
+    eoseLimit,
+    limit,
+  });
 
   createEffect(
     on(
@@ -161,6 +174,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     let subscribing = true;
     count += 1;
 
+    clearEvents();
     setEose(false);
 
     const sub = pool().subscribeMany(
