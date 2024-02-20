@@ -151,6 +151,15 @@ const parseTextNote = (textNoteContent: string) => {
           data: decoded,
           isNIP19: match.groups.nip19 === 'nostr:',
         };
+        if (
+          ((decoded.type === 'npub' || decoded.type === 'note') && !isValidId(decoded.data)) ||
+          (decoded.type === 'nprofile' && !isValidId(decoded.data.pubkey)) ||
+          (decoded.type === 'nevent' && !isValidId(decoded.data.id)) ||
+          (decoded.type === 'naddr' && !isValidId(decoded.data.pubkey)) ||
+          (decoded.type === 'nsec' && decoded.data.length !== 32)
+        ) {
+          throw new Error('Invalid ID');
+        }
         result.push(bech32Entity);
       } catch (e) {
         console.warn(`ignored invalid bech32 entity: ${match[0]}`);
