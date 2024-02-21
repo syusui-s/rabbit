@@ -38,6 +38,9 @@ export default {
     back: 'Back',
     loadLatest: 'Load latest posts',
     loadOld: 'Load old posts',
+    addRelayColumn: {
+      add: '追加',
+    },
     config: {
       columnWidth: 'Column width',
       widest: 'Widest',
