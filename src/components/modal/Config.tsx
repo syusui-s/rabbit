@@ -498,7 +498,9 @@ const MuteConfig = () => {
             {(pubkey) => (
               <li class="flex items-center border-b border-border pr-4">
                 <div class="flex-1 truncate">
-                  <LazyLoad>{() => <UserNameDisplay pubkey={pubkey} />}</LazyLoad>
+                  <LazyLoad fallback={<div class="h-4" />}>
+                    {() => <UserNameDisplay pubkey={pubkey} />}
+                  </LazyLoad>
                 </div>
                 <button class="size-3 shrink-0" onClick={() => removeMutedPubkey(pubkey)}>
                   <XMark />
