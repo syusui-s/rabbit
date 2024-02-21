@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, For } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
@@ -77,85 +77,55 @@ const AddColumn: Component<AddColumnProps> = (props) => {
     finish();
   };
 
+  const menu = [
+    {
+      name: () => i18n.t('column.home'),
+      icon: () => <Home />,
+      onClick: addFollowingColumn,
+    },
+    {
+      name: () => i18n.t('column.notification'),
+      icon: () => <Bell />,
+      onClick: addNotificationColumn,
+    },
+    {
+      name: () => i18n.t('column.japanese'),
+      icon: () => <GlobeAlt />,
+      onClick: addJapanRelaysColumn,
+    },
+    {
+      name: () => i18n.t('column.search'),
+      icon: () => <MagnifyingGlass />,
+      onClick: addSearchColumn,
+    },
+    {
+      name: () => i18n.t('column.myPosts'),
+      icon: () => <User />,
+      onClick: addMyPostsColumn,
+    },
+    {
+      name: () => i18n.t('column.myReactions'),
+      icon: () => <Heart />,
+      onClick: addMyReactionsColumn,
+    },
+    // TODO channel <ChatBubbleLeftRight />
+    // TODO bookmark <BookmarkIcon />
+  ];
+
   return (
     <BasicModal onClose={props.onClose}>
       <div class="flex flex-wrap p-4">
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addFollowingColumn()}
-        >
-          <span class="inline-block size-8">
-            <Home />
-          </span>
-          {i18n.t('column.home')}
-        </button>
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addNotificationColumn()}
-        >
-          <span class="inline-block size-8">
-            <Bell />
-          </span>
-          {i18n.t('column.notification')}
-        </button>
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addJapanRelaysColumn()}
-        >
-          <span class="inline-block size-8">
-            <GlobeAlt />
-          </span>
-          {i18n.t('column.japanese')}
-        </button>
-        {/*
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
-          onClick={() => window.alert()}
-        >
-          <span class="inline-block size-8">
-            <ChatBubbleLeftRight />
-          </span>
-          チャンネル
-        </button>
-        */}
-        {/*
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 sm:basis-1/4"
-          onClick={() => addBookmarkColumn()}
-        >
-          <span class="inline-block size-8">
-            <BookmarkIcon />
-          </span>
-          ブックマーク
-        </button>
-        */}
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addSearchColumn()}
-        >
-          <span class="inline-block size-8">
-            <MagnifyingGlass />
-          </span>
-          {i18n.t('column.search')}
-        </button>
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addMyPostsColumn()}
-        >
-          <span class="inline-block size-8">
-            <User />
-          </span>
-          {i18n.t('column.myPosts')}
-        </button>
-        <button
-          class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
-          onClick={() => addMyReactionsColumn()}
-        >
-          <span class="inline-block size-8">
-            <Heart />
-          </span>
-          {i18n.t('column.myReactions')}
-        </button>
+        <For each={menu}>
+          {(menuItem) => (
+            <button
+              class="flex basis-1/2 flex-col items-center gap-2 py-8 hover:text-primary sm:basis-1/4"
+              onClick={menuItem.onClick}
+            >
+              <span class="inline-block size-8">{menuItem.icon()}</span>
+              {menuItem.name()}
+            </button>
+          )}
+        </For>
       </div>
     </BasicModal>
   );
