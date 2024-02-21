@@ -37,6 +37,9 @@ export default {
     back: '戻る',
     loadLatest: '最新の投稿を読み込む',
     loadOld: '古い投稿を読み込む',
+    addRelayColumn: {
+      add: '追加',
+    },
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',
