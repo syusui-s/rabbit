@@ -222,10 +222,15 @@ const useConfig = (): UseConfig => {
   const mutedPubkeySet = createMemo(() => new Set(config.mutedPubkeys));
   const isPubkeyMuted = (pubkey: string) => mutedPubkeySet().has(pubkey);
 
-  const mutedKeywordsRegex = createMemo(() => asCaseInsensitive(wordsRegex(config.mutedKeywords)));
+  const mutedKeywordsRegex = createMemo(() => {
+    if (config.mutedKeywords.length === 0) return null;
+    return asCaseInsensitive(wordsRegex(config.mutedKeywords));
+  });
   const hasMutedKeyword = (event: NostrEvent) => {
     if (event.kind === Kind.ShortTextNote) {
-      return mutedKeywordsRegex().test(event.content);
+      const regex = mutedKeywordsRegex();
+      if (regex == null) return false;
+      return regex.test(event.content);
     }
     return false;
   };
