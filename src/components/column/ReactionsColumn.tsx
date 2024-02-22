@@ -58,7 +58,6 @@ const ReactionsColumn: Component<ReactionsColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
-      timelineRef={loadMore.timelineRef}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Notification events={reactions()} />
