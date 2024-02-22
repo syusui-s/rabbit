@@ -11,7 +11,6 @@ import {
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ColumnItem from '@/components/ColumnItem';
-import useScroll from '@/hooks/useScroll';
 import { useTranslation } from '@/i18n/useTranslation';
 import { pickOldestEvent } from '@/nostr/event/comparator';
 import epoch from '@/utils/epoch';
@@ -21,13 +20,13 @@ export type UseLoadMoreProps = {
 };
 
 export type UseLoadMore = {
-  timelineRef: (el: HTMLElement) => void;
   setEvents: (event: NostrEvent[]) => void;
   since: Accessor<number | undefined>;
   until: Accessor<number | undefined>;
   continuous: Accessor<boolean>;
   loadLatest: () => void;
   loadOld: () => void;
+  setLoadLatestRef: (el: HTMLButtonElement) => void;
 };
 
 export type LoadMoreProps = {
@@ -47,16 +46,15 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
   const [since, setSince] = createSignal<number | undefined>(calcSince(epoch()));
   const [until, setUntil] = createSignal<number | undefined>();
+  const [loadLatestRef, setLoadLatestRef] = createSignal<HTMLButtonElement | undefined>();
   const continuous = () => until() == null;
-
-  const scroll = useScroll();
 
   const loadLatest = () => {
     batch(() => {
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
-    scroll.scrollToTop();
+    loadLatestRef()?.scrollIntoView();
   };
 
   const loadOld = () => {
@@ -66,17 +64,17 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
-    scroll.scrollToTop();
+    loadLatestRef()?.scrollIntoView();
   };
 
   return {
-    timelineRef: scroll.targetRef,
     setEvents,
     since,
     until,
     continuous,
     loadLatest,
     loadOld,
+    setLoadLatestRef,
   };
 };
 
@@ -88,6 +86,7 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
       <Show when={!props.loadMore.continuous()}>
         <ColumnItem>
           <button
+            ref={props.loadMore.setLoadLatestRef}
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
             onClick={() => props.loadMore.loadLatest()}
           >
