@@ -122,7 +122,12 @@ const AddColumn: Component<AddColumnProps> = (props) => {
   };
 
   const addRelaysColumn = (relayUrls: string[]) => {
-    saveColumn(createRelaysColumn({ relayUrls }));
+    saveColumn(
+      createRelaysColumn({
+        name: relayUrls.join(', '),
+        relayUrls,
+      }),
+    );
     finish();
   };
 
