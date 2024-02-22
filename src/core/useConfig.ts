@@ -1,4 +1,4 @@
-import { createRoot, type Accessor, type Setter } from 'solid-js';
+import { createRoot, type Accessor, type Setter, createMemo } from 'solid-js';
 
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
@@ -21,6 +21,7 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import { asCaseInsensitive, wordsRegex } from '@/utils/regex';
 
 export type CustomEmojiConfig = {
   shortcode: string;
@@ -218,11 +219,13 @@ const useConfig = (): UseConfig => {
       [(e) => e.shortcode.length],
     );
 
-  const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
+  const mutedPubkeySet = createMemo(() => new Set(config.mutedPubkeys));
+  const isPubkeyMuted = (pubkey: string) => mutedPubkeySet().has(pubkey);
 
+  const mutedKeywordsRegex = createMemo(() => asCaseInsensitive(wordsRegex(config.mutedKeywords)));
   const hasMutedKeyword = (event: NostrEvent) => {
     if (event.kind === Kind.ShortTextNote) {
-      return config.mutedKeywords.some((keyword) => event.content.includes(keyword));
+      return mutedKeywordsRegex().test(event.content);
     }
     return false;
   };
