@@ -1,38 +1,24 @@
-import {
-  createSignal,
-  createMemo,
-  Show,
-  For,
-  type Component,
-  type JSX,
-  createEffect,
-  onCleanup,
-} from 'solid-js';
+import { createSignal, createMemo, Show, For, type Component, type JSX } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
-import { Textcomplete } from '@textcomplete/core';
-import { TextareaEditor } from '@textcomplete/textarea';
 import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
 import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
-import * as nip19 from 'nostr-tools/nip19';
 import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
-import useConfig, { CustomEmojiConfig } from '@/core/useConfig';
+import useConfig from '@/core/useConfig';
+import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
 import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
-import useFollowings from '@/nostr/useFollowings';
-import { UseProfile, useProfiles } from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
-import ensureNonNull from '@/utils/ensureNonNull';
 import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
@@ -92,87 +78,6 @@ const format = (parsed: ParsedTextNote) => {
   return content.join('');
 };
 
-const useComplete = () => {
-  const { searchEmojis } = useConfig();
-
-  const pubkey = usePubkey();
-  const { followingPubkeys } = useFollowings(() =>
-    ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({ pubkey: pubkeyNonNull })),
-  );
-  const { searchProfiles } = useProfiles(() => ({
-    pubkeys: followingPubkeys(),
-  }));
-
-  const [elementRef, setElementRef] = createSignal<HTMLTextAreaElement | undefined>();
-
-  createEffect(() => {
-    const el = elementRef();
-    if (el == null) return;
-
-    const editor = new TextareaEditor(el);
-    const textcomplete = new Textcomplete(
-      editor,
-      [
-        {
-          id: 'customEmoji',
-          match: /\B:(\w+)$/,
-          search: (term, callback) => {
-            callback(searchEmojis(term));
-          },
-          template: (config: CustomEmojiConfig) => {
-            const e = (
-              <div class="flex gap-1 border-b border-border px-2 py-1">
-                <img class="h-6 max-w-[3rem]" src={config.url} alt={config.shortcode} />
-                <div>{config.shortcode}</div>
-              </div>
-            ) as HTMLElement;
-            return e.outerHTML;
-          },
-          replace: (result: CustomEmojiConfig) => `:${result.shortcode}: `,
-        },
-        {
-          id: 'profiles',
-          match: /\B@(.+)$/,
-          search: (term, callback) => {
-            callback(searchProfiles(term));
-          },
-          template: (profile: UseProfile) => {
-            const e = (
-              <div class="flex gap-1 border-b border-border px-2 py-1">
-                <Show when={profile.profile()?.picture} fallback={<div class="h-6" />} keyed>
-                  {(url) => <img class="h-6 max-w-[3rem]" src={url} alt="icon" />}
-                </Show>
-                {profile.profile()?.name}
-              </div>
-            ) as HTMLElement;
-            return e.outerHTML;
-          },
-          replace: (result: UseProfile) => {
-            const selectedPubkey = result.pubkey();
-            if (selectedPubkey == null) return '';
-            return nip19.npubEncode(selectedPubkey);
-          },
-        },
-      ],
-      {
-        dropdown: {
-          className: 'bg-bg shadow rounded',
-          item: {
-            className: 'cursor-pointer',
-            activeClassName: 'bg-bg-tertiary cursor-pointer',
-          },
-        },
-      },
-    );
-
-    onCleanup(() => {
-      textcomplete.destroy();
-    });
-  });
-
-  return { elementRef: setElementRef };
-};
-
 const NotePostForm: Component<NotePostFormProps> = (props) => {
   const i18n = useTranslation();
 
@@ -180,7 +85,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   let contentWarningReasonRef: HTMLInputElement | undefined;
   let fileInputRef: HTMLInputElement | undefined;
 
-  const { elementRef: completeTextAreaRef } = useComplete();
+  const { elementRef: emojiTextAreaRef } = useEmojiComplete();
   const [text, setText] = createSignal<string>('');
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
@@ -476,7 +381,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           ref={(el) => {
             textAreaRef = el;
             props.textAreaRef?.(el);
-            completeTextAreaRef(el);
+            emojiTextAreaRef(el);
           }}
           name="text"
           class="scrollbar max-h-[40vh] min-h-[4rem] overflow-y-auto rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
