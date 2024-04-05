@@ -100,7 +100,10 @@ const Hello: Component = () => {
         </SafeLink>
       </p>
       <p class="mt-1 text-xs text-fg-secondary">
-        <SafeLink class="underline hover:text-fg-tertiary" href="https://github.com/syusui-s/">
+        <SafeLink
+          class="underline hover:text-fg-tertiary"
+          href="https://github.com/syusui-s/rabbit"
+        >
           GitHub
         </SafeLink>
       </p>
