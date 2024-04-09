@@ -404,6 +404,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
                 'h-8': mode() === 'reply',
                 'w-8': mode() === 'reply',
               }}
+              type="button"
               onClick={() => close()}
             >
               <span class="inline-block size-5 text-fg-secondary/70">
