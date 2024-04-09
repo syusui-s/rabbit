@@ -13,10 +13,12 @@ export default {
   posting: {
     placeholder: "What's happening?",
     placeholderReply: 'Post a reply',
+    emojiPicker: 'Emoji',
     contentWarning: 'Content warning',
     contentWarningReason: 'Reason of warning',
     uploadImage: 'Upload image',
     submit: 'Submit',
+    close: 'Close',
     forbiddenToIncludeNsec: 'You cannot include private key (nsec).',
     failedToUploadFile: 'Failed to upload files: {{filenames}}',
     replyToPre: 'Reply to',

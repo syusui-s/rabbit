@@ -12,10 +12,12 @@ export default {
   posting: {
     placeholder: 'いまどうしてる？',
     placeholderReply: '返信を投稿',
+    emojiPicker: '絵文字を追加',
     contentWarning: 'コンテンツ警告を設定',
     contentWarningReason: '警告の理由',
     uploadImage: '画像を投稿',
     submit: '投稿',
+    close: '閉じる',
     forbiddenToIncludeNsec: '投稿に秘密鍵(nsec)を含めることはできません。',
     failedToUploadFile: 'ファイルのアップロードに失敗しました: {{filenames}}',
     replyToPre: '',

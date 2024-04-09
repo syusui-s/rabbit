@@ -405,6 +405,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
                 'w-8': mode() === 'reply',
               }}
               type="button"
+              aria-label={i18n.t('posting.close')}
+              title={i18n.t('posting.close')}
               onClick={() => close()}
             >
               <span class="inline-block size-5 text-fg-secondary/70">
@@ -425,6 +427,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'p-[6px]': mode() === 'reply',
             }}
             type="button"
+            aria-label={i18n.t('posting.emojiPicker')}
+            title={i18n.t('posting.emojiPicker')}
             onClick={() => emojiPickerPopup.open()}
           >
             <FaceSmile />
