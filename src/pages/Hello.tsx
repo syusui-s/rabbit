@@ -51,7 +51,7 @@ const Hello: Component = () => {
   });
 
   return (
-    <div class="mx-auto flex max-w-[640px] flex-col items-center p-4 text-fg">
+    <div class="mx-auto flex max-w-screen-sm flex-col items-center p-4 text-fg">
       <div class="flex flex-col items-center gap-4 rounded p-4">
         <img src={resolveAsset('images/rabbit_256.png')} width="96" alt="logo" height="96" />
         <h1 class="text-5xl font-black text-primary">Rabbit</h1>

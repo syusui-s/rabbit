@@ -384,7 +384,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             emojiTextAreaRef(el);
           }}
           name="text"
-          class="scrollbar max-h-[40vh] min-h-[4rem] overflow-y-auto rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}

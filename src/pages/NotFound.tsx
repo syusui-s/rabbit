@@ -6,7 +6,7 @@ const NotFound: Component = () => {
   const i18n = useTranslation();
 
   return (
-    <div class="container mx-auto max-w-[640px] py-10">
+    <div class="container mx-auto max-w-screen-sm py-10">
       <h1 class="text-4xl font-bold text-fg">{i18n.t('notFound.title')}</h1>
       <p class="pt-4">
         <a class="text-link underline" href="/">

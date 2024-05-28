@@ -101,7 +101,7 @@ const parseTextNote = (textNoteContent: string) => {
     ...textNoteContent.matchAll(mentionRegex),
     ...textNoteContent.matchAll(hashTagRegex),
     ...textNoteContent.matchAll(customEmojiRegex),
-  ].sort((a, b) => (a.index as number) - (b.index as number));
+  ].sort((a, b) => a.index - b.index);
   let pos = 0;
   const result: ParsedTextNote = [];
 

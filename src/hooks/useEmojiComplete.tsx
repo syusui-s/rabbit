@@ -27,7 +27,7 @@ const useEmojiComplete = () => {
           template: (config: CustomEmojiConfig) => {
             const e = (
               <div class="flex gap-1 border-b border-border px-2 py-1">
-                <img class="h-6 max-w-[3rem]" src={config.url} alt={config.shortcode} />
+                <img class="h-6 max-w-12" src={config.url} alt={config.shortcode} />
                 <div>{config.shortcode}</div>
               </div>
             ) as HTMLElement;
