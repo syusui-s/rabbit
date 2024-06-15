@@ -4,13 +4,14 @@ import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 
 import TimelineContentDisplay from '@/components/timeline/TimelineContentDisplay';
 import { TimelineContext, useTimelineState } from '@/components/timeline/TimelineContext';
+import { ColumnWidth } from '@/core/column';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export type ColumnProps = {
   columnIndex: number;
   lastColumn: boolean;
-  width: 'widest' | 'wide' | 'medium' | 'narrow' | null | undefined;
+  width: ColumnWidth;
   header: JSX.Element;
   children: JSX.Element;
 };

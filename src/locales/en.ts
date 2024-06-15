@@ -159,10 +159,15 @@ export default {
     confirmImport: 'Import? (The config will be overwritten)',
     copyToClipboard: 'Copy to clipboard',
     importFromClipboard: 'Import from clipboard',
-    profile: {
+    account: {
       profile: 'Profile',
       openProfile: 'Open',
       editProfile: 'Edit',
+      backupConfig: 'Backup configuration',
+      save: 'Save',
+      restore: 'Restore',
+      restored: 'Successfully restored.',
+      failedToRestore: 'Failed to restore',
     },
     relays: {
       relays: 'Relays',

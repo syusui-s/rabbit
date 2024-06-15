@@ -1,8 +1,6 @@
-// import { z } from 'zod';
-import { type Filter } from 'nostr-tools/filter';
+import { z } from 'zod';
 
-import { type ColumnProps } from '@/components/column/Column';
-import { ContentFilter } from '@/core/contentFilter';
+import { ContentFilterSchema } from '@/core/contentFilter';
 import { relaysForJapaneseTL } from '@/core/relayUrls';
 import generateId from '@/utils/generateId';
 
@@ -41,80 +39,100 @@ export type NotificationFilterOptions = {
 //  */
 // export const buildFilter = (options: BuildOptions) => {};
 
-export type BaseColumn = {
-  id: string;
-  name?: string;
-  width: ColumnProps['width'];
-  contentFilter?: ContentFilter;
-};
+export const ColumnWidthSchema = z.union([
+  z.literal('widest'),
+  z.literal('wide'),
+  z.literal('medium'),
+  z.literal('narrow'),
+]);
+
+export type ColumnWidth = z.infer<typeof ColumnWidthSchema>;
+
+export const BaseColumnSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  width: ColumnWidthSchema,
+  contentFilter: z.optional(ContentFilterSchema),
+});
+
+export type BaseColumn = z.infer<typeof BaseColumnSchema>;
 
 /** A column which shows posts by following users */
-export type FollowingColumnType = BaseColumn & {
-  columnType: 'Following';
-  pubkey: string;
-};
+export const FollowingColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Following'),
+  pubkey: z.string(),
+});
+export type FollowingColumnType = z.infer<typeof FollowingColumnSchema>;
 
 /** A column which shows replies, reactions, reposts to the specific user */
-export type NotificationColumnType = BaseColumn & {
-  columnType: 'Notification';
-  // notificationTypes: NotificationType[];
-  pubkey: string;
-};
+export const NotificationColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Notification'),
+  pubkey: z.string(),
+  // notificationTypes: z.array(NotificationTypeSchema),
+});
+export type NotificationColumnType = z.infer<typeof NotificationColumnSchema>;
 
 /** A column which shows posts from the specific user */
-export type PostsColumnType = BaseColumn & {
-  columnType: 'Posts';
-  pubkey: string;
-};
+export const PostsColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Posts'),
+  pubkey: z.string(),
+});
+export type PostsColumnType = z.infer<typeof PostsColumnSchema>;
 
 /** A column which shows reactions published by the specific user */
-export type ReactionsColumnType = BaseColumn & {
-  columnType: 'Reactions';
-  pubkey: string;
-};
+export const ReactionsColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Reactions'),
+  pubkey: z.string(),
+});
+export type ReactionsColumnType = z.infer<typeof ReactionsColumnSchema>;
 
-/** A column which shows reactions published by the specific user */
-export type ChannelColumnType = BaseColumn & {
-  columnType: 'Channel';
-  rootEventId: string;
-};
+/** A column which shows posts published on the specific channel */
+export const ChannelColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Channel'),
+  rootEventId: z.string(),
+});
+export type ChannelColumnType = z.infer<typeof ChannelColumnSchema>;
 
 /** A column which shows text notes and reposts posted to the specific relays */
-export type RelaysColumnType = BaseColumn & {
-  columnType: 'Relays';
-  relayUrls: string[];
-};
+export const RelaysColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Relays'),
+  relayUrls: z.array(z.string()),
+});
+export type RelaysColumnType = z.infer<typeof RelaysColumnSchema>;
 
 /** A column which search text notes from relays which support NIP-50 */
-export type SearchColumnType = BaseColumn & {
-  columnType: 'Search';
-  query: string;
-};
+export const SearchColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Search'),
+  query: z.string(),
+});
+export type SearchColumnType = z.infer<typeof SearchColumnSchema>;
 
 /** A column which shows events in the bookmark */
-export type BookmarkColumnType = BaseColumn & {
-  columnType: 'Bookmark';
-  pubkey: string;
-  identifier: string;
-};
+export const BookmarkColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('Bookmark'),
+  pubkey: z.string(),
+  identifier: z.string(),
+});
+export type BookmarkColumnType = z.infer<typeof BookmarkColumnSchema>;
 
-/** A column which shows text notes and reposts posted to the specific relays */
-export type CustomFilterColumnType = BaseColumn & {
-  columnType: 'CustomFilter';
-  filters: Filter[];
-};
+// /** A column which shows text notes and reposts posted to the specific relays */
+// const CustomFilterColumnSchema = BaseColumnSchema.extend({
+//   columnType: z.literal('CustomFilter'),
+//   filters: z.array(z.any()), // Replace `z.any()` with the appropriate Zod schema if `Filter` is known
+// });
 
-export type ColumnType =
-  | FollowingColumnType
-  | NotificationColumnType
-  | PostsColumnType
-  | ReactionsColumnType
-  | ChannelColumnType
-  | RelaysColumnType
-  | SearchColumnType
-  | BookmarkColumnType;
-/* WIP: */
-/* | CustomFilterColumnType */
+export const ColumnTypeSchema = z.union([
+  FollowingColumnSchema,
+  NotificationColumnSchema,
+  PostsColumnSchema,
+  ReactionsColumnSchema,
+  ChannelColumnSchema,
+  RelaysColumnSchema,
+  SearchColumnSchema,
+  BookmarkColumnSchema,
+]);
+
+export type ColumnType = z.infer<typeof ColumnTypeSchema>;
 
 type CreateParams<T extends BaseColumn> = Omit<T, keyof BaseColumn | 'columnType'> &
   Partial<BaseColumn>;

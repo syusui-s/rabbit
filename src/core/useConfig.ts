@@ -4,10 +4,12 @@ import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
+import { z } from 'zod';
 
 import { colorThemes, type ColorTheme } from '@/core/colorThemes';
 import {
   ColumnType,
+  ColumnTypeSchema,
   createFollowingColumn,
   createJapanRelaysColumn,
   createNotificationColumn,
@@ -23,35 +25,45 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
 import { asCaseInsensitive, wordsRegex } from '@/utils/regex';
 
-export type CustomEmojiConfig = {
-  shortcode: string;
-  url: string;
-};
+const CustomEmojiConfigSchema = z.object({
+  shortcode: z.string(),
+  url: z.string(),
+});
 
-export type ColorThemeConfig = {
-  type: 'specific';
-  id: string;
-};
+export type CustomEmojiConfig = z.infer<typeof CustomEmojiConfigSchema>;
 
-export type Config = {
-  relayUrls: string[];
-  columns: ColumnType[];
-  customEmojis: Record<string, CustomEmojiConfig>;
-  colorTheme: ColorThemeConfig;
-  dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
-  keepOpenPostForm: boolean;
-  useEmojiReaction: boolean;
-  showEmojiReaction: boolean;
-  showMedia: boolean; // TODO 'always' | 'only-followings' | 'never'
-  embedding: {
-    twitter: boolean;
-    youtube: boolean;
-    ogp: boolean;
-  };
-  hideCount: boolean;
-  mutedPubkeys: string[];
-  mutedKeywords: string[];
-};
+const ColorThemeConfigSchema = z.object({
+  type: z.literal('specific'),
+  id: z.string(),
+});
+
+export type ColorThemeConfig = z.infer<typeof ColorThemeConfigSchema>;
+
+export const ConfigSchema = z.object({
+  relayUrls: z.array(z.string()),
+  columns: z.array(ColumnTypeSchema),
+  customEmojis: z.record(CustomEmojiConfigSchema),
+  colorTheme: ColorThemeConfigSchema,
+  dateFormat: z.union([
+    z.literal('relative'),
+    z.literal('absolute-long'),
+    z.literal('absolute-short'),
+  ]),
+  keepOpenPostForm: z.boolean(),
+  useEmojiReaction: z.boolean(),
+  showEmojiReaction: z.boolean(),
+  showMedia: z.boolean(), // TODO 'always' | 'only-followings' | 'never'に変更
+  embedding: z.object({
+    twitter: z.boolean(),
+    youtube: z.boolean(),
+    ogp: z.boolean(),
+  }),
+  hideCount: z.boolean(),
+  mutedPubkeys: z.array(z.string()),
+  mutedKeywords: z.array(z.string()),
+});
+
+export type Config = z.infer<typeof ConfigSchema>;
 
 type UseConfig = {
   config: Accessor<Config>;

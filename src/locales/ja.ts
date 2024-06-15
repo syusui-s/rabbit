@@ -155,10 +155,15 @@ export default {
     confirmImport: 'インポートしますか？（現在の設定は上書きされます）',
     copyToClipboard: 'クリップボードに設定をコピー',
     importFromClipboard: '設定をクリップボードから読み込む',
-    profile: {
+    account: {
       profile: 'プロフィール',
       openProfile: '開く',
       editProfile: '編集',
+      backupConfig: '設定のバックアップ',
+      save: '保存',
+      restore: '復元',
+      restored: '復元しました',
+      failedToRestore: '復元に失敗しました',
     },
     relays: {
       relays: 'リレー',
