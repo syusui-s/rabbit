@@ -2,6 +2,8 @@ import { Component, JSX, Show, createSignal } from 'solid-js';
 
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 
+import { useScroller } from '@/hooks/useScroller';
+
 export type BasicColumnHeaderProps = {
   name: string;
   icon?: JSX.Element;
@@ -12,6 +14,8 @@ export type BasicColumnHeaderProps = {
 const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
   const [isSettingsOpened, setIsSettingOpened] = createSignal(false);
 
+  const { scrollToTop } = useScroller();
+
   const toggleSettingsOpened = () => setIsSettingOpened((current) => !current);
 
   return (
@@ -21,7 +25,9 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
           <Show when={props.icon} keyed>
             {(icon) => <span class="inline-block size-4 shrink-0 text-fg-secondary">{icon}</span>}
           </Show>
-          <span class="truncate">{props.name}</span>
+          <button class="truncate" onClick={() => scrollToTop()}>
+            {props.name}
+          </button>
         </h2>
         <button class="flex h-full place-items-center px-2" onClick={() => toggleSettingsOpened()}>
           <span class="inline-block size-4">
