@@ -31,7 +31,7 @@ const Repost: Component<RepostProps> = (props) => {
             <ArrowPathRoundedSquare />
           </span>
         </div>
-        <div class="notification-user flex min-w-0 flex-1 overflow-hidden text-xs">
+        <div class="notification-user flex min-w-0 flex-1 space-x-1 overflow-hidden text-xs">
           <button
             class="select-text truncate hover:text-link hover:underline"
             onClick={() => showProfile(props.event.pubkey)}
