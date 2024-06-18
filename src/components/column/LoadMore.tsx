@@ -87,7 +87,6 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
         <div class="none" ref={props.loadMore.setTopMarkerRef} />
         <ColumnItem>
           <button
-            ref={props.loadMore.}
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
             onClick={() => props.loadMore.loadLatest()}
           >
