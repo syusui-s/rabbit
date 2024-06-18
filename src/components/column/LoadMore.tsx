@@ -26,7 +26,7 @@ export type UseLoadMore = {
   continuous: Accessor<boolean>;
   loadLatest: () => void;
   loadOld: () => void;
-  loadLatestRef: (el: HTMLButtonElement | undefined) => void;
+  setTopMarkerRef: (el: HTMLElement) => void;
 };
 
 export type LoadMoreProps = {
@@ -46,7 +46,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
   const [since, setSince] = createSignal<number | undefined>(calcSince(epoch()));
   const [until, setUntil] = createSignal<number | undefined>();
-  const [loadLatestRef, setLoadLatestRef] = createSignal<HTMLButtonElement | undefined>();
+  const [topMarkerRef, setTopMarkerRef] = createSignal<HTMLElement | undefined>();
   const continuous = () => until() == null;
 
   const loadLatest = () => {
@@ -54,7 +54,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
-    loadLatestRef()?.scrollIntoView();
+    topMarkerRef()?.scrollIntoView();
   };
 
   const loadOld = () => {
@@ -64,7 +64,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
-    loadLatestRef()?.scrollIntoView();
+    topMarkerRef()?.scrollIntoView();
   };
 
   return {
@@ -74,7 +74,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
     continuous,
     loadLatest,
     loadOld,
-    loadLatestRef: setLoadLatestRef,
+    setTopMarkerRef,
   };
 };
 
@@ -84,9 +84,10 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
   return (
     <>
       <Show when={!props.loadMore.continuous()}>
+        <div class="none" ref={props.loadMore.setTopMarkerRef} />
         <ColumnItem>
           <button
-            ref={props.loadMore.loadLatestRef}
+            ref={props.loadMore.}
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"
             onClick={() => props.loadMore.loadLatest()}
           >

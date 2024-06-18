@@ -1,13 +1,11 @@
 import { createSignal, createEffect, createMemo, onMount, onCleanup, on } from 'solid-js';
 
-import uniqBy from 'lodash/uniqBy';
 import { type Filter } from 'nostr-tools/filter';
 import { type SubscribeManyParams } from 'nostr-tools/pool';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 import { insertEventIntoDescendingList } from 'nostr-tools/utils';
 
 import useConfig from '@/core/useConfig';
-import { sortEvents } from '@/nostr/event/comparator';
 import usePool from '@/nostr/usePool';
 import useStats from '@/nostr/useStats';
 import epoch from '@/utils/epoch';
@@ -44,15 +42,103 @@ setInterval(() => {
   setActiveSubscriptions(count);
 }, 1000);
 
+// avoid updating an array rapidly while this is fetching stored events
+const useThrottledEvents = ({
+  eose,
+  limit,
+  eoseLimit,
+}: {
+  eose: () => boolean;
+  limit: () => number;
+  eoseLimit: () => number;
+}) => {
+  const SecondsToIgnore = 300; // 5 min
+  const [events, setEvents] = createSignal<NostrEvent[]>([]);
+
+  const delayedEvents: NostrEvent[] = [];
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const reflectDelayedEvents = () => {
+    setEvents((currentEvents) => {
+      const newEvents = [...currentEvents];
+      delayedEvents.forEach((event) => {
+        insertEventIntoDescendingList(newEvents, event);
+      });
+      return newEvents.slice(0, eoseLimit());
+    });
+    // clear delayed events
+    delayedEvents.splice(0, delayedEvents.length);
+  };
+
+  const startTimerIfNotStarted = () => {
+    if (timeoutId != null) return;
+    timeoutId = setTimeout(() => {
+      timeoutId = undefined;
+      reflectDelayedEvents();
+    }, 100);
+  };
+
+  const stopTimer = () => {
+    if (timeoutId != null) {
+      clearTimeout(timeoutId);
+    }
+  };
+
+  const addEvent = (event: NostrEvent) => {
+    const diffSec = event.created_at - epoch();
+    if (diffSec > SecondsToIgnore) return;
+    if (diffSec > 0) {
+      setTimeout(() => addEvent(event), diffSec * 1000);
+      return;
+    }
+
+    if (!eose()) {
+      delayedEvents.push(event);
+      startTimerIfNotStarted();
+    } else {
+      // SimplePool de-duplicates events but sometimes onEvent is called for duplicated events.
+      // insertEventIntoDescendingList de-duplicates events.
+      // https://github.com/syusui-s/rabbit/issues/5
+      setEvents((currentEvents) => {
+        const newEvents = [...currentEvents];
+        insertEventIntoDescendingList(newEvents, event);
+        return newEvents.slice(0, limit());
+      });
+    }
+  };
+
+  const clearEvents = () => {
+    setEvents([]);
+    stopTimer();
+  };
+
+  createEffect(() => {
+    if (eose()) {
+      reflectDelayedEvents();
+    }
+  });
+
+  onCleanup(() => {
+    stopTimer();
+  });
+
+  return { events, setEvents, addEvent, clearEvents };
+};
+
 const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
   const { config, shouldMuteEvent } = useConfig();
   const pool = usePool();
-  const [events, setEvents] = createSignal<NostrEvent[]>([]);
   const [eose, setEose] = createSignal<boolean>(false);
   const props = createMemo(propsProvider);
 
   const eoseLimit = () => propsProvider()?.eoseLimit ?? 25;
   const limit = () => propsProvider()?.limit ?? 50;
+
+  const { events, addEvent, clearEvents, setEvents } = useThrottledEvents({
+    eose,
+    eoseLimit,
+    limit,
+  });
 
   createEffect(
     on(
@@ -71,28 +157,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     });
   });
 
-  const addEvent = (event: NostrEvent) => {
-    const SecondsToIgnore = 300; // 5 min
-
-    const diffSec = event.created_at - epoch();
-    if (diffSec > SecondsToIgnore) return;
-    if (diffSec > 0) {
-      setTimeout(() => addEvent(event), diffSec * 1000);
-      return;
-    }
-
-    setEvents((current) => {
-      const sorted = insertEventIntoDescendingList(current, event).slice(0, limit());
-      // FIXME なぜか重複して取得される問題があるが一旦uniqByで対処
-      // https://github.com/syusui-s/rabbit/issues/5
-      const deduped = uniqBy(sorted, (e) => e.id);
-      if (deduped.length !== sorted.length) {
-        console.warn('duplicated event', event);
-      }
-      return deduped;
-    });
-  };
-
   const startSubscription = () => {
     console.debug('startSubscription: start');
 
@@ -110,18 +174,14 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
     let subscribing = true;
     count += 1;
 
-    let pushed = false;
+    clearEvents();
     setEose(false);
-    const storedEvents: NostrEvent[] = [];
-
-    const updateEvents = () => setEvents(sortEvents(storedEvents).slice(0, eoseLimit()));
 
     const sub = pool().subscribeMany(
       relayUrls,
       filters,
       options ?? {
-        eoseTimeout: 12000,
-        maxWait: 6000,
+        maxWait: 12000,
         onevent: (event: NostrEvent) => {
           if (onEvent != null) {
             onEvent(event as NostrEvent & { id: string });
@@ -130,12 +190,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
             return;
           }
 
-          if (!eose()) {
-            pushed = true;
-            storedEvents.push(event);
-          } else {
-            addEvent(event);
-          }
+          addEvent(event);
         },
         oneose: () => {
           // sometimes `oneose` called twice
@@ -144,10 +199,7 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
           if (onEOSE != null) {
             onEOSE();
           }
-
           setEose(true);
-          updateEvents();
-          storedEvents.splice(0, storedEvents.length);
 
           if (!continuous) {
             sub.close();
@@ -160,18 +212,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
       },
     );
 
-    // avoid updating an array too rapidly while this is fetching stored events
-    const intervalId = setInterval(() => {
-      if (eose()) {
-        clearInterval(intervalId);
-        return;
-      }
-      if (pushed) {
-        pushed = false;
-        updateEvents();
-      }
-    }, 100);
-
     onCleanup(() => {
       console.debug('startSubscription: end');
       sub.close();
@@ -179,7 +219,6 @@ const useSubscription = (propsProvider: () => UseSubscriptionProps | null) => {
         subscribing = false;
         count -= 1;
       }
-      clearInterval(intervalId);
     });
   };
 

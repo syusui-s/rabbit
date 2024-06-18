@@ -179,6 +179,10 @@ describe('parseTextNote', () => {
     'npub1a',
     'npub133vj8ycevdle0cq8mtgddq0xtn34kxkwxvak983dx0u5vhqnycyqj6tcz1',
     'npub133vj8ycevdle0cq8mtgddq0xtn34kxkwxvak983dx0u5vhqnycyqj6tczb',
+    // bech32 problem: checksum cannot detect arbitrary number of 'q' before 'p'
+    'npub1harpehyplx66gzpsskwzejtwgm45zenlzr4md58lxrvsvllupe8qunwsqqqqqqqqp',
+    // bech32 problem: checksum cannot detect deletion of 'q' in 'qp'
+    'npub1harpehyplx66gzpsskwzejtwgm45zenlzr4md58lxrvsvllupe8qunwsp',
   ])('should parse text note which includes invalid npub string (%s)', (invalidPubkey) => {
     const content = `this is pubkey\n${invalidPubkey}\nhello`;
     const parsed = parseTextNote(content);

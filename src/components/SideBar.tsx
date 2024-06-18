@@ -1,17 +1,46 @@
-import { createSignal, Show, onMount, onCleanup, lazy, type JSX, Component } from 'solid-js';
+import {
+  createSignal,
+  Show,
+  onMount,
+  onCleanup,
+  lazy,
+  type JSX,
+  Component,
+  For,
+  createMemo,
+} from 'solid-js';
 
+import {
+  DragDropProvider,
+  DragDropSensors,
+  DragEventHandler,
+  SortableProvider,
+  createSortable,
+  closestCenter,
+  useDragDropContext,
+  type Transformer,
+} from '@thisbeyond/solid-dnd';
+import Bell from 'heroicons/24/outline/bell.svg';
+import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
+import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 import Cog6Tooth from 'heroicons/24/outline/cog-6-tooth.svg';
+import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
+import Heart from 'heroicons/24/outline/heart.svg';
+import Home from 'heroicons/24/outline/home.svg';
+import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
-import MagnifyingGlass from 'heroicons/24/solid/magnifying-glass.svg';
+import User from 'heroicons/24/outline/user.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
+import { ParseKeys } from 'i18next';
 import throttle from 'lodash/throttle';
 
 import NotePostForm from '@/components/NotePostForm';
 import usePopup, { type UsePopup } from '@/components/utils/usePopup';
-import { createSearchColumn } from '@/core/column';
+import { ColumnType, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
+import { useTranslation } from '@/i18n/useTranslation';
 import isMobile from '@/utils/isMobile';
 import resolveAsset from '@/utils/resolveAsset';
 
@@ -66,7 +95,7 @@ const SearchButton = () => {
           value={query()}
           onChange={(ev) => setQuery(ev.currentTarget.value)}
         />
-        <button class="h-8 w-8 rounded bg-primary p-1 text-primary-fg" type="submit">
+        <button class="size-8 rounded bg-primary p-1 text-primary-fg" type="submit">
           <MagnifyingGlass />
         </button>
       </form>
@@ -85,12 +114,131 @@ const SearchButton = () => {
           inputRef?.focus();
         }}
       >
-        <span class="inline-block h-9 w-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
+        <span class="inline-block size-9 rounded-full border border-primary p-2 text-2xl font-bold text-primary hover:border-primary-hover hover:text-primary-hover">
           <MagnifyingGlass />
         </span>
       </button>
       {popup.popup()}
     </>
+  );
+};
+
+type ColumnKind = ColumnType['columnType'];
+const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: ParseKeys }>> = {
+  Bookmark: {
+    icon: BookmarkIcon,
+    nameKey: 'column.bookmark',
+  },
+  Channel: {
+    icon: ChatBubbleLeftRight,
+    nameKey: 'column.channel',
+  },
+  Following: {
+    icon: Home,
+    nameKey: 'column.home',
+  },
+  Notification: {
+    icon: Bell,
+    nameKey: 'column.notification',
+  },
+  Posts: {
+    icon: User,
+    nameKey: 'column.posts',
+  },
+  Reactions: {
+    icon: Heart,
+    nameKey: 'column.reactions',
+  },
+  Relays: {
+    icon: GlobeAlt,
+    nameKey: 'column.relay',
+  },
+  Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
+};
+
+const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
+  const i18n = useTranslation();
+
+  const sortable = createSortable(props.column.id);
+
+  const request = useRequestCommand();
+  const jumpToColumn = () => {
+    request({
+      command: 'moveToColumn',
+      columnIndex: props.index,
+    }).catch((err) => console.error(err));
+  };
+
+  const Icon = createMemo(() => columns[props.column.columnType].icon);
+  const columnNameKey = createMemo(() => columns[props.column.columnType].nameKey);
+
+  return (
+    <button
+      // https://github.com/thisbeyond/solid-dnd/issues/60
+      // https://github.com/thisbeyond/solid-dnd/issues/68
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      use:sortable
+      class="relative flex w-full touch-none select-none flex-col items-center py-3 text-primary hover:text-primary-hover"
+      onClick={() => jumpToColumn()}
+      title={props.column.name ?? i18n.t(columnNameKey())}
+    >
+      <span class="inline-block size-6">
+        <Icon />
+      </span>
+      <span class="absolute bottom-2 right-0 text-xs text-primary">{props.index}</span>
+    </button>
+  );
+};
+
+const ConstrainDragAxis = () => {
+  const dragDropContext = useDragDropContext();
+  const actions = dragDropContext?.[1];
+
+  const transformer: Transformer = {
+    id: 'constrain-x-axis',
+    order: 100,
+    callback: (transform) => ({ ...transform, x: 0 }),
+  };
+
+  actions?.onDragStart(({ draggable }) => {
+    actions?.addTransformer('draggables', draggable.id, transformer);
+  });
+
+  actions?.onDragEnd(({ draggable }) => {
+    actions?.removeTransformer('draggables', draggable.id, transformer.id);
+  });
+
+  return <></>;
+};
+
+const ColumnButtons: Component = () => {
+  const { config, moveColumnById } = useConfig();
+
+  const columnIds = () => config().columns.map((column) => column.id);
+
+  const handleDragEnd: DragEventHandler = ({ draggable, droppable }) => {
+    if (draggable && droppable) {
+      const columnId = draggable?.id as string;
+      const insertBeforeId = droppable?.id as string;
+      moveColumnById(columnId, insertBeforeId);
+    }
+  };
+
+  return (
+    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
+      <div class="size-full flex-col items-center justify-center py-2">
+        <DragDropProvider onDragEnd={handleDragEnd} collisionDetector={closestCenter}>
+          <DragDropSensors />
+          <ConstrainDragAxis />
+          <SortableProvider ids={columnIds()}>
+            <For each={config().columns}>
+              {(column, index) => <ColumnButton column={column} index={index() + 1} />}
+            </For>
+          </SortableProvider>
+        </DragDropProvider>
+      </div>
+    </div>
   );
 };
 
@@ -138,7 +286,7 @@ const SideBar: Component = () => {
             when={shouldUseMobileUI()}
             fallback={
               <button class="static w-full px-0 py-1" type="button" onClick={handleClickOpenForm}>
-                <span class="inline-block h-9 w-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg">
+                <span class="inline-block size-9 rounded-full border border-primary bg-primary p-2 text-2xl text-primary-fg">
                   <PencilSquare />
                 </span>
               </button>
@@ -149,20 +297,20 @@ const SideBar: Component = () => {
               type="button"
               onClick={handleClickOpenForm}
             >
-              <span class="inline-block h-14 w-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover">
+              <span class="inline-block size-14 rounded-full border-2 border-primary-fg bg-primary p-3 text-2xl text-primary-fg drop-shadow-md hover:bg-primary-hover">
                 <PencilSquare />
               </span>
             </button>
           </Show>
           <SearchButton />
         </div>
-        <div class="grow" />
+        <ColumnButtons />
         <div class="flex w-full flex-col items-center gap-2 pb-2">
           <button
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => showAddColumn()}
           >
-            <span class="inline-block h-6 w-6">
+            <span class="inline-block size-6">
               <Plus />
             </span>
           </button>
@@ -170,13 +318,13 @@ const SideBar: Component = () => {
             class="flex w-full flex-col items-center py-1 text-primary hover:text-primary-hover"
             onClick={() => setConfigOpened((current) => !current)}
           >
-            <span class="h-6 w-6">
+            <span class="size-6">
               <Cog6Tooth />
             </span>
           </button>
           <button class="flex w-full flex-col items-center" onClick={() => showAbout()}>
             <img
-              class="h-8 w-8"
+              class="size-8"
               src={resolveAsset(getColorTheme().rabbitIconPath)}
               alt="About rabbit"
             />

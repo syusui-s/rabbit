@@ -91,7 +91,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [contentWarningReason, setContentWarningReason] = createSignal('');
   const [lastUsedHashTags, setLastUsedHashTags] = createSignal<string[]>([]);
 
-  const appendText = (s: string) => setText((current) => `${current} ${s}`);
+  const appendText = (s: string) => setText((current) => (current === '' ? s : `${current} ${s}`));
 
   const resetText = () => {
     setText(
@@ -384,7 +384,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             emojiTextAreaRef(el);
           }}
           name="text"
-          class="min-h-[40px] rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}
@@ -404,6 +404,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
                 'h-8': mode() === 'reply',
                 'w-8': mode() === 'reply',
               }}
+              type="button"
+              aria-label={i18n.t('posting.close')}
+              title={i18n.t('posting.close')}
               onClick={() => close()}
             >
               <span class="inline-block size-5 text-fg-secondary/70">
@@ -424,6 +427,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
               'p-[6px]': mode() === 'reply',
             }}
             type="button"
+            aria-label={i18n.t('posting.emojiPicker')}
+            title={i18n.t('posting.emojiPicker')}
             onClick={() => emojiPickerPopup.open()}
           >
             <FaceSmile />

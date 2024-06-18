@@ -15,7 +15,7 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import LazyLoad from '@/components/utils/LazyLoad';
 import usePopup from '@/components/utils/usePopup';
 import { colorThemes } from '@/core/colorThemes';
-import useConfig, { type Config } from '@/core/useConfig';
+import useConfig, { ConfigSchema, type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import usePubkey from '@/nostr/usePubkey';
@@ -83,7 +83,7 @@ const ProfileSection = () => {
   const { showProfile, showProfileEdit } = useModalState();
 
   return (
-    <Section title={i18n.t('config.profile.profile')}>
+    <Section title={i18n.t('config.account.profile')}>
       <div class="flex gap-2 py-1">
         <button
           class="rounded border border-primary px-4 py-1 font-bold text-primary"
@@ -93,15 +93,94 @@ const ProfileSection = () => {
             })
           }
         >
-          {i18n.t('config.profile.openProfile')}
+          {i18n.t('config.account.openProfile')}
         </button>
         <button
           class="rounded border border-primary px-4 py-1 font-bold text-primary"
           onClick={() => showProfileEdit()}
         >
-          {i18n.t('config.profile.editProfile')}
+          {i18n.t('config.account.editProfile')}
         </button>
       </div>
+    </Section>
+  );
+};
+
+const BackupSection = () => {
+  let fileInputRef: HTMLInputElement | undefined;
+
+  const i18n = useTranslation();
+  const config = useConfig();
+
+  const handleSave = () => {
+    const json = JSON.stringify(config.config(), null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const dataUrl = URL.createObjectURL(blob);
+
+    const datetime = new Date().toISOString();
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `rabbit-${datetime}.json`;
+
+    link.click();
+  };
+
+  const handleRestore = () => {
+    if (fileInputRef == null) return;
+    fileInputRef.click();
+  };
+
+  const restore = async (file: File) => {
+    try {
+      const json = await file.text();
+      const validated = ConfigSchema.parse(JSON.parse(json));
+      config.setConfig(validated);
+
+      window.alert(i18n.t('config.account.restored'));
+      window.location.reload();
+    } catch (e) {
+      if (e instanceof Error) {
+        window.alert(`${i18n.t('config.account.failedToRestore')}: ${e.message}`);
+      } else {
+        window.alert(i18n.t('config.account.failedToRestore'));
+      }
+    }
+  };
+
+  const handleChangeFile: JSX.EventHandler<HTMLInputElement, Event> = (ev) => {
+    ev.preventDefault();
+
+    const files = [...(ev.currentTarget.files ?? [])];
+    if (files.length !== 1) return;
+    const file = files[0];
+    restore(file).catch((err) => console.log(err));
+  };
+
+  return (
+    <Section title={i18n.t('config.account.backupConfig')}>
+      <div class="flex gap-2 py-1">
+        <button
+          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          onClick={handleSave}
+        >
+          {i18n.t('config.account.save')}
+        </button>
+        <button
+          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          onClick={handleRestore}
+        >
+          {i18n.t('config.account.restore')}
+        </button>
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        hidden
+        multiple={false}
+        name="config"
+        accept="application/json"
+        onChange={handleChangeFile}
+      />
     </Section>
   );
 };
@@ -498,7 +577,9 @@ const MuteConfig = () => {
             {(pubkey) => (
               <li class="flex items-center border-b border-border pr-4">
                 <div class="flex-1 truncate">
-                  <LazyLoad>{() => <UserNameDisplay pubkey={pubkey} />}</LazyLoad>
+                  <LazyLoad fallback={<div class="h-4" />}>
+                    {() => <UserNameDisplay pubkey={pubkey} />}
+                  </LazyLoad>
                 </div>
                 <button class="size-3 shrink-0" onClick={() => removeMutedPubkey(pubkey)}>
                   <XMark />
@@ -634,13 +715,17 @@ const OtherConfig = () => {
 const ConfigUI = (props: ConfigProps) => {
   const i18n = useTranslation();
   const [menuIndex, setMenuIndex] = createSignal<number | null>(null);
-  const { config, setConfig } = useConfig();
 
   const menu = [
     {
-      name: () => i18n.t('config.profile.profile'),
+      name: () => i18n.t('config.account.profile'),
       icon: () => <User />,
-      render: () => <ProfileSection />,
+      render: () => (
+        <>
+          <ProfileSection />
+          <BackupSection />
+        </>
+      ),
     },
     {
       name: () => i18n.t('config.relays.relays'),
@@ -691,41 +776,6 @@ const ConfigUI = (props: ConfigProps) => {
           fallback={
             <>
               <h2 class="flex-1 text-center text-lg font-bold">{i18n.t('config.config')}</h2>
-              <div class="flex gap-1">
-                <Show when={window.location.host === 'syusui-s.github.io'}>
-                  <button
-                    type="button"
-                    class="rounded bg-primary p-2 text-primary-fg"
-                    onClick={() => {
-                      navigator.clipboard
-                        .writeText(JSON.stringify(config(), null, 2))
-                        .then(() => window.alert('OK'))
-                        .catch(() => window.alert('failed to copy'));
-                    }}
-                  >
-                    {i18n.t('config.copyToClipboard')}
-                  </button>
-                </Show>
-                <Show when={window.location.host === 'rabbit.syusui.net'}>
-                  <button
-                    type="button"
-                    class="rounded bg-primary p-2 text-primary-fg"
-                    onClick={() => {
-                      const text = window.prompt('Paste config') ?? '';
-                      if (text.length === 0) {
-                        window.alert('empty');
-                        return;
-                      }
-                      const json = JSON.parse(text) as ReturnType<typeof config>;
-                      if (window.confirm(`import?:\n${text}`)) {
-                        setConfig(json);
-                      }
-                    }}
-                  >
-                    {i18n.t('config.importFromClipboard')}
-                  </button>
-                </Show>
-              </div>
               <ul class="flex flex-col">
                 <For each={menu}>
                   {(menuItem, i) => (

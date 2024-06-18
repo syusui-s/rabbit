@@ -134,6 +134,14 @@ export const thumbnailUrl = (
       }
     }
     return url.toString();
+
+    // Gravater
+    // https://gravatar.com/userimage/ID/IMAGE_ID.jpeg
+    if (url.host === 'gravatar.com' && url.pathname.startsWith('/userimage/')) {
+      const result = new URL(url);
+      url.searchParams.set('size', '128');
+      return result.toString();
+    }
   } catch {
     return urlString;
   }

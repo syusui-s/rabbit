@@ -156,11 +156,12 @@ em-emoji-picker {
   scrollbar-color: rgb(var(--color-scroll-thumb)) rgb(var(--color-scroll-bg));
 }
 
+/* For Chrome <=120 */
 .scrollbar::-webkit-scrollbar:vertical {
-  width: 5px;
+  width: 10px;
 }
 .scrollbar::-webkit-scrollbar:horizontal {
-  height: 5px;
+  height: 10px;
 }
 .scrollbar::-webkit-scrollbar {
   background-color: rgb(var(--color-scroll-bg));

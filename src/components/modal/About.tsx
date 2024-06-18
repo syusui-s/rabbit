@@ -74,7 +74,7 @@ const About: Component<AboutProps> = (props) => {
         <h2 class="my-4 text-xl font-bold">{i18n.t('about.termOfService')}</h2>
 
         <p class="my-4">
-          Copyright (C) 2023 Shusui Moyatani and{' '}
+          Copyright &copy; 2023, 2024 Shusui Moyatani and{' '}
           <SafeLink
             class="text-link underline"
             href="https://github.com/syusui-s/rabbit/graphs/contributors"

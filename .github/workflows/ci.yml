@@ -38,18 +38,12 @@ jobs:
         run: npm run test
       - name: Build
         run: |
-          if [ "${GITHUB_REPOSITORY}" = "syusui-s/rabbit-transfer-domain" ]; then
-            npm run build
-          else
-            npm run build -- --base="/rabbit/"
-          fi
+          npm run build
         env:
           VITE_COMMIT: ${{ steps.hash.outputs.sha_short }}
       - name: Set CNAME
         run: |
-          if [ "${GITHUB_REPOSITORY}" = "syusui-s/rabbit-transfer-domain" ]; then
-            echo "rabbit.syusui.net" >> ./dist/CNAME
-          fi
+          echo "rabbit.syusui.net" >> ./dist/CNAME
       - name: Check license
         run: npm run checkLicense
       - name: Deploy

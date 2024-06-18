@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Content filter is a text which expresses the filter.
  *
@@ -19,6 +21,7 @@
  *     Case-sensitive
  *     "Hello World"
  */
+
 export type ContentFilterAnd = { filterType: 'AND'; children: ContentFilter[] };
 export type ContentFilterOr = { filterType: 'OR'; children: ContentFilter[] };
 export type ContentFilterNot = { filterType: 'NOT'; child: ContentFilter };
@@ -31,6 +34,55 @@ export type ContentFilter =
   | ContentFilterNot
   | ContentFilterTextInclude
   | ContentFilterRegex;
+
+export const ContentFilterAndSchema = z.object({
+  filterType: z.literal('AND'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  children: z.array(z.lazy(() => ContentFilterSchema)),
+});
+
+export const ContentFilterOrSchema = z.object({
+  filterType: z.literal('OR'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  children: z.array(z.lazy(() => ContentFilterSchema)),
+});
+
+export const ContentFilterNotSchema = z.object({
+  filterType: z.literal('NOT'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  child: z.lazy(() => ContentFilterSchema),
+});
+
+export const ContentFilterTextIncludeSchema = z.object({
+  filterType: z.literal('Text'),
+  text: z.string(),
+});
+
+export const ContentFilterRegexSchema = z
+  .object({
+    filterType: z.literal('Regex'),
+    regex: z.string(),
+    flag: z.string(),
+  })
+  .refine(({ regex, flag }) => {
+    try {
+      /* eslint-disable-next-line no-new */
+      new RegExp(regex, flag);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+// 再帰的型定義を用いる場合、Zodでは型情報を提供しなければならない。
+// https://github.com/colinhacks/zod#recursive-types
+export const ContentFilterSchema: z.ZodSchema<ContentFilter> = z.union([
+  ContentFilterAndSchema,
+  ContentFilterOrSchema,
+  ContentFilterNotSchema,
+  ContentFilterTextIncludeSchema,
+  ContentFilterRegexSchema,
+]);
 
 export const applyContentFilter =
   (filter: ContentFilter) =>

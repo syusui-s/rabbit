@@ -19,6 +19,11 @@ export type ReactionsTask = { type: 'Reactions'; mentionedEventId: string };
 export type ZapReceiptsTask = { type: 'ZapReceipts'; mentionedEventId: string };
 export type RepostsTask = { type: 'Reposts'; mentionedEventId: string };
 export type FollowingsTask = { type: 'Followings'; pubkey: string };
+export type ReplaceableEventTask = {
+  type: 'ReplaceableEvent';
+  kind: number;
+  author: string;
+};
 export type ParameterizedReplaceableEventTask = {
   type: 'ParameterizedReplaceableEvent';
   kind: number;
@@ -33,6 +38,7 @@ export type TaskArgs = [
   ReactionsTask,
   RepostsTask,
   ZapReceiptsTask,
+  ReplaceableEventTask,
   ParameterizedReplaceableEventTask,
 ];
 
@@ -68,6 +74,9 @@ const { setActiveBatchSubscriptions } = useStats();
 setInterval(() => {
   setActiveBatchSubscriptions(count);
 }, 1000);
+
+const keyForReplaceableEvent = ({ kind, author }: { kind: number; author: string }) =>
+  `${kind}:${author}`;
 
 const keyForParameterizedReplaceableEvent = ({
   kind,
@@ -164,6 +173,20 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
     filtersBuilder: (ids) => [{ kinds: [Kind.Zap], '#e': ids }],
     eventKeyExtractor: (ev) => genericEvent(ev).lastTaggedEventId(),
   });
+  const replaceableEventsTasks = createTasks<ReplaceableEventTask>({
+    keyExtractor: keyForReplaceableEvent,
+    filtersBuilder: (keys) => {
+      const result: Filter[] = [];
+      keys.forEach((key) => {
+        const task = replaceableEventsTasks.tasks.get(key)?.[0];
+        if (task == null) return;
+        const { kind, author } = task.req;
+        result.push({ kinds: [kind], authors: [author] });
+      });
+      return result;
+    },
+    eventKeyExtractor: (ev) => keyForReplaceableEvent({ kind: ev.kind, author: ev.pubkey }),
+  });
   const parameterizedReplaceableEventsTasks = createTasks<ParameterizedReplaceableEventTask>({
     keyExtractor: keyForParameterizedReplaceableEvent,
     filtersBuilder: (keys) => {
@@ -200,6 +223,8 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
       reactionsTasks.add(task);
     } else if (isBatchedEventsTaskOf<ZapReceiptsTask>('ZapReceipts')(task)) {
       zapReceiptsTasks.add(task);
+    } else if (isBatchedEventsTaskOf<ReplaceableEventTask>('ReplaceableEvent')(task)) {
+      replaceableEventsTasks.add(task);
     } else if (
       isBatchedEventsTaskOf<ParameterizedReplaceableEventTask>('ParameterizedReplaceableEvent')(
         task,
@@ -218,6 +243,7 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
     ...repostsTasks.buildFilter(),
     ...reactionsTasks.buildFilter(),
     ...zapReceiptsTasks.buildFilter(),
+    ...replaceableEventsTasks.buildFilter(),
     ...parameterizedReplaceableEventsTasks.buildFilter(),
   ];
 
@@ -237,6 +263,9 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
     if (event.kind === Kind.Zap) {
       if (zapReceiptsTasks.resolve(event)) return;
     }
+    if (Kind.isReplaceableKind(event.kind)) {
+      if (replaceableEventsTasks.resolve(event)) return;
+    }
     if (Kind.isParameterizedReplaceableKind(event.kind)) {
       if (parameterizedReplaceableEventsTasks.resolve(event)) return;
     }
@@ -255,6 +284,7 @@ export const tasksRequestBuilder = (tasks: BatchedEventsTask[]) => {
       repostsTasks,
       reactionsTasks,
       zapReceiptsTasks,
+      replaceableEventsTasks,
       parameterizedReplaceableEventsTasks,
     },
     add,

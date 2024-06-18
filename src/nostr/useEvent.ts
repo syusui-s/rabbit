@@ -28,6 +28,7 @@ const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
       const promise = task.firstEventPromise().catch(() => {
         throw new Error(`event not found: ${eventId}`);
       });
+      console.log('useEvent', props());
       registerTask({ task, signal });
       return timeout(15000, `useEvent: ${eventId}`)(promise);
     },

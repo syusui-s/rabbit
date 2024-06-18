@@ -28,7 +28,7 @@ const Copy: Component<CopyProps> = (props) => {
         <ClipboardDocument />
       </button>
       <Show when={showPopup()}>
-        <div class="absolute left-[-2.5rem] top-[-1.5rem] rounded bg-primary p-1 text-xs font-bold text-primary-fg shadow">
+        <div class="absolute -left-10 -top-6 rounded bg-primary p-1 text-xs font-bold text-primary-fg shadow">
           Copied!
         </div>
       </Show>

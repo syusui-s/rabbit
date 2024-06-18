@@ -15,9 +15,11 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  optimizeDeps: {
-    extensions: ['jsx'],
-  },
+  // Unexpectedly, JSX is replaced by React.createElement due to optimizeDeps.
+  // https://github.com/vitejs/vite/issues/17310
+  // optimizeDeps: {
+  //   extensions: ['jsx'],
+  // },
   build: {
     target: 'esnext',
     sourcemap: true,

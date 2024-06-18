@@ -21,6 +21,7 @@ import { requestProvider, type WebLNProvider } from 'webln';
 // eslint-disable-next-line import/no-cycle
 import EventDisplay from '@/components/event/EventDisplay';
 import BasicModal from '@/components/modal/BasicModal';
+import Copy from '@/components/utils/Copy';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import createZapRequest from '@/nostr/builder/createZapRequest';
@@ -81,7 +82,7 @@ const QRCodeDisplay: Component<{ text: string }> = (props) => {
 
     qrcode
       .toCanvas(canvasRef, props.text, {
-        margin: 8,
+        margin: 2,
         color: {
           dark: currentTheme.brightness === 'dark' ? '#ffffffff' : '#000000ff',
           light: '#00000000',
@@ -102,7 +103,7 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
   const { config } = useConfig();
   const webln = useWebLN();
 
-  const lightingInvoice = () => `lightning:${props.invoice}`;
+  const lightingInvoiceWithSchema = () => `lightning:${props.invoice}`;
 
   const { events } = useSubscription(() =>
     ensureNonNull([props.nostrPubkey] as const)(([nostrPubkey]) => ({
@@ -150,13 +151,21 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
         </div>
       }
     >
-      <div class="flex flex-col items-center gap-2">
+      <div class="flex flex-col items-center gap-4">
         <div>
-          <QRCodeDisplay text={lightingInvoice()} />
+          <QRCodeDisplay text={lightingInvoiceWithSchema()} />
+        </div>
+        <div class="flex items-center gap-2 ps-5">
+          <textarea
+            class="h-12 w-80 flex-1 select-all whitespace-pre-wrap break-all rounded-md border border-border bg-bg font-mono text-sm ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+            value={props.invoice}
+            readonly
+          />
+          <Copy class="size-5 hover:text-primary" text={props.invoice} />
         </div>
         <a
           class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
-          href={lightingInvoice()}
+          href={lightingInvoiceWithSchema()}
         >
           {i18n.t('zap.sendViaWallet')}
         </a>
@@ -247,16 +256,8 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
     }
 
     const invoice = callbackResponse.pr;
-    console.log(callbackResponse, invoice);
-    if (
-      !(await verifyInvoice(invoice, {
-        amountMilliSats,
-        metadata: endpointData.metadata,
-        zapRequest: callbackParams.zapRequest,
-      }))
-    ) {
-      throw new Error('Invalid invoice');
-    }
+
+    verifyInvoice(invoice, { amountMilliSats });
 
     return invoice;
   };
@@ -378,7 +379,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
 
   return (
     <BasicModal onClose={props.onClose}>
-      <div class="p-8">
+      <div class="px-8 py-12">
         <Show when={isZapConfigured()} fallback={i18n.t('zap.userDidNotConfigureZap')}>
           <Show when={lud06() != null && lud16() != null}>
             <div class="flex justify-center gap-3 pb-2">

@@ -13,10 +13,12 @@ export default {
   posting: {
     placeholder: "What's happening?",
     placeholderReply: 'Post a reply',
+    emojiPicker: 'Emoji',
     contentWarning: 'Content warning',
     contentWarningReason: 'Reason of warning',
     uploadImage: 'Upload image',
     submit: 'Submit',
+    close: 'Close',
     forbiddenToIncludeNsec: 'You cannot include private key (nsec).',
     failedToUploadFile: 'Failed to upload files: {{filenames}}',
     replyToPre: 'Reply to',
@@ -38,6 +40,9 @@ export default {
     back: 'Back',
     loadLatest: 'Load latest posts',
     loadOld: 'Load old posts',
+    addRelayColumn: {
+      add: '追加',
+    },
     config: {
       columnWidth: 'Column width',
       widest: 'Widest',
@@ -154,10 +159,15 @@ export default {
     confirmImport: 'Import? (The config will be overwritten)',
     copyToClipboard: 'Copy to clipboard',
     importFromClipboard: 'Import from clipboard',
-    profile: {
+    account: {
       profile: 'Profile',
       openProfile: 'Open',
       editProfile: 'Edit',
+      backupConfig: 'Backup configuration',
+      save: 'Save',
+      restore: 'Restore',
+      restored: 'Successfully restored.',
+      failedToRestore: 'Failed to restore',
     },
     relays: {
       relays: 'Relays',

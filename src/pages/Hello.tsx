@@ -3,6 +3,7 @@ import { createSignal, onMount, Switch, Match, type Component } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 
 import SignerExtensions from '@/components/SignerExtensions';
+import SafeLink from '@/components/utils/SafeLink';
 import usePersistStatus from '@/hooks/usePersistStatus';
 import { useTranslation } from '@/i18n/useTranslation';
 import resolveAsset from '@/utils/resolveAsset';
@@ -50,7 +51,7 @@ const Hello: Component = () => {
   });
 
   return (
-    <div class="mx-auto flex max-w-[640px] flex-col items-center p-4 text-fg">
+    <div class="mx-auto flex max-w-screen-sm flex-col items-center p-4 text-fg">
       <div class="flex flex-col items-center gap-4 rounded p-4">
         <img src={resolveAsset('images/rabbit_256.png')} width="96" alt="logo" height="96" />
         <h1 class="text-5xl font-black text-primary">Rabbit</h1>
@@ -85,6 +86,27 @@ const Hello: Component = () => {
           </Match>
         </Switch>
       </div>
+      <p class="mt-4 text-xs text-fg-secondary">
+        Copyright &copy; 2023, 2024{' '}
+        <SafeLink class="underline hover:text-fg-tertiary" href="https://github.com/syusui-s/">
+          Shusui Moyatani
+        </SafeLink>{' '}
+        and{' '}
+        <SafeLink
+          class="underline hover:text-fg-tertiary"
+          href="https://github.com/syusui-s/rabbit/graphs/contributors"
+        >
+          Rabbit contributors
+        </SafeLink>
+      </p>
+      <p class="mt-1 text-xs text-fg-secondary">
+        <SafeLink
+          class="underline hover:text-fg-tertiary"
+          href="https://github.com/syusui-s/rabbit"
+        >
+          GitHub
+        </SafeLink>
+      </p>
     </div>
   );
 };

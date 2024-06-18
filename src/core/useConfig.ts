@@ -1,13 +1,15 @@
-import { createRoot, type Accessor, type Setter } from 'solid-js';
+import { createRoot, type Accessor, type Setter, createMemo } from 'solid-js';
 
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
+import { z } from 'zod';
 
 import { colorThemes, type ColorTheme } from '@/core/colorThemes';
 import {
   ColumnType,
+  ColumnTypeSchema,
   createFollowingColumn,
   createJapanRelaysColumn,
   createNotificationColumn,
@@ -21,36 +23,47 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import { asCaseInsensitive, wordsRegex } from '@/utils/regex';
 
-export type CustomEmojiConfig = {
-  shortcode: string;
-  url: string;
-};
+const CustomEmojiConfigSchema = z.object({
+  shortcode: z.string(),
+  url: z.string(),
+});
 
-export type ColorThemeConfig = {
-  type: 'specific';
-  id: string;
-};
+export type CustomEmojiConfig = z.infer<typeof CustomEmojiConfigSchema>;
 
-export type Config = {
-  relayUrls: string[];
-  columns: ColumnType[];
-  customEmojis: Record<string, CustomEmojiConfig>;
-  colorTheme: ColorThemeConfig;
-  dateFormat: 'relative' | 'absolute-long' | 'absolute-short';
-  keepOpenPostForm: boolean;
-  useEmojiReaction: boolean;
-  showEmojiReaction: boolean;
-  showMedia: boolean; // TODO 'always' | 'only-followings' | 'never'
-  embedding: {
-    twitter: boolean;
-    youtube: boolean;
-    ogp: boolean;
-  };
-  hideCount: boolean;
-  mutedPubkeys: string[];
-  mutedKeywords: string[];
-};
+const ColorThemeConfigSchema = z.object({
+  type: z.literal('specific'),
+  id: z.string(),
+});
+
+export type ColorThemeConfig = z.infer<typeof ColorThemeConfigSchema>;
+
+export const ConfigSchema = z.object({
+  relayUrls: z.array(z.string()),
+  columns: z.array(ColumnTypeSchema),
+  customEmojis: z.record(CustomEmojiConfigSchema),
+  colorTheme: ColorThemeConfigSchema,
+  dateFormat: z.union([
+    z.literal('relative'),
+    z.literal('absolute-long'),
+    z.literal('absolute-short'),
+  ]),
+  keepOpenPostForm: z.boolean(),
+  useEmojiReaction: z.boolean(),
+  showEmojiReaction: z.boolean(),
+  showMedia: z.boolean(), // TODO 'always' | 'only-followings' | 'never'に変更
+  embedding: z.object({
+    twitter: z.boolean(),
+    youtube: z.boolean(),
+    ogp: z.boolean(),
+  }),
+  hideCount: z.boolean(),
+  mutedPubkeys: z.array(z.string()),
+  mutedKeywords: z.array(z.string()),
+});
+
+export type Config = z.infer<typeof ConfigSchema>;
 
 type UseConfig = {
   config: Accessor<Config>;
@@ -63,6 +76,7 @@ type UseConfig = {
   // column
   saveColumn: (column: ColumnType) => void;
   moveColumn: (columnId: string, index: number) => void;
+  moveColumnById: (columnId: string, insertBeforeId: string) => void;
   removeColumn: (columnId: string) => void;
   initializeColumns: (param: { pubkey: string }) => void;
   // emoji
@@ -184,6 +198,11 @@ const useConfig = (): UseConfig => {
     });
   };
 
+  const moveColumnById = (columnId: string, insertBeforeId: string) => {
+    const toIndex = config.columns.findIndex((column) => column.id === insertBeforeId);
+    moveColumn(columnId, toIndex + 1);
+  };
+
   const removeColumn = (columnId: string) => {
     setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
   };
@@ -212,11 +231,18 @@ const useConfig = (): UseConfig => {
       [(e) => e.shortcode.length],
     );
 
-  const isPubkeyMuted = (pubkey: string) => config.mutedPubkeys.includes(pubkey);
+  const mutedPubkeySet = createMemo(() => new Set(config.mutedPubkeys));
+  const isPubkeyMuted = (pubkey: string) => mutedPubkeySet().has(pubkey);
 
+  const mutedKeywordsRegex = createMemo(() => {
+    if (config.mutedKeywords.length === 0) return null;
+    return asCaseInsensitive(wordsRegex(config.mutedKeywords));
+  });
   const hasMutedKeyword = (event: NostrEvent) => {
     if (event.kind === Kind.ShortTextNote) {
-      return config.mutedKeywords.some((keyword) => event.content.includes(keyword));
+      const regex = mutedKeywordsRegex();
+      if (regex == null) return false;
+      return regex.test(event.content);
     }
     return false;
   };
@@ -259,6 +285,7 @@ const useConfig = (): UseConfig => {
     // column
     saveColumn,
     moveColumn,
+    moveColumnById,
     removeColumn,
     initializeColumns,
     // emoji

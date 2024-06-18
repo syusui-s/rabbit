@@ -12,10 +12,12 @@ export default {
   posting: {
     placeholder: 'いまどうしてる？',
     placeholderReply: '返信を投稿',
+    emojiPicker: '絵文字を追加',
     contentWarning: 'コンテンツ警告を設定',
     contentWarningReason: '警告の理由',
     uploadImage: '画像を投稿',
     submit: '投稿',
+    close: '閉じる',
     forbiddenToIncludeNsec: '投稿に秘密鍵(nsec)を含めることはできません。',
     failedToUploadFile: 'ファイルのアップロードに失敗しました: {{filenames}}',
     replyToPre: '',
@@ -37,6 +39,9 @@ export default {
     back: '戻る',
     loadLatest: '最新の投稿を読み込む',
     loadOld: '古い投稿を読み込む',
+    addRelayColumn: {
+      add: '追加',
+    },
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',
@@ -150,10 +155,15 @@ export default {
     confirmImport: 'インポートしますか？（現在の設定は上書きされます）',
     copyToClipboard: 'クリップボードに設定をコピー',
     importFromClipboard: '設定をクリップボードから読み込む',
-    profile: {
+    account: {
       profile: 'プロフィール',
       openProfile: '開く',
       editProfile: '編集',
+      backupConfig: '設定のバックアップ',
+      save: '保存',
+      restore: '復元',
+      restored: '復元しました',
+      failedToRestore: '復元に失敗しました',
     },
     relays: {
       relays: 'リレー',

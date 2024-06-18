@@ -1,4 +1,4 @@
-import { Component, createSignal, createMemo, Show, Switch, Match } from 'solid-js';
+import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
@@ -7,6 +7,7 @@ import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
 
+import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import BasicModal from '@/components/modal/BasicModal';
 import EventDebugModal from '@/components/modal/EventDebugModal';
@@ -20,6 +21,7 @@ import { useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import parseNip05Address from '@/nostr/parseNip05Address';
 import parseTextNote, { toResolved } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
@@ -29,7 +31,6 @@ import usePubkey from '@/nostr/usePubkey';
 import useSubscription from '@/nostr/useSubscription';
 import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
-import epoch from '@/utils/epoch';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
 
@@ -72,14 +73,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const { verification, query: verificationQuery } = useVerification(() =>
     ensureNonNull([profile()?.nip05] as const)(([nip05]) => ({ nip05 })),
   );
-  const nip05Identifier = () => {
-    const ident = profile()?.nip05;
-    if (ident == null) return null;
-    const [user, domain] = ident.split('@');
-    if (domain == null) return null;
-    if (user === '_') return { domain, ident: domain };
-    return { user, domain, ident };
-  };
+  const nip05Identifier = () => parseNip05Address(profile()?.nip05);
   const isVerified = () => verification()?.pubkey === props.pubkey;
   const isMuted = () => isPubkeyMuted(props.pubkey);
 
@@ -272,18 +266,24 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     ],
   }));
 
-  const { events } = useSubscription(() => ({
+  const loadMore = useLoadMore(() => ({ duration: null }));
+
+  const { events, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,
     filters: [
       {
         kinds: [1, 6],
         authors: [props.pubkey],
         limit: 10,
-        until: epoch(),
+        since: loadMore.since(),
+        until: loadMore.until(),
       },
     ],
+    eoseLimit: 10,
     continuous: false,
   }));
+
+  createEffect(() => loadMore.setEvents(events()));
 
   return (
     <BasicModal onClose={() => props.onClose?.()}>
@@ -484,7 +484,9 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         </Match>
       </Switch>
       <ul class="border-t border-border p-1">
-        <Timeline events={events()} />
+        <LoadMore loadMore={loadMore} eose={eose()}>
+          <Timeline events={events()} />
+        </LoadMore>
       </ul>
     </BasicModal>
   );
