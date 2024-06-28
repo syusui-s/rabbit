@@ -1,6 +1,12 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import {
+  createQuery,
+  useQueryClient,
+  type CreateQueryResult,
+  QueryClient,
+  createQueries,
+} from '@tanstack/solid-query';
 import { Event as NostrEvent } from 'nostr-tools/pure';
 
 import { Profile, ProfileWithOtherProperties, safeParseProfile } from '@/nostr/event/Profile';
@@ -13,6 +19,7 @@ export type UseProfileProps = {
 
 export type UseProfile = {
   profile: () => ProfileWithOtherProperties | null;
+  pubkey: () => string | undefined;
   event: () => NostrEvent | null | undefined;
   lud06: () => string | undefined;
   lud16: () => string | undefined;
@@ -30,29 +37,17 @@ export type UseProfiles = {
   queries: CreateQueryResult<NostrEvent | null>[];
 };
 
-const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
-  const queryClient = useQueryClient();
-  const props = createMemo(propsProvider);
-  const genQueryKey = createMemo(() => ['useProfile', props()] as const);
+const genQueryKey = (props: UseProfileProps | null) => ['useProfile', props] as const;
 
-  const query = createQuery(() => ({
-    queryKey: genQueryKey(),
-    queryFn: latestEventQuery<ReturnType<typeof genQueryKey>>({
-      taskProvider: ([, currentProps]) => {
-        if (currentProps == null) return null;
-        const { pubkey } = currentProps;
-        return new BatchedEventsTask<ProfileTask>({ type: 'Profile', pubkey });
-      },
-      queryClient,
-    }),
-    // Profiles are updated occasionally, so a short staleTime is used here.
-    // gcTime is long so that the user see profiles instantly.
-    staleTime: 5 * 60 * 1000, // 5 min
-    gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
-    refetchInterval: 5 * 60 * 1000, // 5 min
-    refetchOnWindowFocus: false,
-  }));
-
+const buildMethod = ({
+  props,
+  query,
+  queryClient,
+}: {
+  props: () => UseProfileProps | null;
+  query: CreateQueryResult<NostrEvent | null>;
+  queryClient: QueryClient;
+}): UseProfile => {
   const event = () => query.data;
 
   const profile = createMemo((): Profile | null => {
@@ -76,9 +71,88 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
   const isZapConfigured = (): boolean => lud06() != null || lud16() != null;
 
   const invalidateProfile = (): Promise<void> =>
-    queryClient.invalidateQueries({ queryKey: genQueryKey() });
+    queryClient.invalidateQueries({ queryKey: genQueryKey(props()) });
 
-  return { profile, lud06, lud16, event, isZapConfigured, invalidateProfile, query };
+  return {
+    profile,
+    pubkey: () => props()?.pubkey,
+    lud06,
+    lud16,
+    event,
+    isZapConfigured,
+    invalidateProfile,
+    query,
+  };
+};
+
+const queryOptions = ({
+  props,
+  queryClient,
+}: {
+  props: () => UseProfileProps | null;
+  queryClient: QueryClient;
+}) => ({
+  queryKey: genQueryKey(props()),
+  queryFn: latestEventQuery<ReturnType<typeof genQueryKey>>({
+    taskProvider: ([, currentProps]) => {
+      if (currentProps == null) return null;
+      const { pubkey } = currentProps;
+      return new BatchedEventsTask<ProfileTask>({ type: 'Profile', pubkey });
+    },
+    queryClient,
+  }),
+  // Profiles are updated occasionally, so a short staleTime is used here.
+  // gcTime is long so that the user see profiles instantly.
+  staleTime: 5 * 60 * 1000, // 5 min
+  gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+  refetchInterval: 5 * 60 * 1000, // 5 min
+  refetchOnWindowFocus: false,
+});
+
+const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
+  const queryClient = useQueryClient();
+  const props = createMemo(propsProvider);
+  const query = createQuery(() => queryOptions({ props, queryClient }));
+
+  return buildMethod({ props, query, queryClient });
+};
+
+export const useProfiles = (propsProvider: () => UseProfilesProps) => {
+  const queryClient = useQueryClient();
+  const props = createMemo(propsProvider);
+
+  const queries = createQueries(() => ({
+    queries: props().pubkeys.map((pubkey) =>
+      queryOptions({
+        props: () => ({ pubkey }),
+        queryClient,
+      }),
+    ),
+  }));
+
+  const profiles = createMemo((): UseProfile[] =>
+    queries.map((query, i) =>
+      buildMethod({
+        props: () => ({ pubkey: props().pubkeys[i] }),
+        query,
+        queryClient,
+      }),
+    ),
+  );
+
+  const searchProfiles = (query: string) =>
+    profiles().filter(
+      (profile) =>
+        profile.profile()?.name?.includes(query) ||
+        profile.profile()?.display_name?.includes(query) ||
+        profile.profile()?.nip05?.includes(query),
+    );
+
+  return {
+    profiles,
+    searchProfiles,
+    queries,
+  };
 };
 
 export default useProfile;
