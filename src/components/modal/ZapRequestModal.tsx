@@ -40,7 +40,6 @@ import verifyInvoice from '@/nostr/zap/verifyInvoice';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 
-
 type ZapTarget = { event: NostrEvent } | { pubkey: string };
 
 export type ZapRequestModalProps = {

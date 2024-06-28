@@ -36,7 +36,6 @@ import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
 
-
 export type ProfileDisplayProps = {
   pubkey: string;
   onClose?: () => void;
