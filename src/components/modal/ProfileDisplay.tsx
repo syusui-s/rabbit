@@ -2,6 +2,7 @@ import { Component, createSignal, createMemo, Show, Switch, Match, createEffect 
 
 import { createMutation } from '@tanstack/solid-query';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
+import Bolt from 'heroicons/24/outline/bolt.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
@@ -12,6 +13,7 @@ import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentD
 import BasicModal from '@/components/modal/BasicModal';
 import EventDebugModal from '@/components/modal/EventDebugModal';
 import UserList from '@/components/modal/UserList';
+import ZapRequestModal from '@/components/modal/ZapRequestModal';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
 import useContextMenu from '@/components/utils/useContextMenu';
@@ -33,6 +35,7 @@ import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
 import timeout from '@/utils/timeout';
+
 
 export type ProfileDisplayProps = {
   pubkey: string;
@@ -60,7 +63,9 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
-  const [modal, setModal] = createSignal<'Following' | 'EventDebugModal' | null>(null);
+  const [modal, setModal] = createSignal<'Following' | 'EventDebugModal' | 'ZapRequest' | null>(
+    null,
+  );
   const closeModal = () => setModal(null);
 
   const {
@@ -355,6 +360,12 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 </Match>
               </Switch>
               <button
+                class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover"
+                onClick={() => setModal('ZapRequest')}
+              >
+                <Bolt />
+              </button>
+              <button
                 ref={otherActionsPopup.targetRef}
                 type="button"
                 class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover"
@@ -481,6 +492,9 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               onClose={closeModal}
             />
           )}
+        </Match>
+        <Match when={modal() === 'ZapRequest'}>
+          <ZapRequestModal zapTo={{ pubkey: props.pubkey }} onClose={closeModal} />
         </Match>
       </Switch>
       <ul class="border-t border-border p-1">

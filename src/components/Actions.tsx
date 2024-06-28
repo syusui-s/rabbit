@@ -460,7 +460,7 @@ const Actions: Component<ActionProps> = (props) => {
           <RepostsModal event={props.event} onClose={closeModal} />
         </Match>
         <Match when={modal() === 'ZapRequest'}>
-          <ZapRequestModal event={props.event} onClose={closeModal} />
+          <ZapRequestModal zapTo={{ event: props.event }} onClose={closeModal} />
         </Match>
       </Switch>
     </>
