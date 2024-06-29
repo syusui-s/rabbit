@@ -66,7 +66,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
             >
               <UserDisplayName pubkey={props.event.pubkey} />
             </button>
-            <span class="shrink-0">{i18n.t('notification.reacted')}</span>
+            <span class="shrink-0 whitespace-pre">{i18n.t('notification.reacted')}</span>
           </div>
         </div>
         <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>

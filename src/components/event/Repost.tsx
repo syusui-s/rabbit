@@ -38,7 +38,7 @@ const Repost: Component<RepostProps> = (props) => {
           >
             <UserDisplayName pubkey={props.event.pubkey} />
           </button>
-          <span class="shrink-0">{i18n.t('notification.reposted')}</span>
+          <span class="shrink-0 whitespace-pre">{i18n.t('notification.reposted')}</span>
         </div>
         <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>
       </div>
