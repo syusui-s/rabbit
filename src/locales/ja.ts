@@ -115,6 +115,7 @@ export default {
     failedToDelete: 'すべてのリレーで削除に失敗しました',
     showImage: '画像を表示する',
     showVideo: '動画を表示する',
+    showAudio: '音声プレイヤーを表示する',
     showPreview: 'プレビューを表示する',
     showOverflow: '続きを読む',
     hideOverflow: '隠す',

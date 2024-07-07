@@ -5,6 +5,7 @@ import * as Kind from 'nostr-tools/kinds';
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 // import ParameterizedReplaceableEventDisplayById from '@/components/event/ParameterizedReplaceableEventDisplayById';
+import AudioDisplay from '@/components/event/textNote/AudioDisplay';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
 import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
@@ -15,7 +16,7 @@ import { createRelaysColumn, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { ParsedTextNoteResolvedNode, type ParsedTextNoteResolved } from '@/nostr/parseTextNote';
-import { isImageUrl, isVideoUrl, isWebSocketUrl } from '@/utils/url';
+import { isImageUrl, isVideoUrl, isAudioUrl, isWebSocketUrl } from '@/utils/url';
 
 export type TextNoteContentDisplayProps = {
   parsed: ParsedTextNoteResolved;
@@ -53,6 +54,9 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           }
           if (isVideoUrl(item.content)) {
             return <VideoDisplay url={item.content} initialHidden={initialHidden()} />;
+          }
+          if (isAudioUrl(item.content)) {
+            return <AudioDisplay url={item.content} initialHidden={initialHidden()} />;
           }
           if (isWebSocketUrl(item.content)) {
             return (
