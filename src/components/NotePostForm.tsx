@@ -16,10 +16,11 @@ import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
 import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
+import Tags from '@/nostr/event/Tags';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
+import { uploadNostrBuild } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
@@ -149,22 +150,46 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const uploadFilesMutation = createMutation(() => ({
     mutationKey: ['uploadFiles'] as const,
     mutationFn: async (files: File[]) => {
-      const uploadResults = await uploadFiles(uploadNostrBuild)(files);
-      const failed: File[] = [];
+      const uploadResults = await uploadNostrBuild(files);
+      const urls: string[] = [];
+      const failed: [File, string][] = [];
 
       uploadResults.forEach((result, i) => {
         if (result.status === 'fulfilled') {
-          appendText(result.value.imageUrl);
-          resizeTextArea();
-        } else {
-          failed.push(files[i]);
-        }
+          const { status, nip94_event: nip94Event } = result.value;
+          if ((status === 'success' || status === 'processing') && nip94Event != null) {
+            // TODO support delayed processing
+            const tags = new Tags(nip94Event.tags);
+            const urlTag = tags.findFirstTagByName('url');
+
+            if (urlTag == null || urlTag.length < 2) {
+              failed.push([files[i], 'url not found']);
+              return;
+            }
+            const url = urlTag[1];
+            urls.push(url);
+          } else if (result.value.status === 'error') {
+            failed.push([files[i], result.value.message]);
+          }
+        } else if (result.reason instanceof Error) {
+            failed.push([files[i], result.reason.message]);
+          } else {
+            failed.push([files[i], 'failed']);
+          }
       });
 
+      if (urls.length > 0) {
+        appendText(urls.join(' '));
+        resizeTextArea();
+      }
       if (failed.length > 0) {
-        const filenames = failed.map((f) => f.name).join(', ');
+        const filenames = failed.map(([f, reason]) => `${f.name}: ${reason}`).join('\n');
         window.alert(i18n.t('posting.failedToUploadFile', { filenames }));
       }
+    },
+    onError: (err) => {
+      console.error(err);
+      window.alert(err);
     },
   }));
 
@@ -299,8 +324,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
 
-    const files = [...(ev.currentTarget.files ?? [])];
-    uploadFilesMutation.mutate(files);
+    const {files} = ev.currentTarget;
+    if (files == null || files.length === 0) return;
+
+    uploadFilesMutation.mutate([...files]);
+
     // eslint-disable-next-line no-param-reassign
     ev.currentTarget.value = '';
   };
@@ -309,17 +337,21 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ev.preventDefault();
     if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
-    const files = [...(ev?.dataTransfer?.files ?? [])];
-    uploadFilesMutation.mutate(files);
+
+    const files = ev?.dataTransfer?.files;
+    if (files == null || files.length === 0) return;
+
+    uploadFilesMutation.mutate([...files]);
   };
 
   const handlePaste: JSX.EventHandler<HTMLTextAreaElement, ClipboardEvent> = (ev) => {
     if (uploadFilesMutation.isPending) return;
 
-    const items = [...(ev?.clipboardData?.items ?? [])];
+    const items = ev?.clipboardData?.items;
+    if (items == null || items.length === 0) return;
 
     const files: File[] = [];
-    items.forEach((item) => {
+    Array.from(items).forEach((item) => {
       if (item.kind === 'file') {
         ev.preventDefault();
         const file = item.getAsFile();

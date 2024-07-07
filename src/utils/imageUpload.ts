@@ -1,74 +1,84 @@
-export type UploadResult = {
-  imageUrl: string;
-};
+import { readServerConfig, type FileUploadResponse } from 'nostr-tools/nip96';
+import { getToken } from 'nostr-tools/nip98';
+import { type EventTemplate } from 'nostr-tools/pure';
 
-export type Uploader = {
+export type ServerDefinition = {
+  id: string;
   name: string;
-  tos: string;
-  upload: (file: File) => Promise<UploadResult>;
+  upload: (files: File[]) => Promise<PromiseSettledResult<FileUploadResponse>[]>;
 };
 
-export type NostrBuildResult = {
-  status: 'success' | 'error';
-  message: string;
-  data: {
-    input_name: string;
-    name: string;
-    url: string;
-    thumbnail?: string;
-    blurhash?: string;
-    sha256: string;
-    type: 'image' | 'video' | 'profile' | 'other';
-    mime: string;
-    size: number;
-    metadata?: Record<string, string>;
-    dimensions?: {
-      width: number;
-      height: number;
-    };
-    responsive?: {
-      '240p': string;
-      '360p': string;
-      '480p': string;
-      '720p': string;
-      '1080p': string;
-    };
-  }[];
+export type UploadFileStorageProps = {
+  files: File[];
+  serverUrl: string;
 };
 
-export const uploadNostrBuild = async (blob: Blob): Promise<UploadResult> => {
-  const form = new FormData();
-  form.set('file', blob);
-
-  const res = await fetch('https://nostr.build/api/v2/upload/files', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-    },
-    mode: 'cors',
-    body: form,
-  });
-
-  if (!res.ok) throw new Error('failed to post image: status code was not 2xx');
-
-  const result = (await res.json()) as NostrBuildResult;
-
-  if (result.status !== 'success') throw new Error(`failed to post image: ${result.message}`);
-
-  return { imageUrl: result.data[0].url };
+export type UploadFileProps = {
+  file: File;
+  authorizationHeader?: string;
+  media_type?: 'avatar' | 'banner';
 };
 
-export const uploaders = {
+export const getAuthorizationHeader = (uploadApiUrl: string): Promise<string> => {
+  const windowNostr = window.nostr;
+  if (windowNostr == null) throw new Error('NIP-07 implementation not found');
+
+  const method = 'POST';
+  const signEvent = (ev: EventTemplate) => windowNostr.signEvent(ev);
+  const includeAuthorizationScheme = true;
+
+  return getToken(uploadApiUrl, method, signEvent, includeAuthorizationScheme);
+};
+
+export const uploadFile = async (
+  uploadApiUrl: string,
+  props: UploadFileProps,
+): Promise<FileUploadResponse> => {
+  const body = new FormData();
+  body.set('file', props.file);
+  body.set('content_type', props.file.type);
+  body.set('size', props.file.size.toString(10));
+
+  const headers = new Headers();
+  if (props.authorizationHeader != null) {
+    headers.set('Authorization', props.authorizationHeader);
+  }
+
+  const response = await fetch(uploadApiUrl, { method: 'POST', headers, body });
+
+  // TODO validate event
+  const json = (await response.json()) as FileUploadResponse;
+
+  if (!response.ok) {
+    throw new Error(`failed to upload: ${response.status} ${json.message}`);
+  }
+
+  return json;
+};
+
+export const uploadFileStorage = async (
+  props: UploadFileStorageProps,
+): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
+  const serverConfig = await readServerConfig(props.serverUrl);
+
+  if (serverConfig.api_url.length === 0 || serverConfig.delegated_to_url != null) {
+    throw new Error('delegated_to_url is not supported');
+  }
+  const uploadApiUrl = serverConfig.api_url;
+  const authorizationHeader = await getAuthorizationHeader(uploadApiUrl);
+
+  const promises = Array.from(props.files).map(async (file) => uploadFile(uploadApiUrl, { authorizationHeader, file }));
+
+  return Promise.allSettled(promises);
+};
+
+export const uploadNostrBuild = (files: File[]) =>
+  uploadFileStorage({ files, serverUrl: 'https://nostr.build' });
+
+export const servers: Record<string, ServerDefinition> = {
   nostrBuild: {
+    id: 'nostrBuild',
     name: 'nostr.build',
-    tos: 'https://nostr.build/tos/',
     upload: uploadNostrBuild,
-  } satisfies Uploader,
-} as const;
-
-export type UploaderIds = keyof typeof uploaders;
-
-export const uploadFiles =
-  <T>(uploadFn: (file: Blob) => Promise<T>) =>
-  (files: File[]): Promise<PromiseSettledResult<Awaited<T>>[]> =>
-    Promise.allSettled(files.map((file) => uploadFn(file)));
+  },
+};
