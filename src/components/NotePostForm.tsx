@@ -172,10 +172,10 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             failed.push([files[i], result.value.message]);
           }
         } else if (result.reason instanceof Error) {
-            failed.push([files[i], result.reason.message]);
-          } else {
-            failed.push([files[i], 'failed']);
-          }
+          failed.push([files[i], result.reason.message]);
+        } else {
+          failed.push([files[i], 'failed']);
+        }
       });
 
       if (urls.length > 0) {
@@ -324,7 +324,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
 
-    const {files} = ev.currentTarget;
+    const { files } = ev.currentTarget;
     if (files == null || files.length === 0) return;
 
     uploadFilesMutation.mutate([...files]);

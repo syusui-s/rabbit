@@ -67,7 +67,9 @@ export const uploadFileStorage = async (
   const uploadApiUrl = serverConfig.api_url;
   const authorizationHeader = await getAuthorizationHeader(uploadApiUrl);
 
-  const promises = Array.from(props.files).map(async (file) => uploadFile(uploadApiUrl, { authorizationHeader, file }));
+  const promises = Array.from(props.files).map(async (file) =>
+    uploadFile(uploadApiUrl, { authorizationHeader, file }),
+  );
 
   return Promise.allSettled(promises);
 };
