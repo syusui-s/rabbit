@@ -3,7 +3,6 @@ import { getToken } from 'nostr-tools/nip98';
 import { type EventTemplate } from 'nostr-tools/pure';
 
 export type ServerDefinition = {
-  id: string;
   name: string;
   upload: (files: File[]) => Promise<PromiseSettledResult<FileUploadResponse>[]>;
 };
@@ -77,10 +76,9 @@ export const uploadFileStorage = async (
 export const uploadNostrBuild = (files: File[]) =>
   uploadFileStorage({ files, serverUrl: 'https://nostr.build' });
 
-export const servers: Record<string, ServerDefinition> = {
-  nostrBuild: {
-    id: 'nostrBuild',
+export const servers = {
+  'nostr.build': {
     name: 'nostr.build',
     upload: uploadNostrBuild,
-  },
-};
+  } satisfies ServerDefinition,
+} as const;

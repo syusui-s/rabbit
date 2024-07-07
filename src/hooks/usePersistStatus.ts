@@ -4,18 +4,17 @@ import {
   createStoreWithStorage,
   createStorageWithSerializer,
 } from '@/hooks/createSignalWithStorage';
-import { UploaderIds } from '@/utils/imageUpload';
 
 type PersistStatus = {
   loggedIn: boolean;
-  agreements: Record<UploaderIds, boolean>;
+  agreements: Record<string, boolean>;
 };
 
 type UsePersistStatus = {
   persistStatus: Accessor<PersistStatus>;
   loggedIn: () => void;
-  agreeToToS: (uploaderId: UploaderIds) => void;
-  didAgreeToToS: (uploaderId: UploaderIds) => boolean;
+  agreeToToS: (hostname: string) => void;
+  didAgreeToToS: (hostname: string) => boolean;
 };
 
 const InitialPersistStatus: PersistStatus = {
@@ -40,11 +39,11 @@ const usePersistStatus = (): UsePersistStatus => {
     setPersistStatus((current) => ({ ...current, loggedIn: true }));
   };
 
-  const agreeToToS = (key: UploaderIds) => {
-    setPersistStatus('agreements', (current) => ({ ...current, [key]: true }));
+  const agreeToToS = (hostname: string) => {
+    setPersistStatus('agreements', (current) => ({ ...current, [hostname]: true }));
   };
 
-  const didAgreeToToS = (key: UploaderIds): boolean => persistStatus.agreements[key] ?? false;
+  const didAgreeToToS = (hostname: string): boolean => persistStatus.agreements[hostname] ?? false;
 
   return {
     persistStatus: () => ({
