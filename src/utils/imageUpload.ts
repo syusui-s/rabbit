@@ -73,6 +73,16 @@ export const uploadFileStorage = async (
   return Promise.allSettled(promises);
 };
 
+export const fileUploadResponseToImetaTag = (res: FileUploadResponse): string[] | null => {
+  const tags = res.nip94_event?.tags;
+  if (tags == null || tags.length === 0) {
+    return null;
+  }
+
+  const keyValues = tags.map(([key, value]) => `${key} ${value}`);
+  return ['imeta', ...keyValues];
+};
+
 export const uploadNostrBuild = (files: File[]) =>
   uploadFileStorage({ files, serverUrl: 'https://nostr.build' });
 

@@ -20,7 +20,7 @@ import Tags from '@/nostr/event/Tags';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { uploadNostrBuild } from '@/utils/imageUpload';
+import { fileUploadResponseToImetaTag, uploadNostrBuild } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
@@ -90,6 +90,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [text, setText] = createSignal<string>('');
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
+  const [imetaTags, setImetaTags] = createSignal<Record<string, string[]>>({});
   const [lastUsedHashTags, setLastUsedHashTags] = createSignal<string[]>([]);
 
   const appendText = (s: string) => setText((current) => (current === '' ? s : `${current} ${s}`));
@@ -102,6 +103,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     );
     setContentWarningReason('');
     setContentWarning(false);
+    setImetaTags({});
   };
 
   const close = () => {
@@ -152,6 +154,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     mutationFn: async (files: File[]) => {
       const uploadResults = await uploadNostrBuild(files);
       const urls: string[] = [];
+      const uploadedImetaTags: Record<string, string[]> = {};
       const failed: [File, string][] = [];
 
       uploadResults.forEach((result, i) => {
@@ -168,6 +171,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             }
             const url = urlTag[1];
             urls.push(url);
+
+            const imetaTag = fileUploadResponseToImetaTag(result.value);
+            if (imetaTag != null) {
+              uploadedImetaTags[url] = imetaTag;
+            }
           } else if (result.value.status === 'error') {
             failed.push([files[i], result.value.message]);
           }
@@ -181,6 +189,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       if (urls.length > 0) {
         appendText(urls.join(' '));
         resizeTextArea();
+        setImetaTags((current) => ({ ...current, ...uploadedImetaTags }));
       }
       if (failed.length > 0) {
         const filenames = failed.map(([f, reason]) => `${f.name}: ${reason}`).join('\n');
@@ -244,6 +253,9 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     const { hashtags, urlReferences, pubkeyReferences, eventReferences, emojis } = extract(parsed);
     const formattedContent = format(parsed);
     const emojiTags = buildEmojiTags(emojis);
+    const usedImetaTags = Object.entries(imetaTags())
+      .filter(([url]) => urlReferences.includes(url))
+      .map(([, imetaTag]) => imetaTag);
 
     setLastUsedHashTags(hashtags);
 
@@ -255,7 +267,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       mentionEventIds: eventReferences,
       hashtags,
       urls: urlReferences,
-      tags: emojiTags,
+      tags: [...emojiTags, ...usedImetaTags],
     };
 
     if (replyTo() != null) {
