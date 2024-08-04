@@ -220,6 +220,15 @@ export default {
       add: 'Add',
     },
   },
+  relayInfo: {
+    administrator: 'Administrator',
+    contact: 'Contact',
+    software: 'Software',
+    version: 'Version',
+    supportedNips: 'Supported NIPs',
+    showJSON: 'Show JSON',
+    unknown: 'Unknown',
+  },
   hello: {
     signerChecking: 'Checking that signer extension is installed...',
     signerUnavailable: 'Please install a signer extension.',

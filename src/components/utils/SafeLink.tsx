@@ -10,7 +10,7 @@ const SafeLink: Component<SafeLinkProps> = (props) => {
   const isSafe = () => {
     try {
       const url = new URL(props.href.toString());
-      return url.protocol === 'https:' || url.protocol === 'http:';
+      return url.protocol === 'https:' || url.protocol === 'http:' || url.protocol === 'mailto:';
     } catch {
       return false;
     }

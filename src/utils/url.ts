@@ -199,3 +199,12 @@ export const parseYouTubeVideoUrl = (urlString: string): YouTubeVideo | null => 
     return null;
   }
 };
+
+export const softwareToGitHostUrl = (gitUrl: string): string | undefined => {
+  const githubMatch = gitUrl.match(/^git\+https:\/\/github.com\/(\w+\/\w+)\.git$/);
+  if (githubMatch != null) {
+    const path = githubMatch[1];
+    return `https://github.com/${path}`;
+  }
+  return undefined;
+};

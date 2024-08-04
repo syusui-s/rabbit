@@ -217,6 +217,15 @@ export default {
       add: '追加',
     },
   },
+  relayInfo: {
+    administrator: '管理者',
+    contact: '連絡先',
+    software: 'ソフトウェア',
+    version: 'バージョン',
+    supportedNips: 'サポートされているNIP',
+    showJSON: 'JSONを確認',
+    unknown: '不明',
+  },
   hello: {
     signerChecking: 'ブラウザ拡張機能のインストール状況を確認中...',
     signerUnavailable: 'ブラウザ拡張機能が必要です',

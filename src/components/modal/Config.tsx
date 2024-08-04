@@ -11,6 +11,7 @@ import User from 'heroicons/24/outline/user.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
+import RelayInfoModal from '@/components/modal/RelayInfoModal';
 import UserNameDisplay from '@/components/UserDisplayName';
 import LazyLoad from '@/components/utils/LazyLoad';
 import usePopup from '@/components/utils/usePopup';
@@ -18,7 +19,9 @@ import { colorThemes } from '@/core/colorThemes';
 import useConfig, { ConfigSchema, type Config } from '@/core/useConfig';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
+import usePool from '@/nostr/usePool';
 import usePubkey from '@/nostr/usePubkey';
+import useRelayInfo from '@/nostr/useRelayInfo';
 import { simpleEmojiPackSchema, convertToEmojiConfig } from '@/utils/emojipack';
 import ensureNonNull from '@/utils/ensureNonNull';
 
@@ -188,8 +191,15 @@ const BackupSection = () => {
 const RelayConfig = () => {
   const i18n = useTranslation();
   const { config, addRelay, removeRelay } = useConfig();
+  const pool = usePool();
 
   const [relayUrlInput, setRelayUrlInput] = createSignal<string>('');
+
+  const [modalState, setModalState] = createSignal<{ type: 'RelayInfo'; relayUrl: string } | null>(
+    null,
+  );
+
+  const closeModal = () => setModalState(null);
 
   const handleClickAddRelay: JSX.EventHandler<HTMLFormElement, Event> = (ev) => {
     ev.preventDefault();
@@ -244,16 +254,44 @@ const RelayConfig = () => {
             {i18n.t('config.relays.addRelay')}
           </button>
         </form>
-        <ul class="pt-2">
+        <ul class="mt-2 max-h-[40vh] divide-y divide-border overflow-y-scroll rounded border border-border">
           <For each={config().relayUrls}>
-            {(relayUrl: string) => (
-              <li class="flex items-center border-t border-border pr-4">
-                <div class="flex-1 truncate">{relayUrl}</div>
-                <button class="size-3 shrink-0" onClick={() => removeRelay(relayUrl)}>
-                  <XMark />
-                </button>
-              </li>
-            )}
+            {(relayUrl: string) => {
+              const { relayInfo } = useRelayInfo(() => ({ relayUrl }));
+              const connected = () => pool().getRelay(relayUrl)?.connected ?? false;
+
+              return (
+                <li class="flex">
+                  <button
+                    class="flex flex-1 items-center truncate rounded py-1 text-start hover:bg-bg-tertiary"
+                    onClick={() => setModalState({ type: 'RelayInfo', relayUrl })}
+                  >
+                    <div class="shrink-0 px-2">
+                      <span
+                        class="inline-block size-2 rounded-full"
+                        classList={{
+                          'bg-rose-500': !connected(),
+                          'bg-green-500': connected(),
+                        }}
+                        aria-label=""
+                      />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="truncate">{relayInfo()?.name ?? relayUrl}</div>
+                      <div class="truncate text-xs text-fg-secondary">{relayUrl}</div>
+                    </div>
+                  </button>
+                  <button
+                    class="align-center flex shrink-0 items-center justify-center pe-6 ps-4"
+                    onClick={() => removeRelay(relayUrl)}
+                  >
+                    <span class="size-3">
+                      <XMark />
+                    </span>
+                  </button>
+                </li>
+              );
+            }}
           </For>
         </ul>
       </Section>
@@ -271,6 +309,13 @@ const RelayConfig = () => {
           {i18n.t('config.relays.importFromExtension')}
         </button>
       </Section>
+      <Show when={modalState()} keyed>
+        {(state) => (
+          <Show when={state.type === 'RelayInfo'}>
+            <RelayInfoModal relayUrl={state.relayUrl} onClose={() => closeModal()} />
+          </Show>
+        )}
+      </Show>
     </>
   );
 };
