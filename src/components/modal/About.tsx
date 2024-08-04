@@ -83,7 +83,7 @@ const About: Component<AboutProps> = (props) => {
           </SafeLink>
         </p>
 
-        <pre class=" max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
+        <pre class="max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
           {i18n.t('about.agplText')}
         </pre>
 

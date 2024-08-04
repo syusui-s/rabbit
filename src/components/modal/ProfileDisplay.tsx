@@ -318,8 +318,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               <Switch>
                 <Match when={props.pubkey === myPubkey()}>
                   <button
-                    class="rounded-full border border-primary px-4 py-2
-                    text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
+                    class="rounded-full border border-primary px-4 py-2 text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
                     onClick={() => showProfileEdit()}
                   >
                     {i18n.t('profile.editProfile')}

@@ -297,7 +297,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               <div>
                 <For each={Object.entries(otherProperties())}>
                   {([key, value]) => (
-                    <div class="flex flex-col items-start ">
+                    <div class="flex flex-col items-start">
                       <span class="text-sm font-bold">{key}</span>
                       <span class="whitespace-pre-wrap break-all text-sm">{value}</span>
                     </div>

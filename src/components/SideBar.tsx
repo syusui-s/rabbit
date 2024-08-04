@@ -226,7 +226,7 @@ const ColumnButtons: Component = () => {
   };
 
   return (
-    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2 ">
+    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2">
       <div class="size-full flex-col items-center justify-center py-2">
         <DragDropProvider onDragEnd={handleDragEnd} collisionDetector={closestCenter}>
           <DragDropSensors />
