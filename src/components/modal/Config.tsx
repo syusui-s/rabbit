@@ -254,7 +254,7 @@ const RelayConfig = () => {
             {i18n.t('config.relays.addRelay')}
           </button>
         </form>
-        <ul class="mt-2 max-h-[40vh] divide-y divide-border overflow-y-scroll rounded border border-border">
+        <ul class="mt-2 divide-y divide-border rounded border border-border">
           <For each={config().relayUrls}>
             {(relayUrl: string) => {
               const { relayInfo } = useRelayInfo(() => ({ relayUrl }));
