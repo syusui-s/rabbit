@@ -45,6 +45,7 @@
     "lint-staged": "^15.2.8",
     "postcss": "^8.4.40",
     "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.5",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",
     "vite-plugin-node-polyfills": "^0.22.0",
