@@ -6,7 +6,6 @@ import { normalizeURL } from 'nostr-tools/utils';
 import { setNostrWasm, verifyEvent } from 'nostr-tools/wasm';
 import { initNostrWasm } from 'nostr-wasm';
 
-
 class Pool extends AbstractSimplePool {
   getRelay(relayUrl: string): AbstractRelay | undefined {
     return this.relays.get(normalizeURL(relayUrl));
