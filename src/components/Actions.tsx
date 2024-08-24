@@ -441,7 +441,7 @@ const Actions: Component<ActionProps> = (props) => {
 
           deleteEvent({
             pubkey: p,
-            eventId: props.event.id,
+            identifier: props.event.id,
             kind: props.event.kind,
           })
             .then((results) => {
