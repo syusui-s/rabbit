@@ -52,6 +52,15 @@ export default {
       moveRight: '右に移動',
       removeColumn: '削除',
     },
+    notificationSettings: {
+      notificationTypes: '通知の種類',
+      types: {
+        replies: '返信',
+        reposts: 'リポスト',
+        reactions: 'リアクション',
+        zap: 'Zap',
+      },
+    },
   },
   profile: {
     following: 'フォロー',

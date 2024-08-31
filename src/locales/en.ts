@@ -53,6 +53,15 @@ export default {
       moveRight: 'Move right',
       removeColumn: 'Remove',
     },
+    notificationSettings: {
+      notificationTypes: 'Notification types',
+      types: {
+        replies: 'Replies',
+        reposts: 'Reposts',
+        reactions: 'Reactions',
+        zap: 'Zap',
+      },
+    },
   },
   profile: {
     following: 'Following',
