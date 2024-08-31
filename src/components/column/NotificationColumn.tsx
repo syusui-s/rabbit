@@ -125,7 +125,7 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
 
   const loadMore = useLoadMore(() => ({ duration: null }));
 
-  const notificationTypes = () => props.column.notificationTypes ?? [];
+  const notificationTypes = () => props.column.notificationTypes ?? [...NotificationTypes];
   const kinds = () => uniq(notificationTypes().flatMap((type) => NotificationTypeKindsMap[type]));
 
   const { events: notifications, eose } = useSubscription(() =>
