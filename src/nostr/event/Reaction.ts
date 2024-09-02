@@ -38,7 +38,7 @@ export default class Reaction extends GenericEvent {
   }
 
   isLike(): boolean {
-    return this.content === '+';
+    return this.content === '+' || this.content.length === 0;
   }
 
   isDislike(): boolean {

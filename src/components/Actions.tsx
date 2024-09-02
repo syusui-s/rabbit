@@ -23,6 +23,7 @@ import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import EmojiDisplay from '@/components/EmojiDisplay';
 import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -240,7 +241,7 @@ const ReactionsModal: Component<{ event: NostrEvent; onClose: () => void }> = (p
       data={reactions()}
       pubkeyExtractor={(ev) => ev.pubkey}
       renderInfo={(ev) => (
-        <div class="w-6">
+        <div class="h-4 min-w-4 max-w-8">
           <EmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
         </div>
       )}
@@ -305,9 +306,19 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
               events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
             const reactionTypes = reaction(events[0]).toReactionTypes();
 
+            const emojiPopup = useEmojiPopup(() => ({
+              reactionTypes,
+              onClick: () => {
+                if (isReactedByMe()) return;
+                if (mutation.isPending) return;
+                doReaction(reactionTypes);
+              },
+            }));
+
             return (
               <button
-                class="flex h-6 max-w-[128px] items-center rounded border border-border px-1"
+                ref={(el) => emojiPopup.emojiRef(el)}
+                class="webkit-touch-callout-none flex h-6 touch-none select-none items-center rounded border border-border px-1"
                 classList={{
                   'text-fg-tertiary': !isReactedByMeWithThisContent,
                   'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
@@ -317,16 +328,14 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                   'text-r-reaction': isReactedByMeWithThisContent,
                 }}
                 type="button"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  doReaction(reactionTypes);
-                }}
-                disabled={isReactedByMe()}
               >
-                <EmojiDisplay reactionTypes={reactionTypes} />
+                <span class="flex h-5 min-w-5 max-w-[128px] items-center justify-center">
+                  <EmojiDisplay reactionTypes={reactionTypes} />
+                </span>
                 <Show when={!config().hideCount}>
                   <span class="ml-1 text-sm">{events.length}</span>
                 </Show>
+                {emojiPopup.popup()}
               </button>
             );
           }}

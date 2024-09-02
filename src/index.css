@@ -173,3 +173,7 @@ em-emoji-picker {
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(var(--color-scroll-thumb) / 0.5);
 }
+
+.webkit-touch-callout-none {
+  -webkit-touch-callout: none;
+}

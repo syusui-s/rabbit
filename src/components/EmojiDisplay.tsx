@@ -8,12 +8,13 @@ export type EmojiDisplayProps = {
   reactionTypes: ReactionTypes;
 };
 
-const isPlus = (r: ReactionTypes) => r.type === 'LikeDislike' && r.content === '+';
+const isPlus = (r: ReactionTypes) =>
+  r.type === 'LikeDislike' && (r.content === '+' || r.content.length === 0);
 
 const EmojiDisplay: Component<EmojiDisplayProps> = (props) => (
   <Switch fallback={<span class="truncate">{props.reactionTypes.content}</span>}>
     <Match when={isPlus(props.reactionTypes)}>
-      <span class="inline-block size-4 pt-px text-r-reaction">
+      <span class="inline-block size-full pt-px text-r-reaction">
         <HeartSolid />
       </span>
     </Match>
@@ -21,7 +22,13 @@ const EmojiDisplay: Component<EmojiDisplayProps> = (props) => (
       {({ content }) => <span class="truncate">{content}</span>}
     </Match>
     <Match when={props.reactionTypes.type === 'CustomEmoji' && props.reactionTypes} keyed>
-      {({ shortcode, url }) => <img class="h-4 max-w-24" src={url} alt={`:${shortcode}:`} />}
+      {({ shortcode, url }) => (
+        <img
+          class="pointer-events-none h-full w-auto object-contain"
+          src={url}
+          alt={`:${shortcode}:`}
+        />
+      )}
     </Match>
   </Switch>
 );

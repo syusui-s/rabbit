@@ -16,6 +16,7 @@ export type UsePopup = {
   close: () => void;
   toggle: () => void;
   popup: () => JSX.Element;
+  isOpen: () => boolean;
 };
 
 const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
@@ -38,7 +39,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   const close = () => setIsOpen(false);
   const toggle = () => setIsOpen((current) => !current);
 
-  const handleClickOutside = (ev: MouseEvent) => {
+  const handleClickOutside = (ev: MouseEvent | TouchEvent) => {
     const target = ev.target as HTMLElement;
     if (target != null && !popupRef()?.contains(target)) {
       close();
@@ -47,9 +48,11 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
   const addClickOutsideHandler = () => {
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
   };
   const removeClickOutsideHandler = () => {
     document.removeEventListener('mousedown', handleClickOutside);
+    document.removeEventListener('touchstart', handleClickOutside);
   };
 
   const adjustPosition = () => {
@@ -115,6 +118,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
     close,
     toggle,
     popup,
+    isOpen,
   };
 };
 

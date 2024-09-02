@@ -4,6 +4,7 @@ import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import EmojiDisplay from '@/components/EmojiDisplay';
 import EventDisplay from '@/components/event/EventDisplay';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
@@ -39,13 +40,21 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
 
   const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;
 
+  const emojiPopup = useEmojiPopup(() => ({
+    reactionTypes: event().toReactionTypes(),
+  }));
+
   return (
     // if the reacted event is not found, it should be a removed event
     <Show when={!isRemoved() && !shouldMuteEvent(props.event)}>
       <div class="flex items-center gap-1 pl-[2px] text-sm">
-        <div class="notification-icon flex max-w-[64px] place-items-center overflow-hidden">
+        <span
+          ref={emojiPopup.emojiRef}
+          class="webkit-touch-callout-none notification-icon flex h-4 min-w-4 max-w-[64px] shrink-0 select-none place-items-center overflow-hidden"
+        >
           <EmojiDisplay reactionTypes={event().toReactionTypes()} />
-        </div>
+        </span>
+        {emojiPopup.popup()}
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
           <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
             <Show when={profile()?.picture} keyed>
