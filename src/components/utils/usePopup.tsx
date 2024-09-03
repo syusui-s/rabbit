@@ -4,7 +4,10 @@ import { Portal } from 'solid-js/web';
 
 export type UsePopupProps = {
   popup?: JSX.Element | (() => JSX.Element);
-  position?: 'left' | 'bottom' | 'right' | 'top';
+  position?: {
+    x?: 'center' | 'left' | 'right';
+    y?: 'top' | 'bottom';
+  };
 };
 
 export type UsePopup = {
@@ -59,20 +62,22 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
     let { top, left } = targetRect;
 
-    if (props().position === 'left') {
-      left -= targetRect.width;
-    } else if (props().position === 'right') {
+    if (props().position?.x === 'left') {
+      left -= popupRect.width;
+    } else if (props().position?.x === 'right') {
       left += targetRect.width;
-    } else if (props().position === 'top') {
-      top -= targetRect.height;
-      left -= targetRect.left + targetRect.width / 2;
     } else {
-      top += targetRect.height;
-      left += targetRect.width / 2;
+      left += (targetRect.width - popupRect.width) / 2;
     }
 
-    top = Math.min(top, window.innerHeight - popupRect.height);
-    left = Math.min(left, window.innerWidth - popupRect.width);
+    if (props().position?.y === 'top') {
+      top -= popupRect.height;
+    } else {
+      top += targetRect.height;
+    }
+
+    top = Math.max(Math.min(top, window.innerHeight - popupRect.height), 0);
+    left = Math.max(Math.min(left, window.innerWidth - popupRect.width), 0);
 
     setStyle({ left: `${left}px`, top: `${top}px` });
   };
