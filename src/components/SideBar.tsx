@@ -100,7 +100,7 @@ const SearchButton = () => {
         </button>
       </form>
     ),
-    position: 'right',
+    position: { x: 'right', y: 0 },
   }));
 
   return (

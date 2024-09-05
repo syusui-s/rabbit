@@ -5,8 +5,8 @@ import { Portal } from 'solid-js/web';
 export type UsePopupProps = {
   popup?: JSX.Element | (() => JSX.Element);
   position?: {
-    x?: 'center' | 'left' | 'right';
-    y?: 'top' | 'bottom';
+    x?: 'center' | 'left' | 'right' | number;
+    y?: 'top' | 'bottom' | number;
   };
 };
 
@@ -62,15 +62,21 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
     let { top, left } = targetRect;
 
-    if (props().position?.x === 'left') {
+    const positionX = props().position?.x;
+    if (typeof positionX === 'number') {
+      left += positionX;
+    } else if (positionX === 'left') {
       left -= popupRect.width;
-    } else if (props().position?.x === 'right') {
+    } else if (positionX === 'right') {
       left += targetRect.width;
     } else {
       left += (targetRect.width - popupRect.width) / 2;
     }
 
-    if (props().position?.y === 'top') {
+    const positionY = props().position?.y;
+    if (typeof positionY === 'number') {
+      top += positionY;
+    } else if (positionY === 'top') {
       top -= popupRect.height;
     } else {
       top += targetRect.height;
