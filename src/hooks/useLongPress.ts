@@ -10,13 +10,13 @@ const DefaultDelay = 300;
 
 const useLongPress = (propsProvider: () => UseLongPressProps) => {
   let ref: HTMLElement | undefined;
+  let longPressed = false;
 
   onMount(() => {
     if (ref == null) return;
     const { onLongPress, onClick, delay = DefaultDelay } = propsProvider();
 
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let longPressed = false;
 
     const startTimer = () => {
       longPressed = false;
@@ -32,11 +32,15 @@ const useLongPress = (propsProvider: () => UseLongPressProps) => {
       }
     };
 
-    const handleMouseDown = () => {
+    const handlePressStart = (ev: Event) => {
+      // Calling prevenDefault prevents 'mousedown' event from firing if the event was triggered by a touch event
+      ev.preventDefault();
       startTimer();
     };
 
-    const handleMouseUp = () => {
+    const handlePressEnd = (ev: Event) => {
+      // Calling prevenDefault prevents 'mouseup' event from firing if the event was triggered by a touch event
+      ev.preventDefault();
       clearTimer();
     };
 
@@ -46,24 +50,23 @@ const useLongPress = (propsProvider: () => UseLongPressProps) => {
       onClick();
     };
 
-    ref.addEventListener('mousedown', handleMouseDown);
-    ref.addEventListener('mouseup', handleMouseUp);
+    ref.addEventListener('mousedown', handlePressStart);
+    ref.addEventListener('mouseup', handlePressEnd);
+
+    ref.addEventListener('touchstart', handlePressStart);
+    ref.addEventListener('touchend', handlePressEnd);
+
     ref.addEventListener('click', handleClick);
-
-    ref.addEventListener('touchstart', handleMouseDown);
-    ref.addEventListener('touchend', handleMouseUp);
-
-    // mousedown touchstart
-    // mouseup mouseleave touchend touchcancel
 
     onCleanup(() => {
       clearTimer();
-      ref?.removeEventListener('mouseddown', handleMouseDown);
-      ref?.removeEventListener('mouseup', handleMouseUp);
-      ref?.removeEventListener('click', handleClick);
+      ref?.removeEventListener('mouseddown', handlePressStart);
+      ref?.removeEventListener('mouseup', handlePressEnd);
 
-      ref?.removeEventListener('touchstart', handleMouseDown);
-      ref?.removeEventListener('touchend', handleMouseUp);
+      ref?.removeEventListener('touchstart', handlePressStart);
+      ref?.removeEventListener('touchend', handlePressEnd);
+
+      ref?.removeEventListener('click', handleClick);
     });
   });
 
