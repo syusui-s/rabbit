@@ -169,7 +169,7 @@ const InvoiceDisplay: Component<{
       }
     >
       <div class="flex flex-col items-center gap-4">
-        <div>
+        <div class="p-8">
           <QRCodeDisplay text={lightingInvoiceWithSchema()} />
         </div>
         <div class="flex items-center gap-2 ps-5">
