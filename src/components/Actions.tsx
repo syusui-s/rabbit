@@ -420,6 +420,7 @@ const Actions: Component<ActionProps> = (props) => {
             relayUrls: config().relayUrls,
             pubkey: p,
             eventId: props.event.id,
+            kind: props.event.kind,
           });
         },
       },
