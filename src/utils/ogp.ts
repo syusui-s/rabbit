@@ -40,15 +40,15 @@ export const parseOgp = (text: string): OgpContent | null => {
 };
 
 export const isOgpUrl = (urlString: string): boolean => {
-  const allowList = ['www3.nhk.or.jp'];
   const url = new URL(urlString);
-  return allowList.includes(url.host);
+  return url.protocol === 'https:';
 };
 
 export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
   if (!isOgpUrl(urlString)) return null;
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlString)}`;
 
-  const res = await fetch(urlString, { headers: { Accept: 'text/html' } });
+  const res = await fetch(proxyUrl, { headers: { Accept: 'text/html' } });
   const text = await res.text();
   return parseOgp(text);
 };
