@@ -7,50 +7,50 @@ export type OgpContent = {
   image: string;
 };
 
-export const parseOgpFromDOM = (doc: HTMLDocument): OgpContent | null => {
+export const parseOgpFromDOM = (doc: HTMLDocument, urlString: string): OgpContent | null => {
   const props: { [property: string]: string } = {};
 
   Array.from(doc.head.querySelectorAll('meta')).forEach((m) => {
-    const property = m.getAttribute('property');
+    const property = m.getAttribute('property') || m.getAttribute('name');
     const content = m.getAttribute('content');
     if (property != null && content != null) {
       props[property] = content;
     }
   });
 
-  if (
-    props['og:image'] != null &&
-    props['og:title'] != null &&
-    props['og:description'] != null &&
-    props['og:url']
-  ) {
+  const image = props['og:image'] || props['twitter:image'];
+  const title = props['og:title'] || props['twitter:title'];
+  const description = props['og:description'] || props['twitter:description'] || '';
+  const url = props['og:url'] || urlString;
+
+  if (image != null && title != null && description != null && url) {
     return {
-      title: props['og:title'],
-      description: props['og:description'],
-      image: props['og:image'],
-      url: props['og:url'],
+      title,
+      description,
+      image,
+      url,
     } satisfies OgpContent;
   }
   return null;
 };
 
-export const parseOgp = (text: string): OgpContent | null => {
+export const parseOgp = (text: string, urlString: string): OgpContent | null => {
   const doc = new DOMParser().parseFromString(text, 'text/html');
-  return parseOgpFromDOM(doc);
+  return parseOgpFromDOM(doc, urlString);
 };
 
 export const isOgpUrl = (urlString: string): boolean => {
-  const allowList = ['www3.nhk.or.jp'];
   const url = new URL(urlString);
-  return allowList.includes(url.host);
+  return url.protocol === 'https:';
 };
 
 export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
   if (!isOgpUrl(urlString)) return null;
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlString)}`;
 
-  const res = await fetch(urlString, { headers: { Accept: 'text/html' } });
+  const res = await fetch(proxyUrl, { headers: { Accept: 'text/html' } });
   const text = await res.text();
-  return parseOgp(text);
+  return parseOgp(text, urlString);
 };
 
 export type UseOgpProps = {

@@ -23,7 +23,7 @@ describe('parseOgpFromDOM', () => {
       </html>
     `;
     const doc = new jsdom.JSDOM(inputHtml);
-    const actual = parseOgpFromDOM(doc.window.document);
+    const actual = parseOgpFromDOM(doc.window.document, '');
     const expected = {
       url: 'https://example.com/',
       title: 'Example',
