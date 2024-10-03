@@ -1,5 +1,7 @@
 import { createQuery } from '@tanstack/solid-query';
 
+const directAccessHosts = ['www3.nhk.or.jp'];
+
 export type OgpContent = {
   url: string;
   title: string;
@@ -44,11 +46,26 @@ export const isOgpUrl = (urlString: string): boolean => {
   return url.protocol === 'https:';
 };
 
+export const shouldAccessDirectly = (urlString: string): boolean => {
+  const url = new URL(urlString);
+  return directAccessHosts.includes(url.hostname);
+};
+
+export const buildUrl = (urlString: string): string => {
+  if (shouldAccessDirectly(urlString)) return urlString;
+  return `https://corsproxy.io/?${encodeURIComponent(urlString)}`;
+};
+
 export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
   if (!isOgpUrl(urlString)) return null;
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlString)}`;
 
-  const res = await fetch(proxyUrl, { headers: { Accept: 'text/html' } });
+  const url = buildUrl(urlString);
+
+  const res = await fetch(url, {
+    mode: 'cors',
+    headers: { Accept: 'text/html' },
+    credentials: 'omit',
+  });
   const text = await res.text();
   return parseOgp(text, urlString);
 };
