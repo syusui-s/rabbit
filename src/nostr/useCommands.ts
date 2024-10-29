@@ -5,7 +5,7 @@ import {
   type UnsignedEvent,
 } from 'nostr-tools/pure';
 
-import createContacts from '@/nostr/builder/createContects';
+import createContacts from '@/nostr/builder/createContacts';
 import createDeletion from '@/nostr/builder/createDeletion';
 import createProfile from '@/nostr/builder/createProfile';
 import createReaction from '@/nostr/builder/createReaction';
