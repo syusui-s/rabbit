@@ -13,16 +13,22 @@ const createRepost = ({
   eventId: string;
   kind: number;
   notifyPubkey: string;
-}): UnsignedEvent => ({
-  kind: kind === 1 ? Kind.Repost : 16 /* generic repost */,
-  pubkey,
-  created_at: epoch(),
-  tags: [
+}): UnsignedEvent => {
+  const tags = [
     ['e', eventId, ''],
     ['p', notifyPubkey],
-    ['k', kind.toString()],
-  ],
-  content: '',
-});
+  ];
+  if (kind !== 1) {
+    tags.push(['k', kind.toString()]);
+  }
+
+  return {
+    kind: kind === 1 ? Kind.Repost : Kind.GenericRepost,
+    pubkey,
+    created_at: epoch(),
+    tags,
+    content: '',
+  };
+};
 
 export default createRepost;
