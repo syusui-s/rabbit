@@ -43,7 +43,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
           </div>
         </div>
         <Show when={relayInfo()?.description} keyed>
-          <div class="scrollbar max-h-24 overflow-scroll whitespace-pre-wrap break-all px-4 py-2">
+          <div class="scrollbar max-h-24 overflow-scroll whitespace-pre-wrap break-normal px-4 py-2">
             {relayInfo()?.description}
           </div>
         </Show>
@@ -56,7 +56,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
               keyed
             >
               {(pubkey) => (
-                <div class="whitespace-pre-wrap break-all">
+                <div class="whitespace-normal break-normal">
                   <button class="inline select-text underline" onClick={() => showProfile(pubkey)}>
                     <UserDisplayName pubkey={pubkey} />
                   </button>
