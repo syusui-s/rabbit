@@ -101,7 +101,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
               </div>
             </Show>
             <ContentWarningDisplay contentWarning={event().contentWarning()}>
-              <div class="content whitespace-pre-wrap break-normal">
+              <div class="content whitespace-pre-wrap break-words">
                 <TextNoteContentDisplay
                   parsed={event().parsed()}
                   embedding={embedding()}
