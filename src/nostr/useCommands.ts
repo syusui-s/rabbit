@@ -10,7 +10,6 @@ import createDeletion from '@/nostr/builder/createDeletion';
 import createProfile from '@/nostr/builder/createProfile';
 import createReaction from '@/nostr/builder/createReaction';
 import createRepost from '@/nostr/builder/createRepost';
-import createTextNote from '@/nostr/builder/createTextNote';
 import usePool from '@/nostr/usePool';
 
 type WithRelayUrls<T> = T & { relayUrls: string[] };
@@ -46,6 +45,14 @@ const useCommands = () => {
       }
     });
 
+  const signAndPublishEvent = async (
+    relayUrls: string[],
+    unsignedEvent: UnsignedEvent,
+  ): Promise<Promise<void>[]> => {
+    const signedEvent = await signEvent(unsignedEvent);
+    return publishEvent(relayUrls, signedEvent);
+  };
+
   const asPublish =
     <P>(f: (p: P) => UnsignedEvent) =>
     async (params: WithRelayUrls<P>): Promise<Promise<void>[]> => {
@@ -55,7 +62,8 @@ const useCommands = () => {
     };
 
   return {
-    publishTextNote: asPublish(createTextNote),
+    publishEvent,
+    signAndPublishEvent,
     publishReaction: asPublish(createReaction),
     publishRepost: asPublish(createRepost),
     updateProfile: asPublish(createProfile),

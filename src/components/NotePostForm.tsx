@@ -14,11 +14,11 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
-import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
+import createTextNote, { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
 import Tags from '@/nostr/event/Tags';
+import useTextNoteMutation from '@/nostr/mutation/useTextNoteMutation';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
-import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import { fileUploadResponseToImetaTag, upload } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
@@ -122,26 +122,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const { config, getEmoji } = useConfig();
+  const { getEmoji } = useConfig();
   // const { persistStatus, didAgreeToToS, agreeToToS } = usePersistStatus();
   const getPubkey = usePubkey();
-  const commands = useCommands();
 
   const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
-  const publishTextNoteMutation = createMutation(() => ({
-    mutationKey: ['publishTextNote'] as const,
-    mutationFn: commands.publishTextNote.bind(commands),
-    onSuccess: () => {
-      console.log('succeeded to post');
-      resetText();
-      props.onPost?.();
-    },
-    onError: (err) => {
-      console.error('error', err);
-    },
-  }));
+  const publishTextNoteMutation = useTextNoteMutation();
 
   const resizeTextArea = () => {
     if (textAreaRef == null) return;
@@ -259,8 +247,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
     setLastUsedHashTags(hashtags);
 
-    let textNoteParams: CreateTextNoteParams & { relayUrls: string[] } = {
-      relayUrls: config().relayUrls,
+    let textNoteParams: CreateTextNoteParams = {
       pubkey,
       content: formattedContent,
       notifyPubkeys: pubkeyReferences,
@@ -281,13 +268,22 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         replyEventId: replyTo()?.id,
       };
     }
+
     if (contentWarning()) {
       textNoteParams = {
         ...textNoteParams,
         contentWarning: contentWarningReason(),
       };
     }
-    publishTextNoteMutation.mutate(textNoteParams);
+
+    const unsignedEvent = createTextNote(textNoteParams);
+
+    publishTextNoteMutation.mutate(unsignedEvent, {
+      onSuccess: () => {
+        resetText();
+        props.onPost?.();
+      },
+    });
     close();
   };
 
