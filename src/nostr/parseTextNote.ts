@@ -154,7 +154,11 @@ const parseTextNote = (textNoteContent: string) => {
         if (
           ((decoded.type === 'npub' || decoded.type === 'note') && !isValidId(decoded.data)) ||
           (decoded.type === 'nprofile' && !isValidId(decoded.data.pubkey)) ||
-          (decoded.type === 'nevent' && !isValidId(decoded.data.id)) ||
+          (decoded.type === 'nevent' &&
+            !(
+              isValidId(decoded.data.id) &&
+              (decoded.data.author == null || isValidId(decoded.data.author))
+            )) ||
           (decoded.type === 'naddr' && !isValidId(decoded.data.pubkey)) ||
           (decoded.type === 'nsec' && decoded.data.length !== 32)
         ) {
@@ -162,7 +166,7 @@ const parseTextNote = (textNoteContent: string) => {
         }
         result.push(bech32Entity);
       } catch (e) {
-        console.warn(`ignored invalid bech32 entity: ${match[0]}`);
+        console.warn(`ignored invalid bech32 entity: ${match[0]}`, e);
         pushPlainText(index + match[0].length);
       }
     } else if (match.groups?.hashtag) {
