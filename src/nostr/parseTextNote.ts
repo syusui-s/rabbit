@@ -90,7 +90,7 @@ const urlRegex =
 const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
 // raw NIP-19 codes, NIP-21 links (NIP-27)
 const mentionRegex =
-  /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent|naddr|nrelay)1[ac-hj-np-z02-9]+))/gi;
+  /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent|naddr)1[ac-hj-np-z02-9]+))/gi;
 const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
 const customEmojiRegex = /:(?<emoji>\w+):/gu;
 

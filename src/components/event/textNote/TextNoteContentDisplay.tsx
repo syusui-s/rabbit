@@ -110,14 +110,6 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'nprofile') {
             return <MentionedUserDisplay pubkey={item.data.data.pubkey} />;
           }
-          if (item.data.type === 'nrelay') {
-            const url: string = item.data.data;
-            return (
-              <button class="select-text text-link underline" onClick={() => addRelayColumn(url)}>
-                {url} ({item.content})
-              </button>
-            );
-          }
           return <span class="text-link underline">{item.content}</span>;
         }
         if (item.type === 'HashTag') {
