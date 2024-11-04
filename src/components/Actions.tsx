@@ -186,7 +186,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
     return (p != null && isRepostedBy(p)) || reposted();
   });
 
-  const publishRepostMutation = useRepostMutation(() => ({
+  const { mutation: publishRepostMutation, repost } = useRepostMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -198,16 +198,17 @@ const RepostAction = (props: { event: NostrEvent }) => {
       return;
     }
 
-    ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishRepostMutation.mutate({
-        relayUrls: config().relayUrls,
-        pubkey: pubkeyNonNull,
-        eventId: eventIdNonNull,
+    const p = pubkey();
+    const { id } = props.event;
+    if (p != null && id != null) {
+      repost({
+        pubkey: p,
+        eventId: id,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
       });
       setReposted(true);
-    });
+    }
   };
 
   return (
