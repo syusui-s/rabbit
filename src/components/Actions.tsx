@@ -11,7 +11,6 @@ import {
   For,
 } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import Bolt from 'heroicons/24/outline/bolt.svg';
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
@@ -29,18 +28,18 @@ import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
+import createDeletion from '@/nostr/builder/createDeletion';
 import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
 import TextNote from '@/nostr/event/TextNote';
+import useDeleteMutation from '@/nostr/mutation/useDeleteMutation';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
 import useRepostMutation from '@/nostr/mutation/useRepostMutation';
-import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
 import { formatSiPrefix } from '@/utils/siPrefix';
-import timeout from '@/utils/timeout';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
 const UserList = lazy(() => import('@/components/modal/UserList'));
@@ -355,7 +354,6 @@ const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
   const { config, addMutedThread } = useConfig();
   const pubkey = usePubkey();
-  const commands = useCommands();
 
   const [modal, setModal] = createSignal<
     'EventDebugModal' | 'Reactions' | 'Reposts' | 'ZapRequest' | null
@@ -363,28 +361,7 @@ const Actions: Component<ActionProps> = (props) => {
 
   const closeModal = () => setModal(null);
 
-  const deleteMutation = createMutation(() => ({
-    mutationKey: ['deleteEvent', props.event.id],
-    mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
-      commands
-        .deleteEvent(...params)
-        .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
-    onSuccess: (results) => {
-      // TODO タイムラインから削除する
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
-        window.alert(i18n.t('post.deletedSuccessfully'));
-      } else if (succeeded > 0) {
-        window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
-      } else {
-        window.alert(i18n.t('post.failedToDelete'));
-      }
-    },
-    onError: (err) => {
-      console.error('failed to delete', err);
-    },
-  }));
+  const deleteMutation = useDeleteMutation(() => ({ id: props.event.id }));
 
   const muteThread = () => {
     batch(() => {
@@ -439,11 +416,28 @@ const Actions: Component<ActionProps> = (props) => {
           if (p == null) return;
 
           if (!window.confirm(i18n.t('post.confirmDelete'))) return;
-          deleteMutation.mutate({
-            relayUrls: config().relayUrls,
+
+          const unsignedEvent = createDeletion({
             pubkey: p,
             eventId: props.event.id,
             kind: props.event.kind,
+          });
+
+          deleteMutation.mutate(unsignedEvent, {
+            onSuccess: (results) => {
+              const succeeded = results.filter((res) => res.status === 'fulfilled').length;
+              const failed = results.length - succeeded;
+              if (succeeded === results.length) {
+                window.alert(i18n.t('post.deletedSuccessfully'));
+              } else if (succeeded > 0) {
+                window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
+              } else {
+                window.alert(i18n.t('post.failedToDelete'));
+              }
+            },
+            onError: (err) => {
+              window.alert(err);
+            },
           });
         },
       },
