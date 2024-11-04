@@ -12,6 +12,7 @@ import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDispl
 import PreviewedLink from '@/components/event/textNote/PreviewedLink';
 import VideoDisplay from '@/components/event/textNote/VideoDisplay';
 import EventLink from '@/components/EventLink';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import { createRelaysColumn, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
@@ -123,15 +124,24 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           );
         }
         if (item.type === 'CustomEmojiResolved') {
-          if (item.url == null) return <span>{item.content}</span>;
+          const { url, shortcode, content } = item;
+          if (url == null) return <span>{item.content}</span>;
           // const { imageRef, canvas } = useImageAnimation({ initialPlaying: false });
+          const { emojiRef, popup } = useEmojiPopup(() => ({
+            emoji: { type: 'CustomEmoji', url, shortcode },
+          }));
+
           return (
-            <img
-              class="inline-block h-8 max-w-32"
-              src={item.url}
-              alt={item.content}
-              title={item.shortcode}
-            />
+            <>
+              {popup()}
+              <img
+                ref={emojiRef}
+                class="inline-block h-8 max-w-32"
+                src={url}
+                alt={content}
+                title={shortcode}
+              />
+            </>
           );
         }
         console.error('Not all ParsedTextNoteNodes are covered', item);

@@ -1,12 +1,11 @@
-import { type JSX, createMemo, createSignal, onMount } from 'solid-js';
+import { type JSX, Show, createMemo, createSignal, onMount } from 'solid-js';
 
-import EmojiDisplay from '@/components/EmojiDisplay';
+import EmojiDisplay, { type EmojiTypes } from '@/components/EmojiDisplay';
 import usePopup from '@/components/utils/usePopup';
 import useLongPress from '@/hooks/useLongPress';
-import { ReactionTypes } from '@/nostr/event/Reaction';
 
-type UseEmojiPopupProps = {
-  reactionTypes: ReactionTypes;
+export type UseEmojiPopupProps = {
+  emoji: EmojiTypes;
   onClick?: () => void;
 };
 
@@ -15,7 +14,7 @@ type UseEmojiPopup = {
   popup: () => JSX.Element;
 };
 
-const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps): UseEmojiPopup => {
+const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps | null): UseEmojiPopup => {
   let emojiRef: HTMLElement | undefined;
 
   const props = createMemo(propsProvider);
@@ -37,19 +36,23 @@ const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps): UseEmojiPopup =
 
   popup = usePopup(() => ({
     popup: () => (
-      <div
-        onMouseEnter={() => {
-          setPopupHover(true);
-        }}
-        onMouseLeave={() => {
-          setPopupHover(false);
-          close();
-        }}
-      >
-        <div class="max-w-screen flex h-24 min-w-24 items-center justify-center rounded border border-border bg-bg text-5xl shadow">
-          <EmojiDisplay reactionTypes={props().reactionTypes} />
-        </div>
-      </div>
+      <Show when={props()?.emoji} keyed>
+        {(emoji) => (
+          <div
+            onMouseEnter={() => {
+              setPopupHover(true);
+            }}
+            onMouseLeave={() => {
+              setPopupHover(false);
+              close();
+            }}
+          >
+            <div class="flex h-24 min-w-24 max-w-screen-lg items-center justify-center rounded border border-border bg-bg text-5xl shadow">
+              <EmojiDisplay emoji={emoji} />
+            </div>
+          </div>
+        )}
+      </Show>
     ),
     position: { x: 'center', y: 'top' },
   }));

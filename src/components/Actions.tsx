@@ -21,7 +21,7 @@ import HeartSolid from 'heroicons/24/solid/heart.svg';
 import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import EmojiDisplay from '@/components/EmojiDisplay';
+import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
 import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
 import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
@@ -242,7 +242,7 @@ const ReactionsModal: Component<{ event: NostrEvent; onClose: () => void }> = (p
       pubkeyExtractor={(ev) => ev.pubkey}
       renderInfo={(ev) => (
         <div class="h-4 min-w-4 max-w-8">
-          <EmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
+          <ReactionEmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
         </div>
       )}
       onClose={props.onClose}
@@ -305,15 +305,18 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
             const isReactedByMeWithThisContent =
               events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
             const reactionTypes = reaction(events[0]).toReactionTypes();
+            const emojiTypes = reactionTypesToEmojiTypes(reactionTypes);
 
-            const emojiPopup = useEmojiPopup(() => ({
-              reactionTypes,
-              onClick: () => {
-                if (isReactedByMe()) return;
-                if (mutation.isPending) return;
-                doReaction(reactionTypes);
-              },
-            }));
+            const emojiPopup = useEmojiPopup(() =>
+              ensureNonNull([emojiTypes] as const)(([emoji]) => ({
+                emoji,
+                onClick: () => {
+                  if (isReactedByMe()) return;
+                  if (mutation.isPending) return;
+                  doReaction(reactionTypes);
+                },
+              })),
+            );
 
             return (
               <button
@@ -330,7 +333,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                 type="button"
               >
                 <span class="flex h-5 min-w-5 max-w-[128px] items-center justify-center">
-                  <EmojiDisplay reactionTypes={reactionTypes} />
+                  <ReactionEmojiDisplay reactionTypes={reactionTypes} />
                 </span>
                 <Show when={!config().hideCount}>
                   <span class="ml-1 text-sm">{events.length}</span>

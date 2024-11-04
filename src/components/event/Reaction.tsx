@@ -2,8 +2,8 @@ import { type Component, Show } from 'solid-js';
 
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import EmojiDisplay from '@/components/EmojiDisplay';
 import EventDisplay from '@/components/event/EventDisplay';
+import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
 import useEmojiPopup from '@/components/useEmojiPopup';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
@@ -40,9 +40,14 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
 
   const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;
 
-  const emojiPopup = useEmojiPopup(() => ({
-    reactionTypes: event().toReactionTypes(),
-  }));
+  const reactionTypes = () => event().toReactionTypes();
+  const emojiTypes = () => reactionTypesToEmojiTypes(reactionTypes());
+
+  const emojiPopup = useEmojiPopup(() =>
+    ensureNonNull([emojiTypes()] as const)(([emoji]) => ({
+      emoji,
+    })),
+  );
 
   return (
     // if the reacted event is not found, it should be a removed event
@@ -52,7 +57,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           ref={emojiPopup.emojiRef}
           class="webkit-touch-callout-none notification-icon flex h-4 min-w-4 max-w-[64px] shrink-0 select-none place-items-center overflow-hidden"
         >
-          <EmojiDisplay reactionTypes={event().toReactionTypes()} />
+          <ReactionEmojiDisplay reactionTypes={reactionTypes()} />
         </span>
         {emojiPopup.popup()}
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
