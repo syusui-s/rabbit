@@ -85,7 +85,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
     return p != null && isReactedByWithEmoji(p);
   });
 
-  const publishReactionMutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -94,17 +94,24 @@ const ReactionAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishReactionMutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -129,14 +136,10 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           'text-fg-tertiary': !isReactedByMe() || isReactedByMeWithEmoji(),
           'hover:text-r-reaction': !isReactedByMe() || isReactedByMeWithEmoji(),
           'text-r-reaction':
-            (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+            (isReactedByMe() && !isReactedByMeWithEmoji()) || reactionMutation.isPending,
         }}
       >
-        <button
-          class="size-4"
-          onClick={handleReaction}
-          disabled={publishReactionMutation.isPending}
-        >
+        <button class="size-4" onClick={handleReaction} disabled={reactionMutation.isPending}>
           <Show when={isReactedByMe() && !isReactedByMeWithEmoji()} fallback={<HeartOutlined />}>
             <HeartSolid />
           </Show>
@@ -154,7 +157,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
             'text-fg-tertiary': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'hover:text-r-reaction': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'text-r-reaction':
-              (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+              (isReactedByMe() && isReactedByMeWithEmoji()) || reactionMutation.isPending,
           }}
         >
           <button
@@ -279,7 +282,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
     eventId: props.event.id,
   }));
 
-  const mutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -294,17 +297,24 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      mutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -323,7 +333,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                 emoji,
                 onClick: () => {
                   if (isReactedByMe()) return;
-                  if (mutation.isPending) return;
+                  if (reactionMutation.isPending) return;
                   doReaction(reactionTypes);
                 },
               })),
