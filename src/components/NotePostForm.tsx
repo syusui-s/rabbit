@@ -13,12 +13,13 @@ import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
-import createTextNote, { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
+import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
 import useTextNoteMutation from '@/nostr/mutation/useTextNoteMutation';
 import useUploadFilesMutation from '@/nostr/mutation/useUploadFilesMutation';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import usePubkey from '@/nostr/usePubkey';
+import { getErrorMessage } from '@/utils/error';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
@@ -127,7 +128,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
-  const publishTextNoteMutation = useTextNoteMutation();
+  const { mutation: publishTextNoteMutation, publishTextNote } = useTextNoteMutation();
 
   const resizeTextArea = () => {
     if (textAreaRef == null) return;
@@ -236,14 +237,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       };
     }
 
-    const unsignedEvent = createTextNote(textNoteParams);
-
-    publishTextNoteMutation.mutate(unsignedEvent, {
-      onSuccess: () => {
+    publishTextNote(textNoteParams)
+      .then(() => {
         resetText();
         props.onPost?.();
-      },
-    });
+      })
+      .catch((err) => {
+        window.alert(getErrorMessage(err));
+      });
     close();
   };
 
