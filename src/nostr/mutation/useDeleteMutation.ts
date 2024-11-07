@@ -1,11 +1,7 @@
 import { createMemo } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
-import { UnsignedEvent } from 'nostr-tools/pure';
-
-import useConfig from '@/core/useConfig';
-import useCommands from '@/nostr/useCommands';
-import timeout from '@/utils/timeout';
+import createDeletion from '@/nostr/builder/createDeletion';
+import usePublishEventMutation from '@/nostr/mutation/usePublishEventMutation';
 
 export type UseDeleteMutationProps = {
   id: string;
@@ -14,24 +10,13 @@ export type UseDeleteMutationProps = {
 const useDeleteMutation = (propsProvider: () => UseDeleteMutationProps) => {
   const props = createMemo(propsProvider);
 
-  const { config } = useConfig();
-  const commands = useCommands();
-
-  const mutation = createMutation(() => ({
-    mutationKey: ['deleteEvent', props().id],
-    mutationFn: (unsignedEvent: UnsignedEvent) =>
-      commands
-        .signAndPublishEvent(config().relayUrls, unsignedEvent)
-        .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
-    onSuccess: (results) => {
-      console.log('succeeded to delete', results);
-    },
-    onError: (err) => {
-      console.error('failed to delete', err);
-    },
+  const { mutation, wrapMutate } = usePublishEventMutation(() => ({
+    mutationKey: ['useDeleteMutation', props().id],
   }));
 
-  return mutation;
+  const deleteEvent = wrapMutate(createDeletion);
+
+  return { mutation, deleteEvent };
 };
 
 export default useDeleteMutation;

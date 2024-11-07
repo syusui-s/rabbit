@@ -28,7 +28,6 @@ import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
-import createDeletion from '@/nostr/builder/createDeletion';
 import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
 import TextNote from '@/nostr/event/TextNote';
@@ -39,6 +38,7 @@ import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { getErrorMessage } from '@/utils/error';
 import { formatSiPrefix } from '@/utils/siPrefix';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
@@ -362,7 +362,9 @@ const Actions: Component<ActionProps> = (props) => {
 
   const closeModal = () => setModal(null);
 
-  const deleteMutation = useDeleteMutation(() => ({ id: props.event.id }));
+  const { mutation: deleteMutation, deleteEvent } = useDeleteMutation(() => ({
+    id: props.event.id,
+  }));
 
   const muteThread = () => {
     batch(() => {
@@ -415,31 +417,29 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           const p = pubkey();
           if (p == null) return;
+          if (deleteMutation.isPending) return;
 
           if (!window.confirm(i18n.t('post.confirmDelete'))) return;
 
-          const unsignedEvent = createDeletion({
+          deleteEvent({
             pubkey: p,
             eventId: props.event.id,
             kind: props.event.kind,
-          });
-
-          deleteMutation.mutate(unsignedEvent, {
-            onSuccess: (results) => {
-              const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-              const failed = results.length - succeeded;
-              if (succeeded === results.length) {
+          })
+            .then((results) => {
+              if (results.failed.length === 0) {
                 window.alert(i18n.t('post.deletedSuccessfully'));
-              } else if (succeeded > 0) {
-                window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
+              } else if (results.succeeded.length > 0) {
+                window.alert(
+                  i18n.t('post.failedToDeletePartially', { count: results.failed.length }),
+                );
               } else {
                 window.alert(i18n.t('post.failedToDelete'));
               }
-            },
-            onError: (err) => {
-              window.alert(err);
-            },
-          });
+            })
+            .catch((err) => {
+              window.alert(getErrorMessage(err));
+            });
         },
       },
     ],

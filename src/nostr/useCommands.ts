@@ -6,7 +6,6 @@ import {
 } from 'nostr-tools/pure';
 
 import createContacts from '@/nostr/builder/createContacts';
-import createDeletion from '@/nostr/builder/createDeletion';
 import createProfile from '@/nostr/builder/createProfile';
 import createReaction from '@/nostr/builder/createReaction';
 import createRepost from '@/nostr/builder/createRepost';
@@ -38,7 +37,6 @@ const useCommands = () => {
       const relay = await pool().ensureRelay(relayUrl);
       try {
         await relay.publish(event);
-        console.log(`${relayUrl} has accepted our event`);
       } catch (err) {
         const reason = err instanceof Error ? err.message : JSON.stringify(err);
         console.warn(`failed to publish to ${relayUrl}: ${reason}`);
@@ -68,7 +66,6 @@ const useCommands = () => {
     publishRepost: asPublish(createRepost),
     updateProfile: asPublish(createProfile),
     updateContacts: asPublish(createContacts),
-    deleteEvent: asPublish(createDeletion),
   };
 };
 
