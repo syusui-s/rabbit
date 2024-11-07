@@ -186,7 +186,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
     return (p != null && isRepostedBy(p)) || reposted();
   });
 
-  const { mutation: publishRepostMutation, repost } = useRepostMutation(() => ({
+  const { mutation: repostMutation, publishRepost } = useRepostMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -197,17 +197,25 @@ const RepostAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (repostMutation.isPending) {
+      return;
+    }
 
     const p = pubkey();
     const { id } = props.event;
     if (p != null && id != null) {
-      repost({
+      publishRepost({
         pubkey: p,
         eventId: id,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReposted(true);
+      })
+        .then(() => {
+          setReposted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     }
   };
 
@@ -217,10 +225,10 @@ const RepostAction = (props: { event: NostrEvent }) => {
       classList={{
         'text-fg-tertiary': !isRepostedByMe(),
         'hover:text-r-repost': !isRepostedByMe(),
-        'text-r-repost': isRepostedByMe() || publishRepostMutation.isPending,
+        'text-r-repost': isRepostedByMe() || repostMutation.isPending,
       }}
     >
-      <button onClick={handleRepost} disabled={publishRepostMutation.isPending}>
+      <button onClick={handleRepost} disabled={repostMutation.isPending}>
         <span class="flex size-4">
           <ArrowPathRoundedSquare />
         </span>

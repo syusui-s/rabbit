@@ -1,13 +1,10 @@
 import { createMemo } from 'solid-js';
 
-import { createMutation, useQueryClient } from '@tanstack/solid-query';
-import { type UnsignedEvent } from 'nostr-tools/pure';
+import { useQueryClient } from '@tanstack/solid-query';
 
-import useConfig from '@/core/useConfig';
 import createRepost from '@/nostr/builder/createRepost';
-import useCommands from '@/nostr/useCommands';
+import usePublishEventMutation from '@/nostr/mutation/usePublishEventMutation';
 import { queryKeyUseReposts } from '@/nostr/useReposts';
-import timeout from '@/utils/timeout';
 
 type UseRepostMutationProps = {
   eventId: string;
@@ -18,30 +15,9 @@ const useRepostMutation = (propsProvider: () => UseRepostMutationProps) => {
 
   const props = createMemo(propsProvider);
 
-  const { config } = useConfig();
-  const commands = useCommands();
-
-  const mutation = createMutation(() => ({
+  const { mutation, wrapMutate } = usePublishEventMutation(() => ({
     mutationKey: ['useRepostMutation', props().eventId] as const,
-    mutationFn: (unsignedEvent: UnsignedEvent) =>
-      commands
-        .signAndPublishEvent(config().relayUrls, unsignedEvent)
-        .then((promises) => Promise.allSettled(promises.map(timeout(10000)))),
-    onSuccess: (results) => {
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
-        console.log('Succeeded to publish a repost');
-      } else if (succeeded > 0) {
-        console.warn(`Failed to publish a repost on ${failed} relays`);
-      } else {
-        console.error('Failed to publish a repost on all relays');
-      }
-    },
-    onError: (err) => {
-      console.error('failed to publish repost: ', err);
-    },
-    onSettled: () => {
+    onSuccess: () => {
       const queryKey = queryKeyUseReposts({ eventId: props().eventId });
       queryClient
         .refetchQueries({ queryKey })
@@ -50,12 +26,9 @@ const useRepostMutation = (propsProvider: () => UseRepostMutationProps) => {
     },
   }));
 
-  const repost = (...params: Parameters<typeof createRepost>) => {
-    const unsignedEvent = createRepost(...params);
-    mutation.mutate(unsignedEvent);
-  };
+  const publishRepost = wrapMutate(createRepost);
 
-  return { mutation, repost };
+  return { mutation, publishRepost };
 };
 
 export default useRepostMutation;
