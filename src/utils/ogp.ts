@@ -10,18 +10,19 @@ export type OgpContent = {
 };
 
 export const getCharset = (source: ArrayBuffer): string | null => {
+  // https://www.w3.org/International/questions/qa-html-encoding-declarations.ja
   const content = new TextDecoder('US-ASCII').decode(source.slice(0, 1024));
-
-  const metaContentTypeMatch = content.match(
-    /<meta\s+http-equiv="Content-Type"\s+content="text\/html;\s+charset=([-A-Za-z0-9_]+)"/i,
-  );
-  if (metaContentTypeMatch != null) {
-    return metaContentTypeMatch[1].toLowerCase();
-  }
 
   const metaCharsetMatch = content.match(/<meta\s+charset="([-A-Za-z0-9]+)"/i);
   if (metaCharsetMatch != null) {
     return metaCharsetMatch[1].toLowerCase();
+  }
+
+  const metaContentTypeMatch = content.match(
+    /<meta\s+http-equiv="Content-Type"\s*content="text\/html;\s*charset=([-A-Za-z0-9_]+)"/i,
+  );
+  if (metaContentTypeMatch != null) {
+    return metaContentTypeMatch[1].toLowerCase();
   }
 
   return null;
