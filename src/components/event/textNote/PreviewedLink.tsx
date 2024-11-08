@@ -50,16 +50,19 @@ const TwitterEmbed: Component<{ url: string }> = (props) => {
   };
 
   return (
-    <blockquote ref={twitterRef} class="twitter-tweet" data-theme={dataTheme()}>
-      <a
-        class="text-link underline"
-        href={twitterUrl(props.url)}
-        target="_blank"
-        rel="noreferrer noopener"
-      >
-        {twitterUrl(props.url)}
-      </a>
-    </blockquote>
+    <>
+      <SafeLink class="text-link underline" href={props.url} />
+      <blockquote ref={twitterRef} class="twitter-tweet" data-theme={dataTheme()}>
+        <a
+          class="text-link underline"
+          href={twitterUrl(props.url)}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          {twitterUrl(props.url)}
+        </a>
+      </blockquote>
+    </>
   );
 };
 
@@ -71,20 +74,23 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
   return (
     <Show when={ogp()} fallback={<SafeLink class="text-link underline" href={props.url} />} keyed>
       {(ogpProps) => (
-        <SafeLink href={props.url}>
-          <div class="my-2 rounded-lg border border-border transition-colors hover:bg-bg-tertiary">
-            <img
-              alt={ogpProps.title}
-              class="max-w-full rounded-t-lg object-contain shadow"
-              src={ogpProps.image}
-            />
-            <div class="mb-1 p-1">
-              <div class="text-xs text-fg-secondary">{new URL(ogpProps.url).host}</div>
-              <div class="text-sm">{ogpProps.title}</div>
-              <div class="text-xs text-fg-secondary">{ogpProps.description}</div>
+        <>
+          <SafeLink class="text-link underline" href={props.url} />
+          <SafeLink href={props.url}>
+            <div class="my-2 rounded-lg border border-border transition-colors hover:bg-bg-tertiary">
+              <img
+                alt={ogpProps.title}
+                class="max-w-full rounded-t-lg object-contain shadow"
+                src={ogpProps.image}
+              />
+              <div class="mb-1 p-1">
+                <div class="text-xs text-fg-secondary">{new URL(ogpProps.url).host}</div>
+                <div class="text-sm">{ogpProps.title}</div>
+                <div class="text-xs text-fg-secondary">{ogpProps.description}</div>
+              </div>
             </div>
-          </div>
-        </SafeLink>
+          </SafeLink>
+        </>
       )}
     </Show>
   );
@@ -104,15 +110,17 @@ const ClickToShow: Component<ClickToShowProps> = (props) => {
     <Show
       when={!hidden()}
       fallback={
-        <div>
-          <button
-            class="flex flex-col items-center rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
-            onClick={() => setHidden(false)}
-          >
-            {i18n.t('post.showPreview')}
-          </button>
+        <>
           <SafeLink class="text-link underline" href={props.url} />
-        </div>
+          <div>
+            <button
+              class="flex flex-col items-center rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
+              onClick={() => setHidden(false)}
+            >
+              {i18n.t('post.showPreview')}
+            </button>
+          </div>
+        </>
       }
     >
       {props.children}
@@ -133,23 +141,20 @@ const PreviewedLink: Component<PreviewedLinkProps> = (props) => {
       <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.url)} keyed>
         {({ videoId }) => (
           <ClickToShow url={props.url} initialHidden={props.initialHidden}>
-            <LazyLoad
-              fallback={
-                <div class="aspect-video max-w-full">
-                  <SafeLink href={props.url} />
-                </div>
-              }
-            >
+            <LazyLoad fallback={<SafeLink class="text-link underline" href={props.url} />}>
               {() => (
-                <div class="my-2 aspect-video w-full">
-                  <iframe
-                    loading="lazy"
-                    title="YouTube"
-                    class="my-2 size-full"
-                    src={youtubeUrl(videoId)}
-                    allowfullscreen
-                  />
-                </div>
+                <>
+                  <SafeLink class="text-link underline" href={props.url} />
+                  <div class="my-2 aspect-video w-full">
+                    <iframe
+                      loading="lazy"
+                      title="YouTube"
+                      class="my-2 size-full"
+                      src={youtubeUrl(videoId)}
+                      allowfullscreen
+                    />
+                  </div>
+                </>
               )}
             </LazyLoad>
           </ClickToShow>
