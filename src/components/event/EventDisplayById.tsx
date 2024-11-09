@@ -11,6 +11,7 @@ import ensureNonNull from '@/utils/ensureNonNull';
 
 type EventDisplayByIdProps = Omit<EventDisplayProps, 'event'> & {
   eventId: string | undefined;
+  displayForcibly?: boolean;
 };
 
 const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
@@ -26,6 +27,7 @@ const EventDisplayById: Component<EventDisplayByIdProps> = (props) => {
 
   const hidden = (): boolean => {
     const ev = fetchedEvent();
+    if (props.displayForcibly) return false;
     return ev != null && shouldMuteEvent(ev);
   };
 

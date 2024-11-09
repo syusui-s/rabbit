@@ -5,6 +5,7 @@ import {
   Match,
   Show,
   lazy,
+  batch,
   createSignal,
   createMemo,
   For,
@@ -18,6 +19,7 @@ import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
+import * as Kind from 'nostr-tools/kinds';
 import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
@@ -29,6 +31,7 @@ import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
+import TextNote from '@/nostr/event/TextNote';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
 import useRepostMutation from '@/nostr/mutation/useRepostMutation';
 import useCommands from '@/nostr/useCommands';
@@ -350,7 +353,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
 const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
-  const { config } = useConfig();
+  const { config, addMutedThread } = useConfig();
   const pubkey = usePubkey();
   const commands = useCommands();
 
@@ -383,6 +386,19 @@ const Actions: Component<ActionProps> = (props) => {
     },
   }));
 
+  const muteThread = () => {
+    batch(() => {
+      addMutedThread(props.event.id);
+
+      if (props.event.kind === Kind.ShortTextNote) {
+        const rootEventId = new TextNote(props.event).rootEvent()?.id;
+        if (rootEventId != null) {
+          addMutedThread(rootEventId);
+        }
+      }
+    });
+  };
+
   const otherActionsPopup = useContextMenu(() => ({
     menu: [
       {
@@ -410,6 +426,10 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           setModal('Reactions');
         },
+      },
+      {
+        content: i18n.t('post.muteThread'),
+        onSelect: () => muteThread(),
       },
       {
         when: () => props.event.pubkey === pubkey(),

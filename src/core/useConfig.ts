@@ -61,6 +61,7 @@ export const ConfigSchema = z.object({
   hideCount: z.boolean(),
   mutedPubkeys: z.array(z.string()),
   mutedKeywords: z.array(z.string()),
+  mutedThreads: z.array(z.string()),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -90,6 +91,8 @@ type UseConfig = {
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
+  addMutedThread: (id: string) => void;
+  removeMutedThread: (id: string) => void;
   isPubkeyMuted: (pubkey: string) => boolean;
   shouldMuteEvent: (event: NostrEvent) => boolean;
 };
@@ -120,6 +123,7 @@ const InitialConfig = (): Config => ({
   hideCount: false,
   mutedPubkeys: [],
   mutedKeywords: [],
+  mutedThreads: [],
 });
 
 const serializer = (config: Config): string => JSON.stringify(config);
@@ -168,6 +172,14 @@ const useConfig = (): UseConfig => {
 
   const removeMutedKeyword = (keyword: string) => {
     setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
+  };
+
+  const addMutedThread = (id: string) => {
+    setConfig('mutedThreads', (current) => uniq([...current, id]));
+  };
+
+  const removeMutedThread = (id: string) => {
+    setConfig('mutedThreads', (current) => current.filter((e) => e !== id));
   };
 
   const saveColumn = (column: ColumnType) => {
@@ -247,12 +259,17 @@ const useConfig = (): UseConfig => {
     return false;
   };
 
+  const mutedThreadSet = createMemo(() => new Set(config.mutedThreads));
+  const isMutedThread = (eventId: string) => mutedThreadSet().has(eventId);
+
   const shouldMuteEvent = (event: NostrEvent) => {
     const ev = genericEvent(event);
     return (
       isPubkeyMuted(event.pubkey) ||
+      isMutedThread(event.id) ||
       ev.taggedPubkeys().some(isPubkeyMuted) ||
-      (event.kind === Kind.ShortTextNote && hasMutedKeyword(event))
+      (event.kind === Kind.ShortTextNote && hasMutedKeyword(event)) ||
+      ev.taggedEventIds().some((eventId) => isMutedThread(eventId))
     );
   };
 
@@ -302,6 +319,8 @@ const useConfig = (): UseConfig => {
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
+    addMutedThread,
+    removeMutedThread,
     isPubkeyMuted,
     shouldMuteEvent,
   };

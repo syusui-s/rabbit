@@ -10,6 +10,7 @@ import ServerStack from 'heroicons/24/outline/server-stack.svg';
 import User from 'heroicons/24/outline/user.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 
+import EventDisplayById from '@/components/event/EventDisplayById';
 import BasicModal from '@/components/modal/BasicModal';
 import RelayInfoModal from '@/components/modal/RelayInfoModal';
 import UserNameDisplay from '@/components/UserDisplayName';
@@ -603,7 +604,8 @@ const EmojiImport = () => {
 
 const MuteConfig = () => {
   const i18n = useTranslation();
-  const { config, removeMutedPubkey, addMutedKeyword, removeMutedKeyword } = useConfig();
+  const { config, removeMutedPubkey, removeMutedThread, addMutedKeyword, removeMutedKeyword } =
+    useConfig();
 
   const [keywordInput, setKeywordInput] = createSignal('');
 
@@ -654,6 +656,26 @@ const MuteConfig = () => {
                 <div class="flex-1 truncate">{keyword}</div>
                 <button class="size-3 shrink-0" onClick={() => removeMutedKeyword(keyword)}>
                   <XMark />
+                </button>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Section>
+      <Section title={i18n.t('config.mute.mutedThreads')} initialOpened={false}>
+        <ul class="flex max-h-[50vh] min-h-64 flex-col gap-1 overflow-y-auto">
+          <For each={config().mutedThreads}>
+            {(eventId) => (
+              <li class="flex items-center">
+                <div class="flex-1 truncate rounded border border-border p-2">
+                  <LazyLoad fallback={<div class="h-4" />}>
+                    {() => <EventDisplayById eventId={eventId} actions={false} displayForcibly />}
+                  </LazyLoad>
+                </div>
+                <button class="p-4" onClick={() => removeMutedThread(eventId)}>
+                  <span class="inline-block size-4">
+                    <XMark />
+                  </span>
                 </button>
               </li>
             )}
