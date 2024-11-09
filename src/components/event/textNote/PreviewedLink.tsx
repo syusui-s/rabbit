@@ -30,6 +30,8 @@ const youtubeUrl = (videoId: string): string => {
   return iframeUrl.href;
 };
 
+const hasTwttr = () => window.twttr != null;
+
 const TwitterEmbed: Component<{ url: string }> = (props) => {
   let twitterRef: HTMLQuoteElement | undefined;
 
@@ -59,7 +61,7 @@ const TwitterEmbed: Component<{ url: string }> = (props) => {
           target="_blank"
           rel="noreferrer noopener"
         >
-          {twitterUrl(props.url)}
+          {''}
         </a>
       </blockquote>
     </>
@@ -134,9 +136,14 @@ const PreviewedLink: Component<PreviewedLinkProps> = (props) => {
   return (
     <Switch fallback={<SafeLink class="text-link underline" href={props.url} />}>
       <Match when={config().embedding.twitter && isTwitterUrl(props.url)}>
-        <ClickToShow url={props.url} initialHidden={props.initialHidden}>
-          <TwitterEmbed url={props.url} />
-        </ClickToShow>
+        <Show
+          when={hasTwttr()}
+          fallback={<SafeLink class="text-link underline" href={props.url} />}
+        >
+          <ClickToShow url={props.url} initialHidden={props.initialHidden}>
+            <LazyLoad>{() => <TwitterEmbed url={props.url} />}</LazyLoad>
+          </ClickToShow>
+        </Show>
       </Match>
       <Match when={config().embedding.youtube && parseYouTubeVideoUrl(props.url)} keyed>
         {({ videoId }) => (
