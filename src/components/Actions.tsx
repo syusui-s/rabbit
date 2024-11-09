@@ -416,6 +416,10 @@ const Actions: Component<ActionProps> = (props) => {
         },
       },
       {
+        content: i18n.t('post.muteThread'),
+        onSelect: () => muteThread(),
+      },
+      {
         content: i18n.t('post.showReposts'),
         onSelect: () => {
           setModal('Reposts');
@@ -426,10 +430,6 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           setModal('Reactions');
         },
-      },
-      {
-        content: i18n.t('post.muteThread'),
-        onSelect: () => muteThread(),
       },
       {
         when: () => props.event.pubkey === pubkey(),
