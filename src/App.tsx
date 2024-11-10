@@ -20,10 +20,6 @@ const queryClient = new QueryClient({});
 
 const i18next = i18nextInstance();
 
-const permalinkFilters = {
-  id: /^npub1[ac-hj-np-z02-9]+$/,
-};
-
 const indexedDBPersister = createAsyncStoragePersister({
   storage: {
     getItem(key: string) {
@@ -66,7 +62,11 @@ const App: Component = () => {
         <HashRouter>
           <Route path="/hello" component={() => <Navigate href="/" />} />
           <Route path="/" component={() => <EntryPoint />} />
-          <Route path="/:id" component={() => <Permalink />} matchFilters={permalinkFilters} />
+          <Route
+            path="/:id"
+            component={() => <Permalink />}
+            matchFilters={{ id: /^(npub|nprofile)1[ac-hj-np-z02-9]+$/ }}
+          />
           <Route path="/*" component={() => <NotFound />} />
         </HashRouter>
       </QueryClientProvider>
