@@ -1,13 +1,19 @@
-import { readServerConfig, type FileUploadResponse } from 'nostr-tools/nip96';
+import {
+  readServerConfig,
+  checkFileProcessingStatus,
+  type FileUploadResponse,
+} from 'nostr-tools/nip96';
 import { getToken } from 'nostr-tools/nip98';
 import { type EventTemplate } from 'nostr-tools/pure';
+
+import sleep from '@/utils/sleep';
 
 export type ServerDefinition = {
   name: string;
   upload: (files: File[]) => Promise<PromiseSettledResult<FileUploadResponse>[]>;
 };
 
-export type UploadFileStorageProps = {
+export type UploadFileStorageParams = {
   files: File[];
   serverUrl: string;
 };
@@ -29,6 +35,26 @@ export const getAuthorizationHeader = (uploadApiUrl: string): Promise<string> =>
   return getToken(uploadApiUrl, method, signEvent, includeAuthorizationScheme);
 };
 
+export const waitDelayProcessing = async (delayProcessingUrl: string) => {
+  // 14.2 sec
+  const multiplier = 1.7;
+  const initialInterval = 1000;
+  const maxRetry = 5;
+
+  const exec = async (interval: number, retry: number) => {
+    if (retry <= 0) throw new Error('Upload timeout');
+
+    const delayProcessingResult = await checkFileProcessingStatus(delayProcessingUrl);
+    if (delayProcessingResult.status !== 'processing') {
+      return delayProcessingResult;
+    }
+    await sleep(interval);
+    return exec(interval * multiplier, retry - 1);
+  };
+
+  return exec(initialInterval, maxRetry);
+};
+
 export const uploadFile = async (
   uploadApiUrl: string,
   props: UploadFileProps,
@@ -43,10 +69,17 @@ export const uploadFile = async (
     headers.set('Authorization', props.authorizationHeader);
   }
 
+  // nostr-tools validation is too strict so I use fetch instead.
   const response = await fetch(uploadApiUrl, { method: 'POST', headers, body });
-
   // TODO validate event
   const json = (await response.json()) as FileUploadResponse;
+
+  if (json.status === 'processing') {
+    if (json.processing_url == null) {
+      throw new Error('processing url is not specified');
+    }
+    await waitDelayProcessing(json.processing_url);
+  }
 
   if (!response.ok) {
     throw new Error(`failed to upload: ${response.status} ${json.message}`);
@@ -55,18 +88,35 @@ export const uploadFile = async (
   return json;
 };
 
-export const uploadFileStorage = async (
-  props: UploadFileStorageProps,
-): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
-  const serverConfig = await readServerConfig(props.serverUrl);
+const MaxRedirect = 5;
+const getServerConfig = async (serverUrl: string) => {
+  const exec = async (url: string, maxRedirect: number = MaxRedirect) => {
+    if (maxRedirect <= 0) throw new Error('Max redirect');
 
-  if (serverConfig.api_url.length === 0 || serverConfig.delegated_to_url != null) {
-    throw new Error('delegated_to_url is not supported');
-  }
+    const serverConfig = await readServerConfig(url);
+
+    if (serverConfig.api_url == null || serverConfig.api_url.length === 0) {
+      if (serverConfig.delegated_to_url == null) {
+        throw new Error('api_url is blank and delegated_to_url is not specified');
+      }
+      return exec(serverConfig.delegated_to_url, maxRedirect - 1);
+    }
+
+    return serverConfig;
+  };
+
+  return exec(serverUrl);
+};
+
+export const uploadFileStorage = async ({
+  serverUrl,
+  files,
+}: UploadFileStorageParams): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
+  const serverConfig = await getServerConfig(serverUrl);
   const uploadApiUrl = serverConfig.api_url;
   const authorizationHeader = await getAuthorizationHeader(uploadApiUrl);
 
-  const promises = Array.from(props.files).map(async (file) =>
+  const promises = Array.from(files).map(async (file) =>
     uploadFile(uploadApiUrl, { authorizationHeader, file }),
   );
 
