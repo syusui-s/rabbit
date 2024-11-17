@@ -20,9 +20,8 @@ const useRepostMutation = (propsProvider: () => UseRepostMutationProps) => {
     onSuccess: () => {
       const queryKey = queryKeyUseReposts({ eventId: props().eventId });
       queryClient
-        .refetchQueries({ queryKey })
-        .then(() => queryClient.invalidateQueries({ queryKey }))
-        .catch((err) => console.error('failed to refetch repost', err));
+        .invalidateQueries({ queryKey })
+        .catch((err) => console.error('failed to invalidate repost', err));
     },
   }));
 

@@ -19,9 +19,8 @@ const useReactionMutation = (propsProvider: () => UseReactionMutationProps) => {
     onSuccess: () => {
       const queryKey = queryKeyUseReactions({ eventId: props().eventId });
       queryClient
-        .refetchQueries({ queryKey })
-        .then(() => queryClient.invalidateQueries({ queryKey }))
-        .catch((err) => console.error('failed to refetch reactions', err));
+        .invalidateQueries({ queryKey })
+        .catch((err) => console.error('failed to invalidate reactions', err));
     },
   }));
 
