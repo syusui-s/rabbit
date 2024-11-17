@@ -17,7 +17,6 @@ export type UseProfile = {
   lud06: () => string | undefined;
   lud16: () => string | undefined;
   isZapConfigured: () => boolean;
-  invalidateProfile: () => Promise<void>;
   query: CreateQueryResult<NostrEvent | null>;
 };
 
@@ -30,10 +29,12 @@ export type UseProfiles = {
   queries: CreateQueryResult<NostrEvent | null>[];
 };
 
+export const queryKeyUseProfile = (props: UseProfileProps | null) => ['useProfile', props] as const;
+
 const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = createMemo(() => ['useProfile', props()] as const);
+  const genQueryKey = createMemo(() => queryKeyUseProfile(props()));
 
   const query = createQuery(() => ({
     queryKey: genQueryKey(),
@@ -75,10 +76,7 @@ const useProfile = (propsProvider: () => UseProfileProps | null): UseProfile => 
 
   const isZapConfigured = (): boolean => lud06() != null || lud16() != null;
 
-  const invalidateProfile = (): Promise<void> =>
-    queryClient.invalidateQueries({ queryKey: genQueryKey() });
-
-  return { profile, lud06, lud16, event, isZapConfigured, invalidateProfile, query };
+  return { profile, lud06, lud16, event, isZapConfigured, query };
 };
 
 export default useProfile;
