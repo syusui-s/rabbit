@@ -32,15 +32,11 @@ const useLongPress = (propsProvider: () => UseLongPressProps) => {
       }
     };
 
-    const handlePressStart = (ev: Event) => {
-      // Calling preventDefault prevents 'mousedown' event from firing if the event was triggered by a touch event
-      ev.preventDefault();
+    const handlePressStart = () => {
       startTimer();
     };
 
-    const handlePressEnd = (ev: Event) => {
-      // Calling preventDefault prevents 'mouseup' event from firing if the event was triggered by a touch event
-      ev.preventDefault();
+    const handlePressEnd = () => {
       clearTimer();
     };
 
