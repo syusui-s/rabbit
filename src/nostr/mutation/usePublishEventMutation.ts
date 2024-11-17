@@ -77,7 +77,6 @@ const usePublishEventMutation = <T extends MutationKey>(
       return mutation.mutateAsync(unsignedEvent);
     };
 
-
   return { mutation, wrapMutate };
 };
 

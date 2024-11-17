@@ -371,7 +371,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
 const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
-  const { config, addMutedThread } = useConfig();
+  const { addMutedThread } = useConfig();
   const pubkey = usePubkey();
 
   const [modal, setModal] = createSignal<
