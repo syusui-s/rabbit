@@ -5,13 +5,7 @@ import {
   type UnsignedEvent,
 } from 'nostr-tools/pure';
 
-import createContacts from '@/nostr/builder/createContacts';
-import createProfile from '@/nostr/builder/createProfile';
-import createReaction from '@/nostr/builder/createReaction';
-import createRepost from '@/nostr/builder/createRepost';
 import usePool from '@/nostr/usePool';
-
-type WithRelayUrls<T> = T & { relayUrls: string[] };
 
 export const signEvent = async (unsignedEvent: UnsignedEvent): Promise<NostrEvent> => {
   const id = getEventHash(unsignedEvent);
@@ -51,21 +45,9 @@ const useCommands = () => {
     return publishEvent(relayUrls, signedEvent);
   };
 
-  const asPublish =
-    <P>(f: (p: P) => UnsignedEvent) =>
-    async (params: WithRelayUrls<P>): Promise<Promise<void>[]> => {
-      const unsignedEvent = f(params);
-      const signedEvent = await signEvent(unsignedEvent);
-      return publishEvent(params.relayUrls, signedEvent);
-    };
-
   return {
     publishEvent,
     signAndPublishEvent,
-    publishReaction: asPublish(createReaction),
-    publishRepost: asPublish(createRepost),
-    updateProfile: asPublish(createProfile),
-    updateContacts: asPublish(createContacts),
   };
 };
 

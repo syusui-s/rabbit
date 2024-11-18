@@ -70,10 +70,12 @@ const usePublishEventMutation = <T extends MutationKey>(
     },
   }));
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type AnyParameters = any[];
   const wrapMutate =
-    <P>(f: (p: P) => UnsignedEvent) =>
-    async (params: P): Promise<PublishEventResult> => {
-      const unsignedEvent = f(params);
+    <P extends AnyParameters>(f: (...params: P) => UnsignedEvent) =>
+    async (...params: P): Promise<PublishEventResult> => {
+      const unsignedEvent = f(...params);
       return mutation.mutateAsync(unsignedEvent);
     };
 

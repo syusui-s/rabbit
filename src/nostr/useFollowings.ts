@@ -24,6 +24,9 @@ export type UseFollowings = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
+export const queryKeyUseFollowings = (props: UseFollowingsProps | null) =>
+  ['useFollowings', props] as const;
+
 const buildMethods = (dataProvider: () => NostrEvent | undefined | null) => {
   const followings = () => {
     const data = dataProvider();
@@ -60,13 +63,14 @@ export const fetchLatestFollowings = async (
   registerTask({ task, signal });
 
   const latestFollowings = await task.latestEventPromise();
+
   return buildMethods(() => latestFollowings);
 };
 
 const useFollowings = (propsProvider: () => UseFollowingsProps | null): UseFollowings => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = () => ['useFollowings', props()] as const;
+  const genQueryKey = createMemo(() => queryKeyUseFollowings(props()));
 
   const query = createQuery(() => ({
     queryKey: genQueryKey(),
