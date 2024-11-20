@@ -45,7 +45,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       pubkey: pubkeyNonNull,
     })),
   );
-  const { mutation, publishProfile } = useProfileMutation({
+  const { mutation, publishProfile } = useProfileMutation(() => ({
     pubkey: pubkey(),
     onSuccess: (results) => {
       if (results.failed.length === 0) {
@@ -60,7 +60,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
 
       props.onClose();
     },
-  });
+  }));
 
   const loading = () => query.isPending || mutation.isPending;
   const disabled = () => loading();

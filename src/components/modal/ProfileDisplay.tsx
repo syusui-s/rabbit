@@ -110,7 +110,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     mutation: followingsMutation,
     follow,
     unfollow,
-  } = useFollowingsMutation({ pubkey: myPubkey() });
+  } = useFollowingsMutation(() => ({ pubkey: myPubkey() }));
 
   const updateFollows = async (action: (ev: UnsignedEvent) => Promise<PublishEventResult>) => {
     try {
