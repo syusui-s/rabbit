@@ -27,7 +27,7 @@ const useFollowingsMutation = (propsProvider: () => UseFollowingsMutationProps) 
         const queryKey = queryKeyUseFollowings({ pubkey });
         queryClient
           .invalidateQueries({ queryKey })
-          .catch((err) => console.error('failed to invalidate profile', err));
+          .catch((err) => console.error('failed to invalidate followings', err));
       }
       props().onSuccess?.(results);
     },
