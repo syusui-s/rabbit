@@ -324,7 +324,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
             return (
               <button
                 ref={(el) => emojiPopup.emojiRef(el)}
-                class="webkit-touch-callout-none flex h-6 touch-none select-none items-center rounded border border-border px-1"
+                class="webkit-touch-callout-none flex h-6 touch-pan-x select-none items-center rounded border border-border px-1"
                 classList={{
                   'text-fg-tertiary': !isReactedByMeWithThisContent,
                   'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
