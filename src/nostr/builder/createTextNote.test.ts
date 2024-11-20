@@ -43,15 +43,15 @@ describe('buildTags', () => {
     assert.deepStrictEqual(actual, expect);
   });
 
-  it('should return root tag, mention tag and reply tag if rootEventId, mentionEventIds and replyEventId are given', () => {
+  it('should return root tag, reply tag and q tag if rootEventId, mentionEventIds and replyEventId are given', () => {
     const rootEventId = '9d6f6ae00ede6420fb053c66f06163f5096c8e11c44313cadcc5dd4ddae7f842';
     const replyEventId = '750bd0e083d49b36e4d1e25f68b3d9bfa5987c71198e3fe97b955d65acefa5a0';
     const mentionEventIds = ['750bd0e083d49b36e4d1e25f68b3d9bfa5987c71198e3fe97b955d65acefa5a0'];
     const actual = buildTags({ rootEventId, replyEventId, mentionEventIds });
     const expect = [
       ['e', rootEventId, '', 'root'],
-      ['e', mentionEventIds[0], '', 'mention'],
       ['e', replyEventId, '', 'reply'],
+      ['q', mentionEventIds[0]],
     ];
 
     assert.deepStrictEqual(actual, expect);
