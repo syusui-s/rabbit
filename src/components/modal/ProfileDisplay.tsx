@@ -90,7 +90,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     return resolved;
   });
 
-  const { followingPubkeys: myFollowingPubkeys, query: myContactsQuery } = useFollowings(() =>
+  const { followingPubkeys: myFollowingPubkeys, query: myFollowingQuery } = useFollowings(() =>
     ensureNonNull([myPubkey()] as const)(([pubkeyNonNull]) => ({
       pubkey: pubkeyNonNull,
     })),
@@ -127,7 +127,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       )
         return;
 
-      if ((latest?.data()?.created_at ?? 0) < (myContactsQuery.data?.created_at ?? 0)) {
+      if ((latest?.data()?.created_at ?? 0) < (myFollowingQuery.data?.created_at ?? 0)) {
         window.alert(i18n.t('profile.failedToFetchLatestFollowList'));
         return;
       }
@@ -282,7 +282,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     {i18n.t('general.updating')}
                   </span>
                 </Match>
-                <Match when={myContactsQuery.isPending || myContactsQuery.isFetching}>
+                <Match when={myFollowingQuery.isPending}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     {i18n.t('general.loading')}
                   </span>
