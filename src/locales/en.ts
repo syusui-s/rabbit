@@ -182,7 +182,7 @@ export default {
     },
     relays: {
       relays: 'Relays',
-      numOfRelays_one: '{{count}} relay are configured.',
+      numOfRelays_one: '{{count}} relay is configured.',
       numOfRelays_other: '{{count}} relays are configured.',
       addRelay: 'Add',
       importRelays: 'Import',
