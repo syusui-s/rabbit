@@ -126,7 +126,7 @@ const useRelayInfo = (propsProvider: () => UseRelayInfoProps): UseRelayInfo => {
     },
     enabled: props() != null,
     staleTime: 5 * 60 * 1000, // 5 min
-    gcTime: 3 * 24 * 60 * 60 * 1000, // 3 days
+    gcTime: 90 * 24 * 60 * 60 * 1000, // 90 days (in case the server is unavailable)
   }));
 
   return {
