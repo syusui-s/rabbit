@@ -20,7 +20,7 @@ import Tags from '@/nostr/event/Tags';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
 import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { fileUploadResponseToImetaTag, uploadNostrBuild } from '@/utils/imageUpload';
+import { fileUploadResponseToImetaTag, upload } from '@/utils/imageUpload';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
@@ -152,7 +152,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const uploadFilesMutation = createMutation(() => ({
     mutationKey: ['uploadFiles'] as const,
     mutationFn: async (files: File[]) => {
-      const uploadResults = await uploadNostrBuild(files);
+      const uploadResults = await upload(config().fileServer)(files);
       const urls: string[] = [];
       const uploadedImetaTags: Record<string, string[]> = {};
       const failed: [File, string][] = [];

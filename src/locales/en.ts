@@ -193,6 +193,11 @@ export default {
       imported_one: 'Imported {{count}} relay.',
       imported_other: 'Imported {{count}} relays',
     },
+    posting: {
+      posting: 'Posting',
+      fileServer: 'File server',
+      addCustomFileServer: 'Add',
+    },
     display: {
       display: 'Display',
       colorTheme: 'Color theme',
