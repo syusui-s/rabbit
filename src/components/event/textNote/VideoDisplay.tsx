@@ -13,6 +13,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
   let videoRef: HTMLVideoElement | undefined;
   const i18n = useTranslation();
   const [hidden, setHidden] = createSignal(props.initialHidden);
+  const [error, setError] = createSignal(false);
 
   return (
     <Show
@@ -28,17 +29,27 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
     >
       <LazyLoad fallback={<div class="aspect-video max-w-full" />}>
         {() => (
-          <SafeLink class="my-2 block" href={props.url}>
+          <Show
+            when={!error()}
+            fallback={
+              <SafeLink class="text-link underline" href={props.url}>
+                {props.url}
+              </SafeLink>
+            }
+          >
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <video
               ref={videoRef}
               class="max-h-64 max-w-full rounded-sm object-contain shadow"
               src={props.url}
+              onError={() => setError(true)}
               controls
             >
-              <a href={props.url}>{i18n.t('post.download')}</a>
+              <SafeLink class="text-link underline" href={props.url}>
+                {i18n.t('post.download')}
+              </SafeLink>
             </video>
-          </SafeLink>
+          </Show>
         )}
       </LazyLoad>
     </Show>
