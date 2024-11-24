@@ -5,15 +5,7 @@ import {
   type UnsignedEvent,
 } from 'nostr-tools/pure';
 
-import createContacts from '@/nostr/builder/createContacts';
-import createDeletion from '@/nostr/builder/createDeletion';
-import createProfile from '@/nostr/builder/createProfile';
-import createReaction from '@/nostr/builder/createReaction';
-import createRepost from '@/nostr/builder/createRepost';
-import createTextNote from '@/nostr/builder/createTextNote';
 import usePool from '@/nostr/usePool';
-
-type WithRelayUrls<T> = T & { relayUrls: string[] };
 
 export const signEvent = async (unsignedEvent: UnsignedEvent): Promise<NostrEvent> => {
   const id = getEventHash(unsignedEvent);
@@ -39,28 +31,23 @@ const useCommands = () => {
       const relay = await pool().ensureRelay(relayUrl);
       try {
         await relay.publish(event);
-        console.log(`${relayUrl} has accepted our event`);
       } catch (err) {
         const reason = err instanceof Error ? err.message : JSON.stringify(err);
         console.warn(`failed to publish to ${relayUrl}: ${reason}`);
       }
     });
 
-  const asPublish =
-    <P>(f: (p: P) => UnsignedEvent) =>
-    async (params: WithRelayUrls<P>): Promise<Promise<void>[]> => {
-      const unsignedEvent = f(params);
-      const signedEvent = await signEvent(unsignedEvent);
-      return publishEvent(params.relayUrls, signedEvent);
-    };
+  const signAndPublishEvent = async (
+    relayUrls: string[],
+    unsignedEvent: UnsignedEvent,
+  ): Promise<Promise<void>[]> => {
+    const signedEvent = await signEvent(unsignedEvent);
+    return publishEvent(relayUrls, signedEvent);
+  };
 
   return {
-    publishTextNote: asPublish(createTextNote),
-    publishReaction: asPublish(createReaction),
-    publishRepost: asPublish(createRepost),
-    updateProfile: asPublish(createProfile),
-    updateContacts: asPublish(createContacts),
-    deleteEvent: asPublish(createDeletion),
+    publishEvent,
+    signAndPublishEvent,
   };
 };
 

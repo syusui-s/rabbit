@@ -11,7 +11,6 @@ import {
   For,
 } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import Bolt from 'heroicons/24/outline/bolt.svg';
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
@@ -32,15 +31,15 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
 import TextNote from '@/nostr/event/TextNote';
+import useDeleteMutation from '@/nostr/mutation/useDeleteMutation';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
 import useRepostMutation from '@/nostr/mutation/useRepostMutation';
-import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { getErrorMessage } from '@/utils/error';
 import { formatSiPrefix } from '@/utils/siPrefix';
-import timeout from '@/utils/timeout';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
 const UserList = lazy(() => import('@/components/modal/UserList'));
@@ -86,7 +85,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
     return p != null && isReactedByWithEmoji(p);
   });
 
-  const publishReactionMutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -95,17 +94,24 @@ const ReactionAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishReactionMutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -130,14 +136,10 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           'text-fg-tertiary': !isReactedByMe() || isReactedByMeWithEmoji(),
           'hover:text-r-reaction': !isReactedByMe() || isReactedByMeWithEmoji(),
           'text-r-reaction':
-            (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+            (isReactedByMe() && !isReactedByMeWithEmoji()) || reactionMutation.isPending,
         }}
       >
-        <button
-          class="size-4"
-          onClick={handleReaction}
-          disabled={publishReactionMutation.isPending}
-        >
+        <button class="size-4" onClick={handleReaction} disabled={reactionMutation.isPending}>
           <Show when={isReactedByMe() && !isReactedByMeWithEmoji()} fallback={<HeartOutlined />}>
             <HeartSolid />
           </Show>
@@ -155,7 +157,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
             'text-fg-tertiary': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'hover:text-r-reaction': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'text-r-reaction':
-              (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+              (isReactedByMe() && isReactedByMeWithEmoji()) || reactionMutation.isPending,
           }}
         >
           <button
@@ -187,7 +189,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
     return (p != null && isRepostedBy(p)) || reposted();
   });
 
-  const publishRepostMutation = useRepostMutation(() => ({
+  const { mutation: repostMutation, publishRepost } = useRepostMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -198,17 +200,26 @@ const RepostAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (repostMutation.isPending) {
+      return;
+    }
 
-    ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishRepostMutation.mutate({
-        relayUrls: config().relayUrls,
-        pubkey: pubkeyNonNull,
-        eventId: eventIdNonNull,
+    const p = pubkey();
+    const { id } = props.event;
+    if (p != null && id != null) {
+      publishRepost({
+        pubkey: p,
+        eventId: id,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReposted(true);
-    });
+      })
+        .then(() => {
+          setReposted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
+    }
   };
 
   return (
@@ -217,10 +228,10 @@ const RepostAction = (props: { event: NostrEvent }) => {
       classList={{
         'text-fg-tertiary': !isRepostedByMe(),
         'hover:text-r-repost': !isRepostedByMe(),
-        'text-r-repost': isRepostedByMe() || publishRepostMutation.isPending,
+        'text-r-repost': isRepostedByMe() || repostMutation.isPending,
       }}
     >
-      <button onClick={handleRepost} disabled={publishRepostMutation.isPending}>
+      <button onClick={handleRepost} disabled={repostMutation.isPending}>
         <span class="flex size-4">
           <ArrowPathRoundedSquare />
         </span>
@@ -271,7 +282,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
     eventId: props.event.id,
   }));
 
-  const mutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -286,17 +297,24 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      mutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -315,7 +333,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                 emoji,
                 onClick: () => {
                   if (isReactedByMe()) return;
-                  if (mutation.isPending) return;
+                  if (reactionMutation.isPending) return;
                   doReaction(reactionTypes);
                 },
               })),
@@ -353,9 +371,8 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
 const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
-  const { config, addMutedThread } = useConfig();
+  const { addMutedThread } = useConfig();
   const pubkey = usePubkey();
-  const commands = useCommands();
 
   const [modal, setModal] = createSignal<
     'EventDebugModal' | 'Reactions' | 'Reposts' | 'ZapRequest' | null
@@ -363,27 +380,8 @@ const Actions: Component<ActionProps> = (props) => {
 
   const closeModal = () => setModal(null);
 
-  const deleteMutation = createMutation(() => ({
-    mutationKey: ['deleteEvent', props.event.id],
-    mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
-      commands
-        .deleteEvent(...params)
-        .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
-    onSuccess: (results) => {
-      // TODO タイムラインから削除する
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
-        window.alert(i18n.t('post.deletedSuccessfully'));
-      } else if (succeeded > 0) {
-        window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
-      } else {
-        window.alert(i18n.t('post.failedToDelete'));
-      }
-    },
-    onError: (err) => {
-      console.error('failed to delete', err);
-    },
+  const { mutation: deleteMutation, deleteEvent } = useDeleteMutation(() => ({
+    id: props.event.id,
   }));
 
   const muteThread = () => {
@@ -437,14 +435,29 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           const p = pubkey();
           if (p == null) return;
+          if (deleteMutation.isPending) return;
 
           if (!window.confirm(i18n.t('post.confirmDelete'))) return;
-          deleteMutation.mutate({
-            relayUrls: config().relayUrls,
+
+          deleteEvent({
             pubkey: p,
             eventId: props.event.id,
             kind: props.event.kind,
-          });
+          })
+            .then((results) => {
+              if (results.failed.length === 0) {
+                window.alert(i18n.t('post.deletedSuccessfully'));
+              } else if (results.succeeded.length > 0) {
+                window.alert(
+                  i18n.t('post.failedToDeletePartially', { count: results.failed.length }),
+                );
+              } else {
+                window.alert(i18n.t('post.failedToDelete'));
+              }
+            })
+            .catch((err) => {
+              window.alert(getErrorMessage(err));
+            });
         },
       },
     ],

@@ -3,17 +3,19 @@ import { type UnsignedEvent } from 'nostr-tools/pure';
 
 import epoch from '@/utils/epoch';
 
+export type CreateRepostParams = {
+  pubkey: string;
+  eventId: string;
+  kind: number;
+  notifyPubkey: string;
+};
+
 const createRepost = ({
   pubkey,
   eventId,
   kind,
   notifyPubkey,
-}: {
-  pubkey: string;
-  eventId: string;
-  kind: number;
-  notifyPubkey: string;
-}): UnsignedEvent => {
+}: CreateRepostParams): UnsignedEvent => {
   const tags = [
     ['e', eventId, ''],
     ['p', notifyPubkey],
