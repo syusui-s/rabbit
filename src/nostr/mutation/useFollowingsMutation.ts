@@ -20,7 +20,7 @@ const useFollowingsMutation = (propsProvider: () => UseFollowingsMutationProps) 
   const props = createMemo(propsProvider);
 
   const { mutation, wrapMutate } = usePublishEventMutation(() => ({
-    mutationKey: ['updateContacts', props().pubkey],
+    mutationKey: ['useFollowingsMutation', props().pubkey],
     onSuccess: (results) => {
       const { pubkey } = props();
       if (pubkey != null) {
