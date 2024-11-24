@@ -5,13 +5,17 @@ import {
 } from 'nostr-tools/nip96';
 import { getToken } from 'nostr-tools/nip98';
 import { type EventTemplate } from 'nostr-tools/pure';
+import { z } from 'zod';
 
 import sleep from '@/utils/sleep';
 
-export type ServerDefinition = {
-  name: string;
-  upload: (files: File[]) => Promise<PromiseSettledResult<FileUploadResponse>[]>;
-};
+export const FileServerDefinitionScheme = z.object({
+  type: z.literal('nip96'),
+  name: z.string(),
+  serverUrl: z.string().url(),
+});
+
+export type FileServerDefinition = z.infer<typeof FileServerDefinitionScheme>;
 
 export type UploadFileStorageParams = {
   files: File[];
@@ -20,8 +24,51 @@ export type UploadFileStorageParams = {
 
 export type UploadFileProps = {
   file: File;
-  authorizationHeader?: string;
+  authorizationHeader: string;
   media_type?: 'avatar' | 'banner';
+};
+
+export const defaultFileServers = [
+  {
+    type: 'nip96',
+    name: 'nostr.build',
+    serverUrl: 'https://nostr.build/',
+  },
+  {
+    type: 'nip96',
+    name: 'nostrcheck.me',
+    serverUrl: 'https://nostrcheck.me/',
+  },
+  {
+    type: 'nip96',
+    name: 'files.sovbit.host',
+    serverUrl: 'https://files.sovbit.host/',
+  },
+  {
+    type: 'nip96',
+    name: 'nostpic.com',
+    serverUrl: 'https://nostpic.com/',
+  },
+  {
+    type: 'nip96',
+    name: 'void.cat',
+    serverUrl: 'https://void.cat/',
+  },
+  {
+    type: 'nip96',
+    name: 'yabu.me',
+    serverUrl: 'https://yabu.me/',
+  },
+] satisfies FileServerDefinition[];
+
+export const fileUploadResponseToImetaTag = (res: FileUploadResponse): string[] | null => {
+  const tags = res.nip94_event?.tags;
+  if (tags == null || tags.length === 0) {
+    return null;
+  }
+
+  const keyValues = tags.map(([key, value]) => `${key} ${value}`);
+  return ['imeta', ...keyValues];
 };
 
 export const getAuthorizationHeader = (uploadApiUrl: string): Promise<string> => {
@@ -73,6 +120,10 @@ export const uploadFile = async (
   const response = await fetch(uploadApiUrl, { method: 'POST', headers, body });
   // TODO validate event
   const json = (await response.json()) as FileUploadResponse;
+  // const json = await nip96UploadFile(props.file, uploadApiUrl, props.authorizationHeader, {
+  //  content_type: props.file.type,
+  //  size: props.file.size.toString(10),
+  // });
 
   if (json.status === 'processing') {
     if (json.processing_url == null) {
@@ -81,8 +132,8 @@ export const uploadFile = async (
     await waitDelayProcessing(json.processing_url);
   }
 
-  if (!response.ok) {
-    throw new Error(`failed to upload: ${response.status} ${json.message}`);
+  if (json.status === 'error') {
+    throw new Error(`failed to upload: ${json.message}`);
   }
 
   return json;
@@ -108,12 +159,22 @@ const getServerConfig = async (serverUrl: string) => {
   return exec(serverUrl);
 };
 
+const buildApiUrl = (apiUrl: string, serverUrl: string): string => {
+  // support relative path for route96 (void.cat, nostr.download)
+  if (apiUrl.startsWith('/')) {
+    const url = new URL(apiUrl, serverUrl);
+    return url.toString();
+  }
+
+  return apiUrl;
+};
+
 export const uploadFileStorage = async ({
   serverUrl,
   files,
 }: UploadFileStorageParams): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
   const serverConfig = await getServerConfig(serverUrl);
-  const uploadApiUrl = serverConfig.api_url;
+  const uploadApiUrl = buildApiUrl(serverConfig.api_url, serverUrl);
   const authorizationHeader = await getAuthorizationHeader(uploadApiUrl);
 
   const promises = Array.from(files).map(async (file) =>
@@ -123,22 +184,5 @@ export const uploadFileStorage = async ({
   return Promise.allSettled(promises);
 };
 
-export const fileUploadResponseToImetaTag = (res: FileUploadResponse): string[] | null => {
-  const tags = res.nip94_event?.tags;
-  if (tags == null || tags.length === 0) {
-    return null;
-  }
-
-  const keyValues = tags.map(([key, value]) => `${key} ${value}`);
-  return ['imeta', ...keyValues];
-};
-
-export const uploadNostrBuild = (files: File[]) =>
-  uploadFileStorage({ files, serverUrl: 'https://nostr.build' });
-
-export const servers = {
-  'nostr.build': {
-    name: 'nostr.build',
-    upload: uploadNostrBuild,
-  } satisfies ServerDefinition,
-} as const;
+export const upload = (server: FileServerDefinition) => (files: File[]) =>
+  uploadFileStorage({ files, serverUrl: server.serverUrl });

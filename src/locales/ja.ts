@@ -189,6 +189,11 @@ export default {
       imported_one: '{{count}}個のリレーをインポートしました',
       imported_other: '{{count}}個のリレーをインポートしました',
     },
+    posting: {
+      posting: '投稿',
+      fileServer: 'ファイルサーバー',
+      addCustomFileServer: '追加',
+    },
     display: {
       display: '表示',
       colorTheme: 'カラーテーマ',

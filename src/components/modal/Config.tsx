@@ -6,6 +6,7 @@ import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import PaintBrush from 'heroicons/24/outline/paint-brush.svg';
 import ServerStack from 'heroicons/24/outline/server-stack.svg';
 import User from 'heroicons/24/outline/user.svg';
+import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
 import ColorThemeSection from '@/components/modal/config/display/ColorThemeSection';
@@ -16,6 +17,7 @@ import ReactionSection from '@/components/modal/config/display/ReactionSection';
 import EmojiImportSection from '@/components/modal/config/emoji/EmojiImportSection';
 import EmojiSection from '@/components/modal/config/emoji/EmojiSection';
 import MuteConfig from '@/components/modal/config/mute/MuteConfig';
+import FileServerSection from '@/components/modal/config/posting/FileServerSection';
 import BackupSection from '@/components/modal/config/profile/BackupSection';
 import ProfileSection from '@/components/modal/config/profile/ProfileSection';
 import RelayConfig from '@/components/modal/config/relays/RelayConfig';
@@ -44,6 +46,15 @@ const ConfigUI = (props: ConfigProps) => {
       name: () => i18n.t('config.relays.relays'),
       icon: () => <ServerStack />,
       render: () => <RelayConfig />,
+    },
+    {
+      name: () => i18n.t('config.posting.posting'),
+      icon: () => <PencilSquare />,
+      render: () => (
+        <>
+          <FileServerSection />
+        </>
+      ),
     },
     {
       name: () => i18n.t('config.display.display'),

@@ -23,6 +23,11 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import {
+  FileServerDefinition,
+  FileServerDefinitionScheme,
+  defaultFileServers,
+} from '@/utils/imageUpload';
 import { asCaseInsensitive, wordsRegex } from '@/utils/regex';
 
 const CustomEmojiConfigSchema = z.object({
@@ -42,6 +47,8 @@ export type ColorThemeConfig = z.infer<typeof ColorThemeConfigSchema>;
 export const ConfigSchema = z.object({
   relayUrls: z.array(z.string()),
   columns: z.array(ColumnTypeSchema),
+  fileServer: FileServerDefinitionScheme,
+  customFileServers: z.array(FileServerDefinitionScheme),
   customEmojis: z.record(CustomEmojiConfigSchema),
   colorTheme: ColorThemeConfigSchema,
   dateFormat: z.union([
@@ -74,6 +81,10 @@ type UseConfig = {
   // relay
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
+  // file server
+  setFileServer: (fileServer: FileServerDefinition) => void;
+  addCustomFileServer: (fileServer: FileServerDefinition) => void;
+  removeCustomFileServer: (fileServerName: string) => void;
   // column
   saveColumn: (column: ColumnType) => void;
   moveColumn: (columnId: string, index: number) => void;
@@ -108,6 +119,8 @@ const initialRelays = (): string[] => {
 const InitialConfig = (): Config => ({
   relayUrls: initialRelays(),
   columns: [],
+  fileServer: defaultFileServers[0],
+  customFileServers: [],
   customEmojis: {},
   colorTheme: { type: 'specific', id: 'sakura' },
   dateFormat: 'relative',
@@ -219,6 +232,20 @@ const useConfig = (): UseConfig => {
     setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
   };
 
+  const setFileServer = (fileServer: FileServerDefinition) => {
+    setConfig('fileServer', fileServer);
+  };
+
+  const addCustomFileServer = (fileServer: FileServerDefinition) => {
+    setConfig('customFileServers', (current) => [...current, fileServer]);
+  };
+
+  const removeCustomFileServer = (fileServerName: string) => {
+    setConfig('customFileServers', (current) =>
+      current.filter(({ name }) => name !== fileServerName),
+    );
+  };
+
   const saveEmoji = (emoji: CustomEmojiConfig) => {
     setConfig('customEmojis', (current) => ({ ...current, [emoji.shortcode]: emoji }));
   };
@@ -308,6 +335,10 @@ const useConfig = (): UseConfig => {
     moveColumnById,
     removeColumn,
     initializeColumns,
+    // file server
+    setFileServer,
+    addCustomFileServer,
+    removeCustomFileServer,
     // emoji
     saveEmoji,
     saveEmojis,
