@@ -52,13 +52,27 @@ const usePublishEventMutation = <T extends MutationKey>(
 
       return { succeeded, failed };
     },
-    onSuccess: (result, unsignedEvent) => {
-      console.log(
-        `Successfully published event: ${JSON.stringify(props().mutationKey)}`,
-        unsignedEvent,
-        result,
-      );
-      props().onSuccess?.(result);
+    onSuccess: (results, unsignedEvent) => {
+      if (results.failed.length === 0) {
+        console.log(
+          `Successfully published event: ${JSON.stringify(props().mutationKey)}`,
+          unsignedEvent,
+          results,
+        );
+      } else if (results.succeeded.length > 0) {
+        console.warn(
+          `Published event but failed on some relays: ${JSON.stringify(props().mutationKey)}`,
+          unsignedEvent,
+          results,
+        );
+      } else {
+        console.error(
+          `Failed to publish event on every relay: ${JSON.stringify(props().mutationKey)}`,
+          unsignedEvent,
+          results,
+        );
+      }
+      props().onSuccess?.(results);
     },
     onError: (err, unsignedEvent) => {
       console.log(

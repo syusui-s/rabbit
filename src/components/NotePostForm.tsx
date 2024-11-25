@@ -128,7 +128,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
-  const { mutation: publishTextNoteMutation, publishTextNote } = useTextNoteMutation();
+  const { publishTextNote } = useTextNoteMutation();
 
   const resizeTextArea = () => {
     if (textAreaRef == null) return;
@@ -185,7 +185,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submit = () => {
     if (text().length === 0) return;
-    if (publishTextNoteMutation.isPending) return;
 
     if (/nsec1[0-9a-zA-Z]+|ncryptosec[0-9a-zA-Z]+|nokakoi:[0-9a-fA-F]+/.test(text())) {
       window.alert(i18n.t('posting.forbiddenToIncludeNsec'));
@@ -237,14 +236,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
       };
     }
 
-    publishTextNote(textNoteParams)
-      .then(() => {
-        resetText();
-        props.onPost?.();
-      })
-      .catch((err) => {
-        window.alert(getErrorMessage(err));
-      });
+    publishTextNote(textNoteParams).catch((err) => {
+      window.alert(getErrorMessage(err));
+    });
+    resetText();
+    props.onPost?.();
     close();
   };
 
@@ -338,10 +334,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ev.preventDefault();
   };
 
-  const submitDisabled = () =>
-    text().trim().length === 0 ||
-    publishTextNoteMutation.isPending ||
-    uploadFilesMutation.isPending;
+  const submitDisabled = () => text().trim().length === 0 || uploadFilesMutation.isPending;
 
   const fileUploadDisabled = () => uploadFilesMutation.isPending;
 
