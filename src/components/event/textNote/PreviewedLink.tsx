@@ -80,13 +80,19 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
           <SafeLink class="text-link underline" href={props.url} />
           <SafeLink href={props.url}>
             <div class="my-2 rounded-lg border border-border transition-colors hover:bg-bg-tertiary">
-              <div class="aspect-video w-full overflow-hidden rounded-t-lg">
-                <img alt={ogpProps.title} class="object-contain shadow" src={ogpProps.image} />
+              <div class="overflow-hidden rounded-t-lg">
+                <img
+                  alt={ogpProps.title}
+                  class="max-h-64 w-full object-cover shadow"
+                  src={ogpProps.image}
+                />
               </div>
-              <div class="mb-1 max-h-32 overflow-hidden p-1">
+              <div class="mb-1 overflow-hidden p-1">
                 <div class="text-xs text-fg-secondary">{new URL(ogpProps.url).host}</div>
                 <div class="text-sm">{ogpProps.title}</div>
-                <div class="text-xs text-fg-secondary">{ogpProps.description}</div>
+                <div class="max-h-16 truncate whitespace-normal break-all text-xs text-fg-secondary">
+                  {ogpProps.description}
+                </div>
               </div>
             </div>
           </SafeLink>
