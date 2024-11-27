@@ -96,6 +96,14 @@ export const RelaysColumnSchema = BaseColumnSchema.extend({
 });
 export type RelaysColumnType = z.infer<typeof RelaysColumnSchema>;
 
+/** A column which shows text notes and reposts posted to the specific relays */
+export const FollowSetColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('FollowSet'),
+  author: z.string(),
+  identifier: z.string(),
+});
+export type FollowSetColumnType = z.infer<typeof FollowSetColumnSchema>;
+
 /** A column which search text notes from relays which support NIP-50 */
 export const SearchColumnSchema = BaseColumnSchema.extend({
   columnType: z.literal('Search'),
@@ -124,6 +132,7 @@ export const ColumnTypeSchema = z.union([
   ReactionsColumnSchema,
   ChannelColumnSchema,
   RelaysColumnSchema,
+  FollowSetColumnSchema,
   SearchColumnSchema,
   BookmarkColumnSchema,
 ]);
@@ -157,6 +166,14 @@ export const createNotificationColumn = (
 export const createRelaysColumn = (params: CreateParams<RelaysColumnType>): RelaysColumnType => ({
   ...createBaseColumn(),
   columnType: 'Relays',
+  ...params,
+});
+
+export const createFollowSetColumn = (
+  params: CreateParams<FollowSetColumnType>,
+): FollowSetColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'FollowSet',
   ...params,
 });
 

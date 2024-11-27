@@ -28,6 +28,7 @@ export default {
     home: 'ホーム',
     notification: '通知',
     relay: 'リレー',
+    followSet: 'フォローセット',
     japanese: '日本語',
     posts: '投稿',
     reactions: 'リアクション',
@@ -41,6 +42,9 @@ export default {
     loadOld: '古い投稿を読み込む',
     addRelayColumn: {
       add: '追加',
+    },
+    addFollowSetColumn: {
+      numberOfFollowSets: '{{count}} 件',
     },
     config: {
       columnWidth: 'カラム幅',

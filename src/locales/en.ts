@@ -29,6 +29,7 @@ export default {
     home: 'Home',
     notification: 'Notification',
     relay: 'Relay',
+    followSet: 'Follow set',
     japanese: 'Japanese',
     posts: 'User',
     reactions: 'Reactions',
@@ -41,7 +42,10 @@ export default {
     loadLatest: 'Load latest posts',
     loadOld: 'Load old posts',
     addRelayColumn: {
-      add: '追加',
+      add: 'Add',
+    },
+    addFollowSetColumn: {
+      numberOfFollowSets: '{{count}} followsets',
     },
     config: {
       columnWidth: 'Column width',

@@ -30,6 +30,7 @@ import Home from 'heroicons/24/outline/home.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import User from 'heroicons/24/outline/user.svg';
+import Users from 'heroicons/24/outline/users.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
 import { ParseKeys } from 'i18next';
 import throttle from 'lodash/throttle';
@@ -153,12 +154,17 @@ const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: Pa
     icon: GlobeAlt,
     nameKey: 'column.relay',
   },
+  FollowSet: {
+    icon: Users,
+    nameKey: 'column.followSet',
+  },
   Search: { icon: MagnifyingGlass, nameKey: 'column.search' },
 };
 
 const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
   const i18n = useTranslation();
 
+  // eslint-disable-next-line no-unused-vars
   const sortable = createSortable(props.column.id);
 
   const request = useRequestCommand();
