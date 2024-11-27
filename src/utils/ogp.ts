@@ -13,7 +13,7 @@ export const getCharset = (source: ArrayBuffer): string | null => {
   // https://www.w3.org/International/questions/qa-html-encoding-declarations.ja
   const content = new TextDecoder('US-ASCII').decode(source.slice(0, 1024));
 
-  const metaCharsetMatch = content.match(/<meta\s+charset="([-A-Za-z0-9]+)"/i);
+  const metaCharsetMatch = content.match(/<meta\s+charset="([-A-Za-z0-9_]+)"/i);
   if (metaCharsetMatch != null) {
     return metaCharsetMatch[1].toLowerCase();
   }
