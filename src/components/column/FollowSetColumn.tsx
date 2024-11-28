@@ -15,13 +15,13 @@ import { useTranslation } from '@/i18n/useTranslation';
 import useFollowSet from '@/nostr/useFollowSet';
 import useSubscription from '@/nostr/useSubscription';
 
-type FollowingColumnDisplayProps = {
+type FollowingColumnProps = {
   columnIndex: number;
   lastColumn: boolean;
   column: FollowSetColumnType;
 };
 
-const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
+const FollowingColumn: Component<FollowingColumnProps> = (props) => {
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
