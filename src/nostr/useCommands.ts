@@ -23,6 +23,27 @@ export const signEvent = async (unsignedEvent: UnsignedEvent): Promise<NostrEven
   return signedEvent;
 };
 
+export const encrypt = async (pubkey: string, content: string): Promise<string> => {
+  if (window.nostr == null) {
+    throw new Error('NIP-07 implementation not found');
+  }
+  if (window.nostr.nip04 == null) {
+    throw new Error('NIP-04 implementation not found');
+  }
+  return window.nostr.nip04.encrypt(pubkey, content);
+};
+
+export const decrypt = async (pubkey: string, encryptedContent: string): Promise<string> => {
+  if (window.nostr == null) {
+    throw new Error('NIP-07 implementation not found');
+  }
+  if (window.nostr.nip04 == null) {
+    throw new Error('NIP-04 implementation not found');
+  }
+
+  return window.nostr.nip04.decrypt(pubkey, encryptedContent);
+};
+
 const useCommands = () => {
   const pool = usePool();
 

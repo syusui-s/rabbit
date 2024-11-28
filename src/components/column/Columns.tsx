@@ -2,6 +2,7 @@ import { For, Switch, Match } from 'solid-js';
 
 import BookmarkColumn from '@/components/column/BookmarkColumn';
 import FollowingColumn from '@/components/column/FollowingColumn';
+import FollowSetColumn from '@/components/column/FollowSetColumn';
 import NotificationColumn from '@/components/column/NotificationColumn';
 import PostsColumn from '@/components/column/PostsColumn';
 import ReactionsColumn from '@/components/column/ReactionsColumn';
@@ -60,6 +61,15 @@ const Columns = () => {
                 {(reactionsColumn) => (
                   <RelaysColumn
                     column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'FollowSet' && column} keyed>
+                {(followSetColumn) => (
+                  <FollowSetColumn
+                    column={followSetColumn}
                     columnIndex={columnIndex()}
                     lastColumn={lastColumn()}
                   />
