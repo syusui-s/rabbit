@@ -7,7 +7,6 @@ export type ReplaceableEventIdentifier = {
 export const replaceableEventIdentifier = (identifier: ReplaceableEventIdentifier): string => {
   if (identifier.identifier != null) {
     return `${identifier.kind}:${identifier.pubkey}:${identifier.identifier}`;
-  } 
-    return `${identifier.kind}:${identifier.pubkey}`;
-  
+  }
+  return `${identifier.kind}:${identifier.pubkey}`;
 };
