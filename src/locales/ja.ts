@@ -46,6 +46,9 @@ export default {
     addFollowSetColumn: {
       numberOfFollowSets: '{{count}} 件',
     },
+    columnInfoCommon: {
+      copyId: 'IDをコピー',
+    },
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',

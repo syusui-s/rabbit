@@ -47,6 +47,9 @@ export default {
     addFollowSetColumn: {
       numberOfFollowSets: '{{count}} followsets',
     },
+    columnInfoCommon: {
+      copyId: 'Copy ID',
+    },
     config: {
       columnWidth: 'Column width',
       widest: 'Widest',

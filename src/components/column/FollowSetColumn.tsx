@@ -2,9 +2,12 @@ import { Component } from 'solid-js';
 
 import Users from 'heroicons/24/outline/users.svg';
 import uniq from 'lodash/uniq';
+import * as Kind from 'nostr-tools/kinds';
+import { naddrEncode } from 'nostr-tools/nip19';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column from '@/components/column/Column';
+import ColumnInfo from '@/components/column/ColumnInfo';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
@@ -21,11 +24,49 @@ type FollowingColumnProps = {
   column: FollowSetColumnType;
 };
 
+export type FollowSetInfoProps = {
+  author: string;
+  identifier: string;
+  image?: string;
+  title?: string;
+  description?: string;
+};
+
+const FollowSetInfo: Component<FollowSetInfoProps> = (props) => {
+  const i18n = useTranslation();
+
+  const naddr = () =>
+    naddrEncode({
+      pubkey: props.author,
+      identifier: props.identifier,
+      kind: Kind.Followsets,
+    });
+
+  const otherActionMenuItems = [
+    {
+      content: i18n.t('column.columnInfoCommon.copyId'),
+      onSelect: () => {
+        navigator.clipboard.writeText(naddr()).catch((err) => window.alert(err));
+      },
+    },
+  ];
+
+  return (
+    <ColumnInfo
+      image={props.image}
+      authorPubkey={props.author}
+      title={props.title ?? props.identifier}
+      description={props.description}
+      otherActionMenuItems={otherActionMenuItems}
+    />
+  );
+};
+
 const FollowingColumn: Component<FollowingColumnProps> = (props) => {
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
-  const { followSet, title, pubkeys } = useFollowSet(() => ({
+  const { followSet, image, title, description, pubkeys } = useFollowSet(() => ({
     author: props.column.author,
     identifier: props.column.identifier,
   }));
@@ -68,7 +109,18 @@ const FollowingColumn: Component<FollowingColumnProps> = (props) => {
         <BasicColumnHeader
           name={columnName()}
           icon={<Users />}
-          settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
+          settings={() => (
+            <>
+              <FollowSetInfo
+                author={props.column.author}
+                identifier={props.column.identifier}
+                image={image()}
+                title={title()}
+                description={description()}
+              />
+              <ColumnSettings column={props.column} columnIndex={props.columnIndex} />
+            </>
+          )}
           onClose={() => removeColumn(props.column.id)}
         />
       }
