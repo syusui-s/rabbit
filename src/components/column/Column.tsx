@@ -1,4 +1,4 @@
-import { Show, type JSX, type Component } from 'solid-js';
+import { Show, type JSX, type Component, createSignal, createEffect } from 'solid-js';
 
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 
@@ -14,7 +14,12 @@ export type ColumnProps = {
   width: ColumnWidth;
   header: JSX.Element;
   children: JSX.Element;
+  columnOperatorRef?: (el: ColumnOperator) => void;
 };
+
+export interface ColumnOperator {
+  scrollToTop(): void;
+}
 
 const Column: Component<ColumnProps> = (props) => {
   let columnDivRef: HTMLDivElement | undefined;
@@ -42,6 +47,18 @@ const Column: Component<ColumnProps> = (props) => {
     },
   }));
 
+  const [timelineEl, setTimelineEl] = createSignal<HTMLElement>();
+
+  createEffect(() => {
+    const operator: ColumnOperator = {
+      scrollToTop: () => {
+        timelineEl()?.scrollTo(0, 0);
+      },
+    };
+
+    props.columnOperatorRef?.(operator);
+  });
+
   return (
     <TimelineContext.Provider value={timelineState}>
       <div
@@ -60,7 +77,9 @@ const Column: Component<ColumnProps> = (props) => {
           fallback={
             <>
               <div class="shrink-0 border-b border-border">{props.header}</div>
-              <div class="scrollbar flex flex-col overflow-y-scroll pb-16">{props.children}</div>
+              <div ref={setTimelineEl} class="scrollbar flex flex-col overflow-y-scroll pb-16">
+                {props.children}
+              </div>
             </>
           }
         >
@@ -77,7 +96,10 @@ const Column: Component<ColumnProps> = (props) => {
                   <div>{i18n.t('column.back')}</div>
                 </button>
               </div>
-              <div class="scrollbar flex max-h-full flex-col overflow-y-scroll scroll-smooth pb-16">
+              <div
+                ref={setTimelineEl}
+                class="scrollbar flex max-h-full flex-col overflow-y-scroll scroll-smooth pb-16"
+              >
                 <TimelineContentDisplay timelineContent={timeline} />
               </div>
             </>
