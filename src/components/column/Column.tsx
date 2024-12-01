@@ -6,7 +6,6 @@ import TimelineContentDisplay from '@/components/timeline/TimelineContentDisplay
 import { TimelineContext, useTimelineState } from '@/components/timeline/TimelineContext';
 import { ColumnWidth } from '@/core/column';
 import { useHandleCommand } from '@/hooks/useCommandBus';
-import { useScroller } from '@/hooks/useScroller';
 import { useTranslation } from '@/i18n/useTranslation';
 
 export type ColumnProps = {
@@ -43,8 +42,6 @@ const Column: Component<ColumnProps> = (props) => {
     },
   }));
 
-  const { Scrollable } = useScroller();
-
   return (
     <TimelineContext.Provider value={timelineState}>
       <div
@@ -63,9 +60,7 @@ const Column: Component<ColumnProps> = (props) => {
           fallback={
             <>
               <div class="shrink-0 border-b border-border">{props.header}</div>
-              <Scrollable class="scrollbar flex flex-col overflow-y-scroll pb-16">
-                {props.children}
-              </Scrollable>
+              <div class="scrollbar flex flex-col overflow-y-scroll pb-16">{props.children}</div>
             </>
           }
         >
@@ -82,9 +77,9 @@ const Column: Component<ColumnProps> = (props) => {
                   <div>{i18n.t('column.back')}</div>
                 </button>
               </div>
-              <Scrollable class="scrollbar flex max-h-full flex-col overflow-y-scroll scroll-smooth pb-16">
+              <div class="scrollbar flex max-h-full flex-col overflow-y-scroll scroll-smooth pb-16">
                 <TimelineContentDisplay timelineContent={timeline} />
-              </Scrollable>
+              </div>
             </>
           )}
         </Show>

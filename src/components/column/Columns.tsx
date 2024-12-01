@@ -8,7 +8,6 @@ import ReactionsColumn from '@/components/column/ReactionsColumn';
 import RelaysColumn from '@/components/column/RelaysColumn';
 import SearchColumn from '@/components/column/SearchColumn';
 import useConfig from '@/core/useConfig';
-import { ScrollerProvider } from '@/hooks/useScroller';
 
 const Columns = () => {
   const { config } = useConfig();
@@ -20,73 +19,71 @@ const Columns = () => {
           const columnIndex = () => index() + 1;
           const lastColumn = () => columnIndex() === config().columns.length;
           return (
-            <ScrollerProvider>
-              <Switch>
-                <Match when={column.columnType === 'Following' && column} keyed>
-                  {(followingColumn) => (
-                    <FollowingColumn
-                      column={followingColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Notification' && column} keyed>
-                  {(notificationColumn) => (
-                    <NotificationColumn
-                      column={notificationColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Posts' && column} keyed>
-                  {(postsColumn) => (
-                    <PostsColumn
-                      column={postsColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Reactions' && column} keyed>
-                  {(reactionsColumn) => (
-                    <ReactionsColumn
-                      column={reactionsColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Relays' && column} keyed>
-                  {(reactionsColumn) => (
-                    <RelaysColumn
-                      column={reactionsColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Bookmark' && column} keyed>
-                  {(bookmarkColumn) => (
-                    <BookmarkColumn
-                      column={bookmarkColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-                <Match when={column.columnType === 'Search' && column} keyed>
-                  {(reactionsColumn) => (
-                    <SearchColumn
-                      column={reactionsColumn}
-                      columnIndex={columnIndex()}
-                      lastColumn={lastColumn()}
-                    />
-                  )}
-                </Match>
-              </Switch>
-            </ScrollerProvider>
+            <Switch>
+              <Match when={column.columnType === 'Following' && column} keyed>
+                {(followingColumn) => (
+                  <FollowingColumn
+                    column={followingColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Notification' && column} keyed>
+                {(notificationColumn) => (
+                  <NotificationColumn
+                    column={notificationColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Posts' && column} keyed>
+                {(postsColumn) => (
+                  <PostsColumn
+                    column={postsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Reactions' && column} keyed>
+                {(reactionsColumn) => (
+                  <ReactionsColumn
+                    column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Relays' && column} keyed>
+                {(reactionsColumn) => (
+                  <RelaysColumn
+                    column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Bookmark' && column} keyed>
+                {(bookmarkColumn) => (
+                  <BookmarkColumn
+                    column={bookmarkColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+              <Match when={column.columnType === 'Search' && column} keyed>
+                {(reactionsColumn) => (
+                  <SearchColumn
+                    column={reactionsColumn}
+                    columnIndex={columnIndex()}
+                    lastColumn={lastColumn()}
+                  />
+                )}
+              </Match>
+            </Switch>
           );
         }}
       </For>
