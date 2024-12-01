@@ -17,6 +17,7 @@ import epoch from '@/utils/epoch';
 
 export type UseLoadMoreProps = {
   duration: number | null;
+  onLoad?: () => void;
 };
 
 export type UseLoadMore = {
@@ -52,6 +53,9 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
+
+    const { onLoad } = props();
+    onLoad?.();
   };
 
   const loadOld = () => {
@@ -61,6 +65,9 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
+
+    const { onLoad } = props();
+    onLoad?.();
   };
 
   return {
