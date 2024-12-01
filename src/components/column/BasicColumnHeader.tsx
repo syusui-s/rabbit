@@ -7,6 +7,7 @@ export type BasicColumnHeaderProps = {
   icon?: JSX.Element;
   settings: () => JSX.Element;
   onClose?: () => void;
+  onClickHeader?: () => void;
 };
 
 const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
@@ -21,7 +22,11 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
           <Show when={props.icon} keyed>
             {(icon) => <span class="inline-block size-4 shrink-0 text-fg-secondary">{icon}</span>}
           </Show>
-          <button class="truncate">{props.name}</button>
+          <Show when={props.onClickHeader} fallback={<span class="truncate">{props.name}</span>}>
+            <button class="truncate" onClick={() => props.onClickHeader?.()}>
+              {props.name}
+            </button>
+          </Show>
         </h2>
         <button class="flex h-full place-items-center px-2" onClick={() => toggleSettingsOpened()}>
           <span class="inline-block size-4">
