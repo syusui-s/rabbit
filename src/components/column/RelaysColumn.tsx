@@ -27,6 +27,9 @@ const RelaysColumn: Component<RelaysColumnDisplayProps> = (props) => {
 
   const loadMore = useLoadMore(() => ({
     duration: 4 * 60 * 60,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
   }));
 
   const { events, eose } = useSubscription(() => ({

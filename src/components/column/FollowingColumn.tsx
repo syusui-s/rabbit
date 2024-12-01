@@ -31,6 +31,9 @@ const FollowingColumn: Component<FollowingColumnDisplayProps> = (props) => {
 
   const loadMore = useLoadMore(() => ({
     duration: 4 * 60 * 60,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
   }));
 
   const { events, eose } = useSubscription(() => {

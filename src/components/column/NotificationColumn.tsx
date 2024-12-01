@@ -25,7 +25,12 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
 
   const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
 
-  const loadMore = useLoadMore(() => ({ duration: null }));
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
+  }));
 
   const { events: notifications, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,

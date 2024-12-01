@@ -25,7 +25,12 @@ const ReactionsColumn: Component<ReactionsColumnDisplayProps> = (props) => {
 
   const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
 
-  const loadMore = useLoadMore(() => ({ duration: null }));
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
+  }));
 
   const { events: reactions, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,

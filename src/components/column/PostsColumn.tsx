@@ -25,7 +25,12 @@ const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
 
   const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
 
-  const loadMore = useLoadMore(() => ({ duration: null }));
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
+  }));
 
   const { events, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,
