@@ -54,8 +54,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setSince(calcSince(epoch()));
     });
 
-    const { onLoad } = props();
-    onLoad?.();
+    props().onLoad?.();
   };
 
   const loadOld = () => {
@@ -66,8 +65,7 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setSince(calcSince(oldest.created_at));
     });
 
-    const { onLoad } = props();
-    onLoad?.();
+    props().onLoad?.();
   };
 
   return {
