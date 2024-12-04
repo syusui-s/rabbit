@@ -47,6 +47,8 @@ const Column: Component<ColumnProps> = (props) => {
     },
   }));
 
+  // 2つの `ref={setTimelineEl}` は `<Show>` の異なる分岐に存在し、
+  // 同時にレンダリングされないので、`timelineEl` は常にひとつの HTMLElement と関連づけられる。
   const [timelineEl, setTimelineEl] = createSignal<HTMLElement>();
 
   createEffect(() => {
