@@ -54,7 +54,7 @@ const Column: Component<ColumnProps> = (props) => {
   createEffect(() => {
     const operator: ColumnOperator = {
       scrollToTop: () => {
-        timelineEl()?.scrollTo(0, 0);
+        timelineEl()?.scrollTo({ top: 0, behavior: 'smooth' });
       },
     };
 
