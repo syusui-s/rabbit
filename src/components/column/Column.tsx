@@ -34,6 +34,11 @@ const Column: Component<ColumnProps> = (props) => {
     handler: (command) => {
       if (command.command === 'moveToColumn' && command.columnIndex === props.columnIndex) {
         columnDivRef?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        const scrollbarEl = columnDivRef?.querySelector('.scrollbar');
+        if (scrollbarEl instanceof HTMLElement) {
+          scrollbarEl.focus();
+          scrollbarEl.blur();
+        }
       }
     },
   }));
