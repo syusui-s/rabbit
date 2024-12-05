@@ -17,6 +17,7 @@ import epoch from '@/utils/epoch';
 
 export type UseLoadMoreProps = {
   duration: number | null;
+  onLoad?: () => void;
 };
 
 export type UseLoadMore = {
@@ -26,7 +27,6 @@ export type UseLoadMore = {
   continuous: Accessor<boolean>;
   loadLatest: () => void;
   loadOld: () => void;
-  setTopMarkerRef: (el: HTMLElement) => void;
 };
 
 export type LoadMoreProps = {
@@ -46,7 +46,6 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
   const [events, setEvents] = createSignal<NostrEvent[]>([]);
   const [since, setSince] = createSignal<number | undefined>(calcSince(epoch()));
   const [until, setUntil] = createSignal<number | undefined>();
-  const [topMarkerRef, setTopMarkerRef] = createSignal<HTMLElement | undefined>();
   const continuous = () => until() == null;
 
   const loadLatest = () => {
@@ -54,7 +53,8 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(undefined);
       setSince(calcSince(epoch()));
     });
-    topMarkerRef()?.scrollIntoView();
+
+    props().onLoad?.();
   };
 
   const loadOld = () => {
@@ -64,7 +64,8 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
       setUntil(oldest.created_at);
       setSince(calcSince(oldest.created_at));
     });
-    topMarkerRef()?.scrollIntoView();
+
+    props().onLoad?.();
   };
 
   return {
@@ -74,7 +75,6 @@ export const useLoadMore = (propsProvider: () => UseLoadMoreProps): UseLoadMore 
     continuous,
     loadLatest,
     loadOld,
-    setTopMarkerRef,
   };
 };
 
@@ -84,7 +84,6 @@ const LoadMore: Component<LoadMoreProps> = (props) => {
   return (
     <>
       <Show when={!props.loadMore.continuous()}>
-        <div class="none" ref={props.loadMore.setTopMarkerRef} />
         <ColumnItem>
           <button
             class="flex h-12 w-full flex-col items-center justify-center hover:text-fg-secondary"

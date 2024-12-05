@@ -1,9 +1,9 @@
-import { createEffect, Component } from 'solid-js';
+import { createEffect, Component, createSignal } from 'solid-js';
 
 import User from 'heroicons/24/outline/user.svg';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
-import Column from '@/components/column/Column';
+import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
@@ -23,7 +23,14 @@ const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
-  const loadMore = useLoadMore(() => ({ duration: null }));
+  const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
+
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
+  }));
 
   const { events, eose } = useSubscription(() => ({
     relayUrls: config().relayUrls,
@@ -53,11 +60,13 @@ const PostsColumn: Component<PostsColumnDisplayProps> = (props) => {
           icon={<User />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
+          onClickHeader={() => columnOperator()?.scrollToTop()}
         />
       }
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      columnOperatorRef={setColumnOperator}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Timeline events={events()} />

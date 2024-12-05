@@ -1,4 +1,4 @@
-import { type JSX, createEffect, Component, For } from 'solid-js';
+import { type JSX, Component, For, createSignal, createEffect } from 'solid-js';
 
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import AtSymbol from 'heroicons/24/outline/at-symbol.svg';
@@ -8,7 +8,7 @@ import HeartSolid from 'heroicons/24/solid/heart.svg';
 import uniq from 'lodash/uniq';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
-import Column from '@/components/column/Column';
+import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings, {
   ColumnSettingsSection,
   RenderOtherSettingsProps,
@@ -123,7 +123,14 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
-  const loadMore = useLoadMore(() => ({ duration: null }));
+  const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
+
+  const loadMore = useLoadMore(() => ({
+    duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
+  }));
 
   const notificationTypes = () => props.column.notificationTypes ?? [...NotificationTypes];
   const kinds = () => uniq(notificationTypes().flatMap((type) => NotificationTypeKindsMap[type]));
@@ -166,11 +173,13 @@ const NotificationColumn: Component<NotificationColumnDisplayProps> = (props) =>
             />
           )}
           onClose={() => removeColumn(props.column.id)}
+          onClickHeader={() => columnOperator()?.scrollToTop()}
         />
       }
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      columnOperatorRef={setColumnOperator}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Notification events={notifications()} />

@@ -3,7 +3,7 @@ import { Component, createEffect, createSignal, Show, JSX, onMount } from 'solid
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 
-import Column from '@/components/column/Column';
+import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
@@ -85,8 +85,13 @@ export type SearchColumnDisplayProps = {
 const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
   const { removeColumn } = useConfig();
 
+  const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
+
   const loadMore = useLoadMore(() => ({
     duration: null,
+    onLoad: () => {
+      columnOperator()?.scrollToTop();
+    },
   }));
 
   const { events, eose } = useSubscription(() => {
@@ -131,6 +136,7 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      columnOperatorRef={setColumnOperator}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Timeline events={events()} />

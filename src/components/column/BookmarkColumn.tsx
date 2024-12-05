@@ -1,9 +1,9 @@
-import { Component, Show } from 'solid-js';
+import { Component, createSignal, Show } from 'solid-js';
 
 import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
-import Column from '@/components/column/Column';
+import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import Bookmark from '@/components/timeline/Bookmark';
 import { BookmarkColumnType } from '@/core/column';
@@ -21,6 +21,8 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
   const i18n = useTranslation();
   const { removeColumn } = useConfig();
 
+  const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
+
   const { event } = useParameterizedReplaceableEvent(() => ({
     kind: 30001,
     author: props.column.pubkey,
@@ -37,11 +39,13 @@ const BookmarkColumn: Component<BookmarkColumnDisplayProps> = (props) => {
           icon={<BookmarkIcon />}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
+          onClickHeader={() => columnOperator()?.scrollToTop()}
         />
       }
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      columnOperatorRef={setColumnOperator}
     >
       <Show when={event()} keyed>
         {(ev) => <Bookmark event={ev} />}
