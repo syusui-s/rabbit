@@ -17,6 +17,7 @@ export type SearchColumnHeaderProps = {
   column: SearchColumnType;
   settings: () => JSX.Element;
   onClose?: () => void;
+  onClickHeader?: () => void;
 };
 
 const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
@@ -52,10 +53,14 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
   return (
     <div class="flex flex-col">
       <div class="flex h-8 items-center gap-1 px-2">
-        <h2 class="flex items-center gap-1">
-          <span class="inline-block size-4 text-fg-secondary">
+        <h2 class="flex items-center">
+          <button
+            type="button"
+            class="inline-block size-4 text-fg-secondary"
+            onClick={() => props.onClickHeader?.()}
+          >
             <MagnifyingGlass />
-          </span>
+          </button>
         </h2>
         <form class="flex-1" onSubmit={handleSubmit}>
           <input
@@ -131,6 +136,7 @@ const SearchColumn: Component<SearchColumnDisplayProps> = (props) => {
           column={props.column}
           settings={() => <ColumnSettings column={props.column} columnIndex={props.columnIndex} />}
           onClose={() => removeColumn(props.column.id)}
+          onClickHeader={() => columnOperator()?.scrollToTop()}
         />
       }
       width={props.column.width}
