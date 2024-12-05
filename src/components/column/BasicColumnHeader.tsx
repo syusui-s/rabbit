@@ -18,15 +18,19 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
   return (
     <div class="flex flex-col">
       <div class="flex h-8 items-center gap-1">
-        <h2 class="flex min-w-0 flex-1 items-center gap-1 ps-2">
-          <Show when={props.icon} keyed>
-            {(icon) => <span class="inline-block size-4 shrink-0 text-fg-secondary">{icon}</span>}
-          </Show>
-          <Show when={props.onClickHeader} fallback={<span class="truncate">{props.name}</span>}>
-            <button class="truncate" onClick={() => props.onClickHeader?.()}>
-              {props.name}
-            </button>
-          </Show>
+        <h2 class="min-w-0 flex-1">
+          <button
+            type="button"
+            class="flex w-full items-center gap-1 ps-2"
+            onClick={() => props.onClickHeader?.()}
+          >
+            <Show when={props.icon} keyed>
+              {(icon) => <span class="inline-block size-4 shrink-0 text-fg-secondary">{icon}</span>}
+            </Show>
+            <Show when={props.onClickHeader} fallback={<span class="truncate">{props.name}</span>}>
+              <span class="truncate">{props.name}</span>
+            </Show>
+          </button>
         </h2>
         <button class="flex h-full place-items-center px-2" onClick={() => toggleSettingsOpened()}>
           <span class="inline-block size-4">
