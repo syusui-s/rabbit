@@ -4,7 +4,10 @@ import { Portal } from 'solid-js/web';
 
 export type UsePopupProps = {
   popup?: JSX.Element | (() => JSX.Element);
-  position?: 'left' | 'bottom' | 'right' | 'top';
+  position?: {
+    x?: 'center' | 'left' | 'right' | number;
+    y?: 'top' | 'bottom' | number;
+  };
 };
 
 export type UsePopup = {
@@ -13,6 +16,7 @@ export type UsePopup = {
   close: () => void;
   toggle: () => void;
   popup: () => JSX.Element;
+  isOpen: () => boolean;
 };
 
 const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
@@ -35,7 +39,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
   const close = () => setIsOpen(false);
   const toggle = () => setIsOpen((current) => !current);
 
-  const handleClickOutside = (ev: MouseEvent) => {
+  const handleClickOutside = (ev: MouseEvent | TouchEvent) => {
     const target = ev.target as HTMLElement;
     if (target != null && !popupRef()?.contains(target)) {
       close();
@@ -44,9 +48,11 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
   const addClickOutsideHandler = () => {
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
   };
   const removeClickOutsideHandler = () => {
     document.removeEventListener('mousedown', handleClickOutside);
+    document.removeEventListener('touchstart', handleClickOutside);
   };
 
   const adjustPosition = () => {
@@ -59,20 +65,28 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
 
     let { top, left } = targetRect;
 
-    if (props().position === 'left') {
-      left -= targetRect.width;
-    } else if (props().position === 'right') {
+    const positionX = props().position?.x;
+    if (typeof positionX === 'number') {
+      left += positionX;
+    } else if (positionX === 'left') {
+      left -= popupRect.width;
+    } else if (positionX === 'right') {
       left += targetRect.width;
-    } else if (props().position === 'top') {
-      top -= targetRect.height;
-      left -= targetRect.left + targetRect.width / 2;
     } else {
-      top += targetRect.height;
-      left += targetRect.width / 2;
+      left += (targetRect.width - popupRect.width) / 2;
     }
 
-    top = Math.min(top, window.innerHeight - popupRect.height);
-    left = Math.min(left, window.innerWidth - popupRect.width);
+    const positionY = props().position?.y;
+    if (typeof positionY === 'number') {
+      top += positionY;
+    } else if (positionY === 'top') {
+      top -= popupRect.height;
+    } else {
+      top += targetRect.height;
+    }
+
+    top = Math.max(Math.min(top, window.innerHeight - popupRect.height), 0);
+    left = Math.max(Math.min(left, window.innerWidth - popupRect.width), 0);
 
     setStyle({ left: `${left}px`, top: `${top}px` });
   };
@@ -104,6 +118,7 @@ const usePopup = (propsProvider: () => UsePopupProps): UsePopup => {
     close,
     toggle,
     popup,
+    isOpen,
   };
 };
 

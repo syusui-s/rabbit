@@ -7,6 +7,8 @@ import GlobalModal from '@/components/modal/GlobalModal';
 import SideBar from '@/components/SideBar';
 import useModalState from '@/hooks/useModalState';
 
+const isProfile = (s: string): boolean => /^(npub|nprofile)1[ac-hj-np-z02-9]+$/.test(s);
+
 const Permalink = () => {
   const navigate = useNavigate();
   const params = useParams();
@@ -16,14 +18,19 @@ const Permalink = () => {
 
   onMount(() => {
     if (params.id != null) {
-      try {
-        const decoded = decode(params.id);
-        if (decoded.type === 'npub') {
-          showProfile(decoded.data);
+      if (isProfile(params.id)) {
+        try {
+          const decoded = decode(params.id);
+          if (decoded.type === 'npub') {
+            showProfile(decoded.data);
+          } else if (decoded.type === 'nprofile') {
+            // TODO support relay URLs
+            showProfile(decoded.data.pubkey);
+          }
+        } catch (err) {
+          window.alert('Invalid ID');
+          navigateTop();
         }
-      } catch (err) {
-        window.alert('Invalid ID');
-        navigateTop();
       }
     } else {
       navigateTop();

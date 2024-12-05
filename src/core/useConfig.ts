@@ -23,6 +23,11 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import {
+  FileServerDefinition,
+  FileServerDefinitionScheme,
+  defaultFileServers,
+} from '@/utils/imageUpload';
 import { asCaseInsensitive, wordsRegex } from '@/utils/regex';
 
 const CustomEmojiConfigSchema = z.object({
@@ -42,6 +47,8 @@ export type ColorThemeConfig = z.infer<typeof ColorThemeConfigSchema>;
 export const ConfigSchema = z.object({
   relayUrls: z.array(z.string()),
   columns: z.array(ColumnTypeSchema),
+  fileServer: FileServerDefinitionScheme,
+  customFileServers: z.array(FileServerDefinitionScheme),
   customEmojis: z.record(CustomEmojiConfigSchema),
   colorTheme: ColorThemeConfigSchema,
   dateFormat: z.union([
@@ -61,6 +68,7 @@ export const ConfigSchema = z.object({
   hideCount: z.boolean(),
   mutedPubkeys: z.array(z.string()),
   mutedKeywords: z.array(z.string()),
+  mutedThreads: z.array(z.string()),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -73,6 +81,10 @@ type UseConfig = {
   // relay
   addRelay: (url: string) => void;
   removeRelay: (url: string) => void;
+  // file server
+  setFileServer: (fileServer: FileServerDefinition) => void;
+  addCustomFileServer: (fileServer: FileServerDefinition) => void;
+  removeCustomFileServer: (fileServerName: string) => void;
   // column
   saveColumn: (column: ColumnType) => void;
   moveColumn: (columnId: string, index: number) => void;
@@ -90,6 +102,8 @@ type UseConfig = {
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
+  addMutedThread: (id: string) => void;
+  removeMutedThread: (id: string) => void;
   isPubkeyMuted: (pubkey: string) => boolean;
   shouldMuteEvent: (event: NostrEvent) => boolean;
 };
@@ -105,6 +119,8 @@ const initialRelays = (): string[] => {
 const InitialConfig = (): Config => ({
   relayUrls: initialRelays(),
   columns: [],
+  fileServer: defaultFileServers[0],
+  customFileServers: [],
   customEmojis: {},
   colorTheme: { type: 'specific', id: 'sakura' },
   dateFormat: 'relative',
@@ -120,6 +136,7 @@ const InitialConfig = (): Config => ({
   hideCount: false,
   mutedPubkeys: [],
   mutedKeywords: [],
+  mutedThreads: [],
 });
 
 const serializer = (config: Config): string => JSON.stringify(config);
@@ -170,6 +187,14 @@ const useConfig = (): UseConfig => {
     setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
   };
 
+  const addMutedThread = (id: string) => {
+    setConfig('mutedThreads', (current) => uniq([...current, id]));
+  };
+
+  const removeMutedThread = (id: string) => {
+    setConfig('mutedThreads', (current) => current.filter((e) => e !== id));
+  };
+
   const saveColumn = (column: ColumnType) => {
     setConfig('columns', (current) => {
       const index = current.findIndex((e) => e.id === column.id);
@@ -205,6 +230,20 @@ const useConfig = (): UseConfig => {
 
   const removeColumn = (columnId: string) => {
     setConfig('columns', (current) => current.filter((e) => e.id !== columnId));
+  };
+
+  const setFileServer = (fileServer: FileServerDefinition) => {
+    setConfig('fileServer', fileServer);
+  };
+
+  const addCustomFileServer = (fileServer: FileServerDefinition) => {
+    setConfig('customFileServers', (current) => [...current, fileServer]);
+  };
+
+  const removeCustomFileServer = (fileServerName: string) => {
+    setConfig('customFileServers', (current) =>
+      current.filter(({ name }) => name !== fileServerName),
+    );
   };
 
   const saveEmoji = (emoji: CustomEmojiConfig) => {
@@ -247,12 +286,17 @@ const useConfig = (): UseConfig => {
     return false;
   };
 
+  const mutedThreadSet = createMemo(() => new Set(config.mutedThreads));
+  const isMutedThread = (eventId: string) => mutedThreadSet().has(eventId);
+
   const shouldMuteEvent = (event: NostrEvent) => {
     const ev = genericEvent(event);
     return (
       isPubkeyMuted(event.pubkey) ||
+      isMutedThread(event.id) ||
       ev.taggedPubkeys().some(isPubkeyMuted) ||
-      (event.kind === Kind.ShortTextNote && hasMutedKeyword(event))
+      (event.kind === Kind.ShortTextNote && hasMutedKeyword(event)) ||
+      ev.taggedEventIds().some((eventId) => isMutedThread(eventId))
     );
   };
 
@@ -262,7 +306,10 @@ const useConfig = (): UseConfig => {
 
     const columns: ColumnType[] = [
       createFollowingColumn({ width: 'widest', pubkey }),
-      createNotificationColumn({ pubkey }),
+      createNotificationColumn({
+        pubkey,
+        notificationTypes: ['Replies', 'Repost', 'Reaction', 'Zap'],
+      }),
       createPostsColumn({ name: i18n.t('column.myPosts'), pubkey }),
       createReactionsColumn({ name: i18n.t('column.myReactions'), pubkey }),
     ];
@@ -288,6 +335,10 @@ const useConfig = (): UseConfig => {
     moveColumnById,
     removeColumn,
     initializeColumns,
+    // file server
+    setFileServer,
+    addCustomFileServer,
+    removeCustomFileServer,
     // emoji
     saveEmoji,
     saveEmojis,
@@ -299,6 +350,8 @@ const useConfig = (): UseConfig => {
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
+    addMutedThread,
+    removeMutedThread,
     isPubkeyMuted,
     shouldMuteEvent,
   };

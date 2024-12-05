@@ -5,17 +5,19 @@ import * as Kind from 'nostr-tools/kinds';
 // eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 // import ParameterizedReplaceableEventDisplayById from '@/components/event/ParameterizedReplaceableEventDisplayById';
+import AudioDisplay from '@/components/event/textNote/AudioDisplay';
 import ImageDisplay from '@/components/event/textNote/ImageDisplay';
 import MentionedEventDisplay from '@/components/event/textNote/MentionedEventDisplay';
 import MentionedUserDisplay from '@/components/event/textNote/MentionedUserDisplay';
 import PreviewedLink from '@/components/event/textNote/PreviewedLink';
 import VideoDisplay from '@/components/event/textNote/VideoDisplay';
 import EventLink from '@/components/EventLink';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import { createRelaysColumn, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { ParsedTextNoteResolvedNode, type ParsedTextNoteResolved } from '@/nostr/parseTextNote';
-import { isImageUrl, isVideoUrl, isWebSocketUrl } from '@/utils/url';
+import { isImageUrl, isVideoUrl, isAudioUrl, isWebSocketUrl } from '@/utils/url';
 
 export type TextNoteContentDisplayProps = {
   parsed: ParsedTextNoteResolved;
@@ -53,6 +55,9 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           }
           if (isVideoUrl(item.content)) {
             return <VideoDisplay url={item.content} initialHidden={initialHidden()} />;
+          }
+          if (isAudioUrl(item.content)) {
+            return <AudioDisplay url={item.content} initialHidden={initialHidden()} />;
           }
           if (isWebSocketUrl(item.content)) {
             return (
@@ -106,14 +111,6 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (item.data.type === 'nprofile') {
             return <MentionedUserDisplay pubkey={item.data.data.pubkey} />;
           }
-          if (item.data.type === 'nrelay') {
-            const url: string = item.data.data;
-            return (
-              <button class="select-text text-link underline" onClick={() => addRelayColumn(url)}>
-                {url} ({item.content})
-              </button>
-            );
-          }
           return <span class="text-link underline">{item.content}</span>;
         }
         if (item.type === 'HashTag') {
@@ -127,15 +124,24 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           );
         }
         if (item.type === 'CustomEmojiResolved') {
-          if (item.url == null) return <span>{item.content}</span>;
+          const { url, shortcode, content } = item;
+          if (url == null) return <span>{item.content}</span>;
           // const { imageRef, canvas } = useImageAnimation({ initialPlaying: false });
+          const { emojiRef, popup } = useEmojiPopup(() => ({
+            emoji: { type: 'CustomEmoji', url, shortcode },
+          }));
+
           return (
-            <img
-              class="inline-block h-8 max-w-32"
-              src={item.url}
-              alt={item.content}
-              title={item.shortcode}
-            />
+            <>
+              {popup()}
+              <img
+                ref={emojiRef}
+                class="inline-block h-8 max-w-32"
+                src={url}
+                alt={content}
+                title={shortcode}
+              />
+            </>
           );
         }
         console.error('Not all ParsedTextNoteNodes are covered', item);

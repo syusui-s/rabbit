@@ -21,6 +21,7 @@ import { requestProvider, type WebLNProvider } from 'webln';
 // eslint-disable-next-line import/no-cycle
 import EventDisplay from '@/components/event/EventDisplay';
 import BasicModal from '@/components/modal/BasicModal';
+import UserNameDisplay from '@/components/UserDisplayName';
 import Copy from '@/components/utils/Copy';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -39,16 +40,31 @@ import verifyInvoice from '@/nostr/zap/verifyInvoice';
 import ensureNonNull from '@/utils/ensureNonNull';
 import epoch from '@/utils/epoch';
 
+type ZapTarget = { event: NostrEvent } | { pubkey: string };
+
 export type ZapRequestModalProps = {
-  event: NostrEvent;
+  zapTo: ZapTarget;
   // TODO zap to profile
   onClose: () => void;
 };
 
 type ZapDialogProps = {
+  zapTo: ZapTarget;
   lnurlPayUrl?: string | null;
-  event: NostrEvent;
 };
+
+const getPubkey = (zapTo: ZapTarget): string => {
+  if ('event' in zapTo) {
+    return zapTo.event.pubkey;
+  }
+  if ('pubkey' in zapTo) {
+    return zapTo.pubkey;
+  }
+  throw new Error('unexpected ZapTarget');
+};
+
+const getEvent = (zapTo: ZapTarget): NostrEvent | undefined =>
+  'event' in zapTo ? zapTo.event : undefined;
 
 const useWebLN = () => {
   const [provider, setProvider] = createSignal<WebLNProvider | undefined>();
@@ -96,9 +112,11 @@ const QRCodeDisplay: Component<{ text: string }> = (props) => {
   return <canvas width="256" height="256" ref={canvasRef} />;
 };
 
-const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubkey?: string }> = (
-  props,
-) => {
+const InvoiceDisplay: Component<{
+  invoice: string;
+  recipientPubkey: string;
+  lnurlPubkey?: string;
+}> = (props) => {
   const i18n = useTranslation();
   const { config } = useConfig();
   const webln = useWebLN();
@@ -106,14 +124,13 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
   const lightingInvoiceWithSchema = () => `lightning:${props.invoice}`;
 
   const { events } = useSubscription(() =>
-    ensureNonNull([props.nostrPubkey] as const)(([nostrPubkey]) => ({
+    ensureNonNull([props.lnurlPubkey] as const)(([lnurlPubkey]) => ({
       relayUrls: config().relayUrls,
       filters: [
         {
           kinds: [Kind.Zap],
-          authors: nostrPubkey != null ? [nostrPubkey] : undefined,
-          '#p': [props.event.pubkey],
-          '#e': [props.event.id],
+          authors: lnurlPubkey != null ? [lnurlPubkey] : undefined,
+          '#p': [props.recipientPubkey],
           since: epoch(),
         },
       ],
@@ -152,7 +169,7 @@ const InvoiceDisplay: Component<{ invoice: string; event: NostrEvent; nostrPubke
       }
     >
       <div class="flex flex-col items-center gap-4">
-        <div>
+        <div class="p-8">
           <QRCodeDisplay text={lightingInvoiceWithSchema()} />
         </div>
         <div class="flex items-center gap-2 ps-5">
@@ -197,8 +214,17 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
     })),
   );
 
-  const event = () => genericEvent(props.event);
-  const hasZapTag = () => event().findTagsByName('zap').length > 0;
+  const event = () => {
+    const rawEvent = getEvent(props.zapTo);
+    if (rawEvent == null) return undefined;
+    return genericEvent(rawEvent);
+  };
+
+  const hasZapTag = () => {
+    const ev = event();
+    if (ev == null) return false;
+    return ev.findTagsByName('zap').length > 0;
+  };
 
   const lnurlPayUrlDomain = () => {
     if (props.lnurlPayUrl == null) return null;
@@ -240,8 +266,8 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
         amountMilliSats,
         content: comment(),
         pubkey: p,
-        recipientPubkey: props.event.pubkey,
-        eventId: props.event.id,
+        recipientPubkey: getPubkey(props.zapTo),
+        eventId: event()?.id,
         relays: config().relayUrls,
         lnurlPayUrl: props.lnurlPayUrl,
       });
@@ -263,7 +289,7 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
   };
 
   const getInvoiceMutation = createMutation(() => ({
-    mutationKey: ['getInvoiceMutation', props.event.id],
+    mutationKey: ['getInvoiceMutation', props.zapTo],
     mutationFn: () => getInvoice(),
   }));
 
@@ -293,8 +319,8 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
         {(invoice) => (
           <InvoiceDisplay
             invoice={invoice}
-            event={props.event}
-            nostrPubkey={endpoint()?.nostrPubkey}
+            recipientPubkey={getPubkey(props.zapTo)}
+            lnurlPubkey={endpoint()?.nostrPubkey}
           />
         )}
       </Match>
@@ -321,7 +347,14 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
             <div>{endpoint()?.decodedMetadata?.textLongDesc}</div>
           </div>
           <div class="w-96 rounded-lg border border-border p-2">
-            <EventDisplay event={props.event} actions={false} embedding={false} />
+            <Switch>
+              <Match when={'event' in props.zapTo && props.zapTo} keyed>
+                {(zapTo) => <EventDisplay event={zapTo.event} actions={false} embedding={false} />}
+              </Match>
+              <Match when={'pubkey' in props.zapTo && props.zapTo} keyed>
+                {(zapTo) => <UserNameDisplay pubkey={zapTo.pubkey} />}
+              </Match>
+            </Switch>
           </div>
           <form class="mt-4 flex w-64 flex-col items-center gap-1" onSubmit={handleSubmit}>
             <label class="flex w-full items-center gap-2">
@@ -366,8 +399,11 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
 
 const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
   const i18n = useTranslation();
+
+  const recipientPubkey = () => getPubkey(props.zapTo);
+
   const { lud06, lud16, isZapConfigured } = useProfile(() => ({
-    pubkey: props.event.pubkey,
+    pubkey: recipientPubkey(),
   }));
 
   const [lnurlSource, setLnurlSource] = createSignal<'lud06' | 'lud16' | undefined>();
@@ -412,10 +448,10 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
             </div>
           </Show>
           <Show when={lnurlSource() === 'lud06' && lud06()} keyed>
-            {(value) => <ZapDialog lnurlPayUrl={lud06ToLnurlPayUrl(value)} event={props.event} />}
+            {(value) => <ZapDialog lnurlPayUrl={lud06ToLnurlPayUrl(value)} zapTo={props.zapTo} />}
           </Show>
           <Show when={lnurlSource() === 'lud16' && lud16()} keyed>
-            {(value) => <ZapDialog lnurlPayUrl={lud16ToLnurlPayUrl(value)} event={props.event} />}
+            {(value) => <ZapDialog lnurlPayUrl={lud16ToLnurlPayUrl(value)} zapTo={props.zapTo} />}
           </Show>
         </Show>
       </div>

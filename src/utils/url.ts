@@ -10,7 +10,16 @@ export const isImageUrl = (urlString: string): boolean => {
 export const isVideoUrl = (urlString: string): boolean => {
   try {
     const url = new URL(urlString);
-    return /\.(mpg|mpeg|mp4|avi|mov|webm|ogv)$/i.test(url.pathname);
+    return /\.(mpg|mpeg|mp4|avi|mov|mkv|webm|ogv)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+};
+
+export const isAudioUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return /\.(wav|mp3|flac|wma|m4a|aac|ogg|oga|opus)$/i.test(url.pathname);
   } catch {
     return false;
   }
@@ -189,4 +198,13 @@ export const parseYouTubeVideoUrl = (urlString: string): YouTubeVideo | null => 
   } catch {
     return null;
   }
+};
+
+export const softwareToGitHostUrl = (gitUrl: string): string | undefined => {
+  const githubMatch = gitUrl.match(/^git\+https:\/\/github.com\/(\w+\/\w+)\.git$/);
+  if (githubMatch != null) {
+    const path = githubMatch[1];
+    return `https://github.com/${path}`;
+  }
+  return undefined;
 };

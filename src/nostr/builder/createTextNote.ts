@@ -42,11 +42,11 @@ export const buildTags = ({
   if (rootEventId == null && replyEventId != null) {
     eTags.push(['e', replyEventId, '', 'root']);
   }
-  if (mentionEventIds != null) {
-    mentionEventIds.forEach((id) => eTags.push(['e', id, '', 'mention']));
-  }
   if (rootEventId != null && replyEventId != null && rootEventId !== replyEventId) {
     eTags.push(['e', replyEventId, '', 'reply']);
+  }
+  if (mentionEventIds != null) {
+    mentionEventIds.forEach((id) => eTags.push(['q', id]));
   }
 
   if (hashtags != null) {

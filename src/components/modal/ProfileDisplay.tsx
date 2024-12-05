@@ -1,17 +1,19 @@
 import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
+import Bolt from 'heroicons/24/outline/bolt.svg';
 import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';
 import CheckCircle from 'heroicons/24/solid/check-circle.svg';
 import ExclamationCircle from 'heroicons/24/solid/exclamation-circle.svg';
+import { type UnsignedEvent } from 'nostr-tools/pure';
 
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import TextNoteContentDisplay from '@/components/event/textNote/TextNoteContentDisplay';
 import BasicModal from '@/components/modal/BasicModal';
 import EventDebugModal from '@/components/modal/EventDebugModal';
 import UserList from '@/components/modal/UserList';
+import ZapRequestModal from '@/components/modal/ZapRequestModal';
 import Timeline from '@/components/timeline/Timeline';
 import SafeLink from '@/components/utils/SafeLink';
 import useContextMenu from '@/components/utils/useContextMenu';
@@ -20,10 +22,12 @@ import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
+import { emptyFollowings } from '@/nostr/builder/createFollowings';
 import { genericEvent } from '@/nostr/event';
+import useFollowingsMutation from '@/nostr/mutation/useFollowingsMutation';
+import { PublishEventResult } from '@/nostr/mutation/usePublishEventMutation';
 import parseNip05Address from '@/nostr/parseNip05Address';
 import parseTextNote, { toResolved } from '@/nostr/parseTextNote';
-import useCommands from '@/nostr/useCommands';
 import useFollowers from '@/nostr/useFollowers';
 import useFollowings, { fetchLatestFollowings } from '@/nostr/useFollowings';
 import useProfile from '@/nostr/useProfile';
@@ -32,7 +36,6 @@ import useSubscription from '@/nostr/useSubscription';
 import useVerification from '@/nostr/useVerification';
 import ensureNonNull from '@/utils/ensureNonNull';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';
-import timeout from '@/utils/timeout';
 
 export type ProfileDisplayProps = {
   pubkey: string;
@@ -51,16 +54,16 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
   const i18n = useTranslation();
   const { config, addMutedPubkey, removeMutedPubkey, isPubkeyMuted, saveColumn } = useConfig();
   const request = useRequestCommand();
-  const commands = useCommands();
   const myPubkey = usePubkey();
   const { showProfileEdit } = useModalState();
 
   const npub = createMemo(() => npubEncodeFallback(props.pubkey));
 
-  const [updatingContacts, setUpdatingContacts] = createSignal(false);
   const [hoverFollowButton, setHoverFollowButton] = createSignal(false);
   const [showFollowers, setShowFollowers] = createSignal(false);
-  const [modal, setModal] = createSignal<'Following' | 'EventDebugModal' | null>(null);
+  const [modal, setModal] = createSignal<'Following' | 'EventDebugModal' | 'ZapRequest' | null>(
+    null,
+  );
   const closeModal = () => setModal(null);
 
   const {
@@ -87,11 +90,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     return resolved;
   });
 
-  const {
-    followingPubkeys: myFollowingPubkeys,
-    invalidateFollowings: invalidateMyFollowings,
-    query: myFollowingQuery,
-  } = useFollowings(() =>
+  const { followingPubkeys: myFollowingPubkeys, query: myFollowingQuery } = useFollowings(() =>
     ensureNonNull([myPubkey()] as const)(([pubkeyNonNull]) => ({
       pubkey: pubkeyNonNull,
     })),
@@ -107,40 +106,18 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
     return p != null && userFollowingPubkeys().includes(p);
   };
 
-  const updateContactsMutation = createMutation(() => ({
-    mutationKey: ['updateContacts'],
-    mutationFn: (...params: Parameters<typeof commands.updateContacts>) =>
-      commands
-        .updateContacts(...params)
-        .then((promises) => Promise.allSettled(promises.map(timeout(5000)))),
-    onSuccess: (results) => {
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
-        console.log('succeeded to update contacts');
-      } else if (succeeded > 0) {
-        console.log(
-          `succeeded to update contacts for ${succeeded} relays but failed for ${failed} relays`,
-        );
-      } else {
-        console.error('failed to update contacts');
-      }
-    },
-    onError: (err) => {
-      console.error('failed to update contacts: ', err);
-    },
-    onSettled: () => {
-      invalidateMyFollowings()
-        .then(() => myFollowingQuery.refetch())
-        .catch((err) => console.error('failed to refetch contacts', err));
-    },
-  }));
+  const {
+    mutation: followingsMutation,
+    follow,
+    unfollow,
+  } = useFollowingsMutation(() => ({ pubkey: myPubkey() }));
 
-  const updateContacts = async (op: 'follow' | 'unfollow', pubkey: string) => {
+  const updateFollows = async (action: (ev: UnsignedEvent) => Promise<PublishEventResult>) => {
     try {
       const p = myPubkey();
       if (p == null) return;
-      setUpdatingContacts(true);
+
+      if (followingsMutation.isPending) return;
 
       const latest = await fetchLatestFollowings({ pubkey: p });
 
@@ -155,44 +132,24 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         return;
       }
 
-      const latestTags = latest.data()?.tags ?? [];
-      let updatedTags: string[][];
-      switch (op) {
-        case 'follow':
-          updatedTags = [...latestTags, ['p', pubkey]];
-          break;
-        case 'unfollow':
-          updatedTags = latestTags.filter(([name, value]) => !(name === 'p' && value === pubkey));
-          break;
-        default:
-          console.error('updateContacts: invalid operation', op);
-          return;
-      }
-
-      await updateContactsMutation.mutateAsync({
-        relayUrls: config().relayUrls,
-        pubkey: p,
-        updatedTags,
-        content: latest.data()?.content ?? '',
-      });
+      const baseEvent = latest.data() ?? emptyFollowings(p);
+      await action(baseEvent);
     } catch (err) {
       console.error('failed to update contact list', err);
       window.alert(i18n.t('profile.failedToUpdateFollowList'));
-    } finally {
-      setUpdatingContacts(false);
     }
   };
 
-  const follow = () => {
-    updateContacts('follow', props.pubkey).catch((err) => {
+  const doFollow = () => {
+    updateFollows((latestEvent) => follow(latestEvent, props.pubkey)).catch((err) => {
       console.log('failed to follow', err);
     });
   };
 
-  const unfollow = () => {
+  const doUnfollow = () => {
     if (!window.confirm(i18n.t('profile.confirmUnfollow'))) return;
 
-    updateContacts('unfollow', props.pubkey).catch((err) => {
+    updateFollows((latestEvent) => unfollow(latestEvent, props.pubkey)).catch((err) => {
       console.log('failed to unfollow', err);
     });
   };
@@ -257,9 +214,9 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
         content: !following() ? i18n.t('profile.followMyself') : i18n.t('profile.unfollowMyself'),
         onSelect: () => {
           if (!following()) {
-            follow();
+            doFollow();
           } else {
-            unfollow();
+            doUnfollow();
           }
         },
       },
@@ -314,19 +271,18 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               <Switch>
                 <Match when={props.pubkey === myPubkey()}>
                   <button
-                    class="rounded-full border border-primary px-4 py-2
-                    text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
+                    class="rounded-full border border-primary px-4 py-2 text-center font-bold text-primary hover:bg-primary hover:text-primary-fg sm:w-20"
                     onClick={() => showProfileEdit()}
                   >
                     {i18n.t('profile.editProfile')}
                   </button>
                 </Match>
-                <Match when={updateContactsMutation.isPending || updatingContacts()}>
+                <Match when={followingsMutation.isPending}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     {i18n.t('general.updating')}
                   </span>
                 </Match>
-                <Match when={myFollowingQuery.isPending || myFollowingQuery.isFetching}>
+                <Match when={myFollowingQuery.isPending}>
                   <span class="rounded-full border border-primary px-4 py-2 text-primary sm:text-base">
                     {i18n.t('general.loading')}
                   </span>
@@ -336,8 +292,8 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                     class="rounded-full border border-primary bg-primary px-4 py-2 text-center font-bold text-primary-fg hover:bg-primary-hover sm:w-36"
                     onMouseEnter={() => setHoverFollowButton(true)}
                     onMouseLeave={() => setHoverFollowButton(false)}
-                    onClick={() => unfollow()}
-                    disabled={updateContactsMutation.isPending}
+                    onClick={() => doUnfollow()}
+                    disabled={followingsMutation.isPending}
                   >
                     <Show when={!hoverFollowButton()} fallback={i18n.t('profile.unfollow')}>
                       {i18n.t('profile.followingCurrently')}
@@ -347,13 +303,19 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
                 <Match when={!following()}>
                   <button
                     class="w-28 rounded-full border border-primary px-4 py-2 text-primary hover:border-primary-hover hover:text-primary-hover"
-                    onClick={() => follow()}
-                    disabled={updateContactsMutation.isPending}
+                    onClick={() => doFollow()}
+                    disabled={followingsMutation.isPending}
                   >
                     {i18n.t('profile.follow')}
                   </button>
                 </Match>
               </Switch>
+              <button
+                class="w-10 rounded-full border border-primary p-2 text-primary hover:border-primary-hover hover:text-primary-hover"
+                onClick={() => setModal('ZapRequest')}
+              >
+                <Bolt />
+              </button>
               <button
                 ref={otherActionsPopup.targetRef}
                 type="button"
@@ -481,6 +443,9 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
               onClose={closeModal}
             />
           )}
+        </Match>
+        <Match when={modal() === 'ZapRequest'}>
+          <ZapRequestModal zapTo={{ pubkey: props.pubkey }} onClose={closeModal} />
         </Match>
       </Switch>
       <ul class="border-t border-border p-1">

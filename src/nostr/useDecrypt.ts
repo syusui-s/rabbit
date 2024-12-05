@@ -1,5 +1,6 @@
-import { createEffect, createRoot, createSignal } from 'solid-js';
+import { createEffect, createRoot, createSignal, batch, untrack } from 'solid-js';
 
+import { decrypt } from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 
 type UseDecryptProps = {
@@ -8,8 +9,12 @@ type UseDecryptProps = {
 
 // eslint-disable-next-line solid/reactivity
 const [memo, setMemo] = createRoot(() => createSignal<Record<string, string>>({}));
+const updateMemo = (encrypted: string, decrypted: string) =>
+  setMemo((current) => ({ ...current, [encrypted]: decrypted }));
+
 // eslint-disable-next-line solid/reactivity
 const [decrypting, setDecrypting] = createRoot(() => createSignal<Record<string, boolean>>({}));
+const isDecrypting = (encrypted: string) => untrack(() => decrypting()[encrypted] ?? false);
 
 const useDecrypt = (propsProvider: () => UseDecryptProps | null) => {
   const pubkey = usePubkey();
@@ -19,29 +24,40 @@ const useDecrypt = (propsProvider: () => UseDecryptProps | null) => {
     const props = propsProvider();
     if (props == null) return;
 
+    if (props.encrypted.length === 0) return;
+
     const { encrypted } = props;
-    if (encrypted in memo()) {
-      setDecrypted(memo()[encrypted]);
+    const memoizedValue = untrack(() => memo()[encrypted]);
+
+    if (memoizedValue != null) {
+      setDecrypted(memoizedValue);
+      return;
+    }
+
+    if (isDecrypting(encrypted)) {
       return;
     }
 
     const p = pubkey();
     if (p == null) return;
 
-    if (decrypting()[encrypted]) {
-      return;
-    }
+    const updateDecrypting = (value: boolean) =>
+      setDecrypting((current) => ({ ...current, [encrypted]: value }));
 
-    setDecrypting((current) => ({ ...current, [encrypted]: true }));
+    updateDecrypting(true);
 
-    window.nostr?.nip04
-      ?.decrypt?.(p, encrypted)
-      ?.then((result) => {
-        setMemo((current) => ({ ...current, [encrypted]: result }));
-        setDecrypted(result);
+    decrypt(p, encrypted)
+      .then((result) => {
+        batch(() => {
+          updateMemo(encrypted, result);
+          setDecrypted(result);
+        });
       })
       .catch((err) => {
         console.error(`failed to decrypt "${encrypted}"`, err);
+      })
+      .finally(() => {
+        updateDecrypting(false);
       });
   });
 

@@ -1,19 +1,17 @@
 import { createSignal, type Component, batch, onMount, For, JSX, Show } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 import omit from 'lodash/omit';
 import omitBy from 'lodash/omitBy';
 
 import BasicModal from '@/components/modal/BasicModal';
-import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import { Profile } from '@/nostr/event/Profile';
-import useCommands from '@/nostr/useCommands';
+import useProfileMutation from '@/nostr/mutation/useProfileMutation';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';
 import ensureNonNull from '@/utils/ensureNonNull';
-import timeout from '@/utils/timeout';
+import { getErrorMessage } from '@/utils/error';
 
 export type ProfileEditProps = {
   onClose: () => void;
@@ -32,7 +30,6 @@ const isInternetIdentifier = (s: string) => InternetIdentifierRegex.test(s);
 const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const i18n = useTranslation();
   const pubkey = usePubkey();
-  const { config } = useConfig();
 
   const [picture, setPicture] = createSignal('');
   const [banner, setBanner] = createSignal('');
@@ -43,35 +40,25 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
   const [nip05, setNIP05] = createSignal('');
   const [lightningAddress, setLightningAddress] = createSignal('');
 
-  const { profile, invalidateProfile, query } = useProfile(() =>
+  const { profile, query } = useProfile(() =>
     ensureNonNull([pubkey()] as const)(([pubkeyNonNull]) => ({
       pubkey: pubkeyNonNull,
     })),
   );
-  const { updateProfile } = useCommands();
-
-  const mutation = createMutation(() => ({
-    mutationKey: ['updateProfile'],
-    mutationFn: (...params: Parameters<typeof updateProfile>) =>
-      updateProfile(...params).then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
+  const { mutation, publishProfile } = useProfileMutation(() => ({
+    pubkey: pubkey(),
     onSuccess: (results) => {
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
+      if (results.failed.length === 0) {
         window.alert(i18n.t('profile.edit.updateSucceeded'));
-      } else if (succeeded > 0) {
-        window.alert(i18n.t('profile.edit.failedToUpdatePartially', { count: failed }));
+      } else if (results.succeeded.length > 0) {
+        window.alert(
+          i18n.t('profile.edit.failedToUpdatePartially', { count: results.failed.length }),
+        );
       } else {
         window.alert(i18n.t('profile.edit.failedToUpdate'));
       }
-      invalidateProfile()
-        .then(() => query.refetch())
-        .catch((err) => console.error(err));
 
       props.onClose();
-    },
-    onError: (err) => {
-      console.error('failed to delete', err);
     },
   }));
 
@@ -112,11 +99,12 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
       (v) => v == null || v.length === 0,
     );
 
-    mutation.mutate({
-      relayUrls: config().relayUrls,
+    publishProfile({
       pubkey: p,
       profile: newProfile,
       otherProperties: otherProperties(),
+    }).catch((err) => {
+      window.alert(getErrorMessage(err));
     });
   };
 
@@ -297,7 +285,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
               <div>
                 <For each={Object.entries(otherProperties())}>
                   {([key, value]) => (
-                    <div class="flex flex-col items-start ">
+                    <div class="flex flex-col items-start">
                       <span class="text-sm font-bold">{key}</span>
                       <span class="whitespace-pre-wrap break-all text-sm">{value}</span>
                     </div>

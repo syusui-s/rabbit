@@ -2,6 +2,7 @@ import { Component, createResource, For, Show } from 'solid-js';
 
 import BasicModal from '@/components/modal/BasicModal';
 import SafeLink from '@/components/utils/SafeLink';
+import useModalState from '@/hooks/useModalState';
 import { useTranslation } from '@/i18n/useTranslation';
 import resolveAsset from '@/utils/resolveAsset';
 
@@ -34,8 +35,12 @@ const fetchPackageInfo = async (): Promise<PackageInfo> => {
 
 const commit = import.meta.env.VITE_COMMIT as string | null;
 
+const authorPubkey = '96203d66276e3214ea93b6c78a577c3c9a7279f9ee7e51b22f3b8c17643a819c';
+
 const About: Component<AboutProps> = (props) => {
   const i18n = useTranslation();
+
+  const { showProfile } = useModalState();
 
   const [packageInfo] = createResource(fetchPackageInfo);
 
@@ -74,7 +79,15 @@ const About: Component<AboutProps> = (props) => {
         <h2 class="my-4 text-xl font-bold">{i18n.t('about.termOfService')}</h2>
 
         <p class="my-4">
-          Copyright &copy; 2023, 2024 Shusui Moyatani and{' '}
+          Copyright &copy; 2023, 2024{' '}
+          <button
+            type="button"
+            class="inline text-link underline"
+            onClick={() => showProfile(authorPubkey)}
+          >
+            Shusui Moyatani
+          </button>{' '}
+          and{' '}
           <SafeLink
             class="text-link underline"
             href="https://github.com/syusui-s/rabbit/graphs/contributors"
@@ -83,7 +96,7 @@ const About: Component<AboutProps> = (props) => {
           </SafeLink>
         </p>
 
-        <pre class=" max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
+        <pre class="max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
           {i18n.t('about.agplText')}
         </pre>
 

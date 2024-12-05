@@ -3,16 +3,13 @@ import { z } from 'zod';
 import { ContentFilterSchema } from '@/core/contentFilter';
 import { relaysForJapaneseTL } from '@/core/relayUrls';
 import generateId from '@/utils/generateId';
+import { literalsUnion } from '@/utils/zodHelper';
 
-export type NotificationType =
-  // The event which includes ["p", ...] tags.
-  | 'PubkeyMention'
-  // The event which includes ["e", ...] tags.
-  | 'EventMention'
-  // The event which has the deprecated kind 6.
-  | 'Repost'
-  // The event which has the deprecated kind 7.
-  | 'Reaction';
+export const NotificationTypes = ['Replies', 'Repost', 'Reaction', 'Zap'] as const;
+
+const NotificationTypeSchema = literalsUnion(NotificationTypes.map((type) => z.literal(type)));
+
+export type NotificationType = z.infer<typeof NotificationTypeSchema>;
 
 export type GenericFilterOptions = {
   matching: string;
@@ -20,10 +17,9 @@ export type GenericFilterOptions = {
   shouldIncludeRepost: boolean;
 };
 
-export type NotificationFilterOptions = {
-  allowedTypes: NotificationType[];
-};
-
+// export type NotificationFilterOptions = {
+//   allowedTypes: NotificationType[];
+// };
 // const notificationFilter =
 //   (filterOption: NotificationFilterOptions) =>
 //   (event: NostrEvent): boolean => {};
@@ -68,7 +64,7 @@ export type FollowingColumnType = z.infer<typeof FollowingColumnSchema>;
 export const NotificationColumnSchema = BaseColumnSchema.extend({
   columnType: z.literal('Notification'),
   pubkey: z.string(),
-  // notificationTypes: z.array(NotificationTypeSchema),
+  notificationTypes: z.optional(z.array(NotificationTypeSchema)),
 });
 export type NotificationColumnType = z.infer<typeof NotificationColumnSchema>;
 
@@ -100,6 +96,14 @@ export const RelaysColumnSchema = BaseColumnSchema.extend({
 });
 export type RelaysColumnType = z.infer<typeof RelaysColumnSchema>;
 
+/** A column which shows text notes and reposts posted to the specific relays */
+export const FollowSetColumnSchema = BaseColumnSchema.extend({
+  columnType: z.literal('FollowSet'),
+  author: z.string(),
+  identifier: z.string(),
+});
+export type FollowSetColumnType = z.infer<typeof FollowSetColumnSchema>;
+
 /** A column which search text notes from relays which support NIP-50 */
 export const SearchColumnSchema = BaseColumnSchema.extend({
   columnType: z.literal('Search'),
@@ -128,6 +132,7 @@ export const ColumnTypeSchema = z.union([
   ReactionsColumnSchema,
   ChannelColumnSchema,
   RelaysColumnSchema,
+  FollowSetColumnSchema,
   SearchColumnSchema,
   BookmarkColumnSchema,
 ]);
@@ -161,6 +166,14 @@ export const createNotificationColumn = (
 export const createRelaysColumn = (params: CreateParams<RelaysColumnType>): RelaysColumnType => ({
   ...createBaseColumn(),
   columnType: 'Relays',
+  ...params,
+});
+
+export const createFollowSetColumn = (
+  params: CreateParams<FollowSetColumnType>,
+): FollowSetColumnType => ({
+  ...createBaseColumn(),
+  columnType: 'FollowSet',
   ...params,
 });
 

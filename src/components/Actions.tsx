@@ -5,12 +5,12 @@ import {
   Match,
   Show,
   lazy,
+  batch,
   createSignal,
   createMemo,
   For,
 } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import Bolt from 'heroicons/24/outline/bolt.svg';
 import ChatBubbleLeft from 'heroicons/24/outline/chat-bubble-left.svg';
@@ -18,25 +18,28 @@ import EllipsisHorizontal from 'heroicons/24/outline/ellipsis-horizontal.svg';
 import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
+import * as Kind from 'nostr-tools/kinds';
 import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import EmojiDisplay from '@/components/EmojiDisplay';
+import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
 import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import { reaction } from '@/nostr/event';
 import { ReactionTypes } from '@/nostr/event/Reaction';
+import TextNote from '@/nostr/event/TextNote';
+import useDeleteMutation from '@/nostr/mutation/useDeleteMutation';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
 import useRepostMutation from '@/nostr/mutation/useRepostMutation';
-import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
 import useReactions from '@/nostr/useReactions';
 import useReposts from '@/nostr/useReposts';
 import ensureNonNull from '@/utils/ensureNonNull';
+import { getErrorMessage } from '@/utils/error';
 import { formatSiPrefix } from '@/utils/siPrefix';
-import timeout from '@/utils/timeout';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
 const UserList = lazy(() => import('@/components/modal/UserList'));
@@ -82,7 +85,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
     return p != null && isReactedByWithEmoji(p);
   });
 
-  const publishReactionMutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -91,17 +94,24 @@ const ReactionAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishReactionMutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -126,14 +136,10 @@ const ReactionAction = (props: { event: NostrEvent }) => {
           'text-fg-tertiary': !isReactedByMe() || isReactedByMeWithEmoji(),
           'hover:text-r-reaction': !isReactedByMe() || isReactedByMeWithEmoji(),
           'text-r-reaction':
-            (isReactedByMe() && !isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+            (isReactedByMe() && !isReactedByMeWithEmoji()) || reactionMutation.isPending,
         }}
       >
-        <button
-          class="size-4"
-          onClick={handleReaction}
-          disabled={publishReactionMutation.isPending}
-        >
+        <button class="size-4" onClick={handleReaction} disabled={reactionMutation.isPending}>
           <Show when={isReactedByMe() && !isReactedByMeWithEmoji()} fallback={<HeartOutlined />}>
             <HeartSolid />
           </Show>
@@ -151,7 +157,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
             'text-fg-tertiary': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'hover:text-r-reaction': !isReactedByMe() || !isReactedByMeWithEmoji(),
             'text-r-reaction':
-              (isReactedByMe() && isReactedByMeWithEmoji()) || publishReactionMutation.isPending,
+              (isReactedByMe() && isReactedByMeWithEmoji()) || reactionMutation.isPending,
           }}
         >
           <button
@@ -183,7 +189,7 @@ const RepostAction = (props: { event: NostrEvent }) => {
     return (p != null && isRepostedBy(p)) || reposted();
   });
 
-  const publishRepostMutation = useRepostMutation(() => ({
+  const { mutation: repostMutation, publishRepost } = useRepostMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -194,17 +200,26 @@ const RepostAction = (props: { event: NostrEvent }) => {
       // TODO remove reaction
       return;
     }
+    if (repostMutation.isPending) {
+      return;
+    }
 
-    ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      publishRepostMutation.mutate({
-        relayUrls: config().relayUrls,
-        pubkey: pubkeyNonNull,
-        eventId: eventIdNonNull,
+    const p = pubkey();
+    const { id } = props.event;
+    if (p != null && id != null) {
+      publishRepost({
+        pubkey: p,
+        eventId: id,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReposted(true);
-    });
+      })
+        .then(() => {
+          setReposted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
+    }
   };
 
   return (
@@ -213,10 +228,10 @@ const RepostAction = (props: { event: NostrEvent }) => {
       classList={{
         'text-fg-tertiary': !isRepostedByMe(),
         'hover:text-r-repost': !isRepostedByMe(),
-        'text-r-repost': isRepostedByMe() || publishRepostMutation.isPending,
+        'text-r-repost': isRepostedByMe() || repostMutation.isPending,
       }}
     >
-      <button onClick={handleRepost} disabled={publishRepostMutation.isPending}>
+      <button onClick={handleRepost} disabled={repostMutation.isPending}>
         <span class="flex size-4">
           <ArrowPathRoundedSquare />
         </span>
@@ -240,8 +255,8 @@ const ReactionsModal: Component<{ event: NostrEvent; onClose: () => void }> = (p
       data={reactions()}
       pubkeyExtractor={(ev) => ev.pubkey}
       renderInfo={(ev) => (
-        <div class="w-6">
-          <EmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
+        <div class="h-4 min-w-4 max-w-8">
+          <ReactionEmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
         </div>
       )}
       onClose={props.onClose}
@@ -267,7 +282,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
     eventId: props.event.id,
   }));
 
-  const mutation = useReactionMutation(() => ({
+  const { mutation: reactionMutation, publishReaction } = useReactionMutation(() => ({
     eventId: props.event.id,
   }));
 
@@ -282,17 +297,24 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
       // TODO remove reaction
       return;
     }
+    if (reactionMutation.isPending) {
+      return;
+    }
 
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
-      mutation.mutate({
-        relayUrls: config().relayUrls,
+      publishReaction({
         pubkey: pubkeyNonNull,
         reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
-      });
-      setReacted(true);
+      })
+        .then(() => {
+          setReacted(true);
+        })
+        .catch((err) => {
+          window.alert(getErrorMessage(err));
+        });
     });
   };
 
@@ -304,10 +326,23 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
             const isReactedByMeWithThisContent =
               events.findIndex((ev) => ev.pubkey === pubkey()) >= 0;
             const reactionTypes = reaction(events[0]).toReactionTypes();
+            const emojiTypes = reactionTypesToEmojiTypes(reactionTypes);
+
+            const emojiPopup = useEmojiPopup(() =>
+              ensureNonNull([emojiTypes] as const)(([emoji]) => ({
+                emoji,
+                onClick: () => {
+                  if (isReactedByMe()) return;
+                  if (reactionMutation.isPending) return;
+                  doReaction(reactionTypes);
+                },
+              })),
+            );
 
             return (
               <button
-                class="flex h-6 max-w-[128px] items-center rounded border border-border px-1"
+                ref={(el) => emojiPopup.emojiRef(el)}
+                class="webkit-touch-callout-none flex h-6 touch-pan-x select-none items-center rounded border border-border px-1"
                 classList={{
                   'text-fg-tertiary': !isReactedByMeWithThisContent,
                   'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
@@ -317,16 +352,14 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                   'text-r-reaction': isReactedByMeWithThisContent,
                 }}
                 type="button"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  doReaction(reactionTypes);
-                }}
-                disabled={isReactedByMe()}
               >
-                <EmojiDisplay reactionTypes={reactionTypes} />
+                <span class="flex h-5 min-w-5 max-w-[128px] items-center justify-center">
+                  <ReactionEmojiDisplay reactionTypes={reactionTypes} />
+                </span>
                 <Show when={!config().hideCount}>
                   <span class="ml-1 text-sm">{events.length}</span>
                 </Show>
+                {emojiPopup.popup()}
               </button>
             );
           }}
@@ -338,9 +371,8 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
 
 const Actions: Component<ActionProps> = (props) => {
   const i18n = useTranslation();
-  const { config } = useConfig();
+  const { addMutedThread } = useConfig();
   const pubkey = usePubkey();
-  const commands = useCommands();
 
   const [modal, setModal] = createSignal<
     'EventDebugModal' | 'Reactions' | 'Reposts' | 'ZapRequest' | null
@@ -348,28 +380,22 @@ const Actions: Component<ActionProps> = (props) => {
 
   const closeModal = () => setModal(null);
 
-  const deleteMutation = createMutation(() => ({
-    mutationKey: ['deleteEvent', props.event.id],
-    mutationFn: (...params: Parameters<typeof commands.deleteEvent>) =>
-      commands
-        .deleteEvent(...params)
-        .then((promeses) => Promise.allSettled(promeses.map(timeout(10000)))),
-    onSuccess: (results) => {
-      // TODO タイムラインから削除する
-      const succeeded = results.filter((res) => res.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
-      if (succeeded === results.length) {
-        window.alert(i18n.t('post.deletedSuccessfully'));
-      } else if (succeeded > 0) {
-        window.alert(i18n.t('post.failedToDeletePartially', { count: failed }));
-      } else {
-        window.alert(i18n.t('post.failedToDelete'));
-      }
-    },
-    onError: (err) => {
-      console.error('failed to delete', err);
-    },
+  const { mutation: deleteMutation, deleteEvent } = useDeleteMutation(() => ({
+    id: props.event.id,
   }));
+
+  const muteThread = () => {
+    batch(() => {
+      addMutedThread(props.event.id);
+
+      if (props.event.kind === Kind.ShortTextNote) {
+        const rootEventId = new TextNote(props.event).rootEvent()?.id;
+        if (rootEventId != null) {
+          addMutedThread(rootEventId);
+        }
+      }
+    });
+  };
 
   const otherActionsPopup = useContextMenu(() => ({
     menu: [
@@ -386,6 +412,10 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           setModal('EventDebugModal');
         },
+      },
+      {
+        content: i18n.t('post.muteThread'),
+        onSelect: () => muteThread(),
       },
       {
         content: i18n.t('post.showReposts'),
@@ -405,13 +435,29 @@ const Actions: Component<ActionProps> = (props) => {
         onSelect: () => {
           const p = pubkey();
           if (p == null) return;
+          if (deleteMutation.isPending) return;
 
           if (!window.confirm(i18n.t('post.confirmDelete'))) return;
-          deleteMutation.mutate({
-            relayUrls: config().relayUrls,
+
+          deleteEvent({
             pubkey: p,
-            eventId: props.event.id,
-          });
+            identifier: props.event.id,
+            kind: props.event.kind,
+          })
+            .then((results) => {
+              if (results.failed.length === 0) {
+                window.alert(i18n.t('post.deletedSuccessfully'));
+              } else if (results.succeeded.length > 0) {
+                window.alert(
+                  i18n.t('post.failedToDeletePartially', { count: results.failed.length }),
+                );
+              } else {
+                window.alert(i18n.t('post.failedToDelete'));
+              }
+            })
+            .catch((err) => {
+              window.alert(getErrorMessage(err));
+            });
         },
       },
     ],
@@ -460,7 +506,7 @@ const Actions: Component<ActionProps> = (props) => {
           <RepostsModal event={props.event} onClose={closeModal} />
         </Match>
         <Match when={modal() === 'ZapRequest'}>
-          <ZapRequestModal event={props.event} onClose={closeModal} />
+          <ZapRequestModal zapTo={{ event: props.event }} onClose={closeModal} />
         </Match>
       </Switch>
     </>

@@ -50,7 +50,7 @@ const SubMenuDisplay: Component<SubMenuDisplayProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const contextMenuPopup = useContextMenu(() => ({
     menu: props.submenu.items,
-    position: 'right',
+    position: { x: 'right', y: 'bottom' },
   }));
 
   const handleClick = () => {
@@ -85,6 +85,7 @@ const useContextMenu = (propsProvider: () => UseContextMenuProps) => {
 
   const popup = usePopup(() => ({
     ensureWidth: 300,
+    position: { x: 'right', y: 'bottom' },
     ...props(),
     popup: (
       <ul class="min-w-[96px] rounded border border-border bg-bg shadow-md">

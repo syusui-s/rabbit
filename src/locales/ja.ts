@@ -28,6 +28,7 @@ export default {
     home: 'ホーム',
     notification: '通知',
     relay: 'リレー',
+    followSet: 'フォローセット',
     japanese: '日本語',
     posts: '投稿',
     reactions: 'リアクション',
@@ -42,6 +43,12 @@ export default {
     addRelayColumn: {
       add: '追加',
     },
+    addFollowSetColumn: {
+      numberOfFollowSets: '{{count}} 件',
+    },
+    columnInfoCommon: {
+      copyId: 'IDをコピー',
+    },
     config: {
       columnWidth: 'カラム幅',
       widest: '特大',
@@ -51,6 +58,15 @@ export default {
       moveLeft: '左に移動',
       moveRight: '右に移動',
       removeColumn: '削除',
+    },
+    notificationSettings: {
+      notificationTypes: '通知の種類',
+      types: {
+        replies: '返信',
+        reposts: 'リポスト',
+        reactions: 'リアクション',
+        zap: 'Zap',
+      },
     },
   },
   profile: {
@@ -106,6 +122,7 @@ export default {
     replyToPost: 'への返信',
     copyEventId: 'IDをコピー',
     showJSON: 'JSONを確認',
+    muteThread: 'スレッドをミュート',
     showReposts: 'リポスト一覧',
     showReactions: 'リアクション一覧',
     deletePost: '削除',
@@ -115,6 +132,7 @@ export default {
     failedToDelete: 'すべてのリレーで削除に失敗しました',
     showImage: '画像を表示する',
     showVideo: '動画を表示する',
+    showAudio: '音声プレイヤーを表示する',
     showPreview: 'プレビューを表示する',
     showOverflow: '続きを読む',
     hideOverflow: '隠す',
@@ -178,6 +196,11 @@ export default {
       imported_one: '{{count}}個のリレーをインポートしました',
       imported_other: '{{count}}個のリレーをインポートしました',
     },
+    posting: {
+      posting: '投稿',
+      fileServer: 'ファイルサーバー',
+      addCustomFileServer: '追加',
+    },
     display: {
       display: '表示',
       colorTheme: 'カラーテーマ',
@@ -213,8 +236,18 @@ export default {
       mute: 'ミュート',
       mutedUsers: 'ミュートしたユーザ',
       mutedKeywords: 'ミュートした単語',
+      mutedThreads: 'ミュートしたスレッド',
       add: '追加',
     },
+  },
+  relayInfo: {
+    administrator: '管理者',
+    contact: '連絡先',
+    software: 'ソフトウェア',
+    version: 'バージョン',
+    supportedNips: 'サポートされているNIP',
+    showJSON: 'JSONを確認',
+    unknown: '不明',
   },
   hello: {
     signerChecking: 'ブラウザ拡張機能のインストール状況を確認中...',

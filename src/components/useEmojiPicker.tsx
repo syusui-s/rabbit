@@ -69,7 +69,7 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
   };
 
   popup = usePopup(() => ({
-    position: 'bottom',
+    position: { y: 'bottom' },
     ...props(),
     popup: () => pickerElement(),
   }));

@@ -2,8 +2,9 @@ import { type Component, Show } from 'solid-js';
 
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import EmojiDisplay from '@/components/EmojiDisplay';
 import EventDisplay from '@/components/event/EventDisplay';
+import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
+import useEmojiPopup from '@/components/useEmojiPopup';
 import UserDisplayName from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useFormatDate from '@/hooks/useFormatDate';
@@ -39,13 +40,26 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
 
   const isRemoved = () => reactedEventQuery.isSuccess && reactedEvent() == null;
 
+  const reactionTypes = () => event().toReactionTypes();
+  const emojiTypes = () => reactionTypesToEmojiTypes(reactionTypes());
+
+  const emojiPopup = useEmojiPopup(() =>
+    ensureNonNull([emojiTypes()] as const)(([emoji]) => ({
+      emoji,
+    })),
+  );
+
   return (
     // if the reacted event is not found, it should be a removed event
     <Show when={!isRemoved() && !shouldMuteEvent(props.event)}>
       <div class="flex items-center gap-1 pl-[2px] text-sm">
-        <div class="notification-icon flex max-w-[64px] place-items-center overflow-hidden">
-          <EmojiDisplay reactionTypes={event().toReactionTypes()} />
-        </div>
+        <span
+          ref={emojiPopup.emojiRef}
+          class="webkit-touch-callout-none notification-icon flex h-4 min-w-4 max-w-[64px] shrink-0 select-none place-items-center overflow-hidden"
+        >
+          <ReactionEmojiDisplay reactionTypes={reactionTypes()} />
+        </span>
+        {emojiPopup.popup()}
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
           <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
             <Show when={profile()?.picture} keyed>
@@ -66,7 +80,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
             >
               <UserDisplayName pubkey={props.event.pubkey} />
             </button>
-            <span class="shrink-0">{i18n.t('notification.reacted')}</span>
+            <span class="shrink-0 whitespace-pre">{i18n.t('notification.reacted')}</span>
           </div>
         </div>
         <div class="text-xs">{formatDate(event().createdAtAsDate())}</div>

@@ -1,4 +1,4 @@
-import { Component, JSX, For } from 'solid-js';
+import { Component, JSX, For, Show } from 'solid-js';
 
 import ChevronLeft from 'heroicons/24/outline/chevron-left.svg';
 import ChevronRight from 'heroicons/24/outline/chevron-right.svg';
@@ -9,9 +9,15 @@ import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { useTranslation } from '@/i18n/useTranslation';
 
-type ColumnSettingsProps = {
-  column: ColumnType;
+export type RenderOtherSettingsProps<T> = {
+  column: T;
+  saveColumn: (column: T) => void;
+};
+
+type ColumnSettingsProps<T extends ColumnType> = {
+  column: T;
   columnIndex: number;
+  renderOtherSettings?: (props: RenderOtherSettingsProps<T>) => JSX.Element;
 };
 
 type ColumnSettingsSectionProps = {
@@ -19,14 +25,14 @@ type ColumnSettingsSectionProps = {
   children: JSX.Element;
 };
 
-const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => (
+export const ColumnSettingsSection: Component<ColumnSettingsSectionProps> = (props) => (
   <div class="flex flex-col gap-2 border-b border-border p-2">
     <div>{props.title}</div>
     <div>{props.children}</div>
   </div>
 );
 
-const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
+const ColumnSettings = <T extends ColumnType>(props: ColumnSettingsProps<T>): JSX.Element => {
   const i18n = useTranslation();
   const { saveColumn, removeColumn, moveColumn } = useConfig();
   const request = useRequestCommand();
@@ -62,6 +68,9 @@ const ColumnSettings: Component<ColumnSettingsProps> = (props) => {
           </For>
         </div>
       </ColumnSettingsSection>
+      <Show when={props.renderOtherSettings} keyed>
+        {(render) => render({ column: props.column, saveColumn })}
+      </Show>
       <div class="flex h-10 items-center gap-2">
         <button
           class="py-4 pl-2"

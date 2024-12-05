@@ -29,6 +29,7 @@ export default {
     home: 'Home',
     notification: 'Notification',
     relay: 'Relay',
+    followSet: 'Follow set',
     japanese: 'Japanese',
     posts: 'User',
     reactions: 'Reactions',
@@ -41,7 +42,13 @@ export default {
     loadLatest: 'Load latest posts',
     loadOld: 'Load old posts',
     addRelayColumn: {
-      add: '追加',
+      add: 'Add',
+    },
+    addFollowSetColumn: {
+      numberOfFollowSets: '{{count}} followsets',
+    },
+    columnInfoCommon: {
+      copyId: 'Copy ID',
     },
     config: {
       columnWidth: 'Column width',
@@ -52,6 +59,15 @@ export default {
       moveLeft: 'Move left',
       moveRight: 'Move right',
       removeColumn: 'Remove',
+    },
+    notificationSettings: {
+      notificationTypes: 'Notification types',
+      types: {
+        replies: 'Replies',
+        reposts: 'Reposts',
+        reactions: 'Reactions',
+        zap: 'Zap',
+      },
     },
   },
   profile: {
@@ -110,6 +126,7 @@ export default {
     replyToPost: '',
     copyEventId: 'Copy ID',
     showJSON: 'Show JSON',
+    muteThread: 'Mute this thread',
     showReposts: 'Show reposts',
     showReactions: 'Show reactions',
     deletePost: 'Delete',
@@ -119,6 +136,7 @@ export default {
     failedToDelete: 'Failed to delete',
     showImage: 'Show image',
     showVideo: 'Show video',
+    showAudio: 'Show audio player',
     showPreview: 'Show preview',
     showOverflow: 'Read more',
     hideOverflow: 'Hide',
@@ -171,8 +189,8 @@ export default {
     },
     relays: {
       relays: 'Relays',
-      numOfRelays_one: '{{count}} relay are configured.',
-      numOfRelays_other: '{{count}} relyas are configured.',
+      numOfRelays_one: '{{count}} relay is configured.',
+      numOfRelays_other: '{{count}} relays are configured.',
       addRelay: 'Add',
       importRelays: 'Import',
       importFromExtension: 'Import from browser extension',
@@ -181,6 +199,11 @@ export default {
       failedToImport: 'Failed to import.',
       imported_one: 'Imported {{count}} relay.',
       imported_other: 'Imported {{count}} relays',
+    },
+    posting: {
+      posting: 'Posting',
+      fileServer: 'File server',
+      addCustomFileServer: 'Add',
     },
     display: {
       display: 'Display',
@@ -216,8 +239,18 @@ export default {
       mute: 'Mute',
       mutedUsers: 'Muted users',
       mutedKeywords: 'Muted keywords',
+      mutedThreads: 'Muted threads',
       add: 'Add',
     },
+  },
+  relayInfo: {
+    administrator: 'Administrator',
+    contact: 'Contact',
+    software: 'Software',
+    version: 'Version',
+    supportedNips: 'Supported NIPs',
+    showJSON: 'Show JSON',
+    unknown: 'Unknown',
   },
   hello: {
     signerChecking: 'Checking that signer extension is installed...',

@@ -174,6 +174,88 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
+  it('should parse text note which includes nevent which has only an event id', () => {
+    const parsed = parseTextNote(
+      'see this post\nnevent1qqs0cvww4xqsr3ntq3jufu07uzxu8v5mzrcakm0axququ42ymta4k4gths3gm\nhello',
+    );
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'see this post\n' },
+      {
+        type: 'Bech32Entity',
+        content: 'nevent1qqs0cvww4xqsr3ntq3jufu07uzxu8v5mzrcakm0axququ42ymta4k4gths3gm',
+        isNIP19: false,
+        data: {
+          type: 'nevent',
+          data: {
+            author: undefined,
+            id: 'fc31cea98101c66b0465c4f1fee08dc3b29b10f1db6dfd30380e5544dafb5b55',
+            kind: undefined,
+            relays: [],
+          },
+        },
+      },
+      { type: 'PlainText', content: '\nhello' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
+  it('should parse text note which includes nevent which has on an event id and an author', () => {
+    const parsed = parseTextNote(
+      'see this post\nnevent1qgsfvgpavcnkuvs5a2fmd3u22a7rexnj08u7ulj3kghnhrqhvsagr8qqyr7rrn4fsyquv6cyvhz0rlhq3hpm9xcs78dkmlfs8q8923x6ldd42z8zs3a\nhello',
+    );
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'see this post\n' },
+      {
+        type: 'Bech32Entity',
+        content:
+          'nevent1qgsfvgpavcnkuvs5a2fmd3u22a7rexnj08u7ulj3kghnhrqhvsagr8qqyr7rrn4fsyquv6cyvhz0rlhq3hpm9xcs78dkmlfs8q8923x6ldd42z8zs3a',
+        isNIP19: false,
+        data: {
+          type: 'nevent',
+          data: {
+            author: '96203d66276e3214ea93b6c78a577c3c9a7279f9ee7e51b22f3b8c17643a819c',
+            id: 'fc31cea98101c66b0465c4f1fee08dc3b29b10f1db6dfd30380e5544dafb5b55',
+            kind: undefined,
+            relays: [],
+          },
+        },
+      },
+      { type: 'PlainText', content: '\nhello' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
+  it('should parse text note which includes nevent which has only an event id', () => {
+    const parsed = parseTextNote(
+      'see this post\nnevent1qqs0cvww4xqsr3ntq3jufu07uzxu8v5mzrcakm0axququ42ymta4k4gths3gm\nhello',
+    );
+
+    const expected: ParsedTextNoteNode[] = [
+      { type: 'PlainText', content: 'see this post\n' },
+      {
+        type: 'Bech32Entity',
+        content: 'nevent1qqs0cvww4xqsr3ntq3jufu07uzxu8v5mzrcakm0axququ42ymta4k4gths3gm',
+        isNIP19: false,
+        data: {
+          type: 'nevent',
+          data: {
+            author: undefined,
+            id: 'fc31cea98101c66b0465c4f1fee08dc3b29b10f1db6dfd30380e5544dafb5b55',
+            kind: undefined,
+            relays: [],
+          },
+        },
+      },
+      { type: 'PlainText', content: '\nhello' },
+    ];
+
+    assert.deepStrictEqual(parsed, expected);
+  });
+
   it.each([
     'npub1namazu',
     'npub1a',

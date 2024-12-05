@@ -18,6 +18,7 @@ const createProfile = ({
     ...profile,
     ...otherProperties,
   };
+  delete contentObj.deleted;
   const content = JSON.stringify(contentObj);
   return {
     kind: Kind.Metadata,

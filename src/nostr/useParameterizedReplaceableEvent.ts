@@ -23,17 +23,20 @@ export type UseParameterizedReplaceableEvent = {
   query: CreateQueryResult<NostrEvent | null>;
 };
 
+export const queryKeyUseParameterizedReplaceableEvent = (
+  props: UseParameterizedReplaceableEventProps | null,
+) => ['useParameterizedReplaceableEvent', props] as const;
+
 const useParameterizedReplaceableEvent = (
   propsProvider: () => UseParameterizedReplaceableEventProps | null,
 ): UseParameterizedReplaceableEvent => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);
-  const genQueryKey = () => ['useFollowings', props()] as const;
+  const genQueryKey = () => queryKeyUseParameterizedReplaceableEvent(props());
 
   const query = createQuery(() => ({
     queryKey: genQueryKey(),
     queryFn: ({ queryKey, signal }) => {
-      console.debug('useFollowings');
       const [, currentProps] = queryKey;
       if (currentProps == null) return Promise.resolve(null);
 

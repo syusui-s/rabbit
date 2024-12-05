@@ -1,6 +1,5 @@
 import { createSignal, createMemo, Show, For, type Component, type JSX } from 'solid-js';
 
-import { createMutation } from '@tanstack/solid-query';
 import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
 import FaceSmile from 'heroicons/24/outline/face-smile.svg';
 import Photo from 'heroicons/24/outline/photo.svg';
@@ -16,10 +15,11 @@ import useEmojiComplete from '@/hooks/useEmojiComplete';
 import { useTranslation } from '@/i18n/useTranslation';
 import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
+import useTextNoteMutation from '@/nostr/mutation/useTextNoteMutation';
+import useUploadFilesMutation from '@/nostr/mutation/useUploadFilesMutation';
 import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
-import useCommands from '@/nostr/useCommands';
 import usePubkey from '@/nostr/usePubkey';
-import { uploadFiles, uploadNostrBuild } from '@/utils/imageUpload';
+import { getErrorMessage } from '@/utils/error';
 // import usePersistStatus from '@/hooks/usePersistStatus';
 
 type NotePostFormProps = {
@@ -89,6 +89,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
   const [text, setText] = createSignal<string>('');
   const [contentWarning, setContentWarning] = createSignal(false);
   const [contentWarningReason, setContentWarningReason] = createSignal('');
+  const [imetaTags, setImetaTags] = createSignal<Record<string, string[]>>({});
   const [lastUsedHashTags, setLastUsedHashTags] = createSignal<string[]>([]);
 
   const appendText = (s: string) => setText((current) => (current === '' ? s : `${current} ${s}`));
@@ -101,6 +102,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     );
     setContentWarningReason('');
     setContentWarning(false);
+    setImetaTags({});
   };
 
   const close = () => {
@@ -119,26 +121,14 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     }
   };
 
-  const { config, getEmoji } = useConfig();
+  const { getEmoji } = useConfig();
   // const { persistStatus, didAgreeToToS, agreeToToS } = usePersistStatus();
   const getPubkey = usePubkey();
-  const commands = useCommands();
 
   const replyTo = () => props.replyTo && textNote(props.replyTo);
   const mode = () => props.mode ?? 'normal';
 
-  const publishTextNoteMutation = createMutation(() => ({
-    mutationKey: ['publishTextNote'] as const,
-    mutationFn: commands.publishTextNote.bind(commands),
-    onSuccess: () => {
-      console.log('succeeded to post');
-      resetText();
-      props.onPost?.();
-    },
-    onError: (err) => {
-      console.error('error', err);
-    },
-  }));
+  const { publishTextNote } = useTextNoteMutation();
 
   const resizeTextArea = () => {
     if (textAreaRef == null) return;
@@ -146,23 +136,16 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     textAreaRef.style.height = `${textAreaRef.scrollHeight}px`;
   };
 
-  const uploadFilesMutation = createMutation(() => ({
-    mutationKey: ['uploadFiles'] as const,
-    mutationFn: async (files: File[]) => {
-      const uploadResults = await uploadFiles(uploadNostrBuild)(files);
-      const failed: File[] = [];
-
-      uploadResults.forEach((result, i) => {
-        if (result.status === 'fulfilled') {
-          appendText(result.value.imageUrl);
-          resizeTextArea();
-        } else {
-          failed.push(files[i]);
-        }
-      });
+  const uploadFilesMutation = useUploadFilesMutation(() => ({
+    onSuccess: ({ urls, uploadedImetaTags, failed }) => {
+      if (urls.length > 0) {
+        appendText(urls.join(' '));
+        resizeTextArea();
+        setImetaTags((current) => ({ ...current, ...uploadedImetaTags }));
+      }
 
       if (failed.length > 0) {
-        const filenames = failed.map((f) => f.name).join(', ');
+        const filenames = failed.map(([f, reason]) => `${f.name}: ${reason}`).join('\n');
         window.alert(i18n.t('posting.failedToUploadFile', { filenames }));
       }
     },
@@ -202,9 +185,8 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
   const submit = () => {
     if (text().length === 0) return;
-    if (publishTextNoteMutation.isPending) return;
 
-    if (/nsec1[0-9a-zA-Z]+/.test(text())) {
+    if (/nsec1[0-9a-zA-Z]+|ncryptosec[0-9a-zA-Z]+|nokakoi:[0-9a-fA-F]+/.test(text())) {
       window.alert(i18n.t('posting.forbiddenToIncludeNsec'));
       return;
     }
@@ -219,18 +201,20 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     const { hashtags, urlReferences, pubkeyReferences, eventReferences, emojis } = extract(parsed);
     const formattedContent = format(parsed);
     const emojiTags = buildEmojiTags(emojis);
+    const usedImetaTags = Object.entries(imetaTags())
+      .filter(([url]) => urlReferences.includes(url))
+      .map(([, imetaTag]) => imetaTag);
 
     setLastUsedHashTags(hashtags);
 
-    let textNoteParams: CreateTextNoteParams & { relayUrls: string[] } = {
-      relayUrls: config().relayUrls,
+    let textNoteParams: CreateTextNoteParams = {
       pubkey,
       content: formattedContent,
       notifyPubkeys: pubkeyReferences,
       mentionEventIds: eventReferences,
       hashtags,
       urls: urlReferences,
-      tags: emojiTags,
+      tags: [...emojiTags, ...usedImetaTags],
     };
 
     if (replyTo() != null) {
@@ -244,13 +228,19 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
         replyEventId: replyTo()?.id,
       };
     }
+
     if (contentWarning()) {
       textNoteParams = {
         ...textNoteParams,
         contentWarning: contentWarningReason(),
       };
     }
-    publishTextNoteMutation.mutate(textNoteParams);
+
+    publishTextNote(textNoteParams).catch((err) => {
+      window.alert(getErrorMessage(err));
+    });
+    resetText();
+    props.onPost?.();
     close();
   };
 
@@ -299,8 +289,11 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
 
-    const files = [...(ev.currentTarget.files ?? [])];
-    uploadFilesMutation.mutate(files);
+    const { files } = ev.currentTarget;
+    if (files == null || files.length === 0) return;
+
+    uploadFilesMutation.mutate([...files]);
+
     // eslint-disable-next-line no-param-reassign
     ev.currentTarget.value = '';
   };
@@ -309,17 +302,21 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ev.preventDefault();
     if (uploadFilesMutation.isPending) return;
     // if (!ensureUploaderAgreement()) return;
-    const files = [...(ev?.dataTransfer?.files ?? [])];
-    uploadFilesMutation.mutate(files);
+
+    const files = ev?.dataTransfer?.files;
+    if (files == null || files.length === 0) return;
+
+    uploadFilesMutation.mutate([...files]);
   };
 
   const handlePaste: JSX.EventHandler<HTMLTextAreaElement, ClipboardEvent> = (ev) => {
     if (uploadFilesMutation.isPending) return;
 
-    const items = [...(ev?.clipboardData?.items ?? [])];
+    const items = ev?.clipboardData?.items;
+    if (items == null || items.length === 0) return;
 
     const files: File[] = [];
-    items.forEach((item) => {
+    Array.from(items).forEach((item) => {
       if (item.kind === 'file') {
         ev.preventDefault();
         const file = item.getAsFile();
@@ -337,10 +334,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
     ev.preventDefault();
   };
 
-  const submitDisabled = () =>
-    text().trim().length === 0 ||
-    publishTextNoteMutation.isPending ||
-    uploadFilesMutation.isPending;
+  const submitDisabled = () => text().trim().length === 0 || uploadFilesMutation.isPending;
 
   const fileUploadDisabled = () => uploadFilesMutation.isPending;
 
@@ -384,7 +378,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             emojiTextAreaRef(el);
           }}
           name="text"
-          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}

@@ -1,16 +1,12 @@
 import { Event as NostrEvent } from 'nostr-tools/pure';
 
 /**
- * compareEvents compares events by created_at and id.
- *
- * Comparison by id is defined in NIP-01 for parameterized replaceable events
- * but it is used here to ensure consistent results for sorting.
+ * compareEvents compares events by created_at and id in ascending order.
  */
 export const compareEvents = (a: NostrEvent, b: NostrEvent): number => {
   const diff = a.created_at - b.created_at;
   if (diff !== 0) return diff;
-  if (a.id === b.id) return 0;
-  return a.id > b.id ? 1 : -1;
+  return -a.id.localeCompare(b.id);
 };
 
 export const pickLatestEvent = (events: NostrEvent[]): NostrEvent | undefined => {

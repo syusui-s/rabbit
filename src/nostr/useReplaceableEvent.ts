@@ -7,7 +7,7 @@ import { pickLatestEvent } from '@/nostr/event/comparator';
 import { registerTask, BatchedEventsTask, ReplaceableEventTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
-export type UseReplacableEventProps = {
+export type UseReplaceableEventProps = {
   kind: number;
   author: string;
 };
@@ -18,7 +18,7 @@ export type UseReplaceableEvent = {
 };
 
 const useReplaceableEvent = (
-  propsProvider: () => UseReplacableEventProps | null,
+  propsProvider: () => UseReplaceableEventProps | null,
 ): UseReplaceableEvent => {
   const queryClient = useQueryClient();
   const props = createMemo(propsProvider);

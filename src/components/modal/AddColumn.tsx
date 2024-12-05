@@ -7,10 +7,12 @@ import Home from 'heroicons/24/outline/home.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
 import Server from 'heroicons/24/outline/server.svg';
 import User from 'heroicons/24/outline/user.svg';
+import Users from 'heroicons/24/outline/users.svg';
 // import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 // import ChatBubbleLeftRight from 'heroicons/24/outline/chat-bubble-left-right.svg';
 
 import BasicModal from '@/components/modal/BasicModal';
+import FollowSetsDisplay from '@/components/modal/followset/FollowSetsDisplay';
 import {
   createFollowingColumn,
   createJapanRelaysColumn,
@@ -18,6 +20,7 @@ import {
   createPostsColumn,
   createReactionsColumn,
   createRelaysColumn,
+  createFollowSetColumn,
   createSearchColumn,
 } from '@/core/column';
 import useConfig from '@/core/useConfig';
@@ -131,6 +134,11 @@ const AddColumn: Component<AddColumnProps> = (props) => {
     finish();
   };
 
+  const addFollowSetColumn = (author: string, identifier: string) => {
+    saveColumn(createFollowSetColumn({ author, identifier }));
+    finish();
+  };
+
   const addSearchColumn = () => {
     saveColumn(createSearchColumn({ query: '' }));
     finish();
@@ -165,6 +173,11 @@ const AddColumn: Component<AddColumnProps> = (props) => {
       name: () => i18n.t('column.relay'),
       icon: () => <Server />,
       onSelect: () => setDetailComponent('AddRelaysColumn'),
+    },
+    {
+      name: () => i18n.t('column.followSet'),
+      icon: () => <Users />,
+      onSelect: () => setDetailComponent('AddFollowSet'),
     },
     {
       name: () => i18n.t('column.japanese'),
@@ -211,6 +224,9 @@ const AddColumn: Component<AddColumnProps> = (props) => {
       >
         <Match when={detailComponent() === 'AddRelaysColumn'}>
           <AddRelaysColumn addRelaysColumn={addRelaysColumn} />
+        </Match>
+        <Match when={detailComponent() === 'AddFollowSet'}>
+          <FollowSetsDisplay pubkey={pubkey()} onSelectFollowSet={addFollowSetColumn} />
         </Match>
       </Switch>
     </BasicModal>

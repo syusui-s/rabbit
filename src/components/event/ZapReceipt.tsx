@@ -104,7 +104,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
         </div>
       </div>
       <Show when={event().description().content.length > 0}>
-        <div class="ml-7 whitespace-pre-wrap break-all rounded border border-border px-1 text-sm">
+        <div class="ml-7 whitespace-pre-wrap break-words rounded border border-border px-1 text-sm">
           {event().description().content}
         </div>
       </Show>

@@ -54,7 +54,8 @@ describe('compareEvents', () => {
     assert(result > 0);
   });
 
-  it('should return negative number if both are made at the same time and first id is smaller than second one', () => {
+  it('should return positive number if both are made at the same time and first id is smaller than second one', () => {
+    // Lower id is considered to be newer
     const result = compareEvents(
       {
         id: '2b4f598e0586b8e54c7fecfd2a1686ef7d91f0e55236bf53d437b100a29c07ea',
@@ -75,7 +76,7 @@ describe('compareEvents', () => {
         sig: 'ca57fbea0f6a0e6a9a93920c204d4b829d0dcc71f0cff9b5e7d91dfe1af2245178d88c34acf9ff72d1afe2d799ef3f4b51a37a8ad2e8a27a9859e58fe984f6ee',
       },
     );
-    assert(result < 0);
+    assert(result > 0);
   });
 });
 
