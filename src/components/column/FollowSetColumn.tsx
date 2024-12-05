@@ -1,4 +1,4 @@
-import { Component } from 'solid-js';
+import { Component, createSignal } from 'solid-js';
 
 import Users from 'heroicons/24/outline/users.svg';
 import uniq from 'lodash/uniq';
@@ -6,7 +6,7 @@ import * as Kind from 'nostr-tools/kinds';
 import { naddrEncode } from 'nostr-tools/nip19';
 
 import BasicColumnHeader from '@/components/column/BasicColumnHeader';
-import Column from '@/components/column/Column';
+import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnInfo from '@/components/column/ColumnInfo';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
@@ -66,6 +66,8 @@ const FollowingColumn: Component<FollowingColumnProps> = (props) => {
   const i18n = useTranslation();
   const { config, removeColumn } = useConfig();
 
+  const [columnOperator, setColumnOperator] = createSignal<ColumnOperator>();
+
   const { followSet, image, title, description, pubkeys } = useFollowSet(() => ({
     author: props.column.author,
     identifier: props.column.identifier,
@@ -122,11 +124,13 @@ const FollowingColumn: Component<FollowingColumnProps> = (props) => {
             </>
           )}
           onClose={() => removeColumn(props.column.id)}
+          onClickHeader={() => columnOperator()?.scrollToTop()}
         />
       }
       width={props.column.width}
       columnIndex={props.columnIndex}
       lastColumn={props.lastColumn}
+      columnOperatorRef={setColumnOperator}
     >
       <LoadMore loadMore={loadMore} eose={eose()}>
         <Timeline events={events()} />
