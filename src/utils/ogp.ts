@@ -85,7 +85,9 @@ export const shouldAccessDirectly = (urlString: string): boolean => {
 
 export const buildUrl = (urlString: string): string => {
   if (shouldAccessDirectly(urlString)) return urlString;
-  return `https://corsproxy.io/?${encodeURIComponent(urlString)}`;
+  const url = new URL('https://corsproxy.io/');
+  url.search = new URLSearchParams({ url: urlString });
+  return url.toString();
 };
 
 export const fetchOgpContent = async (urlString: string): Promise<OgpContent | null> => {
