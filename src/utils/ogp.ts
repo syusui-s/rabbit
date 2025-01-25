@@ -86,7 +86,7 @@ export const shouldAccessDirectly = (urlString: string): boolean => {
 export const buildUrl = (urlString: string): string => {
   if (shouldAccessDirectly(urlString)) return urlString;
   const url = new URL('https://corsproxy.io/');
-  url.search = new URLSearchParams({ url: urlString });
+  url.search = new URLSearchParams({ url: urlString }).toString();
   return url.toString();
 };
 
