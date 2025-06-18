@@ -4,7 +4,7 @@ const npubEncodeFallback = (pubkey: string): string => {
   try {
     return npubEncode(pubkey);
   } catch (err) {
-    console.error('failed to encode pubkey into npub', pubkey);
+    console.error(`failed to encode pubkey into npub: ${pubkey}`, err);
     return pubkey;
   }
 };
