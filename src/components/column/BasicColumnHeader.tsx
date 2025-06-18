@@ -1,4 +1,4 @@
-import { Component, JSX, Show, createSignal } from 'solid-js';
+import { type Component, type JSX, Show, createSignal } from 'solid-js';
 
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 

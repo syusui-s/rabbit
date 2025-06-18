@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
-import { createMutation, MutationKey } from '@tanstack/solid-query';
-import { UnsignedEvent } from 'nostr-tools/pure';
+import { createMutation, type MutationKey } from '@tanstack/solid-query';
+import { type UnsignedEvent } from 'nostr-tools/pure';
 
 import useConfig from '@/core/useConfig';
 import useCommands from '@/nostr/useCommands';

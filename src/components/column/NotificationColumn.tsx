@@ -1,4 +1,4 @@
-import { type JSX, Component, For, createSignal, createEffect } from 'solid-js';
+import { type JSX, type Component, For, createSignal, createEffect } from 'solid-js';
 
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import AtSymbol from 'heroicons/24/outline/at-symbol.svg';
@@ -11,7 +11,7 @@ import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings, {
   ColumnSettingsSection,
-  RenderOtherSettingsProps,
+  type RenderOtherSettingsProps,
 } from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Notification from '@/components/timeline/Notification';

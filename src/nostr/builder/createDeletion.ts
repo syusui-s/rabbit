@@ -1,7 +1,7 @@
 import * as Kind from 'nostr-tools/kinds';
 import { type UnsignedEvent } from 'nostr-tools/pure';
 
-import { ReplaceableEventIdentifier, replaceableEventIdentifier } from '@/nostr/identifier';
+import { type ReplaceableEventIdentifier, replaceableEventIdentifier } from '@/nostr/identifier';
 import epoch from '@/utils/epoch';
 
 const createDeletion = ({

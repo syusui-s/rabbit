@@ -1,11 +1,15 @@
 import { createMemo } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import { Profile, ProfileWithOtherProperties, safeParseProfile } from '@/nostr/event/Profile';
+import {
+  type Profile,
+  type ProfileWithOtherProperties,
+  safeParseProfile,
+} from '@/nostr/event/Profile';
 import { latestEventQuery } from '@/nostr/query';
-import { BatchedEventsTask, ProfileTask } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, type ProfileTask } from '@/nostr/useBatchedEvents';
 
 export type UseProfileProps = {
   pubkey: string;

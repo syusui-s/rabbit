@@ -1,4 +1,4 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { type Component, createSignal, Show } from 'solid-js';
 
 import BookmarkIcon from 'heroicons/24/outline/bookmark.svg';
 
@@ -6,7 +6,7 @@ import BasicColumnHeader from '@/components/column/BasicColumnHeader';
 import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import Bookmark from '@/components/timeline/Bookmark';
-import { BookmarkColumnType } from '@/core/column';
+import { type BookmarkColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import useParameterizedReplaceableEvent from '@/nostr/useParameterizedReplaceableEvent';

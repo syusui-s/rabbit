@@ -1,4 +1,4 @@
-import { createEffect, Component, createSignal } from 'solid-js';
+import { createEffect, type Component, createSignal } from 'solid-js';
 
 import Heart from 'heroicons/24/outline/heart.svg';
 
@@ -7,7 +7,7 @@ import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Notification from '@/components/timeline/Notification';
-import { ReactionsColumnType } from '@/core/column';
+import { type ReactionsColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';

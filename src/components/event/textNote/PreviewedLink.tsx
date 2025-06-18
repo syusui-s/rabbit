@@ -1,4 +1,12 @@
-import { Component, JSX, Switch, Match, createSignal, createEffect, Show } from 'solid-js';
+import {
+  type Component,
+  type JSX,
+  Switch,
+  Match,
+  createSignal,
+  createEffect,
+  Show,
+} from 'solid-js';
 
 import LazyLoad from '@/components/utils/LazyLoad';
 import SafeLink from '@/components/utils/SafeLink';

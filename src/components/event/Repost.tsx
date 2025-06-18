@@ -4,7 +4,6 @@ import { type Component, createMemo } from 'solid-js';
 import ArrowPathRoundedSquare from 'heroicons/24/outline/arrow-path-rounded-square.svg';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-// eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import UserDisplayName from '@/components/UserDisplayName';
 import useFormatDate from '@/hooks/useFormatDate';

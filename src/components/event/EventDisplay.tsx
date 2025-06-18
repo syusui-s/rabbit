@@ -1,12 +1,11 @@
-import { Switch, Match, Component } from 'solid-js';
+import { Switch, Match, type Component } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 // import ChannelInfo from '@/components/event/ChannelInfo';
-// eslint-disable-next-line import/no-cycle
+
 import Repost from '@/components/event/Repost';
-// eslint-disable-next-line import/no-cycle
 import TextNote from '@/components/event/TextNote';
 import EventLink from '@/components/EventLink';
 import { useTranslation } from '@/i18n/useTranslation';

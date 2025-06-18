@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, Show, JSX, onMount } from 'solid-js';
+import { type Component, createEffect, createSignal, Show, type JSX, onMount } from 'solid-js';
 
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 import MagnifyingGlass from 'heroicons/24/outline/magnifying-glass.svg';
@@ -7,7 +7,7 @@ import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
-import { SearchColumnType } from '@/core/column';
+import { type SearchColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import { relaysForSearching } from '@/core/relayUrls';
 import useConfig from '@/core/useConfig';

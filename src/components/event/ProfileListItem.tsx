@@ -1,4 +1,4 @@
-import { Component, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';

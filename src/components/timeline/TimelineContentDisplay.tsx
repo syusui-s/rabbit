@@ -8,8 +8,9 @@ import Timeline from '@/components/timeline/Timeline';
 import { type TimelineContent } from '@/components/timeline/TimelineContext';
 import useConfig from '@/core/useConfig';
 import { textNote } from '@/nostr/event';
-import TextNote from '@/nostr/event/TextNote';
 import useSubscription from '@/nostr/useSubscription';
+
+import type TextNote from '@/nostr/event/TextNote';
 
 const relatedEvents = (event: TextNote) => {
   const ids = [event.id];

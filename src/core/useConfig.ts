@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { colorThemes, type ColorTheme } from '@/core/colorThemes';
 import {
-  ColumnType,
+  type ColumnType,
   ColumnTypeSchema,
   createFollowingColumn,
   createJapanRelaysColumn,
@@ -24,7 +24,7 @@ import {
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
 import {
-  FileServerDefinition,
+  type FileServerDefinition,
   FileServerDefinitionScheme,
   defaultFileServers,
 } from '@/utils/imageUpload';

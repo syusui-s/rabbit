@@ -5,9 +5,8 @@ export type UseImageAnimationProps = {
 };
 
 const drawImageToCanvas = (image: HTMLImageElement, canvas: HTMLCanvasElement) => {
-  // eslint-disable-next-line no-param-reassign
   canvas.width = image.width;
-  // eslint-disable-next-line no-param-reassign
+
   canvas.height = image.height;
   canvas
     .getContext('2d')

@@ -18,7 +18,6 @@ import { type Event as NostrEvent } from 'nostr-tools/pure';
 import qrcode from 'qrcode';
 import { requestProvider, type WebLNProvider } from 'webln';
 
-// eslint-disable-next-line import/no-cycle
 import EventDisplay from '@/components/event/EventDisplay';
 import BasicModal from '@/components/modal/BasicModal';
 import UserNameDisplay from '@/components/UserDisplayName';

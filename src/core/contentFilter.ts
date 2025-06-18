@@ -37,19 +37,19 @@ export type ContentFilter =
 
 export const ContentFilterAndSchema = z.object({
   filterType: z.literal('AND'),
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   children: z.array(z.lazy(() => ContentFilterSchema)),
 });
 
 export const ContentFilterOrSchema = z.object({
   filterType: z.literal('OR'),
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   children: z.array(z.lazy(() => ContentFilterSchema)),
 });
 
 export const ContentFilterNotSchema = z.object({
   filterType: z.literal('NOT'),
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   child: z.lazy(() => ContentFilterSchema),
 });
 
@@ -66,7 +66,6 @@ export const ContentFilterRegexSchema = z
   })
   .refine(({ regex, flag }) => {
     try {
-      /* eslint-disable-next-line no-new */
       new RegExp(regex, flag);
       return true;
     } catch {

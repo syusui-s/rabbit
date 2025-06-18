@@ -1,7 +1,7 @@
 import { createMemo } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import useConfig from '@/core/useConfig';
 import Tags from '@/nostr/event/Tags';

@@ -1,6 +1,5 @@
 import { Switch, Match, type Component, splitProps } from 'solid-js';
 
-// eslint-disable-next-line import/no-cycle
 import EventDisplay from '@/components/event/EventDisplay';
 import { type EventDisplayProps } from '@/components/event/EventDisplay';
 import EventLink from '@/components/EventLink';

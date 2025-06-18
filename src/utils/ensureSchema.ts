@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { type z } from 'zod';
 
 const ensureSchema =
   <T>(schema: z.Schema<T>) =>

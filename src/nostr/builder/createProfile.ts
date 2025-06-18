@@ -1,7 +1,7 @@
 import * as Kind from 'nostr-tools/kinds';
 import { type UnsignedEvent } from 'nostr-tools/pure';
 
-import { ProfileWithOtherProperties, Profile } from '@/nostr/event/Profile';
+import { type ProfileWithOtherProperties, type Profile } from '@/nostr/event/Profile';
 import epoch from '@/utils/epoch';
 
 const createProfile = ({

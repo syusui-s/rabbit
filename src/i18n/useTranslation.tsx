@@ -1,4 +1,11 @@
-import { Component, JSX, createContext, createEffect, createSignal, useContext } from 'solid-js';
+import {
+  type Component,
+  type JSX,
+  createContext,
+  createEffect,
+  createSignal,
+  useContext,
+} from 'solid-js';
 
 import i18next, { type i18n } from 'i18next';
 

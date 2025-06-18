@@ -1,4 +1,4 @@
-import { createSignal, type Component, batch, onMount, For, JSX, Show } from 'solid-js';
+import { createSignal, type Component, batch, onMount, For, type JSX, Show } from 'solid-js';
 
 import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 import omit from 'lodash/omit';
@@ -6,7 +6,7 @@ import omitBy from 'lodash/omitBy';
 
 import BasicModal from '@/components/modal/BasicModal';
 import { useTranslation } from '@/i18n/useTranslation';
-import { Profile } from '@/nostr/event/Profile';
+import { type Profile } from '@/nostr/event/Profile';
 import useProfileMutation from '@/nostr/mutation/useProfileMutation';
 import useProfile from '@/nostr/useProfile';
 import usePubkey from '@/nostr/usePubkey';

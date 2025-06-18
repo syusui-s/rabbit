@@ -1,4 +1,4 @@
-import { Component, Show, JSX } from 'solid-js';
+import { type Component, Show, type JSX } from 'solid-js';
 
 type SafeLinkProps = {
   class?: string;

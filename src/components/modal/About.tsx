@@ -1,4 +1,4 @@
-import { Component, createResource, For, Show } from 'solid-js';
+import { type Component, createResource, For, Show } from 'solid-js';
 
 import BasicModal from '@/components/modal/BasicModal';
 import SafeLink from '@/components/utils/SafeLink';

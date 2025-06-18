@@ -1,4 +1,4 @@
-import { Component, JSX, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { type Component, type JSX, Show, createSignal, onCleanup, onMount } from 'solid-js';
 
 export type LazyLoadProps = {
   threshold?: number[] | number;

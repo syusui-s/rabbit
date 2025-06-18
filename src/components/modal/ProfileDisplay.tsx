@@ -1,4 +1,12 @@
-import { Component, createSignal, createMemo, Show, Switch, Match, createEffect } from 'solid-js';
+import {
+  type Component,
+  createSignal,
+  createMemo,
+  Show,
+  Switch,
+  Match,
+  createEffect,
+} from 'solid-js';
 
 import ArrowPath from 'heroicons/24/outline/arrow-path.svg';
 import Bolt from 'heroicons/24/outline/bolt.svg';
@@ -25,7 +33,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { emptyFollowings } from '@/nostr/builder/createFollowings';
 import { genericEvent } from '@/nostr/event';
 import useFollowingsMutation from '@/nostr/mutation/useFollowingsMutation';
-import { PublishEventResult } from '@/nostr/mutation/usePublishEventMutation';
+import { type PublishEventResult } from '@/nostr/mutation/usePublishEventMutation';
 import parseNip05Address from '@/nostr/parseNip05Address';
 import parseTextNote, { toResolved } from '@/nostr/parseTextNote';
 import useFollowers from '@/nostr/useFollowers';

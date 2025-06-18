@@ -1,4 +1,4 @@
-import { Component, For, Switch, Match, createSignal, type JSX } from 'solid-js';
+import { type Component, For, Switch, Match, createSignal, type JSX } from 'solid-js';
 
 import Bell from 'heroicons/24/outline/bell.svg';
 import GlobeAlt from 'heroicons/24/outline/globe-alt.svg';

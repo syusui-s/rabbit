@@ -1,4 +1,4 @@
-import { lazy, Show, Switch, Match, Component } from 'solid-js';
+import { lazy, Show, Switch, Match, type Component } from 'solid-js';
 
 import useModalState from '@/hooks/useModalState';
 import usePubkey from '@/nostr/usePubkey';

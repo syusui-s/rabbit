@@ -1,5 +1,5 @@
 import { isParameterizedReplaceableKind } from 'nostr-tools/kinds';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import GenericEvent from '@/nostr/event/GenericEvent';
 

@@ -27,7 +27,7 @@
 import uniqBy from 'lodash/uniqBy';
 import { z } from 'zod';
 
-import { CustomEmojiConfig } from '@/core/useConfig';
+import { type CustomEmojiConfig } from '@/core/useConfig';
 
 export const pubkeySchema = z
   .string()

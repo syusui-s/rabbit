@@ -3,7 +3,7 @@ import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { Textcomplete } from '@textcomplete/core';
 import { TextareaEditor } from '@textcomplete/textarea';
 
-import useConfig, { CustomEmojiConfig } from '@/core/useConfig';
+import useConfig, { type CustomEmojiConfig } from '@/core/useConfig';
 
 const useEmojiComplete = () => {
   const { searchEmojis } = useConfig();

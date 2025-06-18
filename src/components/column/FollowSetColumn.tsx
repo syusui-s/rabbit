@@ -1,4 +1,4 @@
-import { Component, createSignal } from 'solid-js';
+import { type Component, createSignal } from 'solid-js';
 
 import Users from 'heroicons/24/outline/users.svg';
 import uniq from 'lodash/uniq';
@@ -11,7 +11,7 @@ import ColumnInfo from '@/components/column/ColumnInfo';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
-import { FollowSetColumnType } from '@/core/column';
+import { type FollowSetColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';

@@ -1,4 +1,4 @@
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 /**
  * compareEvents compares events by created_at and id in ascending order.
