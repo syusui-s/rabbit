@@ -48,7 +48,7 @@ const ZapRequestModal = lazy(() => import('@/components/modal/ZapRequestModal'))
 
 export type ActionProps = {
   event: NostrEvent;
-  onClickReply: () => void;
+  onClickReply?: () => void;
 };
 
 const emojiDataToReactionTypes = (emoji: EmojiData): ReactionTypes => {
@@ -467,17 +467,19 @@ const Actions: Component<ActionProps> = (props) => {
     <>
       <EmojiReactions event={props.event} />
       <div class="actions flex w-64 max-w-full items-center justify-between pt-1">
-        <button
-          class="shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            props.onClickReply();
-          }}
-        >
-          <span class="flex size-4">
-            <ChatBubbleLeft />
-          </span>
-        </button>
+        {props.onClickReply && (
+          <button
+            class="shrink-0 text-fg-tertiary hover:text-fg-tertiary/70"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              props.onClickReply?.();
+            }}
+          >
+            <span class="flex size-4">
+              <ChatBubbleLeft />
+            </span>
+          </button>
+        )}
         <RepostAction event={props.event} />
         <ReactionAction event={props.event} />
         <button type="button" onClick={() => setModal('ZapRequest')}>

@@ -14,6 +14,7 @@ export type PostProps = {
   content: JSX.Element;
   actions?: JSX.Element;
   footer?: JSX.Element;
+  subtitle?: JSX.Element;
   onShowProfile?: () => void;
   onShowEvent?: () => void;
 };
@@ -36,7 +37,7 @@ const Post: Component<PostProps> = (props) => {
       <div class="flex w-full gap-1">
         <button
           type="button"
-          class="author-icon size-10 shrink-0 overflow-hidden rounded"
+          class="author-icon size-10 shrink-0 overflow-hidden rounded border"
           onClick={(ev) => {
             ev.preventDefault();
             props.onShowProfile?.();
@@ -84,6 +85,7 @@ const Post: Component<PostProps> = (props) => {
                 </div>
               </span>
             </button>
+            {props.subtitle && <>{props.subtitle}</>}
             <div class="created-at shrink-0">
               <button
                 type="button"
