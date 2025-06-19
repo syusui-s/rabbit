@@ -21,8 +21,6 @@ const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps | null): UseEmoji
 
   const [popupHover, setPopupHover] = createSignal(false);
 
-  let popup: ReturnType<typeof usePopup>;
-
   const close = () => {
     setTimeout(() => {
       if (popupHover()) return;
@@ -34,7 +32,7 @@ const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps | null): UseEmoji
     popup.open();
   };
 
-  popup = usePopup(() => ({
+  const popup = usePopup(() => ({
     popup: () => (
       <Show when={props()?.emoji} keyed>
         {(emoji) => (

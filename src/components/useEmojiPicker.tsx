@@ -2,7 +2,7 @@ import { createMemo } from 'solid-js';
 
 import { Picker } from 'emoji-mart';
 
-import usePopup, { type UsePopup, type UsePopupProps } from '@/components/utils/usePopup';
+import usePopup, { type UsePopupProps } from '@/components/utils/usePopup';
 import useConfig from '@/core/useConfig';
 
 // https://github.com/missive/emoji-mart/blob/main/packages/emoji-mart/src/utils.ts#L26
@@ -25,8 +25,6 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
   const { config } = useConfig();
 
   const props = createMemo(propsProvider);
-
-  let popup: UsePopup | undefined;
 
   const pickerElement = () => {
     const customEmojis = Object.entries(config().customEmojis).map(([name, { url }]) => ({
@@ -68,7 +66,7 @@ const useEmojiPicker = (propsProvider: () => UseEmojiPickerProps) => {
     return picker as any as HTMLElement;
   };
 
-  popup = usePopup(() => ({
+  const popup = usePopup(() => ({
     position: { y: 'bottom' },
     ...props(),
     popup: () => pickerElement(),
