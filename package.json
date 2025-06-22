@@ -81,7 +81,7 @@
     "zod": "^3.23.8"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "./scripts/fix.sh"
+    "*.{js,jsx,mjs,ts,tsx,json}": "./scripts/fix.sh"
   },
   "nyc": {
     "include": [
