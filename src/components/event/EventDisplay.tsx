@@ -1,12 +1,13 @@
-import { Switch, Match, Component } from 'solid-js';
+import { Component, Match, Switch } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 // import ChannelInfo from '@/components/event/ChannelInfo';
 // eslint-disable-next-line import/no-cycle
-import Repost from '@/components/event/Repost';
+import Highlight from '@/components/event/Highlight';
 // eslint-disable-next-line import/no-cycle
+import Repost from '@/components/event/Repost';
 import TextNote from '@/components/event/TextNote';
 import EventLink from '@/components/EventLink';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -41,8 +42,11 @@ const EventDisplay: Component<EventDisplayProps> = (props) => {
           <EventLink eventId={props.event.id} kind={props.event.kind} />
         </div>
       </Match>
+      <Match when={props.event.kind === Kind.Highlights}>
+        <Highlight event={props.event} />
+      </Match>
       <Match when={props.event.kind === Kind.ShortTextNote}>
-        <TextNote event={props.event} embedding={props.actions} actions={props.actions} />
+        <TextNote event={props.event} embedding={props.embedding} actions={props.actions} />
       </Match>
       <Match when={props.event.kind === Kind.Repost}>
         <Repost event={props.event} />
