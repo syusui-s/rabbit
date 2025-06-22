@@ -34,7 +34,6 @@ export default typescriptEslint.config(
   },
   eslint.configs.recommended,
   typescriptEslintConfigs.recommended,
-  // ...compat.extends('airbnb-base'),
   pluginSolid.configs['flat/typescript'],
   pluginJsxA11Y.flatConfigs.recommended,
   ...pluginTailwindcss.configs['flat/recommended'],
