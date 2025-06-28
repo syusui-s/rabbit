@@ -1,4 +1,4 @@
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 import { z } from 'zod';
 
 import isValidId from '@/nostr/event/isValidId';

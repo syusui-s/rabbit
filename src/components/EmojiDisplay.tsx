@@ -1,4 +1,4 @@
-import { Component, Match, Switch } from 'solid-js';
+import { type Component, Match, Switch } from 'solid-js';
 
 export type EmojiTypes =
   | { type: 'Emoji'; content: string }

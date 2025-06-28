@@ -4,7 +4,7 @@ import { describe, it } from 'vitest';
 
 import Tags from '@/nostr/event/Tags';
 import parseTextNote, {
-  TagReference,
+  type TagReference,
   type ParsedTextNoteNode,
   resolveTagReference,
 } from '@/nostr/parseTextNote';

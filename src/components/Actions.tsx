@@ -23,13 +23,13 @@ import { noteEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
-import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
+import useEmojiPicker, { type EmojiData } from '@/components/useEmojiPicker';
 import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
 import { reaction } from '@/nostr/event';
-import { ReactionTypes } from '@/nostr/event/Reaction';
+import { type ReactionTypes } from '@/nostr/event/Reaction';
 import TextNote from '@/nostr/event/TextNote';
 import useDeleteMutation from '@/nostr/mutation/useDeleteMutation';
 import useReactionMutation from '@/nostr/mutation/useReactionMutation';
@@ -43,7 +43,7 @@ import { formatSiPrefix } from '@/utils/siPrefix';
 
 const EventDebugModal = lazy(() => import('@/components/modal/EventDebugModal'));
 const UserList = lazy(() => import('@/components/modal/UserList'));
-// eslint-disable-next-line import/no-cycle
+
 const ZapRequestModal = lazy(() => import('@/components/modal/ZapRequestModal'));
 
 export type ActionProps = {

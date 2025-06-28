@@ -1,4 +1,4 @@
-import { createEffect, Component, createSignal } from 'solid-js';
+import { createEffect, type Component, createSignal } from 'solid-js';
 
 import User from 'heroicons/24/outline/user.svg';
 
@@ -7,7 +7,7 @@ import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
-import { PostsColumnType } from '@/core/column';
+import { type PostsColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';

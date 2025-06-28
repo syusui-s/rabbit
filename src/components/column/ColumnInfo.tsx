@@ -1,9 +1,9 @@
-import { Component, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 
 import EllipsisVertical from 'heroicons/24/outline/ellipsis-vertical.svg';
 
 import UserDisplayName from '@/components/UserDisplayName';
-import useContextMenu, { MenuItem } from '@/components/utils/useContextMenu';
+import useContextMenu, { type MenuItem } from '@/components/utils/useContextMenu';
 import useModalState from '@/hooks/useModalState';
 
 export type ColumnInfoProps = {

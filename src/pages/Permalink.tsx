@@ -28,6 +28,7 @@ const Permalink = () => {
             showProfile(decoded.data.pubkey);
           }
         } catch (err) {
+          console.error('Failed to decode NIP-19', err);
           window.alert('Invalid ID');
           navigateTop();
         }

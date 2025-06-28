@@ -4,7 +4,7 @@ import ArrowLeft from 'heroicons/24/outline/arrow-left.svg';
 
 import TimelineContentDisplay from '@/components/timeline/TimelineContentDisplay';
 import { TimelineContext, useTimelineState } from '@/components/timeline/TimelineContext';
-import { ColumnWidth } from '@/core/column';
+import { type ColumnWidth } from '@/core/column';
 import { useHandleCommand } from '@/hooks/useCommandBus';
 import { useTranslation } from '@/i18n/useTranslation';
 

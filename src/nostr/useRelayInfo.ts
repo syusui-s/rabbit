@@ -96,7 +96,6 @@ export const fetchRelayInfo = async (relayUrl: string): Promise<RelayInfo> => {
     throw new Error('failed to fetch relay info: status was not 200');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const body = await res.json();
   if (!ensureSchema(RelayInfoSchema)(body)) {
     throw new Error('failed to fetch relay info: unexpected form of data');

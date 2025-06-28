@@ -43,7 +43,6 @@ export const useRequestMessage = <Req, Res>(propsProvider: () => UseRequestMessa
 
   const waitResponse = (requestId: string, timeoutMs = 1000): Promise<Res> =>
     new Promise((resolve, reject) => {
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       const listener = (event: MessageEvent) => {
         const data = event.data as MessageChannelResponse<Res>;
 
@@ -60,7 +59,7 @@ export const useRequestMessage = <Req, Res>(propsProvider: () => UseRequestMessa
         }
       };
 
-      timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         channel().port1.removeEventListener('message', listener);
         reject(new Error(`TimeoutError: ${requestId}`));
       }, timeoutMs);
@@ -104,7 +103,6 @@ export const useHandleMessage = <Req, Res>(
           port.postMessage(response);
         })
         .catch((err) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const response: MessageChannelResponse<Res> = { requestId, ok: false, error: err };
           port.postMessage(response);
         });

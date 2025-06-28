@@ -1,10 +1,10 @@
-import { Component, JSX, For, Show } from 'solid-js';
+import { type Component, type JSX, For, Show } from 'solid-js';
 
 import ChevronLeft from 'heroicons/24/outline/chevron-left.svg';
 import ChevronRight from 'heroicons/24/outline/chevron-right.svg';
 import Trash from 'heroicons/24/outline/trash.svg';
 
-import { ColumnType } from '@/core/column';
+import { type ColumnType } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
 import { useTranslation } from '@/i18n/useTranslation';

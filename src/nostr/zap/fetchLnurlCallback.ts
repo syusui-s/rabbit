@@ -41,7 +41,7 @@ const fetchLnurlCallback = async ({
   }
 
   const res = await fetch(callbackUrl, { mode: 'cors', redirect: 'error' });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const body = await res.json();
 
   if (ensureSchema(LnurlErrorSchema)(body)) return body;

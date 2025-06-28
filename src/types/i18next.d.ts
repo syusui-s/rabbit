@@ -1,6 +1,6 @@
 import 'i18next';
 
-import ja from '@/locales/ja';
+import type ja from '@/locales/ja';
 
 declare module 'i18next' {
   interface CustomTypeOptions {

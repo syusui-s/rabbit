@@ -1,5 +1,6 @@
-import ja from '@/locales/ja';
 import stripMargin from '@/utils/stripMargin';
+
+import type ja from '@/locales/ja';
 
 export default {
   general: {

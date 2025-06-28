@@ -1,4 +1,4 @@
-import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { type Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
 import Home from 'heroicons/24/outline/home.svg';
 import uniq from 'lodash/uniq';
@@ -8,7 +8,7 @@ import Column, { type ColumnOperator } from '@/components/column/Column';
 import ColumnSettings from '@/components/column/ColumnSettings';
 import LoadMore, { useLoadMore } from '@/components/column/LoadMore';
 import Timeline from '@/components/timeline/Timeline';
-import { FollowingColumnType } from '@/core/column';
+import { type FollowingColumnType } from '@/core/column';
 import { applyContentFilter } from '@/core/contentFilter';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';

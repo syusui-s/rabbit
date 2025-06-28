@@ -3,7 +3,7 @@ import { createSignal, type Component, type JSX, Show } from 'solid-js';
 import ExclamationTriangle from 'heroicons/24/outline/exclamation-triangle.svg';
 
 import { useTranslation } from '@/i18n/useTranslation';
-import { ContentWarning } from '@/nostr/event/TextNoteLike';
+import { type ContentWarning } from '@/nostr/event/TextNoteLike';
 
 export type ContentWarningDisplayProps = {
   contentWarning: ContentWarning;

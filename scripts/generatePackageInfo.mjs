@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import util from 'util';
 
 const readDepFile = (key, filename) =>
   fs.readFile(path.resolve(key, filename), { encoding: 'utf8' });
@@ -10,7 +9,7 @@ const getPackageInfo = async (key) => {
     const depPackageJson = await readDepFile(key, 'package.json');
     return JSON.parse(depPackageJson);
   } catch (e) {
-    console.error(`package.json for ${key} is not found.`);
+    console.error(`package.json for ${key} is not found.`, e);
     return undefined;
   }
 };
@@ -30,7 +29,7 @@ const getLicense = async (key) =>
       return undefined;
     });
 
-const generatePackages = async function (selfName) {
+const generatePackages = async function () {
   const packageLockJson = await fs.readFile('./package-lock.json', { encoding: 'utf8' });
   const packageLock = JSON.parse(packageLockJson);
 
@@ -38,7 +37,7 @@ const generatePackages = async function (selfName) {
   const result = [];
 
   const buildDependencies = async (deps) => {
-    for (const [name, _ver] of Object.entries(deps)) {
+    for (const [name] of Object.entries(deps)) {
       const key = `node_modules/${name}`;
       const dep = packageLock?.packages?.[key];
       if (dep == null) continue;

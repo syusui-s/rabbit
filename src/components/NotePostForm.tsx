@@ -6,9 +6,9 @@ import Photo from 'heroicons/24/outline/photo.svg';
 import XMark from 'heroicons/24/outline/x-mark.svg';
 import PaperAirplane from 'heroicons/24/solid/paper-airplane.svg';
 import uniq from 'lodash/uniq';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
-import useEmojiPicker, { EmojiData } from '@/components/useEmojiPicker';
+import useEmojiPicker, { type EmojiData } from '@/components/useEmojiPicker';
 import UserNameDisplay from '@/components/UserDisplayName';
 import useConfig from '@/core/useConfig';
 import useEmojiComplete from '@/hooks/useEmojiComplete';
@@ -17,7 +17,7 @@ import { type CreateTextNoteParams } from '@/nostr/builder/createTextNote';
 import { textNote } from '@/nostr/event';
 import useTextNoteMutation from '@/nostr/mutation/useTextNoteMutation';
 import useUploadFilesMutation from '@/nostr/mutation/useUploadFilesMutation';
-import parseTextNote, { ParsedTextNote } from '@/nostr/parseTextNote';
+import parseTextNote, { type ParsedTextNote } from '@/nostr/parseTextNote';
 import usePubkey from '@/nostr/usePubkey';
 import { getErrorMessage } from '@/utils/error';
 // import usePersistStatus from '@/hooks/usePersistStatus';
@@ -294,7 +294,6 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
 
     uploadFilesMutation.mutate([...files]);
 
-    // eslint-disable-next-line no-param-reassign
     ev.currentTarget.value = '';
   };
 

@@ -1,4 +1,4 @@
-import { Component, Switch, Match } from 'solid-js';
+import { type Component, Switch, Match } from 'solid-js';
 
 import useProfile from '@/nostr/useProfile';
 import npubEncodeFallback from '@/utils/npubEncodeFallback';

@@ -4,7 +4,11 @@ import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/s
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { pickLatestEvent } from '@/nostr/event/comparator';
-import { registerTask, BatchedEventsTask, ReplaceableEventTask } from '@/nostr/useBatchedEvents';
+import {
+  registerTask,
+  BatchedEventsTask,
+  type ReplaceableEventTask,
+} from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 export type UseReplaceableEventProps = {

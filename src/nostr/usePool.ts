@@ -1,7 +1,7 @@
 import { createRoot, createSignal } from 'solid-js';
 
 import { AbstractSimplePool } from 'nostr-tools/abstract-pool';
-import { AbstractRelay } from 'nostr-tools/abstract-relay';
+import { type AbstractRelay } from 'nostr-tools/abstract-relay';
 import { normalizeURL } from 'nostr-tools/utils';
 import { setNostrWasm, verifyEvent } from 'nostr-tools/wasm';
 import { initNostrWasm } from 'nostr-wasm';

@@ -1,6 +1,6 @@
 import GenericEvent from '@/nostr/event/GenericEvent';
 import isValidId from '@/nostr/event/isValidId';
-import parseTextNote, { ParsedTextNoteResolved, toResolved } from '@/nostr/parseTextNote';
+import parseTextNote, { type ParsedTextNoteResolved, toResolved } from '@/nostr/parseTextNote';
 
 export type EventMarker = 'reply' | 'root' | 'mention';
 

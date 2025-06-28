@@ -2,7 +2,6 @@ import { For } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 
-// eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 // import ParameterizedReplaceableEventDisplayById from '@/components/event/ParameterizedReplaceableEventDisplayById';
 import AudioDisplay from '@/components/event/textNote/AudioDisplay';
@@ -16,7 +15,10 @@ import useEmojiPopup from '@/components/useEmojiPopup';
 import { createRelaysColumn, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useRequestCommand } from '@/hooks/useCommandBus';
-import { ParsedTextNoteResolvedNode, type ParsedTextNoteResolved } from '@/nostr/parseTextNote';
+import {
+  type ParsedTextNoteResolvedNode,
+  type ParsedTextNoteResolved,
+} from '@/nostr/parseTextNote';
 import { isImageUrl, isVideoUrl, isAudioUrl, isWebSocketUrl } from '@/utils/url';
 
 export type TextNoteContentDisplayProps = {

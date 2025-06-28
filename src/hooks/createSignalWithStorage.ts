@@ -1,6 +1,6 @@
 import { createSignal, createEffect, onMount, type Signal } from 'solid-js';
 
-import { createStore, SetStoreFunction, type Store, type StoreNode } from 'solid-js/store';
+import { createStore, type SetStoreFunction, type Store, type StoreNode } from 'solid-js/store';
 
 type GenericStorage<T> = {
   getItem(key: string): T | null;

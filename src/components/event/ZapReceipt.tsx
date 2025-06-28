@@ -1,4 +1,4 @@
-import { Component, Show, createMemo } from 'solid-js';
+import { type Component, Show, createMemo } from 'solid-js';
 
 import Bolt from 'heroicons/24/solid/bolt.svg';
 import { type Event as NostrEvent } from 'nostr-tools/pure';

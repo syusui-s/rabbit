@@ -1,7 +1,7 @@
 import * as Kind from 'nostr-tools/kinds';
 import { type UnsignedEvent } from 'nostr-tools/pure';
 
-import { ReactionTypes } from '@/nostr/event/Reaction';
+import { type ReactionTypes } from '@/nostr/event/Reaction';
 import epoch from '@/utils/epoch';
 
 export type CreateReactionParams = {

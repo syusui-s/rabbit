@@ -47,7 +47,6 @@ const SelectableItemDisplay: Component<SelectableItemDisplayProps> = (props) => 
 };
 
 const SubMenuDisplay: Component<SubMenuDisplayProps> = (props) => {
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const contextMenuPopup = useContextMenu(() => ({
     menu: props.submenu.items,
     position: { x: 'right', y: 'bottom' },

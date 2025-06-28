@@ -1,9 +1,9 @@
-import { QueryClient, QueryKey } from '@tanstack/solid-query';
+import { type QueryClient, type QueryKey } from '@tanstack/solid-query';
 import uniqBy from 'lodash/uniqBy';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { compareEvents, pickLatestEvent, sortEvents } from '@/nostr/event/comparator';
-import { BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
+import { type BatchedEventsTask, registerTask } from '@/nostr/useBatchedEvents';
 import timeout from '@/utils/timeout';
 
 const chooseLatestEvent = (

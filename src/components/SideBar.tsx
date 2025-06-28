@@ -5,7 +5,7 @@ import {
   onCleanup,
   lazy,
   type JSX,
-  Component,
+  type Component,
   For,
   createMemo,
 } from 'solid-js';
@@ -13,7 +13,7 @@ import {
 import {
   DragDropProvider,
   DragDropSensors,
-  DragEventHandler,
+  type DragEventHandler,
   SortableProvider,
   createSortable,
   closestCenter,
@@ -32,12 +32,12 @@ import Plus from 'heroicons/24/outline/plus.svg';
 import User from 'heroicons/24/outline/user.svg';
 import Users from 'heroicons/24/outline/users.svg';
 import PencilSquare from 'heroicons/24/solid/pencil-square.svg';
-import { ParseKeys } from 'i18next';
+import { type ParseKeys } from 'i18next';
 import throttle from 'lodash/throttle';
 
 import NotePostForm from '@/components/NotePostForm';
-import usePopup, { type UsePopup } from '@/components/utils/usePopup';
-import { ColumnType, createSearchColumn } from '@/core/column';
+import usePopup from '@/components/utils/usePopup';
+import { type ColumnType, createSearchColumn } from '@/core/column';
 import useConfig from '@/core/useConfig';
 import { useHandleCommand, useRequestCommand } from '@/hooks/useCommandBus';
 import useModalState from '@/hooks/useModalState';
@@ -72,8 +72,6 @@ const SearchButton = () => {
   const request = useRequestCommand();
   const [query, setQuery] = createSignal('');
 
-  let popup: UsePopup;
-
   const handleSearchSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
     ev.preventDefault();
 
@@ -83,7 +81,7 @@ const SearchButton = () => {
     setQuery('');
   };
 
-  popup = usePopup(() => ({
+  const popup = usePopup(() => ({
     popup: (
       <form
         class="flex w-72 items-center gap-1 rounded-md border border-border bg-bg p-4 shadow-md"
@@ -164,7 +162,6 @@ const columns: Readonly<Record<ColumnKind, { icon: string /* svg */; nameKey: Pa
 const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) => {
   const i18n = useTranslation();
 
-  // eslint-disable-next-line no-unused-vars
   const sortable = createSortable(props.column.id);
 
   const request = useRequestCommand();

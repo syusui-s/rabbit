@@ -4,7 +4,7 @@ import * as Kind from 'nostr-tools/kinds';
 import { describe, it } from 'vitest';
 
 import TextNote from '@/nostr/event/TextNote';
-import { MarkedEventTag, markedEventTags } from '@/nostr/event/TextNoteLike';
+import { type MarkedEventTag, markedEventTags } from '@/nostr/event/TextNoteLike';
 
 describe('markedEventTags', () => {
   it('should return an empty array if the event has no tags', () => {

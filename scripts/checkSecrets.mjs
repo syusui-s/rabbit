@@ -7,7 +7,6 @@
  */
 import fs from 'fs/promises';
 import path from 'path';
-import util from 'util';
 
 const rootDir = path.resolve();
 const pattern = /nsec1[0-9a-zA-Z]+/;

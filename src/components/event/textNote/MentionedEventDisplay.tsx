@@ -2,7 +2,6 @@ import { Show } from 'solid-js';
 
 import * as Kind from 'nostr-tools/kinds';
 
-// eslint-disable-next-line import/no-cycle
 import EventDisplayById from '@/components/event/EventDisplayById';
 import EventLink from '@/components/EventLink';
 import LazyLoad from '@/components/utils/LazyLoad';

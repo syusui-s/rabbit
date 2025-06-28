@@ -1,4 +1,4 @@
-import { createSignal, For, JSX, Show } from 'solid-js';
+import { createSignal, For, type JSX, Show } from 'solid-js';
 
 import XMark from 'heroicons/24/outline/x-mark.svg';
 

@@ -54,7 +54,6 @@ export const parseLnurlEndpointMetadata = (
   metadataString: string,
 ): LnurlEndpointMetadata | null => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const metadata = JSON.parse(metadataString);
     if (!ensureSchema(RawLnurlEndpointMetadataSchema)(metadata)) return null;
 
@@ -86,7 +85,6 @@ export const parseLnurlEndpointMetadata = (
 const fetchLnurlEndpoint = async (lnurl: string): Promise<LnurlEndpoint | LnurlError> => {
   const res = await fetch(lnurl, { mode: 'cors', redirect: 'error' });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const body = await res.json();
   if (ensureSchema(LnurlErrorSchema)(body)) return body;
 

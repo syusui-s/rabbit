@@ -1,5 +1,6 @@
-import TagsBase from '@/nostr/event/TagsBase';
-import { AbstractConstructorOf } from '@/utils/typeUtils';
+import { type AbstractConstructorOf } from '@/utils/typeUtils';
+
+import type TagsBase from '@/nostr/event/TagsBase';
 
 const NostrSetTagsMixIn = <TBase extends AbstractConstructorOf<TagsBase>>(Base: TBase) => {
   abstract class NostrSetBase extends Base {

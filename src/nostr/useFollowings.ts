@@ -1,11 +1,11 @@
 import { createMemo } from 'solid-js';
 
 import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
-import { Event as NostrEvent } from 'nostr-tools/pure';
+import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { genericEvent } from '@/nostr/event';
 import { latestEventQuery } from '@/nostr/query';
-import { BatchedEventsTask, FollowingsTask, registerTask } from '@/nostr/useBatchedEvents';
+import { BatchedEventsTask, type FollowingsTask, registerTask } from '@/nostr/useBatchedEvents';
 
 type Following = {
   pubkey: string;

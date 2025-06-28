@@ -1,9 +1,9 @@
-import { Component, Match, Switch } from 'solid-js';
+import { type Component, Match, Switch } from 'solid-js';
 
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 
 import EmojiDisplay, { type EmojiTypes } from '@/components/EmojiDisplay';
-import { ReactionTypes } from '@/nostr/event/Reaction';
+import { type ReactionTypes } from '@/nostr/event/Reaction';
 
 export type ReactionEmojiDisplayProps = {
   reactionTypes: ReactionTypes;
