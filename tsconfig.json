@@ -20,14 +20,6 @@
     },
     "incremental": true
   },
-  "include": [
-    "vite.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "**/*.mjs",
-    "./.eslintrc.js"
-  ],
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -21,9 +21,14 @@ export default typescriptEslint.config(
         ...globals.browser,
         ...globals.node,
       },
-      parser: typescriptEslintParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
+    },
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: typescriptEslintParser,
       parserOptions: {
         project: './tsconfig.json',
         ecmaFeatures: {
@@ -36,18 +41,18 @@ export default typescriptEslint.config(
   typescriptEslintConfigs.recommended,
   pluginSolid.configs['flat/typescript'],
   pluginJsxA11Y.flatConfigs.recommended,
+  pluginImport.flatConfigs.recommended,
+  pluginImport.flatConfigs.typescript,
   ...pluginTailwindcss.configs['flat/recommended'],
   configPrettier,
   {
-    files: ['**/*.{ts,tsx,js,jsx,mjs}'],
-    extends: [pluginImport.flatConfigs.recommended, pluginImport.flatConfigs.typescript],
     plugins: {
       'no-relative-import-paths': pluginNoRelativeImportPaths,
     },
     settings: {
       'import/resolver': {
         typescript: {
-          extensions: ['.mjs', '.js', '.json', '.ts', '.tsx', '.d.ts'],
+          extensions: ['.json', '.ts', '.tsx', '.d.ts'],
         },
       },
       'jsx-a11y': {
@@ -157,7 +162,6 @@ export default typescriptEslint.config(
     },
   },
   {
-    name: 'test',
     files: ['**/*.test.ts'],
     rules: {
       'func-names': 'off',
