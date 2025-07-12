@@ -50,7 +50,7 @@ export const buildTags = ({
   }
 
   if (hashtags != null) {
-    hashtags.forEach((tag) => otherTags.push(['t', tag]));
+    hashtags.forEach((tag) => otherTags.push(['t', tag.toLowerCase()]));
   }
 
   if (urls != null) {

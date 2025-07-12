@@ -64,4 +64,15 @@ describe('buildTags', () => {
 
     assert.deepStrictEqual(actual, expect);
   });
+
+  it('should lowercase hashtags in the t tag', () => {
+    const hashtags = ['Nostr', 'TestTag', 'MIXEDcase'];
+    const actual = buildTags({ hashtags });
+    const expect = [
+      ['t', 'nostr'],
+      ['t', 'testtag'],
+      ['t', 'mixedcase'],
+    ];
+    assert.deepStrictEqual(actual, expect);
+  });
 });
