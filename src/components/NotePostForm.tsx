@@ -48,6 +48,8 @@ const extract = (parsed: ParsedTextNote) => {
         pubkeyReferences.push(node.data.data);
       } else if (node.data.type === 'note') {
         eventReferences.push(node.data.data);
+      } else if (node.data.type === 'nevent') {
+        eventReferences.push(node.data.data.id);
       }
       // TODO nevent can contain an event not only textnote (kind:1).
       // In my understanding, it is not allowed to include other kinds of events in `tags`.

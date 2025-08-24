@@ -19,7 +19,7 @@ import HeartOutlined from 'heroicons/24/outline/heart.svg';
 import Plus from 'heroicons/24/outline/plus.svg';
 import HeartSolid from 'heroicons/24/solid/heart.svg';
 import * as Kind from 'nostr-tools/kinds';
-import { noteEncode } from 'nostr-tools/nip19';
+import { neventEncode } from 'nostr-tools/nip19';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import ReactionEmojiDisplay, { reactionTypesToEmojiTypes } from '@/components/ReactionEmojiDisplay';
@@ -403,7 +403,7 @@ const Actions: Component<ActionProps> = (props) => {
         content: i18n.t('post.copyEventId'),
         onSelect: () => {
           navigator.clipboard
-            .writeText(noteEncode(props.event.id))
+            .writeText(neventEncode({ id: props.event.id }))
             .catch((err) => window.alert(err));
         },
       },
