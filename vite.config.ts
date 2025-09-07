@@ -1,4 +1,5 @@
 /* eslint import/no-extraneous-dependencies: 0 */
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import solidPlugin from 'vite-plugin-solid';
@@ -8,6 +9,7 @@ export default defineConfig({
   plugins: [
     solidPlugin(),
     solidSvg(),
+    tailwindcss(),
     nodePolyfills({
       include: ['buffer', 'stream'],
     }),

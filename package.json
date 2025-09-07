@@ -4,6 +4,7 @@
   "description": "",
   "license": "AGPL-3.0-or-later",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "npm run generatePackageInfo && vite",
     "dev": "npm run generatePackageInfo && vite",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
+    "@tailwindcss/vite": "^4.1.13",
     "@types/jsdom": "^21.1.7",
     "@types/qrcode": "^1.5.5",
     "autoprefixer": "^10.4.21",
@@ -41,7 +43,6 @@
     "jsdom": "^26.1.0",
     "license-checker": "^25.0.1",
     "lint-staged": "^16.1.5",
-    "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "^5.9.2",
