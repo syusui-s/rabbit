@@ -1,141 +1,143 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
-@theme {
-  --color-fg: var(--color-fg);
-  --color-fg-secondary: var(--color-fg-secondary);
-  --color-fg-tertiary: var(--color-fg-tertiary);
-  --color-bg: var(--color-bg);
-  --color-bg-secondary: var(--color-bg-secondary);
-  --color-bg-tertiary: var(--color-bg-tertiary);
-  --color-border: var(--color-border);
-  --color-primary: var(--color-primary);
-  --color-primary-disabled: var(--color-primary-disabled);
-  --color-primary-hover: var(--color-primary-hover);
-  --color-primary-fg: var(--color-primary-fg);
-  --color-danger: var(--color-danger);
-  --color-danger-fg: var(--color-danger-fg);
-  --color-link: var(--color-link);
-  --color-r-sidebar: var(--color-r-sidebar);
-  --color-r-reaction: var(--color-r-reaction);
-  --color-r-repost: var(--color-r-repost);
-  --color-r-zap: var(--color-r-zap);
+@theme inline {
+  --color-fg: rgb(var(--rgb-fg));
+  --color-fg-secondary: rgb(var(--rgb-fg-secondary));
+  --color-fg-tertiary: rgb(var(--rgb-fg-tertiary));
+  --color-bg: rgb(var(--rgb-bg));
+  --color-bg-secondary: rgb(var(--rgb-bg-secondary));
+  --color-bg-tertiary: rgb(var(--rgb-bg-tertiary));
+  --color-border: rgb(var(--rgb-border));
+  --color-primary: rgb(var(--rgb-primary));
+  --color-primary-disabled: rgb(var(--rgb-primary-disabled));
+  --color-primary-hover: rgb(var(--rgb-primary-hover));
+  --color-primary-fg: rgb(var(--rgb-primary-fg));
+  --color-danger: rgb(var(--rgb-danger));
+  --color-link: rgb(var(--rgb-link));
+  --color-r-sidebar: rgb(var(--rgb-r-sidebar));
+  --color-r-reaction: rgb(var(--rgb-r-reaction));
+  --color-r-repost: rgb(var(--rgb-r-repost));
+  --color-r-zap: rgb(var(--rgb-r-zap));
 }
 
 /* LIGHT Sakura */
 .theme-sakura {
-  --color-fg: rgb(38 25 23);
-  --color-fg-secondary: rgb(87 83 78);
-  --color-fg-tertiary: rgb(168 162 158);
-  --color-bg: rgb(255 255 255);
-  --color-bg-secondary: rgb(168 162 158);
-  --color-bg-tertiary: rgb(235 235 233);
-  --color-primary: rgb(253 164 175);
-  --color-primary-fg: rgb(255 255 255);
-  --color-primary-disabled: rgb(254 205 211);
-  --color-primary-hover: rgb(254 126 142);
-  --color-danger: rgb(244 63 94);
-  --color-link: rgb(59 130 246);
-  --color-border: rgb(231 229 228);
-  --color-r-sidebar: rgb(255 228 230);
-  --color-r-reaction: rgb(251 113 133);
-  --color-r-repost: rgb(74 222 128);
-  --color-r-zap: rgb(255 193 0);
-  --color-scroll-thumb: rgb(254 205 211);
-  --color-scroll-bg: rgb(255 255 255 / 0.7);
+  --rgb-fg: 38 25 23;
+  --rgb-fg-secondary: 87 83 78;
+  --rgb-fg-tertiary: 168 162 158;
+  --rgb-bg: 255 255 255;
+  --rgb-bg-secondary: 168 162 158;
+  --rgb-bg-tertiary: 235 235 233;
+  --rgb-primary: 253 164 175;
+  --rgb-primary-fg: 255 255 255;
+  --rgb-primary-disabled: 254 205 211;
+  --rgb-primary-hover: 254 126 142;
+  --rgb-danger: 244 63 94;
+  --rgb-link: 59 130 246;
+  --rgb-border: 231 229 228;
+  --rgb-r-sidebar: 255 228 230;
+  --rgb-r-reaction: 251 113 133;
+  --rgb-r-repost: 74 222 128;
+  --rgb-r-zap: 255 193 0;
+  --rgb-scroll-thumb: 254 205 211;
+  --rgb-scroll-bg: 255 255 255;
+  --opacity-scroll-bg: 0.7;
 }
 
 /* LIGHT Cinnamon */
 .theme-cinnamon {
-  --color-fg: rgb(70 20 20);
-  --color-fg-secondary: rgb(87 80 58);
-  --color-fg-tertiary: rgb(168 162 158);
-  --color-bg: rgb(234 220 211);
-  --color-bg-secondary: rgb(168 162 158);
-  --color-bg-tertiary: rgb(220 205 190);
-  --color-primary: rgb(77 57 56);
-  --color-primary-fg: rgb(255 250 225);
-  --color-primary-disabled: rgb(100 90 90);
-  --color-primary-hover: rgb(52 10 10);
-  --color-danger: rgb(244 63 94);
-  --color-link: rgb(74 149 188);
-  --color-border: rgb(215 198 189);
-  --color-r-sidebar: rgb(155 125 110);
-  --color-r-reaction: rgb(249 110 130);
-  --color-r-repost: rgb(0 190 0);
-  --color-r-zap: rgb(242 183 0);
-  --color-scroll-thumb: rgb(49 38 38);
-  --color-scroll-bg: rgb(245 235 222 / 0.7);
+  --rgb-fg: 70 20 20;
+  --rgb-fg-secondary: 87 80 58;
+  --rgb-fg-tertiary: 168 162 158;
+  --rgb-bg: 234 220 211;
+  --rgb-bg-secondary: 168 162 158;
+  --rgb-bg-tertiary: 220 205 190;
+  --rgb-primary: 77 57 56;
+  --rgb-primary-fg: 255 250 225;
+  --rgb-primary-disabled: 100 90 90;
+  --rgb-primary-hover: 52 10 10;
+  --rgb-danger: 244 63 94;
+  --rgb-link: 74 149 188;
+  --rgb-border: 215 198 189;
+  --rgb-r-sidebar: 155 125 110;
+  --rgb-r-reaction: 249 110 130;
+  --rgb-r-repost: 0 190 0;
+  --rgb-r-zap: 242 183 0;
+  --rgb-scroll-thumb: 49 38 38;
+  --rgb-scroll-bg: 245 235 222;
+  --opacity-scroll-bg: 0.7;
 }
 
 /* DARK Yozakura */
 .theme-yozakura {
-  --color-fg: rgb(255 235 235);
-  --color-fg-secondary: rgb(220 180 180);
-  --color-fg-tertiary: rgb(160 130 130);
-  --color-bg: rgb(35 27 33);
-  --color-bg-secondary: rgb(50 40 50);
-  --color-bg-tertiary: rgb(63 40 50);
-  --color-primary: rgb(217 121 133);
-  --color-primary-fg: var(--color-fg);
-  --color-primary-disabled: rgb(158 93 102);
-  --color-primary-hover: rgb(220 110 120);
-  --color-danger: rgb(244 63 94);
-  --color-link: rgb(104 91 247);
-  --color-border: rgb(70 50 60);
-  --color-r-sidebar: rgb(35 27 33);
-  --color-r-reaction: rgb(251 113 133);
-  --color-r-repost: rgb(139 191 67);
-  --color-r-zap: rgb(251 191 36);
-  --color-scroll-thumb: var(--color-fg-secondary);
-  --color-scroll-bg: var(--color-bg-tertiary);
+  --rgb-fg: 255 235 235;
+  --rgb-fg-secondary: 220 180 180;
+  --rgb-fg-tertiary: 160 130 130;
+  --rgb-bg: 35 27 33;
+  --rgb-bg-secondary: 50 40 50;
+  --rgb-bg-tertiary: 63 40 50;
+  --rgb-primary: 217 121 133;
+  --rgb-primary-fg: 255 235 235;
+  --rgb-primary-disabled: 158 93 102;
+  --rgb-primary-hover: 220 110 120;
+  --rgb-danger: 244 63 94;
+  --rgb-link: 104 91 247;
+  --rgb-border: 70 50 60;
+  --rgb-r-sidebar: 35 27 33;
+  --rgb-r-reaction: 251 113 133;
+  --rgb-r-repost: 139 191 67;
+  --rgb-r-zap: 251 191 36;
+  --rgb-scroll-thumb: 220 180 180;
+  --rgb-scroll-bg: 63 40 50;
 }
 
 /* DARK Midnight Blue */
 /* Thank to https://gist.github.com/kaosf/d8f58ade388f7328d0b5b6a12e5a14c8 */
 .theme-midnight-blue {
-  --color-fg: rgb(199 199 199);
-  --color-fg-secondary: rgb(156 156 156);
-  --color-fg-tertiary: rgb(168 168 168);
-  --color-bg: rgb(32 39 50);
-  --color-bg-secondary: rgb(37 42 51);
-  --color-bg-tertiary: rgb(52 65 84);
-  --color-primary: rgb(220 220 220);
-  --color-primary-fg: rgb(32 39 50);
-  --color-primary-disabled: rgb(150 150 150);
-  --color-primary-hover: rgb(255 255 255);
-  --color-danger: rgb(244 63 94);
-  --color-link: rgb(119 112 240);
-  --color-border: rgb(64 69 77);
-  --color-r-sidebar: rgb(32 39 50);
-  --color-r-reaction: rgb(249 110 130);
-  --color-r-repost: rgb(0 190 0);
-  --color-r-zap: rgb(251 191 36);
-  --color-scroll-thumb: rgb(102 102 102);
-  --color-scroll-bg: rgb(136 136 136 / 0.1);
+  --rgb-fg: 199 199 199;
+  --rgb-fg-secondary: 156 156 156;
+  --rgb-fg-tertiary: 168 168 168;
+  --rgb-bg: 32 39 50;
+  --rgb-bg-secondary: 37 42 51;
+  --rgb-bg-tertiary: 52 65 84;
+  --rgb-primary: 220 220 220;
+  --rgb-primary-fg: 32 39 50;
+  --rgb-primary-disabled: 150 150 150;
+  --rgb-primary-hover: 255 255 255;
+  --rgb-danger: 244 63 94;
+  --rgb-link: 119 112 240;
+  --rgb-border: 64 69 77;
+  --rgb-r-sidebar: 32 39 50;
+  --rgb-r-reaction: 249 110 130;
+  --rgb-r-repost: 0 190 0;
+  --rgb-r-zap: 251 191 36;
+  --rgb-scroll-thumb: 102 102 102;
+  --rgb-scroll-bg: 136 136 136;
+  --opacity-scroll-bg: 0.1;
 }
 
 /* DARK Black */
 .theme-black {
-  --color-fg: rgb(255 250 250);
-  --color-fg-secondary: rgb(160 160 160);
-  --color-fg-tertiary: rgb(130 130 130);
-  --color-bg: rgb(0 0 0);
-  --color-bg-secondary: rgb(20 20 20);
-  --color-bg-tertiary: rgb(30 30 30);
-  --color-primary: rgb(255 255 255);
-  --color-primary-fg: rgb(0 0 0);
-  --color-primary-disabled: rgb(160 160 160);
-  --color-primary-hover: rgb(230 230 230);
-  --color-danger: rgb(244 63 94);
-  --color-link: rgb(59 130 246);
-  --color-border: rgb(60 60 70);
-  --color-r-sidebar: rgb(0 0 0);
-  --color-r-reaction: rgb(251 113 133);
-  --color-r-repost: rgb(74 222 128);
-  --color-r-zap: rgb(251 191 36);
-  --color-scroll-thumb: var(--color-fg-secondary);
-  --color-scroll-bg: var(--color-bg-tertiary);
+  --rgb-fg: 255 250 250;
+  --rgb-fg-secondary: 160 160 160;
+  --rgb-fg-tertiary: 130 130 130;
+  --rgb-bg: 0 0 0;
+  --rgb-bg-secondary: 20 20 20;
+  --rgb-bg-tertiary: 30 30 30;
+  --rgb-primary: 255 255 255;
+  --rgb-primary-fg: 0 0 0;
+  --rgb-primary-disabled: 160 160 160;
+  --rgb-primary-hover: 230 230 230;
+  --rgb-danger: 244 63 94;
+  --rgb-link: 59 130 246;
+  --rgb-border: 60 60 70;
+  --rgb-r-sidebar: 0 0 0;
+  --rgb-r-reaction: 251 113 133;
+  --rgb-r-repost: 74 222 128;
+  --rgb-r-zap: 251 191 36;
+  --rgb-scroll-thumb: 160 160 160;
+  --rgb-scroll-bg: 30 30 30;
 }
 
 @layer base { 
@@ -159,19 +161,19 @@ code {
 }
 
 em-emoji-picker {
-  --background-rgb: 85, 170, 255;
+  --background-rgb: 85 170 255;
   --border-radius: 8px;
-  --color-border-over: rgba(0, 0, 0, 0.3);
-  --color-border: rgba(0, 0, 0, 0.2);
+  --color-border-over: rgba(0 0 0, 0.3);
+  --color-border: rgba(0 0 0, 0.2);
   --category-icon-size: 20px;
   --font-size: 14px;
-  --rgb-accent: var(--color-primary);
-  --rgb-background: var(--color-bg);
-  --rgb-color: var(--color-fg);
-  --rgb-input: var(--color-bg);
+  --rgb-accent: var(--rgb-primary);
+  --rgb-background: var(--rgb-bg);
+  --rgb-color: var(--rgb-fg);
+  --rgb-input: var(--rgb-bg);
   --shadow: 0 8px 8px -8px #000;
 
-  border: 1px solid rgba(var(--color-border));
+  border: 1px solid rgb(var(--rgb-border));
   height: 50vh;
   min-height: 400px;
   max-height: 800px;
@@ -180,7 +182,7 @@ em-emoji-picker {
 }
 
 .scrollbar {
-  scrollbar-color: rgb(var(--color-scroll-thumb)) rgb(var(--color-scroll-bg));
+  scrollbar-color: rgb(var(--rgb-scroll-thumb)) rgba(var(--rgb-scroll-bg) / var(--opacity-scroll-bg, 1));
 }
 
 /* For Chrome <=120 */
@@ -191,14 +193,14 @@ em-emoji-picker {
   height: 10px;
 }
 .scrollbar::-webkit-scrollbar {
-  background-color: rgb(var(--color-scroll-bg));
+  background-color: rgba(var(--rgb-scroll-bg) / var(--opacity-scroll-bg, 1));
 }
 .scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgb(var(--color-scroll-thumb));
+  background-color: rgb(var(--rgb-scroll-thumb));
   border-radius: 2px;
 }
 .scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(var(--color-scroll-thumb) / 0.5);
+  background-color: rgba(var(--rgb-scroll-thumb) / 0.5);
 }
 
 .webkit-touch-callout-none {
