@@ -1,3 +1,12 @@
+export const isAbsoluteUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString); // Relative URL will cause a TypeError.
+    return /^https?:$/.test(url.protocol);
+  } catch {
+    return false;
+  }
+};
+
 export const isImageUrl = (urlString: string): boolean => {
   try {
     const url = new URL(urlString);

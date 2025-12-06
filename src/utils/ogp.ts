@@ -1,5 +1,7 @@
 import { createQuery } from '@tanstack/solid-query';
 
+import { isAbsoluteUrl } from '@/utils/url';
+
 const directAccessHosts = ['www3.nhk.or.jp'];
 
 export type OgpContent = {
@@ -62,10 +64,10 @@ export const parseOgpFromDOM = (doc: Document, urlString: string): OgpContent | 
   // Optional
   const description = props['og:description'] || props['twitter:description'] || '';
 
-  if (image && title && url) {
-    return { title, description, image, url } satisfies OgpContent;
-  }
-  return null;
+  if (!(image && title && url)) return null;
+  if (!(isAbsoluteUrl(image) && isAbsoluteUrl(url))) return null;
+
+  return { title, description, image, url } satisfies OgpContent;
 };
 
 export const parseOgp = (text: string, urlString: string): OgpContent | null => {

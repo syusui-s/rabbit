@@ -1,8 +1,9 @@
-import { type Component, createSignal, Show } from 'solid-js';
+import { type Component } from 'solid-js';
 
-import LazyLoad from '@/components/utils/LazyLoad';
+import MediaDisplay from '@/components/event/textNote/MediaDisplay';
 import SafeLink from '@/components/utils/SafeLink';
 import { useTranslation } from '@/i18n/useTranslation';
+
 
 type AudioDisplayProps = {
   url: string;
@@ -11,31 +12,25 @@ type AudioDisplayProps = {
 
 const AudioDisplay: Component<AudioDisplayProps> = (props) => {
   const i18n = useTranslation();
-  const [hidden, setHidden] = createSignal(props.initialHidden);
 
   return (
-    <Show
-      when={!hidden()}
-      fallback={
-        <button
-          class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
-          onClick={() => setHidden(false)}
-        >
-          {i18n.t('post.showAudio')}
-        </button>
+    <MediaDisplay
+      initialHidden={props.initialHidden}
+      placeholder={
+        <div class="max-w-full">
+          <SafeLink class="text-link underline" href={props.url} />
+        </div>
       }
+      fallback={<SafeLink class="text-link underline" href={props.url} />}
+      showButtonText={i18n.t('post.showAudio')}
     >
-      <LazyLoad fallback={<div class="max-w-full" />}>
-        {() => (
-          <SafeLink class="my-2 block" href={props.url}>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <audio src={props.url} controls>
-              <a href={props.url}>{i18n.t('post.download')}</a>
-            </audio>
-          </SafeLink>
-        )}
-      </LazyLoad>
-    </Show>
+      {(mediaProps) => (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <audio src={props.url} controls onError={mediaProps.error}>
+          <a href={props.url}>{i18n.t('post.download')}</a>
+        </audio>
+      )}
+    </MediaDisplay>
   );
 };
 
