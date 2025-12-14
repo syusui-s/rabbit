@@ -182,14 +182,14 @@ const ColumnButton: Component<{ column: ColumnType; index: number }> = (props) =
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       use:sortable
-      class="relative flex w-full touch-none select-none flex-col items-center py-3 text-primary hover:text-primary-hover"
+      class="relative flex w-full touch-none flex-col items-center py-3 text-primary select-none hover:text-primary-hover"
       onClick={() => jumpToColumn()}
       title={props.column.name ?? i18n.t(columnNameKey())}
     >
       <span class="inline-block size-6">
         <Icon />
       </span>
-      <span class="absolute bottom-2 right-0 text-xs text-primary">{props.index}</span>
+      <span class="absolute right-0 bottom-2 text-xs text-primary">{props.index}</span>
     </button>
   );
 };
@@ -229,7 +229,7 @@ const ColumnButtons: Component = () => {
   };
 
   return (
-    <div class="scrollbar flex w-full grow overflow-y-auto overflow-x-hidden border-y border-primary/30 px-2">
+    <div class="scrollbar flex w-full grow overflow-x-hidden overflow-y-auto border-y border-primary/30 px-2">
       <div class="size-full flex-col items-center justify-center py-2">
         <DragDropProvider onDragEnd={handleDragEnd} collisionDetector={closestCenter}>
           <DragDropSensors />

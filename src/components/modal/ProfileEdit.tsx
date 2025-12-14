@@ -140,7 +140,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             <img src={banner()} alt="header" class="size-full object-cover" />
           </div>
         </Show>
-        <div class="ml-4 mt-[-64px] size-28 rounded-lg shadow-md">
+        <div class="mt-[-64px] ml-4 size-28 rounded-lg shadow-md">
           <Show when={picture().length > 0}>
             <img src={picture()} alt="user icon" class="size-full rounded-lg object-cover" />
           </Show>
@@ -287,7 +287,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
                   {([key, value]) => (
                     <div class="flex flex-col items-start">
                       <span class="text-sm font-bold">{key}</span>
-                      <span class="whitespace-pre-wrap break-all text-sm">{value}</span>
+                      <span class="text-sm break-all whitespace-pre-wrap">{value}</span>
                     </div>
                   )}
                 </For>

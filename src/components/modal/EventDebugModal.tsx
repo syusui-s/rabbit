@@ -25,7 +25,7 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
     <BasicModal onClose={props.onClose}>
       <div class="p-4">
         <h2 class="text-lg font-bold">Event JSON</h2>
-        <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-4 text-xs">
+        <pre class="rounded-lg border border-border p-4 text-xs break-all whitespace-pre-wrap">
           {json()}
         </pre>
         <div class="flex justify-end">
@@ -35,7 +35,7 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
       <Show when={props.extra}>
         <div class="p-4">
           <h2 class="text-lg font-bold">Extra</h2>
-          <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-4 text-xs">
+          <pre class="rounded-lg border border-border p-4 text-xs break-all whitespace-pre-wrap">
             {props.extra}
           </pre>
         </div>
@@ -43,7 +43,7 @@ const EventDebugModal: Component<EventDebugModalProps> = (props) => {
       <div class="p-4">
         <h2 class="text-lg font-bold">Found in these relays</h2>
         <p>If this is empty, it is from the cache.</p>
-        <pre class="whitespace-pre-wrap break-all rounded-lg border border-border p-2 text-xs">
+        <pre class="rounded-lg border border-border p-2 text-xs break-all whitespace-pre-wrap">
           {seenOn()}
         </pre>
       </div>

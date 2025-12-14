@@ -32,7 +32,7 @@ const Repost: Component<RepostProps> = (props) => {
         </div>
         <div class="notification-user flex min-w-0 flex-1 overflow-hidden text-xs">
           <button
-            class="select-text truncate hover:text-link hover:underline"
+            class="truncate select-text hover:text-link hover:underline"
             onClick={() => showProfile(props.event.pubkey)}
           >
             <UserDisplayName pubkey={props.event.pubkey} />

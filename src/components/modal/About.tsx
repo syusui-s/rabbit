@@ -115,7 +115,7 @@ const About: Component<AboutProps> = (props) => {
         <For each={packageInfo()?.packages ?? []}>
           {(p) => (
             <>
-              <h3 class="mb-2 mt-4 font-mono">
+              <h3 class="mt-4 mb-2 font-mono">
                 {p.name}@{p.version} ({p.licenseSpdx})
               </h3>
               <pre class="scrollbar max-h-96 overflow-auto rounded bg-bg-tertiary p-4 text-xs">

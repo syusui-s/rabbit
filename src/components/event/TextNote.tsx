@@ -85,7 +85,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
                 <For each={event().taggedPubkeys()}>
                   {(replyToPubkey: string) => (
                     <button
-                      class="select-text pr-1 text-link hover:underline"
+                      class="pr-1 text-link select-text hover:underline"
                       onClick={(ev) => {
                         ev.stopPropagation();
                         showProfile(replyToPubkey);
@@ -99,7 +99,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
               </div>
             </Show>
             <ContentWarningDisplay contentWarning={event().contentWarning()}>
-              <div class="content whitespace-pre-wrap break-words">
+              <div class="content break-words whitespace-pre-wrap">
                 <TextNoteContentDisplay
                   parsed={event().parsed()}
                   embedding={embedding()}

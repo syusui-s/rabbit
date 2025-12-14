@@ -4,7 +4,6 @@ import MediaDisplay from '@/components/event/textNote/MediaDisplay';
 import SafeLink from '@/components/utils/SafeLink';
 import { useTranslation } from '@/i18n/useTranslation';
 
-
 type AudioDisplayProps = {
   url: string;
   initialHidden: boolean;

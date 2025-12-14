@@ -64,7 +64,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           if (isWebSocketUrl(item.content)) {
             return (
               <button
-                class="select-text text-link underline"
+                class="text-link underline select-text"
                 onClick={() => addRelayColumn(item.content)}
               >
                 {item.content}
@@ -118,7 +118,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'HashTag') {
           return (
             <button
-              class="select-text text-link underline"
+              class="text-link underline select-text"
               onClick={() => addHashTagColumn(item.content)}
             >
               {item.content}

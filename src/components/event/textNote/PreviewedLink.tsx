@@ -98,7 +98,7 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
               <div class="mb-1 overflow-hidden p-1">
                 <div class="text-xs text-fg-secondary">{new URL(ogpProps.url).host}</div>
                 <div class="text-sm">{ogpProps.title}</div>
-                <div class="max-h-16 truncate whitespace-normal break-all text-xs text-fg-secondary">
+                <div class="max-h-16 truncate text-xs break-all whitespace-normal text-fg-secondary">
                   {ogpProps.description}
                 </div>
               </div>

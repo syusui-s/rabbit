@@ -21,7 +21,7 @@ const MediaDisplay: Component<MediaDisplayProps> = (props) => {
       when={!hidden()}
       fallback={
         <button
-          class="bg-bg-tertiary text-fg-secondary rounded p-3 text-xs hover:shadow"
+          class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
           onClick={() => setHidden(false)}
         >
           {props.showButtonText}

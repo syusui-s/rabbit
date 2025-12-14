@@ -5,7 +5,6 @@ import SafeLink from '@/components/utils/SafeLink';
 import { useTranslation } from '@/i18n/useTranslation';
 import { thumbnailUrl } from '@/utils/url';
 
-
 type ImageDisplayProps = {
   url: string;
   initialHidden: boolean;

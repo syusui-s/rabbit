@@ -61,7 +61,7 @@ const Post: Component<PostProps> = (props) => {
           <div class="flex justify-between gap-1 text-xs">
             <button
               type="button"
-              class="author flex min-w-0 select-text truncate hover:text-link"
+              class="author flex min-w-0 truncate select-text hover:text-link"
               onClick={(ev) => {
                 ev.preventDefault();
                 props?.onShowProfile?.();

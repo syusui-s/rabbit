@@ -255,7 +255,7 @@ const ReactionsModal: Component<{ event: NostrEvent; onClose: () => void }> = (p
       data={reactions()}
       pubkeyExtractor={(ev) => ev.pubkey}
       renderInfo={(ev) => (
-        <div class="h-4 min-w-4 max-w-8">
+        <div class="h-4 max-w-8 min-w-4">
           <ReactionEmojiDisplay reactionTypes={reaction(ev).toReactionTypes()} />
         </div>
       )}
@@ -342,7 +342,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
             return (
               <button
                 ref={(el) => emojiPopup.emojiRef(el)}
-                class="webkit-touch-callout-none flex h-6 touch-pan-x select-none items-center rounded border border-border px-1"
+                class="webkit-touch-callout-none flex h-6 touch-pan-x items-center rounded border border-border px-1 select-none"
                 classList={{
                   'text-fg-tertiary': !isReactedByMeWithThisContent,
                   'hover:bg-r-reaction/10': !isReactedByMeWithThisContent,
@@ -353,7 +353,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
                 }}
                 type="button"
               >
-                <span class="flex h-5 min-w-5 max-w-[128px] items-center justify-center">
+                <span class="flex h-5 max-w-[128px] min-w-5 items-center justify-center">
                   <ReactionEmojiDisplay reactionTypes={reactionTypes} />
                 </span>
                 <Show when={!config().hideCount}>

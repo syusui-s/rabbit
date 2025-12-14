@@ -386,7 +386,7 @@ const ProfileDisplay: Component<ProfileDisplayProps> = (props) => {
       </div>
       <Show when={aboutParsed()} keyed>
         {(parsed) => (
-          <div class="max-h-40 shrink-0 overflow-y-auto whitespace-pre-wrap px-4 py-2 text-sm">
+          <div class="max-h-40 shrink-0 overflow-y-auto px-4 py-2 text-sm whitespace-pre-wrap">
             <TextNoteContentDisplay parsed={parsed} embedding={false} initialHidden />
           </div>
         )}

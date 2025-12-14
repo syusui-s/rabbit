@@ -21,7 +21,7 @@ const BasicColumnHeader: Component<BasicColumnHeaderProps> = (props) => {
         <h2 class="min-w-0 flex-1">
           <button
             type="button"
-            class="flex w-full select-text items-center gap-1 ps-2"
+            class="flex w-full items-center gap-1 ps-2 select-text"
             onClick={() => props.onClickHeader?.()}
           >
             <Show when={props.icon} keyed>

@@ -43,7 +43,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
           </div>
         </div>
         <Show when={relayInfo()?.description} keyed>
-          <div class="scrollbar max-h-24 overflow-scroll whitespace-pre-wrap break-words px-4 py-2">
+          <div class="scrollbar max-h-24 overflow-scroll px-4 py-2 break-words whitespace-pre-wrap">
             {relayInfo()?.description}
           </div>
         </Show>
@@ -56,8 +56,8 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
               keyed
             >
               {(pubkey) => (
-                <div class="whitespace-normal break-words">
-                  <button class="inline select-text underline" onClick={() => showProfile(pubkey)}>
+                <div class="break-words whitespace-normal">
+                  <button class="inline underline select-text" onClick={() => showProfile(pubkey)}>
                     <UserDisplayName pubkey={pubkey} />
                   </button>
                 </div>
@@ -72,7 +72,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
               keyed
             >
               {(contact) => (
-                <div class="whitespace-pre-wrap break-all">
+                <div class="break-all whitespace-pre-wrap">
                   <SafeLink class="underline" href={contact}>
                     {contact}
                   </SafeLink>
@@ -90,7 +90,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
               keyed
             >
               {(software) => (
-                <div class="whitespace-pre-wrap break-all">
+                <div class="break-all whitespace-pre-wrap">
                   <Show when={softwareToGitHostUrl(software)} fallback={software} keyed>
                     {(url) => <SafeLink class="underline" href={url} />}
                   </Show>
@@ -105,7 +105,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
               fallback={<div>{i18n.t('relayInfo.unknown')}</div>}
               keyed
             >
-              {(version) => <div class="whitespace-pre-wrap break-all">{version}</div>}
+              {(version) => <div class="break-all whitespace-pre-wrap">{version}</div>}
             </Show>
           </div>
         </div>
@@ -129,7 +129,7 @@ const RelayInfoModal: Component<RelayInfoModalProps> = (props) => {
         </Show>
         <div class="flex flex-col gap-2 p-4">
           <button
-            class="select-text rounded-lg border border-border bg-bg-tertiary/20 p-2 text-fg-secondary hover:bg-bg-tertiary"
+            class="rounded-lg border border-border bg-bg-tertiary/20 p-2 text-fg-secondary select-text hover:bg-bg-tertiary"
             onClick={toggleShowRawInfo}
           >
             {i18n.t('relayInfo.showJSON')}

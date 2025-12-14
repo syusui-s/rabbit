@@ -173,7 +173,7 @@ const InvoiceDisplay: Component<{
         </div>
         <div class="flex items-center gap-2 ps-5">
           <textarea
-            class="h-12 w-80 flex-1 select-all whitespace-pre-wrap break-all rounded-md border border-border bg-bg font-mono text-sm ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+            class="h-12 w-80 flex-1 rounded-md border border-border bg-bg font-mono text-sm break-all whitespace-pre-wrap ring-border select-all placeholder:text-fg-secondary focus:border-border focus:ring-primary"
             value={props.invoice}
             readonly
           />

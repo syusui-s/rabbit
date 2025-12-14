@@ -94,7 +94,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
           </div>
           <div class="flex min-w-0 flex-1 overflow-hidden">
             <button
-              class="select-text truncate font-bold hover:text-link hover:underline"
+              class="truncate font-bold select-text hover:text-link hover:underline"
               onClick={() => showProfile(event().senderPubkey())}
             >
               <UserDisplayName pubkey={event().senderPubkey()} />
@@ -104,7 +104,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
         </div>
       </div>
       <Show when={event().description().content.length > 0}>
-        <div class="ml-7 whitespace-pre-wrap break-words rounded border border-border px-1 text-sm">
+        <div class="ml-7 rounded border border-border px-1 text-sm break-words whitespace-pre-wrap">
           {event().description().content}
         </div>
       </Show>

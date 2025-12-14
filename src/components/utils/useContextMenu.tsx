@@ -58,7 +58,7 @@ const SubMenuDisplay: Component<SubMenuDisplayProps> = (props) => {
 
   return (
     <li ref={contextMenuPopup.targetRef} class="border-b border-border hover:bg-bg-tertiary">
-      <button class="flex w-full items-center py-1 pe-2 ps-4 text-start" onClick={handleClick}>
+      <button class="flex w-full items-center py-1 ps-4 pe-2 text-start" onClick={handleClick}>
         <span class="flex-1">{props.submenu.content}</span>
         <span class="inline-block size-4 shrink-0">
           <ChevronRight />

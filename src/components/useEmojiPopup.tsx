@@ -45,7 +45,7 @@ const useEmojiPopup = (propsProvider: () => UseEmojiPopupProps | null): UseEmoji
               close();
             }}
           >
-            <div class="flex h-24 min-w-24 max-w-screen-lg items-center justify-center rounded border border-border bg-bg text-5xl shadow">
+            <div class="flex h-24 max-w-screen-lg min-w-24 items-center justify-center rounded border border-border bg-bg text-5xl shadow">
               <EmojiDisplay emoji={emoji} />
             </div>
           </div>

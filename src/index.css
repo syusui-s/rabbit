@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
 
 @theme inline {
   --color-fg: rgb(var(--rgb-fg));
@@ -140,17 +140,18 @@
   --rgb-scroll-bg: 30 30 30;
 }
 
-@layer base { 
+@layer base {
   button:not(:disabled),
-  [role="button"]:not(:disabled) {
+  [role='button']:not(:disabled) {
     cursor: pointer;
   }
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   @apply bg-bg text-fg;
@@ -182,7 +183,8 @@ em-emoji-picker {
 }
 
 .scrollbar {
-  scrollbar-color: rgb(var(--rgb-scroll-thumb)) rgba(var(--rgb-scroll-bg) / var(--opacity-scroll-bg, 1));
+  scrollbar-color: rgb(var(--rgb-scroll-thumb))
+    rgba(var(--rgb-scroll-bg) / var(--opacity-scroll-bg, 1));
 }
 
 /* For Chrome <=120 */

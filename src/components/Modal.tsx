@@ -18,7 +18,7 @@ const Modal: Component<ModalProps> = (props) => {
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <div
       ref={containerRef}
-      class="absolute left-0 top-0 z-10 flex h-screen w-screen cursor-default place-content-center place-items-start bg-black/30"
+      class="absolute top-0 left-0 z-10 flex h-screen w-screen cursor-default place-content-center place-items-start bg-black/30"
       onClick={handleClickContainer}
     >
       {props.children}

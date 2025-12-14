@@ -104,7 +104,7 @@ const RelayConfig = () => {
                     </div>
                   </button>
                   <button
-                    class="flex shrink-0 items-center justify-center pe-6 ps-4"
+                    class="flex shrink-0 items-center justify-center ps-4 pe-6"
                     onClick={() => removeRelay(relayUrl)}
                   >
                     <span class="size-3">

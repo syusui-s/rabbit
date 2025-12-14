@@ -23,7 +23,7 @@ const ColumnInfo: Component<ColumnInfoProps> = (props) => {
   }));
 
   return (
-    <div class="flex items-start gap-2 break-all border-t border-border p-1">
+    <div class="flex items-start gap-2 border-t border-border p-1 break-all">
       <div class="mt-1 size-14 shrink-0 overflow-hidden rounded">
         <Show when={props.image} keyed>
           {(url) => <img class="size-full object-cover" alt="icon" src={url} />}
@@ -31,12 +31,12 @@ const ColumnInfo: Component<ColumnInfoProps> = (props) => {
       </div>
       <div class="flex flex-1 flex-col overflow-hidden">
         <h3 class="truncate text-lg font-bold">{props.title}</h3>
-        <p class="max-h-[3.25rem] overflow-y-auto break-all text-sm">{props.description}</p>
+        <p class="max-h-[3.25rem] overflow-y-auto text-sm break-all">{props.description}</p>
         <Show when={props.authorPubkey} keyed>
           {(authorPubkey) => (
             <div class="text-xs">
               <button
-                class="select-text truncate hover:text-link hover:underline"
+                class="truncate select-text hover:text-link hover:underline"
                 onClick={() => showProfile(authorPubkey)}
               >
                 <UserDisplayName pubkey={authorPubkey} />

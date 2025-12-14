@@ -55,7 +55,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
       <div class="flex items-center gap-1 pl-[2px] text-sm">
         <span
           ref={emojiPopup.emojiRef}
-          class="webkit-touch-callout-none notification-icon flex h-4 min-w-4 max-w-[64px] shrink-0 select-none place-items-center overflow-hidden"
+          class="webkit-touch-callout-none notification-icon flex h-4 max-w-[64px] min-w-4 shrink-0 place-items-center overflow-hidden select-none"
         >
           <ReactionEmojiDisplay reactionTypes={reactionTypes()} />
         </span>
@@ -75,7 +75,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
           </div>
           <div class="flex min-w-0 flex-1 overflow-hidden">
             <button
-              class="select-text truncate font-bold hover:text-link hover:underline"
+              class="truncate font-bold select-text hover:text-link hover:underline"
               onClick={() => showProfile(props.event.pubkey)}
             >
               <UserDisplayName pubkey={props.event.pubkey} />
