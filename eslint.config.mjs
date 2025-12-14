@@ -1,10 +1,10 @@
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
+import pluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import pluginImport from 'eslint-plugin-import';
 import pluginJsxA11Y from 'eslint-plugin-jsx-a11y';
 import pluginNoRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import pluginSolid from 'eslint-plugin-solid';
-import pluginTailwindcss from 'eslint-plugin-tailwindcss';
 import globals from 'globals';
 import typescriptEslint, {
   configs as typescriptEslintConfigs,
@@ -43,11 +43,11 @@ export default typescriptEslint.config(
   pluginJsxA11Y.flatConfigs.recommended,
   pluginImport.flatConfigs.recommended,
   pluginImport.flatConfigs.typescript,
-  ...pluginTailwindcss.configs['flat/recommended'],
   configPrettier,
   {
     plugins: {
       'no-relative-import-paths': pluginNoRelativeImportPaths,
+      'better-tailwindcss': pluginBetterTailwindcss,
     },
     settings: {
       'import/resolver': {
@@ -61,7 +61,8 @@ export default typescriptEslint.config(
         },
       },
       linkComponents: ['Link'],
-      tailwindcss: {
+      'better-tailwindcss': {
+        entryPoint: 'src/index.css',
         whitelist: [
           'h-fill-available',
           'form-input',
@@ -158,7 +159,41 @@ export default typescriptEslint.config(
           ],
         },
       ],
-      'tailwindcss/classnames-order': 'error',
+      ...pluginBetterTailwindcss.configs['recommended-warn'].rules,
+      ...pluginBetterTailwindcss.configs['recommended-error'].rules,
+      'better-tailwindcss/enforce-consistent-class-order': ['error', { order: 'official' }],
+      'better-tailwindcss/enforce-consistent-line-wrapping': ['off'],
+      'better-tailwindcss/no-unregistered-classes': [
+        'warn',
+        {
+          ignore: [
+            // Utilities
+            'h-fill-available',
+            'scrollbar',
+            'form-input',
+            'webkit-touch-callout-none',
+            // nostr
+            'post',
+            'nostr-textnote',
+            'author',
+            'author-icon',
+            'author-name',
+            'author-username',
+            'created-at',
+            'actions',
+            'content',
+            'profile',
+            'profile-icon',
+            'profile-name',
+            'profile-username',
+            'notification-icon',
+            'notification-user',
+            'notification-event',
+            // for twitter
+            'twitter-tweet',
+          ],
+        },
+      ],
     },
   },
   {

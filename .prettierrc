@@ -4,7 +4,6 @@
   "tabWidth": 2,
   "semi": true,
   "singleQuote": true,
-  "plugins": ["prettier-plugin-tailwindcss"],
   "overrides": [
     {
       "__comment__": "This should be removed if this is fixed: https://github.com/prettier/prettier/pull/15927",
