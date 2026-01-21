@@ -1,4 +1,4 @@
-import { type core , z } from 'zod';
+import { type core, z } from 'zod';
 
 // https://github.com/colinhacks/zod/issues/831
 export const isZodLiteralsUnion = <T extends z.ZodLiteral<core.util.Literal>>(
