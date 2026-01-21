@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import useConfig from '@/core/useConfig';
@@ -17,7 +17,7 @@ export type UseReactions = {
   reactionsGrouped: () => Map<string, NostrEvent[]>;
   isReactedBy: (pubkey: string) => boolean;
   isReactedByWithEmoji: (pubkey: string) => boolean;
-  query: CreateQueryResult<NostrEvent[]>;
+  query: UseQueryResult<NostrEvent[]>;
 };
 
 const EmojiRegex = /\p{Emoji_Presentation}/u;

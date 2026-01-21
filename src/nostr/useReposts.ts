@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import useConfig from '@/core/useConfig';
@@ -14,7 +14,7 @@ export type UseRepostsProps = {
 export type UseReposts = {
   reposts: () => NostrEvent[];
   isRepostedBy: (pubkey: string) => boolean;
-  query: CreateQueryResult<NostrEvent[]>;
+  query: UseQueryResult<NostrEvent[]>;
 };
 
 export const queryKeyUseReposts = (props: UseRepostsProps) => ['useReposts', props] as const;

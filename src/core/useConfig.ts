@@ -49,7 +49,7 @@ export const ConfigSchema = z.object({
   columns: z.array(ColumnTypeSchema),
   fileServer: FileServerDefinitionScheme,
   customFileServers: z.array(FileServerDefinitionScheme),
-  customEmojis: z.record(CustomEmojiConfigSchema),
+  customEmojis: z.record(z.string(), CustomEmojiConfigSchema),
   colorTheme: ColorThemeConfigSchema,
   dateFormat: z.union([
     z.literal('relative'),

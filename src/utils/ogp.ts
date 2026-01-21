@@ -11,7 +11,7 @@ export type OgpContent = {
   image: string;
 };
 
-export const getCharset = (source: ArrayBuffer): string | null => {
+export const getCharset = (source: Uint8Array<ArrayBuffer>): string | null => {
   // https://www.w3.org/International/questions/qa-html-encoding-declarations.ja
   const content = new TextDecoder('US-ASCII').decode(source.slice(0, 1024));
 
@@ -33,7 +33,7 @@ export const getCharset = (source: ArrayBuffer): string | null => {
 // https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/decode
 const supportedEncodings = new Set(['utf-8', 'shift_jis', 'shift-jis', 'euc-jp', 'iso-2022-jp']);
 
-export const fixEncoding = (source: ArrayBuffer): string => {
+export const fixEncoding = (source: Uint8Array<ArrayBuffer>): string => {
   try {
     const charset = getCharset(source) ?? 'utf-8';
     if (!supportedEncodings.has(charset)) {
@@ -104,7 +104,7 @@ export const fetchOgpContent = async (urlString: string): Promise<OgpContent | n
       credentials: 'omit',
     });
     const arrayBuffer = await res.arrayBuffer();
-    const encodedContent = fixEncoding(arrayBuffer);
+    const encodedContent = fixEncoding(new Uint8Array(arrayBuffer));
     return parseOgp(encodedContent, urlString);
   } catch (err) {
     console.error(`failed to fetch ogp for ${urlString}`, err);

@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, type UseQueryResult } from '@tanstack/solid-query';
 import { z } from 'zod';
 
 import isValidId from '@/nostr/event/isValidId';
@@ -110,7 +110,7 @@ export type UseRelayInfoProps = {
 
 export type UseRelayInfo = {
   relayInfo: () => RelayInfo | undefined;
-  query: CreateQueryResult<RelayInfo | undefined>;
+  query: UseQueryResult<RelayInfo | undefined>;
 };
 
 const useRelayInfo = (propsProvider: () => UseRelayInfoProps): UseRelayInfo => {

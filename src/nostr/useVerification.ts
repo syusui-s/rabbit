@@ -1,6 +1,6 @@
 import { createMemo, type Accessor } from 'solid-js';
 
-import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, type UseQueryResult } from '@tanstack/solid-query';
 import { queryProfile } from 'nostr-tools/nip05';
 import { type ProfilePointer } from 'nostr-tools/nip19';
 
@@ -10,7 +10,7 @@ export type UseVerificationProps = {
 
 export type UseVerification = {
   verification: Accessor<ProfilePointer | null>;
-  query: CreateQueryResult<ProfilePointer | null>;
+  query: UseQueryResult<ProfilePointer | null>;
 };
 
 const useVerification = (propsProvider: () => UseVerificationProps | null): UseVerification => {

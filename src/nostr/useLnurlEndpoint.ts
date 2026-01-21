@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import isValidId from '@/nostr/event/isValidId';
@@ -19,7 +19,7 @@ export type UseLnurlEndpoint = {
   allowsNostr: () => boolean;
   commentAllowed: () => number;
   isZapReceiptVerified: (event: NostrEvent) => boolean;
-  query: CreateQueryResult<LnurlEndpoint | LnurlError | undefined>;
+  query: UseQueryResult<LnurlEndpoint | LnurlError | undefined>;
 };
 
 const useLnurlEndpoint = (propsProvider: () => UseLnurlEndpointProps | null): UseLnurlEndpoint => {

@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { genericEvent } from '@/nostr/event';
@@ -21,7 +21,7 @@ export type UseFollowings = {
   followings: () => Following[];
   followingPubkeys: () => string[];
   invalidateFollowings: () => Promise<void>;
-  query: CreateQueryResult<NostrEvent | null>;
+  query: UseQueryResult<NostrEvent | null>;
 };
 
 export const queryKeyUseFollowings = (props: UseFollowingsProps | null) =>

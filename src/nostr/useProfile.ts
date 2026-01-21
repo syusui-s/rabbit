@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import {
@@ -21,7 +21,7 @@ export type UseProfile = {
   lud06: () => string | undefined;
   lud16: () => string | undefined;
   isZapConfigured: () => boolean;
-  query: CreateQueryResult<NostrEvent | null>;
+  query: UseQueryResult<NostrEvent | null>;
 };
 
 export type UseProfilesProps = {
@@ -30,7 +30,7 @@ export type UseProfilesProps = {
 
 export type UseProfiles = {
   profiles: () => Record<string, ProfileWithOtherProperties>;
-  queries: CreateQueryResult<NostrEvent | null>[];
+  queries: UseQueryResult<NostrEvent | null>[];
 };
 
 export const queryKeyUseProfile = (props: UseProfileProps | null) => ['useProfile', props] as const;

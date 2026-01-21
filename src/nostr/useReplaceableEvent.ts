@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, useQueryClient, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { pickLatestEvent } from '@/nostr/event/comparator';
@@ -18,7 +18,7 @@ export type UseReplaceableEventProps = {
 
 export type UseReplaceableEvent = {
   event: () => NostrEvent | null;
-  query: CreateQueryResult<NostrEvent | null>;
+  query: UseQueryResult<NostrEvent | null>;
 };
 
 const useReplaceableEvent = (

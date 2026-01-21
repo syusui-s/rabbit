@@ -1,6 +1,6 @@
 import { createMemo } from 'solid-js';
 
-import { createQuery, type CreateQueryResult } from '@tanstack/solid-query';
+import { createQuery, type UseQueryResult } from '@tanstack/solid-query';
 import { type Event as NostrEvent } from 'nostr-tools/pure';
 
 import { registerTask, BatchedEventsTask, type EventTask } from '@/nostr/useBatchedEvents';
@@ -12,7 +12,7 @@ export type UseEventProps = {
 
 export type UseEvent = {
   event: () => NostrEvent | null;
-  query: CreateQueryResult<NostrEvent | null>;
+  query: UseQueryResult<NostrEvent | null>;
 };
 
 const useEvent = (propsProvider: () => UseEventProps | null): UseEvent => {
