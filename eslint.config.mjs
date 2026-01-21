@@ -163,7 +163,7 @@ export default typescriptEslint.config(
       ...pluginBetterTailwindcss.configs['recommended-error'].rules,
       'better-tailwindcss/enforce-consistent-class-order': ['error', { order: 'official' }],
       'better-tailwindcss/enforce-consistent-line-wrapping': ['off'],
-      'better-tailwindcss/no-unregistered-classes': [
+      'better-tailwindcss/no-unknown-classes': [
         'warn',
         {
           ignore: [
