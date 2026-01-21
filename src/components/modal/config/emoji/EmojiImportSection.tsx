@@ -39,7 +39,7 @@ const EmojiImportSection = () => {
         />
         <button
           type="submit"
-          class="w-24 self-end rounded bg-primary p-2 font-bold text-primary-fg"
+          class="w-24 self-end rounded-sm bg-primary p-2 font-bold text-primary-fg"
         >
           {i18n.t('config.customEmoji.importEmoji')}
         </button>

@@ -379,7 +379,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             emojiTextAreaRef(el);
           }}
           name="text"
-          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto rounded-md border border-border bg-bg break-words whitespace-pre-wrap ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
+          class="scrollbar max-h-[40vh] min-h-16 overflow-y-auto rounded-md border border-border bg-bg wrap-break-word whitespace-pre-wrap ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           rows={4}
           placeholder={placeholder(mode())}
           onInput={handleInput}
@@ -412,7 +412,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           <span class="flex-1" />
           <button
             ref={emojiPickerPopup.targetRef}
-            class="inline-block rounded bg-primary text-primary-fg"
+            class="inline-block rounded-sm bg-primary text-primary-fg"
             classList={{
               'h-9': mode() === 'normal',
               'w-9': mode() === 'normal',
@@ -430,7 +430,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
           </button>
           {emojiPickerPopup.popup()}
           <button
-            class="rounded text-primary-fg"
+            class="rounded-sm text-primary-fg"
             classList={{
               'bg-primary': !contentWarning(),
               'bg-primary-hover': contentWarning(),
@@ -452,7 +452,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <ExclamationTriangle />
           </button>
           <button
-            class="rounded text-primary-fg"
+            class="rounded-sm text-primary-fg"
             classList={{
               'bg-primary-disabled': fileUploadDisabled(),
               'bg-primary': !fileUploadDisabled(),
@@ -472,7 +472,7 @@ const NotePostForm: Component<NotePostFormProps> = (props) => {
             <Photo />
           </button>
           <button
-            class="rounded p-2 text-primary-fg"
+            class="rounded-sm p-2 text-primary-fg"
             classList={{
               'bg-primary-disabled': submitDisabled(),
               'bg-primary': !submitDisabled(),

@@ -27,7 +27,7 @@ const ImageDisplay: Component<ImageDisplayProps> = (props) => {
       {(mediaProps) => (
         <SafeLink class="my-2 block" href={props.url}>
           <img
-            class="max-h-64 max-w-full rounded object-contain shadow hover:shadow-md"
+            class="max-h-64 max-w-full rounded-sm object-contain shadow-sm hover:shadow-md"
             src={thumbnailUrl(props.url)}
             alt={props.url}
             onError={mediaProps.error}

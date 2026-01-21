@@ -297,7 +297,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
           <div class="flex gap-2">
             <button
               type="submit"
-              class="rounded p-2 font-bold text-primary-fg hover:bg-primary-hover"
+              class="rounded-sm p-2 font-bold text-primary-fg hover:bg-primary-hover"
               classList={{
                 'bg-primary': !mutation.isPending,
                 'bg-primary-disabled': mutation.isPending,
@@ -308,7 +308,7 @@ const ProfileEdit: Component<ProfileEditProps> = (props) => {
             </button>
             <button
               type="button"
-              class="rounded border border-primary p-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
+              class="rounded-sm border border-primary p-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
               onClick={() => props.onClose()}
             >
               {i18n.t('profile.edit.cancel')}

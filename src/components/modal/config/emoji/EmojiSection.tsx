@@ -53,7 +53,7 @@ const EmojiSection = () => {
         </label>
         <button
           type="submit"
-          class="w-24 self-end rounded bg-primary p-2 font-bold text-primary-fg"
+          class="w-24 self-end rounded-sm bg-primary p-2 font-bold text-primary-fg"
         >
           {i18n.t('config.customEmoji.addEmoji')}
         </button>
@@ -63,7 +63,7 @@ const EmojiSection = () => {
           {({ shortcode, url }) => {
             const popup = usePopup(() => ({
               popup: (
-                <div class="flex min-w-24 flex-col items-center rounded border border-border bg-bg shadow">
+                <div class="flex min-w-24 flex-col items-center rounded-sm border border-border bg-bg shadow-sm">
                   <div class="flex items-center p-1">
                     <img class="h-20 max-w-20 object-contain" src={url} alt={shortcode} />
                   </div>
@@ -85,7 +85,7 @@ const EmojiSection = () => {
               <li ref={popup.targetRef} class="min-w-0 basis-1/2 sm:basis-1/4">
                 <button
                   type="button"
-                  class="flex w-full flex-col items-center gap-1 rounded p-2 hover:bg-bg-tertiary/20 hover:shadow"
+                  class="flex w-full flex-col items-center gap-1 rounded-sm p-2 hover:bg-bg-tertiary/20 hover:shadow-sm"
                   onClick={() => popup.open()}
                 >
                   <LazyLoad fallback={<div class="size-8" />}>

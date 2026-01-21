@@ -20,7 +20,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
       when={!hidden()}
       fallback={
         <button
-          class="rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
+          class="rounded-sm bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow-sm"
           onClick={() => setHidden(false)}
         >
           {i18n.t('post.showVideo')}
@@ -40,7 +40,7 @@ const VideoDisplay: Component<VideoDisplayProps> = (props) => {
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <video
               ref={videoRef}
-              class="max-h-64 max-w-full rounded-sm object-contain shadow"
+              class="max-h-64 max-w-full rounded-sm object-contain shadow-sm"
               src={props.url}
               onError={() => setError(true)}
               controls

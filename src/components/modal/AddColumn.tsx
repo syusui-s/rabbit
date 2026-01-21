@@ -69,7 +69,7 @@ const AddRelaysColumn: Component<AddRelayColumnProps> = (props) => {
           onChange={(ev) => setRelayUrl(ev.currentTarget.value)}
         />
         <button
-          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          class="rounded-sm border border-primary px-4 py-1 font-bold text-primary"
           type="submit"
         >
           {i18n.t('column.addRelayColumn.add')}

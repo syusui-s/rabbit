@@ -26,7 +26,7 @@ const ProfileListItem: Component<ProfileListItemProps> = (props) => {
       >
         <Show when={profile()?.picture} keyed>
           {(url) => (
-            <img src={thumbnailUrl(url)} alt="icon" class="size-full rounded object-cover" />
+            <img src={thumbnailUrl(url)} alt="icon" class="size-full rounded-sm object-cover" />
           )}
         </Show>
       </button>

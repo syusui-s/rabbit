@@ -89,12 +89,12 @@ const SearchButton = () => {
       >
         <input
           ref={inputRef}
-          class="h-8 w-full rounded border border-border bg-bg focus:border-primary focus:ring-border"
+          class="h-8 w-full rounded-sm border border-border bg-bg focus:border-primary focus:ring-border"
           type="text"
           value={query()}
           onChange={(ev) => setQuery(ev.currentTarget.value)}
         />
-        <button class="size-8 rounded bg-primary p-1 text-primary-fg" type="submit">
+        <button class="size-8 rounded-sm bg-primary p-1 text-primary-fg" type="submit">
           <MagnifyingGlass />
         </button>
       </form>
@@ -354,7 +354,7 @@ const SideBar: Component = () => {
         }
       >
         <div
-          class="absolute bottom-0 left-20 z-10 w-[calc(100vw-8rem)] rounded-md border-t border-border bg-r-sidebar px-2 pt-2 shadow"
+          class="absolute bottom-0 left-20 z-10 w-[calc(100vw-8rem)] rounded-md border-t border-border bg-r-sidebar px-2 pt-2 shadow-sm"
           classList={{
             static: formOpened() || config().keepOpenPostForm,
             hidden: !(formOpened() || config().keepOpenPostForm),

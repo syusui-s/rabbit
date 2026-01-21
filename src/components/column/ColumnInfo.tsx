@@ -24,14 +24,14 @@ const ColumnInfo: Component<ColumnInfoProps> = (props) => {
 
   return (
     <div class="flex items-start gap-2 border-t border-border p-1 break-all">
-      <div class="mt-1 size-14 shrink-0 overflow-hidden rounded">
+      <div class="mt-1 size-14 shrink-0 overflow-hidden rounded-sm">
         <Show when={props.image} keyed>
           {(url) => <img class="size-full object-cover" alt="icon" src={url} />}
         </Show>
       </div>
       <div class="flex flex-1 flex-col overflow-hidden">
         <h3 class="truncate text-lg font-bold">{props.title}</h3>
-        <p class="max-h-[3.25rem] overflow-y-auto text-sm break-all">{props.description}</p>
+        <p class="max-h-13 overflow-y-auto text-sm break-all">{props.description}</p>
         <Show when={props.authorPubkey} keyed>
           {(authorPubkey) => (
             <div class="text-xs">

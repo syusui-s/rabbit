@@ -52,7 +52,7 @@ const Hello: Component = () => {
 
   return (
     <div class="mx-auto flex max-w-screen-sm flex-col items-center p-4 text-fg">
-      <div class="flex flex-col items-center gap-4 rounded p-4">
+      <div class="flex flex-col items-center gap-4 rounded-sm p-4">
         <img src={resolveAsset('images/rabbit_256.png')} width="96" alt="logo" height="96" />
         <h1 class="text-5xl font-black text-primary">Rabbit</h1>
         <div>Rabbit is a Web client for Nostr.</div>
@@ -69,7 +69,7 @@ const Hello: Component = () => {
             <div class="flex flex-col items-center gap-2">
               <p class="text-sm">{i18n.t('hello.reloadAfterInstall')}</p>
               <button
-                class="rounded border border-primary px-4 py-2 text-sm font-bold text-primary hover:text-primary-hover"
+                class="rounded-sm border border-primary px-4 py-2 text-sm font-bold text-primary hover:text-primary-hover"
                 onClick={() => window.location.reload()}
               >
                 {i18n.t('hello.reload')}
@@ -78,7 +78,7 @@ const Hello: Component = () => {
           </Match>
           <Match when={signerStatus() === 'available'}>
             <button
-              class="rounded bg-primary p-4 text-lg font-bold text-primary-fg hover:shadow-md"
+              class="rounded-sm bg-primary p-4 text-lg font-bold text-primary-fg hover:shadow-md"
               onClick={handleLogin}
             >
               {i18n.t('hello.loginWithSigner')}

@@ -42,7 +42,7 @@ const DateFormatSection = () => {
             <div class="flex flex-1 flex-row items-center gap-1 sm:flex-col">
               <button
                 type="button"
-                class="w-48 rounded border border-primary p-2 font-bold sm:w-full"
+                class="w-48 rounded-sm border border-primary p-2 font-bold sm:w-full"
                 classList={{
                   'bg-primary': config().dateFormat === id,
                   'text-primary-fg': config().dateFormat === id,

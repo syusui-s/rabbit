@@ -91,7 +91,7 @@ const OgpEmbed: Component<{ class?: string; url: string }> = (props) => {
               <div class="overflow-hidden rounded-t-lg">
                 <img
                   alt={ogpProps.title}
-                  class="max-h-64 w-full object-cover shadow"
+                  class="max-h-64 w-full object-cover shadow-sm"
                   src={ogpProps.image}
                 />
               </div>
@@ -128,7 +128,7 @@ const ClickToShow: Component<ClickToShowProps> = (props) => {
           <SafeLink class="text-link underline" href={props.url} />
           <div>
             <button
-              class="flex flex-col items-center rounded bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow"
+              class="flex flex-col items-center rounded-sm bg-bg-tertiary p-3 text-xs text-fg-secondary hover:shadow-sm"
               onClick={() => setHidden(false)}
             >
               {i18n.t('post.showPreview')}

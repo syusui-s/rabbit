@@ -180,7 +180,7 @@ const InvoiceDisplay: Component<{
           <Copy class="size-5 hover:text-primary" text={props.invoice} />
         </div>
         <a
-          class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
+          class="inline-block rounded-sm bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
           href={lightingInvoiceWithSchema()}
         >
           {i18n.t('zap.sendViaWallet')}
@@ -188,7 +188,7 @@ const InvoiceDisplay: Component<{
         <Show when={webln.status() === 'available'}>
           <button
             type="button"
-            class="inline-block rounded bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
+            class="inline-block rounded-sm bg-primary p-4 font-bold text-primary-fg hover:bg-primary-hover"
             onClick={handleClickWebLN}
           >
             {i18n.t('zap.sendViaWebLN')}
@@ -331,11 +331,11 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
           <Show when={hasZapTag()}>
             <div class="pb-8 text-center">{i18n.t('zap.zapSplitIsNotSupported')}</div>
           </Show>
-          <div class="flex flex-col items-center overflow-hidden rounded px-8 py-2 text-fg-secondary">
+          <div class="flex flex-col items-center overflow-hidden rounded-sm px-8 py-2 text-fg-secondary">
             <Show when={lnurlServiceIcon()} keyed>
               {(url) => (
                 <img
-                  class="max-h-64 w-64 rounded object-cover"
+                  class="max-h-64 w-64 rounded-sm object-cover"
                   alt="LNURL service icon"
                   src={url}
                 />
@@ -382,7 +382,7 @@ const ZapDialog: Component<ZapDialogProps> = (props) => {
             />
             <button
               type="submit"
-              class="flex w-full items-center justify-center rounded bg-primary py-4 text-primary-fg hover:bg-primary-hover"
+              class="flex w-full items-center justify-center rounded-sm bg-primary py-4 text-primary-fg hover:bg-primary-hover"
               disabled={getInvoiceMutation.isPending}
             >
               <span class="inline-block size-6">
@@ -420,7 +420,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
             <div class="flex justify-center gap-3 pb-2">
               <button
                 type="button"
-                class="rounded border-2 border-primary p-2"
+                class="rounded-sm border-2 border-primary p-2"
                 classList={{
                   'bg-primary': lnurlSource() === 'lud06',
                   'text-primary-fg': lnurlSource() === 'lud06',
@@ -433,7 +433,7 @@ const ZapRequestModal: Component<ZapRequestModalProps> = (props) => {
               </button>
               <button
                 type="button"
-                class="rounded border-2 border-primary p-2"
+                class="rounded-sm border-2 border-primary p-2"
                 classList={{
                   'bg-primary': lnurlSource() === 'lud16',
                   'text-primary-fg': lnurlSource() === 'lud16',

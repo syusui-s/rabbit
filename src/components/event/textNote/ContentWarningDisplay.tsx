@@ -19,7 +19,7 @@ const ContentWarningDisplay: Component<ContentWarningDisplayProps> = (props) => 
       when={!props.contentWarning.contentWarning || showContentWarning()}
       fallback={
         <button
-          class="mt-2 flex w-full flex-col items-center rounded border border-border p-2 text-center text-xs text-fg-secondary"
+          class="mt-2 flex w-full flex-col items-center rounded-sm border border-border p-2 text-center text-xs text-fg-secondary"
           onClick={() => setShowContentWarning(true)}
         >
           <span class="inline-block size-4">

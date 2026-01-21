@@ -36,7 +36,7 @@ const Post: Component<PostProps> = (props) => {
       <div class="flex w-full gap-1">
         <button
           type="button"
-          class="author-icon size-10 shrink-0 overflow-hidden rounded"
+          class="author-icon size-10 shrink-0 overflow-hidden rounded-sm"
           onClick={(ev) => {
             ev.preventDefault();
             props.onShowProfile?.();
@@ -107,7 +107,7 @@ const Post: Component<PostProps> = (props) => {
           </div>
           <Show when={overflow()}>
             <button
-              class="mt-2 w-full rounded border border-border p-2 text-center text-xs text-fg-secondary shadow-sm hover:bg-bg-tertiary hover:shadow"
+              class="mt-2 w-full rounded-sm border border-border p-2 text-center text-xs text-fg-secondary shadow-sm hover:bg-bg-tertiary hover:shadow-sm"
               onClick={(ev) => {
                 ev.stopPropagation();
                 setShowOverflow((current) => !current);

@@ -64,7 +64,7 @@ const SearchColumnHeader: Component<SearchColumnHeaderProps> = (props) => {
         </h2>
         <form class="flex-1" onSubmit={handleSubmit}>
           <input
-            class="w-full rounded border border-border bg-bg px-1 py-0 ring-border focus:border-border focus:ring-primary"
+            class="w-full rounded-sm border border-border bg-bg px-1 py-0 ring-border focus:border-border focus:ring-primary"
             type="text"
             name="query"
             value={query()}

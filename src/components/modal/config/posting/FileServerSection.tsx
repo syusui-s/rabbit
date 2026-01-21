@@ -79,7 +79,7 @@ const FileServerSection = () => {
           pattern={HttpUrlRegex}
           onChange={(ev) => setUrlInput(ev.currentTarget.value)}
         />
-        <button type="submit" class="rounded bg-primary p-2 font-bold text-primary-fg">
+        <button type="submit" class="rounded-sm bg-primary p-2 font-bold text-primary-fg">
           {i18n.t('config.posting.addCustomFileServer')}
         </button>
       </form>

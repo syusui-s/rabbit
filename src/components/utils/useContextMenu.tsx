@@ -87,7 +87,7 @@ const useContextMenu = (propsProvider: () => UseContextMenuProps) => {
     position: { x: 'right', y: 'bottom' },
     ...props(),
     popup: (
-      <ul class="min-w-[96px] rounded border border-border bg-bg shadow-md">
+      <ul class="min-w-[96px] rounded-sm border border-border bg-bg shadow-md">
         <For each={props().menu.filter((e) => e.when == null || e.when())}>
           {(item) => (
             <Switch>

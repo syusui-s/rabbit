@@ -63,13 +63,13 @@ const About: Component<AboutProps> = (props) => {
 
         <div class="my-4 flex justify-center gap-3">
           <SafeLink
-            class="rounded border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
+            class="rounded-sm border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
             href="https://github.com/syusui-s/rabbit/issues/new/choose"
           >
             {i18n.t('about.bugReport')}
           </SafeLink>
           <SafeLink
-            class="rounded border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
+            class="rounded-sm border-2 border-primary px-4 py-2 font-bold text-primary hover:border-primary-hover hover:text-primary-hover"
             href="https://github.com/syusui-s/rabbit"
           >
             {i18n.t('about.sourceCode')}
@@ -96,7 +96,7 @@ const About: Component<AboutProps> = (props) => {
           </SafeLink>
         </p>
 
-        <pre class="max-h-96 overflow-auto rounded bg-bg-tertiary p-2 text-sm">
+        <pre class="max-h-96 overflow-auto rounded-sm bg-bg-tertiary p-2 text-sm">
           {i18n.t('about.agplText')}
         </pre>
 
@@ -106,7 +106,7 @@ const About: Component<AboutProps> = (props) => {
           </SafeLink>
         </p>
 
-        <pre class="scrollbar max-h-96 overflow-auto rounded bg-bg-tertiary p-4 text-xs">
+        <pre class="scrollbar max-h-96 overflow-auto rounded-sm bg-bg-tertiary p-4 text-xs">
           {packageInfo()?.self.licenseText}
         </pre>
 
@@ -118,7 +118,7 @@ const About: Component<AboutProps> = (props) => {
               <h3 class="mt-4 mb-2 font-mono">
                 {p.name}@{p.version} ({p.licenseSpdx})
               </h3>
-              <pre class="scrollbar max-h-96 overflow-auto rounded bg-bg-tertiary p-4 text-xs">
+              <pre class="scrollbar max-h-96 overflow-auto rounded-sm bg-bg-tertiary p-4 text-xs">
                 {p.licenseText}
               </pre>
             </>

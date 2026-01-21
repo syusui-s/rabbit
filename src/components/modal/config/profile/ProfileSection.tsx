@@ -13,7 +13,7 @@ const ProfileSection = () => {
     <Section title={i18n.t('config.account.profile')}>
       <div class="flex gap-2 py-1">
         <button
-          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          class="rounded-sm border border-primary px-4 py-1 font-bold text-primary"
           onClick={() =>
             ensureNonNull([pubkey()])(([pubkeyNonNull]) => {
               showProfile(pubkeyNonNull);
@@ -23,7 +23,7 @@ const ProfileSection = () => {
           {i18n.t('config.account.openProfile')}
         </button>
         <button
-          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          class="rounded-sm border border-primary px-4 py-1 font-bold text-primary"
           onClick={() => showProfileEdit()}
         >
           {i18n.t('config.account.editProfile')}

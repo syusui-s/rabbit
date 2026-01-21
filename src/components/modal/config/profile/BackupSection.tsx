@@ -58,13 +58,13 @@ const BackupSection = () => {
     <Section title={i18n.t('config.account.backupConfig')}>
       <div class="flex gap-2 py-1">
         <button
-          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          class="rounded-sm border border-primary px-4 py-1 font-bold text-primary"
           onClick={handleSave}
         >
           {i18n.t('config.account.save')}
         </button>
         <button
-          class="rounded border border-primary px-4 py-1 font-bold text-primary"
+          class="rounded-sm border border-primary px-4 py-1 font-bold text-primary"
           onClick={handleRestore}
         >
           {i18n.t('config.account.restore')}

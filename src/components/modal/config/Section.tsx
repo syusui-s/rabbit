@@ -8,7 +8,7 @@ const Section = (props: { title: string; initialOpened?: boolean; children: JSX.
   const toggleOpened = () => setOpened((current) => !current);
 
   return (
-    <div class="mb-2 rounded border border-border shadow hover:shadow-md">
+    <div class="mb-2 rounded-sm border border-border shadow-sm hover:shadow-md">
       <h3 class="text-lg font-bold">
         <button
           type="button"

@@ -22,7 +22,7 @@ const FollowSetsDisplay: Component<FollowSetsDisplayProps> = (props) => {
   return (
     <div class="p-8">
       {i18n.t('column.addFollowSetColumn.numberOfFollowSets', { count: followSets().length })}
-      <div class="flex flex-col divide-y divide-border rounded border border-border">
+      <div class="flex flex-col divide-y divide-border rounded-sm border border-border">
         <For each={followSets()}>
           {(followSet) => {
             const event = new NostrSet(followSet);

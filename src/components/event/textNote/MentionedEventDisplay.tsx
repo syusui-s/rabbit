@@ -16,7 +16,7 @@ const MentionedEventDisplay = (props: MentionedEventDisplayProps) => (
     when={props.mentionedEvent.marker != null && props.mentionedEvent.marker.length > 0}
     fallback={<EventLink eventId={props.mentionedEvent.eventId} />}
   >
-    <div class="my-1 rounded border p-1">
+    <div class="my-1 rounded-sm border p-1">
       <LazyLoad>
         {() => (
           <EventDisplayById

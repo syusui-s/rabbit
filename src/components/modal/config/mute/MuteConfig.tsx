@@ -52,7 +52,7 @@ const MuteConfig = () => {
             value={keywordInput()}
             onChange={(ev) => setKeywordInput(ev.currentTarget.value)}
           />
-          <button type="submit" class="rounded bg-primary p-2 font-bold text-primary-fg">
+          <button type="submit" class="rounded-sm bg-primary p-2 font-bold text-primary-fg">
             {i18n.t('config.mute.add')}
           </button>
         </form>
@@ -74,7 +74,7 @@ const MuteConfig = () => {
           <For each={config().mutedThreads}>
             {(eventId) => (
               <li class="flex items-center">
-                <div class="flex-1 truncate rounded border border-border p-2">
+                <div class="flex-1 truncate rounded-sm border border-border p-2">
                   <LazyLoad fallback={<div class="h-4" />}>
                     {() => <EventDisplayById eventId={eventId} actions={false} displayForcibly />}
                   </LazyLoad>

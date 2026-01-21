@@ -80,7 +80,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
           <div class="mt-[-2px] shrink-0 text-xs">{amountSi()}</div>
         </div>
         <div class="notification-user flex gap-1 overflow-hidden">
-          <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
+          <div class="author-icon size-5 shrink-0 overflow-hidden rounded-sm">
             <Show when={senderProfile()?.picture} keyed>
               {(url) => (
                 <img
@@ -104,7 +104,7 @@ const ZapReceiptDisplay: Component<ZapReceiptProps> = (props) => {
         </div>
       </div>
       <Show when={event().description().content.length > 0}>
-        <div class="ml-7 rounded border border-border px-1 text-sm break-words whitespace-pre-wrap">
+        <div class="ml-7 rounded-sm border border-border px-1 text-sm wrap-break-word whitespace-pre-wrap">
           {event().description().content}
         </div>
       </Show>

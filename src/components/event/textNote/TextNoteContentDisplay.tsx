@@ -90,7 +90,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
         if (item.type === 'Bech32Entity') {
           if (item.data.type === 'note' && props.embedding) {
             return (
-              <div class="my-1 rounded border border-border p-1">
+              <div class="my-1 rounded-sm border border-border p-1">
                 <EventDisplayById
                   eventId={item.data.data}
                   actions={false}
@@ -102,7 +102,7 @@ const TextNoteContentDisplay = (props: TextNoteContentDisplayProps) => {
           }
           if (item.data.type === 'nevent' && props.embedding) {
             return (
-              <div class="my-1 rounded border border-border p-1">
+              <div class="my-1 rounded-sm border border-border p-1">
                 <EventDisplayById eventId={item.data.data.id} actions={false} embedding={false} />
               </div>
             );

@@ -61,7 +61,7 @@ const ReactionDisplay: Component<ReactionDisplayProps> = (props) => {
         </span>
         {emojiPopup.popup()}
         <div class="notification-user flex flex-1 gap-1 overflow-hidden">
-          <div class="author-icon size-5 shrink-0 overflow-hidden rounded">
+          <div class="author-icon size-5 shrink-0 overflow-hidden rounded-sm">
             <Show when={profile()?.picture} keyed>
               {(url) => (
                 <img

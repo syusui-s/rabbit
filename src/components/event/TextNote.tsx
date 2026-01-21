@@ -72,7 +72,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
           <div class="textnote-content">
             <Show when={showReplyEvent()} keyed>
               {(id) => (
-                <div class="mt-1 rounded border border-border p-1">
+                <div class="mt-1 rounded-sm border border-border p-1">
                   <LazyLoad fallback={<div class="h-12" />}>
                     {() => <EventDisplayById eventId={id} actions={false} embedding={false} />}
                   </LazyLoad>
@@ -99,7 +99,7 @@ const TextNote: Component<TextNoteProps> = (props) => {
               </div>
             </Show>
             <ContentWarningDisplay contentWarning={event().contentWarning()}>
-              <div class="content break-words whitespace-pre-wrap">
+              <div class="content wrap-break-word whitespace-pre-wrap">
                 <TextNoteContentDisplay
                   parsed={event().parsed()}
                   embedding={embedding()}

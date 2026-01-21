@@ -15,7 +15,7 @@ const ToggleButton = (props: {
     area-label={props.value}
     onClick={(event) => props.onClick(event)}
   >
-    <span class="m-[-3px] inline-block size-5 rounded-full border bg-primary-fg shadow" />
+    <span class="m-[-3px] inline-block size-5 rounded-full border bg-primary-fg shadow-sm" />
   </button>
 );
 

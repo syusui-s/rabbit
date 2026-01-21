@@ -72,11 +72,11 @@ const RelayConfig = () => {
             pattern={RelayUrlRegex}
             onChange={(ev) => setRelayUrlInput(ev.currentTarget.value)}
           />
-          <button type="submit" class="rounded bg-primary p-2 font-bold text-primary-fg">
+          <button type="submit" class="rounded-sm bg-primary p-2 font-bold text-primary-fg">
             {i18n.t('config.relays.addRelay')}
           </button>
         </form>
-        <ul class="mt-2 divide-y divide-border rounded border border-border">
+        <ul class="mt-2 divide-y divide-border rounded-sm border border-border">
           <For each={config().relayUrls}>
             {(relayUrl: string) => {
               const { relayInfo } = useRelayInfo(() => ({ relayUrl }));
@@ -85,7 +85,7 @@ const RelayConfig = () => {
               return (
                 <li class="flex">
                   <button
-                    class="flex flex-1 items-center truncate rounded py-1 text-start hover:bg-bg-tertiary"
+                    class="flex flex-1 items-center truncate rounded-sm py-1 text-start hover:bg-bg-tertiary"
                     onClick={() => setModalState({ type: 'RelayInfo', relayUrl })}
                   >
                     <div class="shrink-0 px-2">
@@ -120,7 +120,7 @@ const RelayConfig = () => {
       <Section title={i18n.t('config.relays.importRelays')}>
         <button
           type="button"
-          class="rounded bg-primary p-2 font-bold text-primary-fg"
+          class="rounded-sm bg-primary p-2 font-bold text-primary-fg"
           onClick={() => {
             importFromNIP07().catch((err) => {
               console.error('failed to import relays', err);
