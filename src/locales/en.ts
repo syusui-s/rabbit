@@ -240,6 +240,11 @@ export default {
       mute: 'Mute',
       mutedUsers: 'Muted users',
       mutedKeywords: 'Muted keywords',
+      mutedReactions: {
+        mutedReactions: 'Muted reactions',
+        emoji: 'Emoji',
+        url: 'URL',
+      },
       mutedThreads: 'Muted threads',
       add: 'Add',
     },

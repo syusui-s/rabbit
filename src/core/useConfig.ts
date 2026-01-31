@@ -1,5 +1,6 @@
 import { createRoot, type Accessor, type Setter, createMemo } from 'solid-js';
 
+import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import * as Kind from 'nostr-tools/kinds';
@@ -210,7 +211,7 @@ const useConfig = (): UseConfig => {
   };
 
   const removeMutedReaction = (mutedReaction: MutedReaction) => {
-    setConfig('mutedReactions', (current) => current.filter((e) => e !== mutedReaction));
+    setConfig('mutedReactions', (current) => current.filter((e) => !isEqual(e, mutedReaction)));
   };
 
   const addMutedThread = (id: string) => {

@@ -236,6 +236,11 @@ export default {
       mute: 'ミュート',
       mutedUsers: 'ミュートしたユーザ',
       mutedKeywords: 'ミュートした単語',
+      mutedReactions: {
+        mutedReactions: 'ミュートしたリアクション',
+        emoji: '絵文字',
+        url: 'URL',
+      },
       mutedThreads: 'ミュートしたスレッド',
       add: '追加',
     },
