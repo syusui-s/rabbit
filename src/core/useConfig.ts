@@ -23,6 +23,7 @@ import {
 } from '@/hooks/createSignalWithStorage';
 import { useTranslation } from '@/i18n/useTranslation';
 import { genericEvent } from '@/nostr/event';
+import Reaction from '@/nostr/event/Reaction';
 import {
   type FileServerDefinition,
   FileServerDefinitionScheme,
@@ -43,6 +44,19 @@ const ColorThemeConfigSchema = z.object({
 });
 
 export type ColorThemeConfig = z.infer<typeof ColorThemeConfigSchema>;
+
+const MutedReactionSchema = z.union([
+  z.object({
+    type: z.literal('emoji'),
+    emoji: z.string(),
+  }),
+  z.object({
+    type: z.literal('url'),
+    url: z.string(),
+  }),
+]);
+
+export type MutedReaction = z.infer<typeof MutedReactionSchema>;
 
 export const ConfigSchema = z.object({
   relayUrls: z.array(z.string()),
@@ -68,6 +82,7 @@ export const ConfigSchema = z.object({
   hideCount: z.boolean(),
   mutedPubkeys: z.array(z.string()),
   mutedKeywords: z.array(z.string()),
+  mutedReactions: z.array(MutedReactionSchema),
   mutedThreads: z.array(z.string()),
 });
 
@@ -102,6 +117,8 @@ type UseConfig = {
   removeMutedPubkey: (pubkey: string) => void;
   addMutedKeyword: (keyword: string) => void;
   removeMutedKeyword: (keyword: string) => void;
+  addMutedReaction: (reaction: MutedReaction) => void;
+  removeMutedReaction: (reaction: MutedReaction) => void;
   addMutedThread: (id: string) => void;
   removeMutedThread: (id: string) => void;
   isPubkeyMuted: (pubkey: string) => boolean;
@@ -136,6 +153,7 @@ const InitialConfig = (): Config => ({
   hideCount: false,
   mutedPubkeys: [],
   mutedKeywords: [],
+  mutedReactions: [],
   mutedThreads: [],
 });
 
@@ -185,6 +203,14 @@ const useConfig = (): UseConfig => {
 
   const removeMutedKeyword = (keyword: string) => {
     setConfig('mutedKeywords', (current) => current.filter((e) => e !== keyword));
+  };
+
+  const addMutedReaction = (mutedReaction: MutedReaction) => {
+    setConfig('mutedReactions', (current) => uniq([...current, mutedReaction]));
+  };
+
+  const removeMutedReaction = (mutedReaction: MutedReaction) => {
+    setConfig('mutedReactions', (current) => current.filter((e) => e !== mutedReaction));
   };
 
   const addMutedThread = (id: string) => {
@@ -277,11 +303,35 @@ const useConfig = (): UseConfig => {
     if (config.mutedKeywords.length === 0) return null;
     return asCaseInsensitive(wordsRegex(config.mutedKeywords));
   });
+
   const hasMutedKeyword = (event: NostrEvent) => {
     if (event.kind === Kind.ShortTextNote) {
       const regex = mutedKeywordsRegex();
       if (regex == null) return false;
       return regex.test(event.content);
+    }
+    return false;
+  };
+
+  const mutedReactionEmojis = createMemo(() => {
+    const emojis = config.mutedReactions.filter((e) => e.type === 'emoji').map((e) => e.emoji);
+    return new Set(emojis);
+  });
+
+  const mutedReactionUrls = createMemo(() => {
+    const urls = config.mutedReactions.filter((e) => e.type === 'url').map((e) => e.url);
+    return new Set(urls);
+  });
+
+  const hasMutedReaction = (event: NostrEvent) => {
+    if (event.kind === Kind.Reaction) {
+      if (mutedReactionEmojis().has(event.content)) return true;
+
+      const reaction = new Reaction(event);
+      const url = reaction.getUrl();
+      if (url == null) return false;
+
+      return mutedReactionUrls().has(url);
     }
     return false;
   };
@@ -296,6 +346,7 @@ const useConfig = (): UseConfig => {
       isMutedThread(event.id) ||
       ev.taggedPubkeys().some(isPubkeyMuted) ||
       (event.kind === Kind.ShortTextNote && hasMutedKeyword(event)) ||
+      (event.kind === Kind.Reaction && hasMutedReaction(event)) ||
       ev.taggedEventIds().some((eventId) => isMutedThread(eventId))
     );
   };
@@ -350,6 +401,8 @@ const useConfig = (): UseConfig => {
     removeMutedPubkey,
     addMutedKeyword,
     removeMutedKeyword,
+    addMutedReaction,
+    removeMutedReaction,
     addMutedThread,
     removeMutedThread,
     isPubkeyMuted,
