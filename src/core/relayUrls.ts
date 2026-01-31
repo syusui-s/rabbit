@@ -8,7 +8,6 @@ export const relaysGlobal: string[] = [
 // 日本語タイムライン用のリレーリスト（日本国内限定・日本語中心のリレー）
 export const relaysForJapaneseTL: string[] = [
   'wss://relay-jp.nostr.wirednet.jp',
-  'wss://nostr.holybea.com',
   'wss://r.kojira.io',
   'wss://yabu.me', // note130lx92q6dayqx8v98gahwxaq3vkgg4upqdvaa4w8t7yptcgjs4asjc7awf
 ];
