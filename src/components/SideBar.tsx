@@ -354,9 +354,9 @@ const SideBar: Component = () => {
         }
       >
         <div
-          class="absolute bottom-0 left-20 z-10 w-[calc(100vw-8rem)] rounded-md border-t border-border bg-r-sidebar px-2 pt-2 shadow-sm"
+          class="bottom-0 left-20 z-10 w-[calc(100vw-8rem)] rounded-md border-t border-border bg-r-sidebar px-2 pt-2 shadow-sm"
           classList={{
-            static: formOpened() || config().keepOpenPostForm,
+            absolute: formOpened() || config().keepOpenPostForm,
             hidden: !(formOpened() || config().keepOpenPostForm),
           }}
         >
