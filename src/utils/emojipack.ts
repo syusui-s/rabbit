@@ -34,7 +34,7 @@ export const pubkeySchema = z
   .length(64)
   .regex(/^[0-9a-f]{64}$/);
 
-export const shortcodeSchema = z.string().regex(/^\w+$/);
+export const shortcodeSchema = z.string().regex(/^[\w-]+$/);
 
 export const emojiSchema = z.object({
   shortcode: shortcodeSchema,

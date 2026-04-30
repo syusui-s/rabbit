@@ -279,6 +279,10 @@ describe('parseTextNote', () => {
       expected: [{ type: 'CustomEmoji', content: ':bunhd:', shortcode: 'bunhd' }],
     },
     {
+      given: ':bunhd-pop:',
+      expected: [{ type: 'CustomEmoji', content: ':bunhd-pop:', shortcode: 'bunhd-pop' }],
+    },
+    {
       given: ':sushi_maguro:',
       expected: [{ type: 'CustomEmoji', content: ':sushi_maguro:', shortcode: 'sushi_maguro' }],
     },
@@ -302,7 +306,7 @@ describe('parseTextNote', () => {
     assert.deepStrictEqual(parsed, expected);
   });
 
-  it.each([':bunhd-hop:', ':+1:', ':-1:', ':hello', '::: NOSTR :::'])(
+  it.each([':+1:', ':hello', '::: NOSTR :::'])(
     'should parse text note which includes invalid custom emoji ($emoji)',
     (content) => {
       const parsed = parseTextNote(content);

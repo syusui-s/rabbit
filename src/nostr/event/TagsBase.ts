@@ -9,8 +9,8 @@ export const TagsSchema = z.array(z.array(z.string()));
 export const EmojiTagSchema = z
   .tuple([
     z.literal('emoji'),
-    z.string().regex(/^\w+$/, {
-      message: 'shortcode can includes only alpahnumeric characters and underscore',
+    z.string().regex(/^[\w-]+$/, {
+      message: 'shortcode can include only alphanumeric characters, underscores and hyphens',
     }),
     z.string().url(),
   ])

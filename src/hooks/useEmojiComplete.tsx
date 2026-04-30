@@ -20,7 +20,7 @@ const useEmojiComplete = () => {
       [
         {
           id: 'customEmoji',
-          match: /\B:(\w+)$/,
+          match: /\B:([\w-]+)$/,
           search: (term, callback) => {
             callback(searchEmojis(term));
           },

@@ -33,7 +33,7 @@ const EmojiSection = () => {
             name="shortcode"
             placeholder="smiley"
             value={shortcodeInput()}
-            pattern="^\\w+$"
+            pattern="^[\\w-]+$"
             required
             onChange={(ev) => setShortcodeInput(ev.currentTarget.value)}
           />

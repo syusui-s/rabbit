@@ -93,7 +93,7 @@ const tagRefRegex = /(?:#\[(?<idx>\d+)\])/g;
 const mentionRegex =
   /(?<mention>(?<nip19>nostr:)?(?<bech32>(?:npub|note|nprofile|nevent|naddr)1[ac-hj-np-z02-9]+))/gi;
 const hashTagRegex = /#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu;
-const customEmojiRegex = /:(?<emoji>\w+):/gu;
+const customEmojiRegex = /:(?<emoji>[\w-]+):/gu;
 
 const parseTextNote = (textNoteContent: string) => {
   const matches = [

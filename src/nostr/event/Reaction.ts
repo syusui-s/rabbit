@@ -4,7 +4,7 @@ import { type Event as NostrEvent } from 'nostr-tools/pure';
 import GenericEvent from '@/nostr/event/GenericEvent';
 
 const emojiRegex = /^\p{Emoji}[\p{Emoji_Component}\p{Emoji_Modifier}\p{Emoji_Presentation}]*$/u;
-const customEmojiRegex = /^:(\w+):$/;
+const customEmojiRegex = /^:([\w-]+):$/;
 
 export type ReactionTypes =
   | { type: 'Emoji'; content: string }
