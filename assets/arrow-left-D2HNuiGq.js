@@ -1,0 +1,2 @@
+import{d as e,p as t}from"./web-DT2KjDMR.js";var n=t(`<svg xmlns=http://www.w3.org/2000/svg fill=none stroke=currentColor stroke-width=1.5 aria-hidden=true data-slot=icon viewBox="0 0 24 24"><path stroke-linecap=round stroke-linejoin=round d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18">`),r=((t={})=>(()=>{let r=n();return e(r,t,!0,!0),r})());export{r as t};
+//# sourceMappingURL=arrow-left-D2HNuiGq.js.map
