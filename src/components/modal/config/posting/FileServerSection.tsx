@@ -16,17 +16,19 @@ const FileServerSection = () => {
   const { config, setFileServer, addCustomFileServer, removeCustomFileServer } = useConfig();
 
   const [urlInput, setUrlInput] = createSignal('');
+  const [typeInput, setTypeInput] = createSignal<FileServerDefinition['type']>('nip96');
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (ev) => {
     ev.preventDefault();
 
     addCustomFileServer({
-      type: 'nip96',
+      type: typeInput(),
       name: urlInput(),
       serverUrl: urlInput(),
     });
 
     ev.currentTarget.reset();
+    setTypeInput('nip96');
   };
 
   const servers = (): FileServerDefinitionCustom[] => [
@@ -52,10 +54,16 @@ const FileServerSection = () => {
               >
                 <button
                   type="button"
-                  class="flex-1 text-start"
+                  class="flex flex-1 items-center gap-2 text-start"
                   onClick={() => setFileServer(server)}
                 >
-                  {server.name}
+                  <span class="flex-1">{server.name}</span>
+                  <span
+                    class="rounded-sm border border-current px-1 text-xs opacity-70"
+                    classList={{ 'text-primary-fg': isDefault() }}
+                  >
+                    {server.type === 'blossom' ? 'Blossom' : 'NIP-96'}
+                  </span>
                 </button>
                 <Show when={server.custom}>
                   <button type="button" onClick={() => removeCustomFileServer(server.name)}>
@@ -70,6 +78,15 @@ const FileServerSection = () => {
         </For>
       </div>
       <form class="mt-2 flex gap-2" onSubmit={handleSubmit}>
+        <select
+          class="rounded-md border border-border bg-bg ring-border focus:border-border focus:ring-primary"
+          name="type"
+          value={typeInput()}
+          onChange={(ev) => setTypeInput(ev.currentTarget.value as FileServerDefinition['type'])}
+        >
+          <option value="nip96">NIP-96</option>
+          <option value="blossom">Blossom</option>
+        </select>
         <input
           class="flex-1 rounded-md border border-border bg-bg ring-border placeholder:text-fg-secondary focus:border-border focus:ring-primary"
           type="text"
