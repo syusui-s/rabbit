@@ -52,12 +52,7 @@ export type CustomEmojiResolved = Omit<CustomEmoji, 'type'> & {
 };
 
 export type ParsedTextNoteNode =
-  | PlainText
-  | UrlText
-  | TagReference
-  | Bech32Entity
-  | HashTag
-  | CustomEmoji;
+  PlainText | UrlText | TagReference | Bech32Entity | HashTag | CustomEmoji;
 
 export type ParsedTextNote = ParsedTextNoteNode[];
 

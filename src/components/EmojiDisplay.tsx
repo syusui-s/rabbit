@@ -1,8 +1,7 @@
 import { type Component, Match, Switch } from 'solid-js';
 
 export type EmojiTypes =
-  | { type: 'Emoji'; content: string }
-  | { type: 'CustomEmoji'; shortcode: string; url: string };
+  { type: 'Emoji'; content: string } | { type: 'CustomEmoji'; shortcode: string; url: string };
 
 export type EmojiDisplayProps = {
   emoji: EmojiTypes;
