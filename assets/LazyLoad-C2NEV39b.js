@@ -1,2 +1,0 @@
-import{B as e,M as t,R as n,b as r,m as i,p as a,s as o,w as s}from"./web-DT2KjDMR.js";var c=a(`<div>`),l=a=>{let l,[u,d]=t(!1);return e(()=>{let e=new IntersectionObserver(t=>{t.forEach(t=>{t.isIntersecting&&(d(!0),e.disconnect())})},{threshold:a.threshold??0});l!=null&&e.observe(l),n(()=>{e.disconnect()})}),s(r,{get when(){return u()},get fallback(){return(()=>{let e=c(),t=l;return typeof t==`function`?i(t,e):l=e,o(e,()=>a.fallback),e})()},keyed:!0,children:e=>a.children()})};export{l as t};
-//# sourceMappingURL=LazyLoad-C2NEV39b.js.map

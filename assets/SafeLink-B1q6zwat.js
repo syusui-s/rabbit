@@ -1,0 +1,2 @@
+import{a as e,b as t,k as n,p as r,s as i,u as a,w as o}from"./web-B_xYOoxu.js";var s=r(`<a target=_blank rel="noreferrer noopener">`),c=r=>{let c=()=>{try{let e=new URL(r.href.toString());return e.protocol===`https:`||e.protocol===`http:`||e.protocol===`mailto:`}catch{return!1}};return o(t,{get when(){return c()},get fallback(){return r.href},get children(){var t=s();return i(t,()=>r.children??r.href),n(n=>{var i=r.class,o=r.href;return i!==n.e&&e(t,n.e=i),o!==n.t&&a(t,`href`,n.t=o),n},{e:void 0,t:void 0}),t}})};export{c as t};
+//# sourceMappingURL=SafeLink-B1q6zwat.js.map

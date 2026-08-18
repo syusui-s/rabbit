@@ -1,0 +1,2 @@
+import{D as e,j as t}from"./web-B_xYOoxu.js";import{Kt as n}from"./index-CQTtTSQ6.js";var[r,i]=n({activeSubscriptions:0,activeBatchSubscriptions:0});t(()=>{e(()=>{console.debug(`stats`,{...r})})});var a=()=>({stats:r,setActiveSubscriptions:e=>i(`activeSubscriptions`,e),setActiveBatchSubscriptions:e=>i(`activeBatchSubscriptions`,e)});export{a as t};
+//# sourceMappingURL=useStats-CCWAzoPS.js.map

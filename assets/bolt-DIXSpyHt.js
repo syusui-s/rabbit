@@ -1,0 +1,2 @@
+import{d as e,p as t}from"./web-B_xYOoxu.js";var n=t(`<svg xmlns=http://www.w3.org/2000/svg fill=currentColor aria-hidden=true data-slot=icon viewBox="0 0 24 24"><path fill-rule=evenodd d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143"clip-rule=evenodd>`),r=(t={})=>(()=>{var r=n();return e(r,t,!0,!0),r})();export{r as t};
+//# sourceMappingURL=bolt-DIXSpyHt.js.map

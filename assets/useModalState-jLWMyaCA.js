@@ -1,2 +1,0 @@
-import{M as e,j as t}from"./web-DT2KjDMR.js";var[n,r]=t(()=>e({type:`Closed`})),i=()=>({modalState:n,setModalState:r,showLogin:()=>{r({type:`Login`})},showProfile:e=>{r({type:`Profile`,pubkey:e})},showProfileEdit:()=>{r({type:`ProfileEdit`})},showAddColumn:()=>{r({type:`AddColumn`})},showAbout:()=>{r({type:`About`})},closeModal:()=>{r({type:`Closed`})}});export{i as t};
-//# sourceMappingURL=useModalState-jLWMyaCA.js.map

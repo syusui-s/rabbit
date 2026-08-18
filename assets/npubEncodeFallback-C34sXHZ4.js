@@ -1,2 +1,0 @@
-import{x as e}from"./index-BasE3WBQ.js";var t=t=>{try{return e(t)}catch(e){return console.error(`failed to encode pubkey into npub: ${t}`,e),t}};export{t};
-//# sourceMappingURL=npubEncodeFallback-C34sXHZ4.js.map

@@ -1,2 +1,0 @@
-import{r as e}from"./createSignalWithStorage-kl5pV6Ln.js";import{D as t,j as n}from"./web-DT2KjDMR.js";var[r,i]=e({activeSubscriptions:0,activeBatchSubscriptions:0});n(()=>{t(()=>{console.debug(`stats`,{...r})})});var a=()=>({stats:r,setActiveSubscriptions:e=>i(`activeSubscriptions`,e),setActiveBatchSubscriptions:e=>i(`activeBatchSubscriptions`,e)});export{a as t};
-//# sourceMappingURL=useStats-p3ULwAip.js.map
