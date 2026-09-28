@@ -9,11 +9,18 @@ import { z } from 'zod';
 
 import sleep from '@/utils/sleep';
 
-export const FileServerDefinitionScheme = z.object({
-  type: z.literal('nip96'),
-  name: z.string(),
-  serverUrl: z.string().url(),
-});
+export const FileServerDefinitionScheme = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('nip96'),
+    name: z.string(),
+    serverUrl: z.string().url(),
+  }),
+  z.object({
+    type: z.literal('blossom'),
+    name: z.string(),
+    serverUrl: z.string().url(),
+  }),
+]);
 
 export type FileServerDefinition = z.infer<typeof FileServerDefinitionScheme>;
 
@@ -58,6 +65,21 @@ export const defaultFileServers = [
     type: 'nip96',
     name: 'yabu.me',
     serverUrl: 'https://yabu.me/',
+  },
+  {
+    type: 'blossom',
+    name: 'blossom.primal.net',
+    serverUrl: 'https://blossom.primal.net/',
+  },
+  {
+    type: 'blossom',
+    name: 'cdn.satellite.earth',
+    serverUrl: 'https://cdn.satellite.earth/',
+  },
+  {
+    type: 'blossom',
+    name: 'blossom.band',
+    serverUrl: 'https://blossom.band/',
   },
 ] satisfies FileServerDefinition[];
 
@@ -169,7 +191,7 @@ const buildApiUrl = (apiUrl: string, serverUrl: string): string => {
   return apiUrl;
 };
 
-export const uploadFileStorage = async ({
+export const uploadFileStorageNip96 = async ({
   serverUrl,
   files,
 }: UploadFileStorageParams): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
@@ -184,5 +206,105 @@ export const uploadFileStorage = async ({
   return Promise.allSettled(promises);
 };
 
-export const upload = (server: FileServerDefinition) => (files: File[]) =>
-  uploadFileStorage({ files, serverUrl: server.serverUrl });
+// Blossom (BUD-01/BUD-02/BUD-08)
+
+const sha256Hex = async (file: File): Promise<string> => {
+  const buffer = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+// BUD-01 authorization event (kind 24242), base64-encoded into a `Nostr` scheme header.
+export const getBlossomAuthorizationHeader = async (sha256: string): Promise<string> => {
+  const windowNostr = window.nostr;
+  if (windowNostr == null) throw new Error('NIP-07 implementation not found');
+
+  const now = Math.floor(Date.now() / 1000);
+  const event = await windowNostr.signEvent({
+    kind: 24242,
+    content: 'Upload file',
+    created_at: now,
+    tags: [
+      ['t', 'upload'],
+      ['x', sha256],
+      ['expiration', (now + 60 * 5).toString(10)],
+    ],
+  });
+
+  return `Nostr ${btoa(JSON.stringify(event))}`;
+};
+
+export type BlossomBlobDescriptor = {
+  url: string;
+  sha256: string;
+  size: number;
+  type?: string;
+  uploaded?: number;
+  // BUD-08: optional NIP-94 tags provided by the server
+  nip94?: [string, string][];
+};
+
+// Normalize a Blossom blob descriptor into the NIP-96 FileUploadResponse shape so the rest of
+// the upload pipeline (URL extraction, imeta tags) can stay protocol-agnostic.
+export const blossomDescriptorToFileUploadResponse = (
+  descriptor: BlossomBlobDescriptor,
+): FileUploadResponse => {
+  const tags: [string, string][] =
+    descriptor.nip94 != null && descriptor.nip94.length > 0
+      ? descriptor.nip94
+      : [
+          ['url', descriptor.url],
+          ['x', descriptor.sha256],
+          ['ox', descriptor.sha256],
+          ...(descriptor.size != null
+            ? ([['size', descriptor.size.toString(10)]] as [string, string][])
+            : []),
+          ...(descriptor.type != null && descriptor.type.length > 0
+            ? ([['m', descriptor.type]] as [string, string][])
+            : []),
+        ];
+
+  return {
+    status: 'success',
+    message: 'Uploaded',
+    nip94_event: { content: '', tags },
+  };
+};
+
+export const uploadBlossom = async (serverUrl: string, file: File): Promise<FileUploadResponse> => {
+  const sha256 = await sha256Hex(file);
+  const authorizationHeader = await getBlossomAuthorizationHeader(sha256);
+
+  const uploadUrl = new URL('/upload', serverUrl).toString();
+  const headers = new Headers();
+  headers.set('Authorization', authorizationHeader);
+  if (file.type.length > 0) {
+    headers.set('Content-Type', file.type);
+  }
+
+  const response = await fetch(uploadUrl, { method: 'PUT', headers, body: file });
+  if (!response.ok) {
+    const reason = response.headers.get('X-Reason') ?? response.statusText;
+    throw new Error(`failed to upload: ${reason}`);
+  }
+
+  const descriptor = (await response.json()) as BlossomBlobDescriptor;
+  return blossomDescriptorToFileUploadResponse(descriptor);
+};
+
+export const uploadFileStorageBlossom = async ({
+  serverUrl,
+  files,
+}: UploadFileStorageParams): Promise<PromiseSettledResult<FileUploadResponse>[]> => {
+  const promises = Array.from(files).map(async (file) => uploadBlossom(serverUrl, file));
+  return Promise.allSettled(promises);
+};
+
+export const upload = (server: FileServerDefinition) => (files: File[]) => {
+  if (server.type === 'blossom') {
+    return uploadFileStorageBlossom({ files, serverUrl: server.serverUrl });
+  }
+  return uploadFileStorageNip96({ files, serverUrl: server.serverUrl });
+};
