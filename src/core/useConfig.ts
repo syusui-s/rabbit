@@ -82,7 +82,8 @@ export const ConfigSchema = z.object({
   keepOpenPostForm: z.boolean(),
   useEmojiReaction: z.boolean(),
   showEmojiReaction: z.boolean(),
-  defaultReaction: DefaultReactionSchema,
+  // a backup made before this option existed has no value, so give the default to restore it
+  defaultReaction: DefaultReactionSchema.default({ type: 'default', content: '' }),
   showMedia: z.boolean(), // TODO 'always' | 'only-followings' | 'never'に変更
   embedding: z.object({
     twitter: z.boolean(),
@@ -298,8 +299,9 @@ const useConfig = (): UseConfig => {
     setConfig('customEmojis', (current) => ({ ...current, [shortcode]: undefined }));
   };
 
+  // an own property only: `constructor` or `toString` would be found on the prototype
   const getEmoji = (shortcode: string): CustomEmojiConfig | undefined =>
-    config.customEmojis[shortcode];
+    Object.hasOwn(config.customEmojis, shortcode) ? config.customEmojis[shortcode] : undefined;
 
   const searchEmojis = (term: string): CustomEmojiConfig[] =>
     sortBy(
