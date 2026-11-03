@@ -17,6 +17,7 @@ import ReactionSection from '@/components/modal/config/display/ReactionSection';
 import EmojiImportSection from '@/components/modal/config/emoji/EmojiImportSection';
 import EmojiSection from '@/components/modal/config/emoji/EmojiSection';
 import MuteConfig from '@/components/modal/config/mute/MuteConfig';
+import DefaultReactionSection from '@/components/modal/config/posting/DefaultReactionSection';
 import FileServerSection from '@/components/modal/config/posting/FileServerSection';
 import BackupSection from '@/components/modal/config/profile/BackupSection';
 import ProfileSection from '@/components/modal/config/profile/ProfileSection';
@@ -53,6 +54,7 @@ const ConfigUI = (props: ConfigProps) => {
       render: () => (
         <>
           <FileServerSection />
+          <DefaultReactionSection />
         </>
       ),
     },

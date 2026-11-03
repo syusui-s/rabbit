@@ -28,6 +28,7 @@ import useEmojiPopup from '@/components/useEmojiPopup';
 import useContextMenu from '@/components/utils/useContextMenu';
 import useConfig from '@/core/useConfig';
 import { useTranslation } from '@/i18n/useTranslation';
+import { resolveDefaultReaction } from '@/nostr/defaultReaction';
 import { reaction } from '@/nostr/event';
 import { type ReactionTypes } from '@/nostr/event/Reaction';
 import TextNote from '@/nostr/event/TextNote';
@@ -67,7 +68,7 @@ const emojiDataToReactionTypes = (emoji: EmojiData): ReactionTypes => {
 };
 
 const ReactionAction = (props: { event: NostrEvent }) => {
-  const { config } = useConfig();
+  const { config, getEmoji } = useConfig();
   const pubkey = usePubkey();
 
   const [reacted, setReacted] = createSignal(false);
@@ -101,7 +102,7 @@ const ReactionAction = (props: { event: NostrEvent }) => {
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
       publishReaction({
         pubkey: pubkeyNonNull,
-        reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
+        reactionTypes: reactionTypes ?? resolveDefaultReaction(config().defaultReaction, getEmoji),
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,
@@ -273,7 +274,7 @@ const RepostsModal: Component<{ event: NostrEvent; onClose: () => void }> = (pro
 };
 
 const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
-  const { config } = useConfig();
+  const { config, getEmoji } = useConfig();
   const pubkey = usePubkey();
 
   const [reacted, setReacted] = createSignal(false);
@@ -304,7 +305,7 @@ const EmojiReactions: Component<{ event: NostrEvent }> = (props) => {
     ensureNonNull([pubkey(), props.event.id] as const)(([pubkeyNonNull, eventIdNonNull]) => {
       publishReaction({
         pubkey: pubkeyNonNull,
-        reactionTypes: reactionTypes ?? { type: 'LikeDislike', content: '+' },
+        reactionTypes: reactionTypes ?? resolveDefaultReaction(config().defaultReaction, getEmoji),
         eventId: eventIdNonNull,
         kind: props.event.kind,
         notifyPubkey: props.event.pubkey,

@@ -205,6 +205,12 @@ export default {
       posting: 'Posting',
       fileServer: 'File server',
       addCustomFileServer: 'Add',
+      defaultReaction: 'Default reaction',
+      defaultReactionDefault: 'Default +',
+      defaultReactionCustom: 'Custom',
+      defaultReactionPlaceholder: '🐰 or :shortcode:',
+      defaultReactionInvalid:
+        'It is empty or not a registered custom emoji. + is used in the meantime.',
     },
     display: {
       display: 'Display',
