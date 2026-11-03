@@ -59,6 +59,14 @@ const MutedReactionSchema = z.union([
 
 export type MutedReaction = z.infer<typeof MutedReactionSchema>;
 
+// content is kept while type is 'default' so that switching back restores it
+const DefaultReactionSchema = z.object({
+  type: z.union([z.literal('default'), z.literal('custom')]),
+  content: z.string(),
+});
+
+export type DefaultReaction = z.infer<typeof DefaultReactionSchema>;
+
 export const ConfigSchema = z.object({
   relayUrls: z.array(z.string()),
   columns: z.array(ColumnTypeSchema),
@@ -74,6 +82,8 @@ export const ConfigSchema = z.object({
   keepOpenPostForm: z.boolean(),
   useEmojiReaction: z.boolean(),
   showEmojiReaction: z.boolean(),
+  // a backup made before this option existed has no value, so give the default to restore it
+  defaultReaction: DefaultReactionSchema.default({ type: 'default', content: '' }),
   showMedia: z.boolean(), // TODO 'always' | 'only-followings' | 'never'に変更
   embedding: z.object({
     twitter: z.boolean(),
@@ -145,6 +155,7 @@ const InitialConfig = (): Config => ({
   keepOpenPostForm: false,
   useEmojiReaction: true,
   showEmojiReaction: true,
+  defaultReaction: { type: 'default', content: '' },
   showMedia: true,
   embedding: {
     twitter: true,
@@ -288,8 +299,9 @@ const useConfig = (): UseConfig => {
     setConfig('customEmojis', (current) => ({ ...current, [shortcode]: undefined }));
   };
 
+  // an own property only: `constructor` or `toString` would be found on the prototype
   const getEmoji = (shortcode: string): CustomEmojiConfig | undefined =>
-    config.customEmojis[shortcode];
+    Object.hasOwn(config.customEmojis, shortcode) ? config.customEmojis[shortcode] : undefined;
 
   const searchEmojis = (term: string): CustomEmojiConfig[] =>
     sortBy(

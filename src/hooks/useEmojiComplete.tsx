@@ -8,13 +8,16 @@ import useConfig, { type CustomEmojiConfig } from '@/core/useConfig';
 const useEmojiComplete = () => {
   const { searchEmojis } = useConfig();
 
-  const [elementRef, setElementRef] = createSignal<HTMLTextAreaElement | undefined>();
+  const [elementRef, setElementRef] = createSignal<
+    HTMLTextAreaElement | HTMLInputElement | undefined
+  >();
 
   createEffect(() => {
     const el = elementRef();
     if (el == null) return;
 
-    const editor = new TextareaEditor(el);
+    // TextareaEditor works with <input> too: it only reads the value and the selection
+    const editor = new TextareaEditor(el as HTMLTextAreaElement);
     const textcomplete = new Textcomplete(
       editor,
       [

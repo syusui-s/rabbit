@@ -200,6 +200,12 @@ export default {
       posting: '投稿',
       fileServer: 'ファイルサーバー',
       addCustomFileServer: '追加',
+      defaultReaction: 'デフォルトのリアクション',
+      defaultReactionDefault: 'デフォルト +',
+      defaultReactionCustom: 'カスタム',
+      defaultReactionPlaceholder: '🐰 や :shortcode:',
+      defaultReactionInvalid:
+        '空か、登録されていないカスタム絵文字です。この間は + でリアクションします。',
     },
     display: {
       display: '表示',
